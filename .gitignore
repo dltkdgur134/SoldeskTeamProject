@@ -55,4 +55,4 @@ bin/
 
 # === OS 별 ===
 .DS_Store
-Thumbs.db
+Thumbs.dbgit push
