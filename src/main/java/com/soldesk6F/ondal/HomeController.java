@@ -9,19 +9,7 @@ public class HomeController {
 
 	@GetMapping("/")
 	public String home() {
-		return "index";
-		
-	}
-	
-	@GetMapping("/test")
-	public String test(Model model) {
-		model.addAttribute("menu", "햄버거");
-		return "example";
-	}
-	
-	@GetMapping("/test2")
-	public String test2() {
-		return "test2";
+		return "content/index";
 	}
 	
 }

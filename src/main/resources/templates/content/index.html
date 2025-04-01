@@ -1,14 +1,11 @@
-<!--resources/templates/thymeleafEx.html-->
-
 <!DOCTYPE html>
 <html xmlns:th="http//www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default}">
-
     <div layout:fragment="content">
     	<nav class="navbar navbar-light bg-light ">
   			<form class="form-inline">
-    			<input class="form-control mr-sm-2" type="search" th:placeholder="${menu}" aria-label="Search">
+    			<input class="form-control mr-sm-2" type="search" placeholder="배고프다" aria-label="Search">
     			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
   			</form>
 	  	</nav>
