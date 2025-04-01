@@ -1,0 +1,30 @@
+<!--resources/templates/thymeleafEx.html-->
+
+<!DOCTYPE html>
+<html xmlns:th="http//www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+
+    <div layout:fragment="content">
+    	<nav class="navbar navbar-light bg-light ">
+  			<form class="form-inline">
+    			<input class="form-control mr-sm-2" type="search" th:placeholder="${menu}" aria-label="Search">
+    			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
+  			</form>
+	  	</nav>
+	  	
+	  	<div class="gallery-container">
+			<div><a href="#" class="labels">패스트푸드</a><img class="imgs" th:src="@{/css/imgs/img1.png}"></div>
+			<div><a href="#" class="labels">중식</a><img class="imgs" th:src="@{/css/imgs/img2.png}"></div>
+			<div><a href="#" class="labels">한식</a><img class="imgs" th:src="@{/css/imgs/img3.png}"></div>
+			<div><a href="#" class="labels">분식</a><img class="imgs" th:src="@{/css/imgs/img4.png}"></div>
+			<div><a href="#" class="labels">치킨</a><img class="imgs" th:src="@{/css/imgs/img5.png}"></div>
+			<div><a href="#" class="labels">피자</a><img class="imgs" th:src="@{/css/imgs/img6.png}"></div>
+			<div><a href="#" class="labels">찜 탕</a><img class="imgs" th:src="@{/css/imgs/img7.png}"></div>
+			<div><a href="#" class="labels">일식</a><img class="imgs" th:src="@{/css/imgs/img8.png}"></div>
+			<div><a href="#" class="labels">구이</a><img class="imgs" th:src="@{/css/imgs/img9.png}"></div>
+			<div><a href="#" class="labels">카페</a><img class="imgs" th:src="@{/css/imgs/img10.png}"></div>
+		</div>
+    </div>
+
+</html>
