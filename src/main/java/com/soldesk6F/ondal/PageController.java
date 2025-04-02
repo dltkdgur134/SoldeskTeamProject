@@ -5,11 +5,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class HomeController {
-
-	@GetMapping("/")
-	public String home() {
-		return "content/index";
+public class PageController {
+	
+	@GetMapping (value = "/userlogin")
+	public String goUserLogin(Model model) {
+		
+		return "login";
 	}
 	
 }
