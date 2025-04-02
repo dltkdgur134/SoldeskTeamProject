@@ -2,14 +2,24 @@
 <html xmlns:th="http//www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default}">
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
     <div layout:fragment="content">
-    	<nav class="navbar navbar-light bg-light ">
+    	<!-- <nav class="navbar navbar-light" style="background-color: none;">
   			<form class="form-inline">
-    			<input class="form-control mr-sm-2" type="search" placeholder="배고프다" aria-label="Search">
+    			<input class="form-control mr-sm-2" type="search" placeholder="뭐 먹을까?" aria-label="Search">
     			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
   			</form>
-	  	</nav>
-	  	
+	  	</nav> -->
+	  	<div class="d-flex justify-content-center px-5">
+        	<div class="search"> 
+        		<input type="text" class="search-input" placeholder="뭐 먹을까?" name=""> 
+        		<a href="#" class="search-icon"> <i class="fa fa-search"></i> </a> 
+        	</div>
+        </div>
 	  	<div class="gallery-container">
 			<div><a href="#" class="labels">패스트푸드</a><img class="imgs" th:src="@{/css/imgs/img1.png}"></div>
 			<div><a href="#" class="labels">중식</a><img class="imgs" th:src="@{/css/imgs/img2.png}"></div>
