@@ -10,6 +10,23 @@ body {
 	text-align: center;
 }
 
+.footer-sns-link i{
+	color: black;
+	box-shadow: black 5px;
+}
+
+.footer-sns-link i:hover {
+	color: #ffc107;
+}
+
+.footer-sns-link i:active {
+	color: #D39E00;
+}
+
+.footer-sns-link:visited {
+	color: black;
+}
+
 .imgs {
 	width: 150px;
 	height: 150px;
@@ -21,6 +38,7 @@ body {
 	grid-template-columns: repeat(5, 1fr);
 	max-width: 70%;
 	margin: auto;
+	background-color: white;
 }
 /* #f2c131 */
 .gallery-container div {
@@ -36,7 +54,7 @@ body {
 	background: rgba(0, 0, 0, 0.4);
 	
 	color: white;
-	font-size: 24pt;
+	font-size: 2.5vw;
 	font-weight: bold;
 	text-decoration: none;
 	
@@ -60,5 +78,69 @@ body {
 
 .gallery-container img:hover {
 	outline: grey solid 10px;
-	
 }
+
+.search {
+    /* width: 100%; */
+    min-width: 320px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    height: 50px;
+    background-color: #fff;
+    padding: 10px;
+    border: solid #ffc107 3px;
+    border-radius: 5px;
+}
+
+.search-input {
+    color: white;
+    border: 0;
+    outline: 0;
+    background: none;
+    width: 0;
+    margin-top: 5px;
+    caret-color: transparent;
+    line-height: 20px;
+    transition: width 0.4s linear
+}
+
+.search .search-input {
+    padding: 0 10px;
+    width: 100%;
+    caret-color: #536bf6;
+    font-size: 16px;
+    /* font-size: 2vw; */
+    font-weight: 300;
+    color: black;
+    transition: width 0.4s linear;
+}
+
+
+.search-icon {
+        height: 34px;
+    width: 34px;
+    float: right;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: #ffc107;
+    font-size: 10px;
+        bottom: 30px;
+        position: relative;
+        border-radius: 5px;
+}
+
+.search-icon:hover {
+  color: #fff !important;
+}
+
+.search-icon:active {
+	background-color: #D39E00;
+}
+
+a:link {
+    text-decoration: none
+}
+
+
