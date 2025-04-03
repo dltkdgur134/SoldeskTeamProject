@@ -53,6 +53,20 @@ bin/
 .apt_generated/
 .recommenders/
 
-# === OS 별 ===
+# === OS ===
 .DS_Store
 Thumbs.dbgit push
+
+# === Maven local repo ===
+.m2/
+
+# === Logs ===
+*.log
+
+# === 환경 변수 파일 ===
+.env
+.env.*
+
+# === OS 생성 파일 ===
+*.swp
+*.swo
