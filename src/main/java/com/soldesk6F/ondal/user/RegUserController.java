@@ -23,17 +23,16 @@ public class RegUserController {
     @PostMapping("/register")
     public String register(
             @RequestParam("userId") String userId,
+            @RequestParam("password") String password,
+            @RequestParam("userProfileName") String userProfileName,
+            @RequestParam("userProfileExtension") String userProfileExtension,
+            @RequestParam("userProfilePath") String userProfilePath,
             @RequestParam("userName") String userName,
             @RequestParam("nickname") String nickname,
             @RequestParam("email") String email,
-            @RequestParam("password") String password,
             @RequestParam("userPhone") String userPhone,
             @RequestParam("userAddress") String userAddress,
-            @RequestParam("userProfileName") String userProfileName,
-            @RequestParam("userProfilePath") String userProfilePath,
-            @RequestParam("userProfileExtension") String userProfileExtension,
             @RequestParam("socialLoginProvider") String socialLoginProvider,
-            @RequestParam("username") String username,
             Model model
     ) 
      
@@ -64,7 +63,6 @@ public class RegUserController {
                 .userProfilePath(userProfilePath)
                 .userProfileExtension(userProfileExtension)
                 .socialLoginProvider(socialLoginProvider)
-                .userName(username)
                 .build();
 
         userRepository.save(user);
