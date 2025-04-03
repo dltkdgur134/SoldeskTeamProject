@@ -104,7 +104,7 @@ public class Store {
         CLOSED  // 영업 종료
     }
 
-    @PrePersist
+    @PrePersist		//store는 기본적으로 닫힌 상태
     public void prePersist() {
         this.storeStatus = (this.storeStatus == null) ? StoreStatus.CLOSED : this.storeStatus;
     }

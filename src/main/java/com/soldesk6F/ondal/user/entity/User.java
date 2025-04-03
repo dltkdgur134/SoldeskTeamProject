@@ -22,7 +22,7 @@ import lombok.Setter;
 public class User {
 
     @Id
-    @Column(name = "user_id", nullable = false, length = 15)
+    @Column(name = "user_id", updatable = false,nullable = false, length = 15,unique = true)
     private String userId;
 
     @Column(name = "password", nullable = false, length = 255)
@@ -75,7 +75,7 @@ public class User {
     	 BANNED;		// 영구 정지
     }
     
-    @PrePersist
+    @PrePersist		// user는 회원가입시 이메일 인증 전이기에 기본적으로 미 인증 상태
     public void prePersist() {
         this.status = (this.status == null) ? Status.UNVERIFIED : this.status;
     }

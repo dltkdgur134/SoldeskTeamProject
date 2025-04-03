@@ -65,7 +65,7 @@ public class Rider {
 	    DELIVERING,    // 배달 중
 	    RESTING        // 휴식 중
 	}
-	@PrePersist
+	@PrePersist		//rider는 기본적으로 대기 상태
     public void prePersist() {
         this.riderStatus = (this.riderStatus == null) ? RiderStatus.WAITING : this.riderStatus;
     }
