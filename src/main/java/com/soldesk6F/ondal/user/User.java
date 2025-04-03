@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +16,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
+@Entity
 @Table(name="user")
 public class User {
 
@@ -60,6 +63,24 @@ public class User {
     @Column(name = "updated_date", nullable = false)
     private LocalDateTime updatedDate;
 
+    //@PrePersist에서 기본값을 정해서 DB에 저장
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status",nullable = false, length = 20)
+    private Status status;
+    
+    public enum Status {
+    	 UNVERIFIED, 	//미 인증 상태
+    	 ACTIVE, 		// 활동 중(정상)
+    	 SUSPENDED, 	// 경고
+    	 BANNED;		// 영구 정지
+    }
+    
+    @PrePersist
+    public void prePersist() {
+        this.status = (this.status == null) ? Status.UNVERIFIED : this.status;
+    }
+    
+    
     @Builder
     public User(String userId, String password, String userProfileName, String userProfileExtension,
                 String userProfilePath, String userName, String nickName, String email, String userPhone,

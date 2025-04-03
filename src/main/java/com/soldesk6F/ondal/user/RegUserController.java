@@ -1,10 +1,11 @@
 package com.soldesk6F.ondal.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import com.soldesk6F.ondal.user.User.Status;
 
 @Controller
 @RequiredArgsConstructor

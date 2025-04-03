@@ -28,7 +28,7 @@ public class Owner {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User userId;
 
-    @Column(name = "secondary_password",nullable = false)
+    @Column(name = "secondary_password",nullable = false , length = 10)
     private String secondaryPassword;  // 비밀번호 해싱 필요
 
     @CreationTimestamp
