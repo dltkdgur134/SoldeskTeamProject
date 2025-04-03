@@ -1,11 +1,13 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import com.soldesk6F.ondal.user.User.Status;
+import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.entity.User.Status;
+import com.soldesk6F.ondal.user.repository.UserRepository;
 
 @Controller
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.user.entity;
 
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;

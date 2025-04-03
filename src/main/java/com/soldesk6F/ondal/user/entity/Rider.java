@@ -1,12 +1,10 @@
-package com.soldesk6F.ondal.rider;
+package com.soldesk6F.ondal.user.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
-
-import com.soldesk6F.ondal.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +24,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name= "rider")
 public class Rider {
 	
 	@Id
@@ -53,7 +53,7 @@ public class Rider {
 	private double longitude;
 	
 	@CreationTimestamp
-    @Column(name = "registration_date")
+    @Column(name = "registration_date", updatable = false)
     private LocalDateTime registrationDate;
 	
 	@Enumerated(EnumType.STRING)

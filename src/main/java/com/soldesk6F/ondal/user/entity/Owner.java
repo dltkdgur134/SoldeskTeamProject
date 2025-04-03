@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.owner;
+package com.soldesk6F.ondal.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,8 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.soldesk6F.ondal.user.User;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "owner")
 public class Owner {
 
     @Id
@@ -32,7 +31,7 @@ public class Owner {
     private String secondaryPassword;  // 비밀번호 해싱 필요
 
     @CreationTimestamp
-    @Column(name = "registration_date")
+    @Column(name = "registration_date" , updatable = false)
     private LocalDateTime registrationDate;
 
     
