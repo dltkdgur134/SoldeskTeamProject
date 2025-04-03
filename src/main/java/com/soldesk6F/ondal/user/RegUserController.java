@@ -1,7 +1,5 @@
-package com.soldesk6F.ondal.controller;
+package com.soldesk6F.ondal.user;
 
-import com.soldesk6F.ondal.domain.User;
-import com.soldesk6F.ondal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -10,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
-public class AuthController {
+public class RegUserController {
 
     private final UserRepository userRepository;
 //    private final BCryptPasswordEncoder passwordEncoder;
@@ -37,8 +35,17 @@ public class AuthController {
             @RequestParam("socialLoginProvider") String socialLoginProvider,
             @RequestParam("username") String username,
             Model model
-    ) {
-        if (userRepository.existsByEmail(email)) {
+    ) 
+     
+    {
+        if (userRepository.existsById(userId)) {
+        	model.addAttribute("error", "이미 등록된 ID입니다.");
+            return "register";
+        }
+    	
+    	
+    	
+    	if (userRepository.existsByEmail(email)) {
             model.addAttribute("error", "이미 등록된 이메일입니다.");
             return "register";
         }
@@ -48,7 +55,7 @@ public class AuthController {
         User user = User.builder()
                 .userId(userId)
                 .userName(userName)
-                .nickname(nickname)
+                .nickName(nickname)
                 .email(email)
                 .password(password)
                 .userPhone(userPhone)
@@ -57,7 +64,7 @@ public class AuthController {
                 .userProfilePath(userProfilePath)
                 .userProfileExtension(userProfileExtension)
                 .socialLoginProvider(socialLoginProvider)
-                .username(username)
+                .userName(username)
                 .build();
 
         userRepository.save(user);

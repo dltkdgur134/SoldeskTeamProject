@@ -9,6 +9,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -61,6 +62,7 @@ public class User {
 	@Column(name = "updated_date",nullable = false)
 	private LocalDateTime updatedDate;
 
+	@Builder
 	public User(String userId, String password, String userProfileName, String userProfileExtension,
 			String userProfilePath, String userName, String nickName, String email, String userPhone,
 			String userAddress, String socialLoginProvider) {
