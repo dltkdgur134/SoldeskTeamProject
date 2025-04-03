@@ -12,4 +12,13 @@ public class HomeController {
 		return "content/index";
 	}
 	
+	@GetMapping("/login")
+	public String login() {
+		return "content/login";
+		
+	}
+	
+	
+	
+	
 }
