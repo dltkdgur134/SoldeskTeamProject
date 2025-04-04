@@ -1,7 +1,5 @@
-package com.soldesk6F.ondal.controller;
+package com.soldesk6F.ondal.user;
 
-import com.soldesk6F.ondal.domain.User;
-import com.soldesk6F.ondal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
@@ -16,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Controller
 @RequiredArgsConstructor
-public class AuthController {
+public class RegUserController {
 
     private final UserRepository userRepository;
 //    private final BCryptPasswordEncoder passwordEncoder;
@@ -57,6 +55,20 @@ public class AuthController {
     		return "register";
     	}
         if (userRepository.existsByEmail(email)) {
+        	
+        }
+
+    
+     
+    
+        if (userRepository.existsById(userId)) {
+        	model.addAttribute("error", "이미 등록된 ID입니다.");
+            return "register";
+        }
+    	
+    	
+    	
+    	if (userRepository.existsByEmail(email)) {
             model.addAttribute("error", "이미 등록된 이메일입니다.");
             model.addAttribute("userId", userId);
             model.addAttribute("userName", userName);
@@ -99,7 +111,7 @@ public class AuthController {
         User user = User.builder()
                 .userId(userId)
                 .userName(userName)
-                .nickname(nickname)
+                .nickName(nickname)
                 .email(email)
                 .password(password)
                 .userPhone(userPhone)
