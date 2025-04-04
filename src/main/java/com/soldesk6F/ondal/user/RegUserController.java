@@ -54,20 +54,7 @@ public class RegUserController {
     		model.addAttribute("socialLoginProvider", socialLoginProvider);
     		return "register";
     	}
-        if (userRepository.existsByEmail(email)) {
-        	
-        }
 
-    
-     
-    
-        if (userRepository.existsById(userId)) {
-        	model.addAttribute("error", "이미 등록된 ID입니다.");
-            return "register";
-        }
-    	
-    	
-    	
     	if (userRepository.existsByEmail(email)) {
             model.addAttribute("error", "이미 등록된 이메일입니다.");
             model.addAttribute("userId", userId);
