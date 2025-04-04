@@ -11,21 +11,20 @@ body {
 
 :root {
 	--bs-link-color: black;
-	--bs-link-hover-color: #ffc107;
+	--bs-link-hover-color: #FFDF33;
 }
 
 
 .btn-primary {
-    background-color: black !important;
+    background-color: #404040 !important;
     border: none !important;
     color: #fff !important;
   }
 
   .btn-primary:hover {
-    background-color: #a10136 !important;
-    border-color: #e64a19 !important;
+    background-color: #FF9A66 !important;
+    border-color: #FF9A66 !important;
   }
-
 
 
 .info-card {
@@ -34,13 +33,14 @@ body {
       border-radius: 1rem;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-    
+
+
 .navbar-brand {
 	color: black;
 }
 
 .navbar-light {
-    background-color: #ffc107 !important; /* custom background */
+    background-color: #FFE766 !important; /* custom background */
   }
 
   .navbar-light .navbar-brand,
@@ -49,7 +49,7 @@ body {
   }
 
   .navbar-light .nav-link:hover {
-    color: #cc5200 !important; /* hover color */
+    color: #FFEF99 !important; /* hover color */
   }
 
   .nav-pills .nav-link {
