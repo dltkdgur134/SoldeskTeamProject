@@ -81,6 +81,9 @@ public class User {
 	}
 	
 	
-
+	public User update(String name) {
+	    this.userName = name;	
+	    return this;
+	}
 
 }
