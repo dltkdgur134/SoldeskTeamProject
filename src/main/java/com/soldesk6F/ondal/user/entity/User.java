@@ -97,4 +97,20 @@ public class User {
         this.userAddress = userAddress;
         this.socialLoginProvider = socialLoginProvider;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
