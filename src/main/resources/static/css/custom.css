@@ -10,9 +10,23 @@ body {
 }
 
 :root {
-	--bs-link-color: #ffc107;
-	--bs-link-hover-color: #cc5200;
+	--bs-link-color: black;
+	--bs-link-hover-color: #ffc107;
 }
+
+
+.btn-primary {
+    background-color: black !important;
+    border: none !important;
+    color: #fff !important;
+  }
+
+  .btn-primary:hover {
+    background-color: #a10136 !important;
+    border-color: #e64a19 !important;
+  }
+
+
 
 .info-card {
       max-width: 600px;
@@ -22,8 +36,38 @@ body {
     }
     
 .navbar-brand {
-	color: blakc;
+	color: black;
 }
+
+.navbar-light {
+    background-color: #ffc107 !important; /* custom background */
+  }
+
+  .navbar-light .navbar-brand,
+  .navbar-light .nav-link {
+    color: #000 !important; /* text color */
+  }
+
+  .navbar-light .nav-link:hover {
+    color: #cc5200 !important; /* hover color */
+  }
+
+  .nav-pills .nav-link {
+    color: #333 !important; /* base text */
+    background-color: transparent;
+  }
+
+  .nav-pills .nav-link:hover {
+    color: #cc5200 !important;
+    background-color: #ffe0b2 !important;
+  }
+
+  .nav-pills .nav-link.active {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: bold;
+  }
+
 
 .tooltip .tooltip-inner {
   font-size: 9px; /* Adjust size */
@@ -32,4 +76,22 @@ body {
 
 .card-title a {
 	color: #ffc107;
+}
+
+
+.footer-sns-link i{
+	color: black;
+	box-shadow: black 5px;
+}
+
+.footer-sns-link i:hover {
+	color: #ffc107;
+}
+
+.footer-sns-link i:active {
+	color: #D39E00;
+}
+
+.footer-sns-link:visited {
+	color: black;
 }

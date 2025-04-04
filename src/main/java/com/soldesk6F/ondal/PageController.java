@@ -14,9 +14,15 @@ public class PageController {
 	}
 	
 	@GetMapping (value = "/infopage")
-	public String goMyPage(Model model) {
+	public String goInfoPage(Model model) {
 		
 		return "content/infopage";
+	}
+	
+	@GetMapping (value = "/mypage")
+	public String goMyPage(Model model) {
+		
+		return "content/mypage";
 	}
 	
 }

@@ -10,23 +10,6 @@ body {
 	text-align: center;
 }
 
-.footer-sns-link i{
-	color: black;
-	box-shadow: black 5px;
-}
-
-.footer-sns-link i:hover {
-	color: #ffc107;
-}
-
-.footer-sns-link i:active {
-	color: #D39E00;
-}
-
-.footer-sns-link:visited {
-	color: black;
-}
-
 .imgs {
 	width: 150px;
 	height: 150px;
