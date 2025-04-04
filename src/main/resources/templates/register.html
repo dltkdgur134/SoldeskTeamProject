@@ -3,29 +3,6 @@
 <head>
 <title>회원가입</title>
 <meta charset="UTF-8">
-
-</head>
-<body>
-	<h1>회원가입</h1>
-	<form th:action="@{/register}" method="post">
-		<label>아이디(user_id): <input type="text" name="userId" required></label><br>
-		<label>비밀번호: <input type="password" name="password" required></label><br>
-		<label>프로필 파일 이름: <input type="text" name="userProfileName"
-			required></label><br> <label>프로필 확장자: <input type="text"
-			name="userProfileExtension" required></label><br> <label>프로필
-			경로: <input type="text" name="userProfilePath" required>
-		</label><br> <label>이름(user_name): <input type="text"
-			name="userName" required></label><br> <label>닉네임: <input
-			type="text" name="nickname" required></label><br> <label>이메일:
-			<input type="email" name="email" required>
-		</label><br> <label>전화번호: <input type="text" name="userPhone"
-			required></label><br> <label>주소: <input type="text"
-			name="userAddress" required></label><br> <label>소셜 로그인
-			제공자: <input type="text" name="socialLoginProvider" required>
-		</label><br>
-		<button type="submit">가입하기</button>
-	</form>
-
 	<link rel="stylesheet" th:href="@{/css/register.css}">
 	<script src="https://kit.fontawesome.com/20dab02d7e.js"
 		crossorigin="anonymous"></script>
@@ -119,13 +96,6 @@
 				<i class="fa-solid fa-folder-open input-icon"></i> <input
 					type="file" name="profileImage" accept="image/*" required>
 			</div>
-
-			<div class="form-group">
-				<i class="fa-solid fa-right-to-bracket input-icon"></i> <input
-					type="text" name="socialLoginProvider"
-					th:value="${socialLoginProvider}" placeholder="추천인" required>
-			</div>
-
 			<div class="form-group">
 				<button class="reg-btn" type="submit">가입하기</button>
 			</div>
