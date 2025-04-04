@@ -1,0 +1,35 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "acloud";
+	src: url(acloud.ttf);
+}
+
+body {
+	font-family: "acloud";
+}
+
+:root {
+	--bs-link-color: #ffc107;
+	--bs-link-hover-color: #cc5200;
+}
+
+.info-card {
+      max-width: 600px;
+      margin: auto;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    
+.navbar-brand {
+	color: blakc;
+}
+
+.tooltip .tooltip-inner {
+  font-size: 9px; /* Adjust size */
+  padding: 4px 8px; /* Optional: Adjust padding */
+}
+
+.card-title a {
+	color: #ffc107;
+}

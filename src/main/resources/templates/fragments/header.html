@@ -4,13 +4,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<script th:fragment="js" th:src="@{/js/index.js}"></script>
-	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
+	<!-- <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/> -->
+	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
 </head>	
 	
     <div th:fragment="header">
     <nav class="navbar navbar-light" style="background-color: #ffc107;">
     	<div class="container-md justify-content-between">
-	    	<a class="navbar-brand" href="#" >
+	    	<a class="navbar-brand" href="/" >
 	      		<img src="/css/imgs/ondal_text.png" alt="" width="30" height="30" class="img-fluid">
 	    	</a>
 	    	<a class="btn btn-warning btn-lg" data-bs-toggle="offcanvas" href="#menu-list" role="button" aria-controls="menu-list" style="background-color: #ffc107;">
@@ -28,7 +29,7 @@
   </div>
   <div class="offcanvas-body">
     <div>
-      <a href="#">로그인  <i class="fa-solid fa-right-to-bracket"></i></a>
+      <a href="userlogin">로그인  <i class="fa-solid fa-right-to-bracket"></i></a>
     </div>
 	<ul class="nav flex-column">
 		<li class="nav-item">
@@ -41,7 +42,7 @@
 	    	<a class="nav-link" href="#">주문 내역</a>
 	  	</li>
 	  	<li class="nav-item">
-	    	<a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">마이페이지</a>
+	    	<a class="nav-link" href="infopage">마이페이지</a>
 	  	</li>
 	</ul>
  

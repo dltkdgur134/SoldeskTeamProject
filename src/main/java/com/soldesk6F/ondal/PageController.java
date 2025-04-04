@@ -13,4 +13,10 @@ public class PageController {
 		return "login";
 	}
 	
+	@GetMapping (value = "/infopage")
+	public String goMyPage(Model model) {
+		
+		return "content/infopage";
+	}
+	
 }
