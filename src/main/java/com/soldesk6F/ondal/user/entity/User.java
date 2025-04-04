@@ -27,13 +27,13 @@ public class User {
 	@Column(name = "password",nullable = false,length = 255)
 	private String password;
 	
-	@Column(name = "user_profile_name",nullable = false,length = 255)
+	@Column(name = "user_profile_name",length = 255)
 	private String userProfileName;
 	
-	@Column(name = "user_profile_extension",nullable = false,length = 10)
+	@Column(name = "user_profile_extension",length = 10)
 	private String userProfileExtension;
 	
-	@Column(name = "user_profile_path",nullable = false,length = 255)
+	@Column(name = "user_profile_path",length = 255)
 	private String userProfilePath;
 	
 	@Column(name = "user_name",nullable = false,length = 10)

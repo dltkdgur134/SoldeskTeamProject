@@ -15,7 +15,7 @@ body {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .form-container h1 {
@@ -39,10 +39,26 @@ body {
     pointer-events: none;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #495057;
+.custom-file-label {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #ffc107;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 35px;
+}
+
+.custom-file-label:hover {
+  background-color: #d39e00;
+}
+
+.file-name {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #555;
 }
 
 .form-group input {
@@ -97,30 +113,30 @@ form input {
 }
 
 .address-group {
-  position: relative;
+	position: relative;
 }
 
 .address-group input {
-  padding-right: 90px; /* 버튼 들어갈 공간 */
+	padding-right: 90px; /* 버튼 들어갈 공간 */
 }
 
 .address-btn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 30px;
-  font-size: 12px;
-  padding: 0 10px;
-  background-color: #ffc107;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 30px;
+	font-size: 12px;
+	padding: 0 10px;
+	background-color: #ffc107;
+	border: none;
+	border-radius: 4px;
+	color: #fff;
+	cursor: pointer;
 }
 
 .address-btn:hover {
-  background-color: #e0a800;
+	background-color: #e0a800;
 }
 
 .reg-btn {
@@ -136,4 +152,60 @@ form input {
 
 .reg-btn:hover {
     background-color: #D39E00;
+}
+
+.email-group {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	position: relative;
+}
+
+.email-group input[type="text"] {
+	height: 40px;
+	font-size: 16px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+	color: #495057;
+}
+
+#email_domain_input {
+	width: 100px;
+	padding: 0 10px;
+}
+
+#email_domain_select {
+	width: 100px;
+}
+
+.email-group select {
+	height: 40px;
+	font-size: 16px;
+	padding: 0 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background-color: #fff;
+	appearance: none;
+	box-sizing: border-box;
+	color: #495057;
+	cursor: pointer;
+}
+
+.email-group select:focus {
+	border-color: #66afe9;
+	outline: none;
+}
+
+.email-group select:hover {
+	background-color: #f1f1f1;
+}
+
+.email-group select::-ms-expand {
+	display: none;
+}
+
+.email-at {
+	font-size: 16px;
+	color: #333;
 }

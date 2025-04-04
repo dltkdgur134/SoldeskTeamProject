@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.Rider;
@@ -38,6 +39,7 @@ public class Order {
 
     @Id
     @GeneratedValue
+    @UuidGenerator
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;  // 기본키 (UUID 사용)
 

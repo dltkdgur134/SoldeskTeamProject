@@ -70,33 +70,61 @@ public class RegUserController {
     		model.addAttribute("socialLoginProvider", socialLoginProvider);
             return "register";
         }
+        ////////////////////////////////////////////////////////////////////
         
-        String fileName = profileImage.getOriginalFilename();
-        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+    	String fileName = "default.png";
+    	String extension = "png";
+    	String filePath = uploadDir + File.separator + fileName;
 
-        String savePath = new File(uploadDir).getAbsolutePath();
-        File saveFolder = new File(savePath);
-        if (!saveFolder.exists()) {
-            saveFolder.mkdirs(); // 폴더 없으면 생성
-        }
+    	if (profileImage != null && !profileImage.isEmpty()) {
+    	    fileName = profileImage.getOriginalFilename();
+    	    extension = fileName.substring(fileName.lastIndexOf(".") + 1);
 
-        File saveFile = new File(saveFolder, fileName);
+    	    String savePath = new File(uploadDir).getAbsolutePath();
+    	    File saveFolder = new File(savePath);
+    	    if (!saveFolder.exists()) {
+    	        saveFolder.mkdirs();
+    	    }
+
+    	    File saveFile = new File(saveFolder, fileName);
+    	    try {
+    	        profileImage.transferTo(saveFile);
+    	        filePath = uploadDir + File.separator + fileName;
+    	    } catch (IOException e) {
+    	        e.printStackTrace();
+    	        model.addAttribute("error", "파일 업로드 실패");
+    	        return "register";
+    	    }
+    	}
         
-        try {
-            profileImage.transferTo(saveFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            model.addAttribute("error", "파일 업로드 실패");
-            model.addAttribute("userId", userId);
-            model.addAttribute("userName", userName);
-            model.addAttribute("nickname", nickname);
-            model.addAttribute("email", email);
-    		model.addAttribute("userPhone", userPhone);
-    		model.addAttribute("userAddress", userAddress);
-    		model.addAttribute("socialLoginProvider", socialLoginProvider);
-            return "register";
-        }
-        
+//        
+//    	
+//        String fileName = profileImage.getOriginalFilename();
+//        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+//
+//        String savePath = new File(uploadDir).getAbsolutePath();
+//        File saveFolder = new File(savePath);
+//        if (!saveFolder.exists()) {
+//            saveFolder.mkdirs(); // 폴더 없으면 생성
+//        }
+//
+//        File saveFile = new File(saveFolder, fileName);
+//        
+//        try {
+//            profileImage.transferTo(saveFile);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            model.addAttribute("error", "파일 업로드 실패");
+//            model.addAttribute("userId", userId);
+//            model.addAttribute("userName", userName);
+//            model.addAttribute("nickname", nickname);
+//            model.addAttribute("email", email);
+//    		model.addAttribute("userPhone", userPhone);
+//    		model.addAttribute("userAddress", userAddress);
+//    		model.addAttribute("socialLoginProvider", socialLoginProvider);
+//            return "register";
+//        }
+        //////////////////////////////////////////////////////////////////
 //        String encryptedPassword = passwordEncoder.encode(password);
         
         User user = User.builder()
@@ -108,7 +136,8 @@ public class RegUserController {
                 .userPhone(userPhone)
                 .userAddress(userAddress + " " + userAddressDetail)
                 .userProfileName(fileName)
-                .userProfilePath(uploadDir + File.separator + fileName)
+//                .userProfilePath(uploadDir + File.separator + fileName)
+                .userProfilePath(filePath)
                 .userProfileExtension(extension)
                 .socialLoginProvider(socialLoginProvider)
                 .build();

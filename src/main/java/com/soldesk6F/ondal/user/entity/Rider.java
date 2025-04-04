@@ -45,7 +45,10 @@ public class Rider {
 	
 	@Column(name = "rider_hub_address" , nullable = false, length = 80)
 	private String riderHubAddress;
-	
+			
+	@Column(name = "rider_phone" , nullable = false, length = 13)
+	private String riderPhone;
+
 	@Column(name = "latitude",nullable = false)
 	private double latitude;
 	
@@ -65,19 +68,22 @@ public class Rider {
 	    DELIVERING,    // 배달 중
 	    RESTING        // 휴식 중
 	}
+	
 	@PrePersist		//rider는 기본적으로 대기 상태
     public void prePersist() {
         this.riderStatus = (this.riderStatus == null) ? RiderStatus.WAITING : this.riderStatus;
     }
 	
 	// Owner 생성자에 riderId와 registrationDate , riderStatus가 없는 이유:자동으로 생성하는 값이기에 없어도 된다.
-	public Rider(User userId, String secondart_Password, String vehicleNumber, String riderHubAddress, double latitude,
+	public Rider(User userId, String secondart_Password, String vehicleNumber, String riderHubAddress, String riderPhone, double latitude,
 			double longitude) {
 		super();
 		this.user = userId;
 		this.secondaryPassword = secondart_Password;
 		this.vehicleNumber = vehicleNumber;
 		this.riderHubAddress = riderHubAddress;
+		this.riderPhone = riderPhone;
+		
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
