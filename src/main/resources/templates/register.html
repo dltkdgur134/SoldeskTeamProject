@@ -3,23 +3,102 @@
 <head>
     <title>회원가입</title>
     <meta charset="UTF-8">
+	<link rel="stylesheet" th:href="@{/css/register.css}">
+	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script>
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const icon = document.querySelector(".toggle-password");
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.textContent = "🙈"; // 눈 감은 이모지
+        } else {
+            passwordInput.type = "password";
+            icon.textContent = "👁️";
+        }
+    }
+	function searchAddress() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                document.getElementById("address").value = data.address;
+            }
+        }).open();
+    }
+	function execDaumPostcode() {
+	    new daum.Postcode({
+	        oncomplete: function(data) {
+	            // 도로명 주소 or 지번 주소
+	            var addr = data.roadAddress || data.jibunAddress;
+	            document.getElementById("address").value = addr;
+	        }
+	    }).open();
+	}
+</script>
 <body>
-    <h1>회원가입</h1>
-    <form th:action="@{/register}" method="post">
-        <label>아이디(user_id): <input type="text" name="userId" required></label><br>
-        <label>이름(user_name): <input type="text" name="userName" required></label><br>
-        <label>닉네임: <input type="text" name="nickname" required></label><br>
-        <label>이메일: <input type="email" name="email" required></label><br>
-        <label>비밀번호: <input type="password" name="password" required></label><br>
-        <label>전화번호: <input type="text" name="userPhone" required></label><br>
-        <label>주소: <input type="text" name="userAddress" required></label><br>
-        <label>프로필 파일 이름: <input type="text" name="userProfileName" required></label><br>
-        <label>프로필 경로: <input type="text" name="userProfilePath" required></label><br>
-        <label>프로필 확장자: <input type="text" name="userProfileExtension" required></label><br>
-        <label>소셜 로그인 제공자: <input type="text" name="socialLoginProvider" required></label><br>
-        <label>사용자 이름(username): <input type="text" name="username" required></label><br>
-        <button type="submit">가입하기</button>
-    </form>
+	<div class="form-container">
+		<div class="title-and-error">
+		    <h1>회원가입</h1>
+		    <div class="error-message" th:if="${error}" th:text="${error}"></div>
+		</div>
+		<form th:action="@{/register}" method="post" enctype="multipart/form-data">
+			<div class="form-group">
+			    <i class="fa-solid fa-user input-icon"></i>
+			    <input type="text" name="userId" th:value="${userId}" placeholder="아이디" required>
+			</div>
+
+			<div class="form-group password-group">
+			    <i class="fa-solid fa-lock input-icon"></i>
+			    <input type="password" name="password" id="password" placeholder="비밀번호" required>
+			    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+			</div>
+
+			<div class="form-group">
+			    <i class="fa-solid fa-user input-icon"></i>
+			    <input type="text" name="userName" th:value="${userName}" placeholder="이름" required>
+			</div>
+
+			<div class="form-group">
+			    <i class="fa-solid fa-smile input-icon"></i>
+			    <input type="text" name="nickname" th:value="${nickname}" placeholder="닉네임" required>
+			</div>
+
+			<div class="form-group">
+			    <i class="fa-solid fa-envelope input-icon"></i>
+			    <input type="email" name="email" th:value="${email}" placeholder="이메일" required>
+			</div>
+
+			<div class="form-group">
+			    <i class="fa-solid fa-phone input-icon"></i>
+			    <input type="text" name="userPhone" th:value="${userPhone}" placeholder="전화번호" required>
+			</div>
+
+			<div class="form-group address-group">
+			  <i class="fa-solid fa-house input-icon"></i>
+			  <input type="text" name="userAddress" id="address" placeholder="주소" th:value="${userAddress}" readonly required>
+			  <button type="button" class="address-btn" onclick="execDaumPostcode()">주소 검색</button>
+			</div>
+
+			<div class="form-group">
+			  <i class="fa-solid fa-location-dot input-icon"></i>
+			  <input type="text" name="userAddressDetail" placeholder="상세 주소" th:value="${userAddressDetail}">
+			</div>
+
+			<div class="form-group">
+				<i class="fa-solid fa-folder-open input-icon"></i>
+			    <input type="file" name="profileImage" accept="image/*" required>
+			</div>
+
+			<div class="form-group">
+			    <i class="fa-solid fa-right-to-bracket input-icon"></i>
+			    <input type="text" name="socialLoginProvider" th:value="${socialLoginProvider}" placeholder="추천인" required>
+			</div>
+
+			<div class="form-group">
+			    <button class="reg-btn" type="submit">가입하기</button>
+			</div>
+        </form>
+	</div>
 </body>
 </html>

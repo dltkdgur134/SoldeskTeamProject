@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CurrentTimestamp;
+
 @Entity
 @Table(name = "user")
 @Getter
@@ -17,10 +19,10 @@ public class User {
     @Id
     @Column(name = "user_id", length = 15)
     private String userId;
-
+    @CurrentTimestamp
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
-
+    @CurrentTimestamp
     @Column(name = "updated_date", nullable = false)
     private LocalDateTime updatedDate;
 
@@ -54,6 +56,4 @@ public class User {
     @Column(name = "user_profile_path", nullable = false, length = 255)
     private String userProfilePath;
 
-    @Column(nullable = false, length = 50)
-    private String username;
 }
