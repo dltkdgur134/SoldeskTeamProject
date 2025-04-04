@@ -14,9 +14,6 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.soldesk6F.ondal.user.CostomUserDetailsService;
-import com.soldesk6F.ondal.user.User;
-import com.soldesk6F.ondal.user.UserDetailsServiceDB;
-import com.soldesk6F.ondal.user.UserRepository;
 
 @Configuration
 @EnableWebSecurity

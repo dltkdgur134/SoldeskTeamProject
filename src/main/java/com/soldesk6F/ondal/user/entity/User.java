@@ -1,13 +1,13 @@
-package com.soldesk6F.ondal.user;
-
+package com.soldesk6F.ondal.user.entity;
 
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,10 +58,11 @@ public class User {
 	@Column(name = "created_date",nullable = false, updatable = false)
 	private LocalDateTime createdDate;
 	
-	@CreationTimestamp
+	@UpdateTimestamp
 	@Column(name = "updated_date",nullable = false)
 	private LocalDateTime updatedDate;
-
+	
+	
 	@Builder
 	public User(String userId, String password, String userProfileName, String userProfileExtension,
 			String userProfilePath, String userName, String nickName, String email, String userPhone,
@@ -77,13 +78,8 @@ public class User {
 		this.email = email;
 		this.userPhone = userPhone;
 		this.userAddress = userAddress;
-		this.socialLoginProvider = socialLoginProvider;
+		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE" : socialLoginProvider;
 	}
-	
-	
-	public User update(String name) {
-	    this.userName = name;	
-	    return this;
-	}
+
 
 }
