@@ -26,6 +26,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -71,8 +72,8 @@ public class Order {
     private String deliveryRequest;  // 배달 요청사항
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private OrderStatus status;  // 주문 상태
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus orderStatus;  // 주문 상태
 
     @Column(name = "total_price", nullable = false)
     private int totalPrice;  // 총 주문 금액
@@ -85,7 +86,7 @@ public class Order {
  
     // 🔹 주문 상세 목록 추가 (OrderDetail과 연관 관계 설정)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDetail> orderDetails = new ArrayList<>();
+    private List<OrderDetail> orderDetails = new ArrayList<>();  // 주문 상세 목록
 
     public enum OrderStatus {
     	PENDING,  // 주문 접수 대기
@@ -95,14 +96,12 @@ public class Order {
     	CANCELED  // 주문 취소
     }
 
-    @PrePersist
-    public void prePersist() {
-        this.status = OrderStatus.PENDING;  // 주문이 생성될 때 기본값 설정
-    }
     
     
+    @Builder
     public Order(User user, Store store, String deliveryAddress, String storeRequest,
-            String deliveryRequest, int totalPrice, String orderAdditional1, String orderAdditional2) {
+            String deliveryRequest, int totalPrice, String orderAdditional1, String orderAdditional2,
+            OrderStatus orderStatus) {
    this.user = user;
    this.store = store;
    this.deliveryAddress = deliveryAddress;
@@ -111,6 +110,7 @@ public class Order {
    this.totalPrice = totalPrice;
    this.orderAdditional1 = orderAdditional1;
    this.orderAdditional2 = orderAdditional2;
+   this.orderStatus = OrderStatus.PENDING;
 }
 
     // ✅ 주문 상세를 추가하면서 자동으로 총 가격 업데이트

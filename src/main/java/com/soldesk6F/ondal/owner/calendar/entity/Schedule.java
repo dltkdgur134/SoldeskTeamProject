@@ -16,7 +16,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -76,7 +79,17 @@ public class Schedule {
 
 	@Column(name = "alarm_timing", nullable = false)
 	private int alarmTiming; // 일정 시작 몇 분 전에 알람을 보낼지 (예: 10분 전)
-
+	
+	@PrePersist
+    @PreUpdate
+    public void validateTimes() {
+        if (this.scheduleStartTime != null && this.scheduleEndTime != null) {
+            if (this.scheduleStartTime.isAfter(this.scheduleEndTime)) {
+                throw new IllegalArgumentException("Schedule start time must be before end time.");
+            }
+        }
+    }
+	@Builder
 	public Schedule(OwnerCalendar calendar,Store store, String scheduleTitle, String scheduleContent, String scheduleImgName,
 			String scheduleImgExtension, String scheduleImgPath, String scheduleAddress,
 			LocalDateTime scheduleStartTime, LocalDateTime scheduleEndTime, int alarmTiming) {

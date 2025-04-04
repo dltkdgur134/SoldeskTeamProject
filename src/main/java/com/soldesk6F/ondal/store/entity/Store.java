@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.store.entity;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -97,22 +99,30 @@ public class Store {
 
     @CreationTimestamp
     @Column(name = "registration_date", updatable = false)
-    private LocalTime registrationDate;
+    private LocalDateTime registrationDate;
 
     public enum StoreStatus {
-        OPEN,   // 영업 중
-        CLOSED  // 영업 종료
+        OPEN("영업중"),
+        CLOSED("영업종료"),
+        SUSPENDED("일시정지"),
+        BANNED("영구정지");
+
+        private final String description;
+
+        StoreStatus(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
-    @PrePersist		//store는 기본적으로 닫힌 상태
-    public void prePersist() {
-        this.storeStatus = (this.storeStatus == null) ? StoreStatus.CLOSED : this.storeStatus;
-    }
-
+    @Builder
 	public Store(Owner owner, String storeName, String category, String storePhone, String storeImgName,
 			String storeImgExtension, String storeImgPath, String brandImgName, String brandImgExtension,
 			String brandImgPath, String storeAddress, double latitude, double longitude, double deliveryRange,
-			String storeIntroduce, LocalTime openingTime, LocalTime closingTime, String holiday) {
+			String storeIntroduce, LocalTime openingTime, LocalTime closingTime, String holiday ,StoreStatus storeStatus) {
 		super();
 		this.owner = owner;
 		this.storeName = storeName;
@@ -132,6 +142,7 @@ public class Store {
 		this.openingTime = openingTime;
 		this.closingTime = closingTime;
 		this.holiday = holiday;
+		this.storeStatus = (this.storeStatus == null) ? StoreStatus.CLOSED : this.storeStatus;
 	}
 	
 	

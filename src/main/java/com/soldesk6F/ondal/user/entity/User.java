@@ -6,8 +6,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,23 +63,42 @@ public class User {
 	@Column(name = "updated_date",nullable = false)
 	private LocalDateTime updatedDate;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "user_status", nullable = false, length = 20)
+	private UserStatus userStatus = UserStatus.UNVERIFIED;
 	
-	@Builder
-	public User(String userId, String password, String userProfileName, String userProfileExtension,
-			String userProfilePath, String userName, String nickName, String email, String userPhone,
-			String userAddress, String socialLoginProvider) {
-		super();
-		this.userId = userId;
-		this.password = password;
-		this.userProfileName = userProfileName;
-		this.userProfileExtension = userProfileExtension;
-		this.userProfilePath = userProfilePath;
-		this.userName = userName;
-		this.nickName = nickName;
-		this.email = email;
-		this.userPhone = userPhone;
-		this.userAddress = userAddress;
-		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE" : socialLoginProvider;
+	public enum UserStatus {
+	    ACTIVE("정상"),      // 정상 회원
+	    SUSPENDED("일시 정지"),   // 일시 정지
+	    BANNED("영구 정지"),      // 영구 정지
+	    UNVERIFIED("미 인증");   // 이메일 인증 미완료 (기본값)
+	    private final String description;
+
+	    UserStatus(String description) {
+	        this.description = description;
+	    }
+
+	    public String getDescription() {
+	        return description;
+	    }
 	}
+	@Builder
+    public User(String userId, String password, String userProfileName, String userProfileExtension,
+                String userProfilePath, String userName, String nickName, String email, 
+                String userPhone, String userAddress, String socialLoginProvider, 
+                UserStatus userStatus) {
+        this.userId = userId;
+        this.password = password;
+        this.userProfileName = userProfileName;
+        this.userProfileExtension = userProfileExtension;
+        this.userProfilePath = userProfilePath;
+        this.userName = userName;
+        this.nickName = nickName;
+        this.email = email;
+        this.userPhone = userPhone;
+        this.userAddress = userAddress;
+        this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE" : socialLoginProvider;
+        this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNVERIFIED;
+    }
 
 }

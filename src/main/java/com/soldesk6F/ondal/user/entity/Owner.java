@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +38,7 @@ public class Owner {
     
     
     // Owner 생성자에 owner_id와 registrationDate가 없는 이유: 이 둘은 자동으로 생성하는 값이기에 없어도 된다.
+    @Builder
 	public Owner(User user, String secondaryPassword) {
 		super();
 		this.user = user;

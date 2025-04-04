@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,6 +52,15 @@ public class RiderManagement {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;  // 매출이 갱신될 때마다 업데이트
 
+ // 총 매출액과 부가세를 업데이트하는 메서드
+    public void updateTotalSalesAndVat(int deliverySales, int deliveryVat) {
+        if (deliverySales < 0 || deliveryVat < 0) {
+            throw new IllegalArgumentException("매출액과 부가세는 0 이상이어야 합니다.");
+        }
+        this.totalSales += deliverySales;
+        this.totalVat += deliveryVat;
+    }
+    @Builder
 	public RiderManagement(Rider rider, int totalVat, int totalSales) {
 		super();
 		this.rider = rider;

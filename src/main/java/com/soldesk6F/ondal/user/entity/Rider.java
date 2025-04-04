@@ -6,6 +6,12 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.soldesk6F.ondal.order.entity.Order;
+import com.soldesk6F.ondal.rider.ridermanagement.entity.DeliverySales;
+import com.soldesk6F.ondal.rider.ridermanagement.entity.RiderManagement;
+import com.soldesk6F.ondal.rider.ridermanagement.entity.DeliverySales.DeliveryStatus;
+import com.soldesk6F.ondal.store.entity.Store;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +22,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -65,17 +72,25 @@ public class Rider {
 	private RiderStatus riderStatus;
 	
 	public enum RiderStatus {
-	    WAITING,       // 대기 (새로운 배달을 기다리는 상태)
-	    DELIVERING,    // 배달 중
-	    RESTING        // 휴식 중
+	    WAITING("대기"),       // 대기 (새로운 배달을 기다리는 상태)
+	    DELIVERING("배달 중"),    // 배달 중
+	    RESTING("휴식 중");        // 휴식 중
+
+	    private final String description;
+
+	    RiderStatus(String description) {
+	        this.description = description;
+	    }
+
+	    public String getDescription() {
+	        return description;
+	    }
 	}
-	@PrePersist		//rider는 기본적으로 대기 상태
-    public void prePersist() {
-        this.riderStatus = (this.riderStatus == null) ? RiderStatus.WAITING : this.riderStatus;
-    }
+
 	// Owner 생성자에 riderId와 registrationDate , riderStatus가 없는 이유:자동으로 생성하는 값이기에 없어도 된다.
+	@Builder
 	public Rider(User user, String secondaryPassword, String vehicleNumber, String riderHubAddress, String riderPhone,
-			double latitude, double longitude) {
+			double latitude, double longitude, RiderStatus riderStatus) {
 		super();
 		this.user = user;
 		this.secondaryPassword = secondaryPassword;
@@ -84,6 +99,7 @@ public class Rider {
 		this.riderPhone = riderPhone;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.riderStatus = (this.riderStatus == null) ? RiderStatus.WAITING : this.riderStatus;
 	}
 	
 	

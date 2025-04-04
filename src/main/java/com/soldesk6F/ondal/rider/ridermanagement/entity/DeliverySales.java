@@ -20,7 +20,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,17 +56,13 @@ public class DeliverySales {
     @Column(name = "delivery_sales_date", nullable = false)
     private LocalDate deliverySalesDate;  // 배달이 완료된 날짜 (날짜 단위 정산 가능)
 
-    @Column(name = "product_price", nullable = false)
-    private int productPrice;  // 배달한 상품 가격
 
     @Column(name = "delivery_price", nullable = false)
     private int deliveryPrice;  // 배달료
 
-    @Column(name = "vat", nullable = false)
-    private int vat;  // 부가세 (배달료의 10%로 설정 가능)
+    @Column(name = "delivery_vat", nullable = false)
+    private int deliveryVat;  // 부가세 (배달료의 10%로 설정 가능)
 
-    @Column(name = "total_sales", nullable = false)
-    private int totalSales;  // 최종 매출액 (상품 가격 + 배달료)
 
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_status", nullable = false)
@@ -90,17 +89,35 @@ public class DeliverySales {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;  // 매출 기록 수정 시간
 
+    @PrePersist
+    @PreUpdate
+    public void updateTotalSales() {
+        if (this.deliveryStatus == DeliveryStatus.COMPLETED) {
+            // 배달이 완료된 경우에만 반영
+            int deliverySales = this.deliveryPrice - this.deliveryVat;
 
-	public DeliverySales(RiderManagement riderManagement, Store store, Order order, int productPrice, int deliveryPrice,
-			int vat, int totalSales, DeliveryStatus deliveryStatus, String deliverySalesTitle, String deliveryContent) {
+            // 부가세가 배달료보다 크거나 부정적인 값이 되지 않도록 검증
+            if (deliverySales < 0) {
+                throw new IllegalArgumentException("배달 매출액은 부가세를 빼면 0 이상이어야 합니다.");
+            }
+
+            RiderManagement riderManagement = this.riderManagement;
+            riderManagement.setTotalSales(riderManagement.getTotalSales() + deliverySales);
+
+            // RiderManagement 업데이트 필요 (예시: EntityManager 또는 Repository 사용)
+            // riderManagementRepository.save(riderManagement);  // 예시 저장 작업
+        }
+    }
+    
+    @Builder
+	public DeliverySales(RiderManagement riderManagement, Store store, Order order, int deliveryPrice,
+			int deliveryVat, DeliveryStatus deliveryStatus, String deliverySalesTitle, String deliveryContent) {
 		super();
 		this.riderManagement = riderManagement;
 		this.store = store;
 		this.order = order;
-		this.productPrice = productPrice;
 		this.deliveryPrice = deliveryPrice;
-		this.vat = vat;
-		this.totalSales = totalSales;
+		this.deliveryVat = deliveryVat;
 		this.deliveryStatus = deliveryStatus;
 		this.deliverySalesTitle = deliverySalesTitle;
 		this.deliveryContent = deliveryContent;

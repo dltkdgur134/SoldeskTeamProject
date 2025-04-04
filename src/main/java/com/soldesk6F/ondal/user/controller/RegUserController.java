@@ -23,7 +23,7 @@ public class RegUserController {
     private final UserRepository userRepository;
 //    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Value("${upload.path}")
+    @Value("${upload.path.userProfiles}")
     private String uploadDir;
     
     // 회원가입 폼 보여주기
