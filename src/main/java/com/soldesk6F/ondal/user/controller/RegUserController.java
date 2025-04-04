@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.entity.User.Status;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
 @Controller

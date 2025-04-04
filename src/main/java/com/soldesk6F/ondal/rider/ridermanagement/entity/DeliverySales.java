@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.order.entity.Order;
-import com.soldesk6F.ondal.store.Store;
+import com.soldesk6F.ondal.store.entity.Store;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

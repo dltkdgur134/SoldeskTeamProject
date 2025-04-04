@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.store;
+package com.soldesk6F.ondal.store.entity;
 
 import java.time.LocalTime;
 import java.util.UUID;

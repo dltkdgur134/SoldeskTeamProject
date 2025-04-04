@@ -2,14 +2,17 @@ package com.soldesk6F.ondal.order.entity;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.soldesk6F.ondal.store.Store;
+import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,6 +22,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -76,6 +80,10 @@ public class Order {
 
     @Column(name = "order_additional2", length = 255)
     private String orderAdditional2;  // 추가 옵션 2
+ 
+    // 🔹 주문 상세 목록 추가 (OrderDetail과 연관 관계 설정)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     public enum OrderStatus {
     	PENDING,  // 주문 접수 대기
@@ -103,7 +111,19 @@ public class Order {
    this.orderAdditional2 = orderAdditional2;
 }
 
-    
+    // ✅ 주문 상세를 추가하면서 자동으로 총 가격 업데이트
+    public void addOrderDetail(OrderDetail orderDetail) {
+        orderDetails.add(orderDetail);
+        orderDetail.setOrder(this);
+        updateTotalPrice();
+    }
+
+    // ✅ 총 가격 업데이트 메서드
+    public void updateTotalPrice() {
+        this.totalPrice = orderDetails.stream()
+                .mapToInt(od -> od.getQuantity() * od.getPrice())
+                .sum();
+    }
     
     
 }
