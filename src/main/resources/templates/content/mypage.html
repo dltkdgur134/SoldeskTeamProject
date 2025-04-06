@@ -42,16 +42,12 @@
 					aria-label="user_phone" aria-describedby="basic-addon4">
 			</div>
 			<div class="input-group mb-3">
-				<span class="input-group-text" id="basic-addon5"><i
-					class="fa-solid fa-house"></i></span> <input type="button"
-					class="form-control" placeholder="서울 강남구 봉은사로 119 성옥빌딩 6층"
-					aria-label="user_phone" aria-describedby="basic-addon5" onclick="sample6_execDaumPostcode()" value="우편번호 찾기">
-			</div>
-			<div class="input-group mb-3">
 				<span class="input-group-text" id="basic-addon6"><i
 					class="fa-solid fa-house"></i></span> <input type="text" 
-					class="form-control" placeholder="주소"
-					aria-label="user_address1" aria-describedby="basic-addon6"  id="sample6_address">
+					class="form-control" placeholder="서울 강남구 봉은사로 119 성옥빌딩 6층"
+					aria-label="user_address1" aria-describedby="basic-addon6"  id="sample6_address"><input type="button"
+					class="form-control" placeholder=""
+					aria-label="user_phone" aria-describedby="basic-addon5" onclick="sample6_execDaumPostcode()" value="우편번호 찾기">
 			</div>
 			<div class="input-group mb-3">
 				<span class="input-group-text" id="basic-addon7"><i
@@ -62,6 +58,10 @@
 			<div>
 				<input type="text" id="sample6_extraAddress" placeholder="참고항목" hidden>
 				<input type="text" id="sample6_postcode" placeholder="우편번호" hidden>
+			</div>
+			<div class="d-grid gap-2 col-6 mx-auto">
+			  <button class="btn btn-primary" type="button">수정하기</button>
+			  <button class="btn btn-primary" type="button">뒤로가기</button>
 			</div>
 		</form>
 	</div>
