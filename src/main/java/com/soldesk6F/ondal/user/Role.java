@@ -7,7 +7,7 @@ public enum Role {
 	
 	
 	USER("ROLE_USER"),
-	STORE("ROLE_STORE"),
+	OWNER("ROLE_OWNER"),
 	RIDER("ROLE_RIDER"),
 	ALL("ROLE_ALL");
 	
