@@ -10,6 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,10 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name="user")
+@Table(name="user",
+uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "user_profile_name"})
+    })
 public class User {
 	@Id
 	@Column(name = "user_id", nullable = false ,length = 15)
@@ -28,7 +32,7 @@ public class User {
 	@Column(name = "password",nullable = false,length = 255)
 	private String password;
 	
-	@Column(name = "user_profile_name",nullable = false,length = 255)
+	@Column(name = "user_profile_name",nullable = false,length = 255,unique = true)
 	private String userProfileName;
 	
 	@Column(name = "user_profile_extension",nullable = false,length = 10)

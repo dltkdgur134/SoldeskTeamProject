@@ -7,9 +7,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.soldesk6F.ondal.order.entity.Order;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.Owner;
+import com.soldesk6F.ondal.useract.order.entity.Order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

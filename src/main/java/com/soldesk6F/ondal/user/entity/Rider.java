@@ -6,11 +6,11 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.soldesk6F.ondal.order.entity.Order;
 import com.soldesk6F.ondal.rider.entity.DeliverySales;
 import com.soldesk6F.ondal.rider.entity.RiderManagement;
 import com.soldesk6F.ondal.rider.entity.DeliverySales.DeliveryStatus;
 import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.useract.order.entity.Order;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

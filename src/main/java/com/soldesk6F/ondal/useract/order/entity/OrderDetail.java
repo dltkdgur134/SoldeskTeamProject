@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.order.entity;
+package com.soldesk6F.ondal.useract.order.entity;
 
 import java.util.UUID;
 
