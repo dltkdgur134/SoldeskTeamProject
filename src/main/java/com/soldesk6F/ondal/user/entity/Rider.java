@@ -7,9 +7,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.order.entity.Order;
-import com.soldesk6F.ondal.rider.ridermanagement.entity.DeliverySales;
-import com.soldesk6F.ondal.rider.ridermanagement.entity.RiderManagement;
-import com.soldesk6F.ondal.rider.ridermanagement.entity.DeliverySales.DeliveryStatus;
+import com.soldesk6F.ondal.rider.entity.DeliverySales;
+import com.soldesk6F.ondal.rider.entity.RiderManagement;
+import com.soldesk6F.ondal.rider.entity.DeliverySales.DeliveryStatus;
 import com.soldesk6F.ondal.store.entity.Store;
 
 import jakarta.persistence.Column;

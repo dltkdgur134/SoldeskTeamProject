@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.rider.ridermanagement.entity;
+package com.soldesk6F.ondal.rider.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
