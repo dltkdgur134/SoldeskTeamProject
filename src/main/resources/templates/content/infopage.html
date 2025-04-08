@@ -30,10 +30,9 @@
 		</h6>
 		<div class="card-body">
 			<ul class="list-group list-group-flush">
-				<li class="list-group-item d-flex justify-content-between"><Label>아이디</Label><strong
-					sec:authentication="user_id">a</strong></li>
-				<li class="list-group-item d-flex justify-content-between"><Label>닉네임</Label><strong
-					sec:authentication="user_name">a</strong></li>
+				<!-- <li class="list-group-item d-flex justify-content-between"><Label>아이디</Label></li> -->
+				<li class="list-group-item d-flex justify-content-between"><Label>아이디</Label><strong th:text="${#authentication.principal}"></strong></li>
+				<li class="list-group-item d-flex justify-content-between"><Label>닉네임</Label><strong><sec:authentication property="principal" /></strong></li>
 				<li class="list-group-item d-flex justify-content-between"><Label>이메일</Label><strong
 					sec:authentication="email">a</strong></li>
 				<li class="list-group-item d-flex justify-content-between"><Label>전화번호</Label><strong

@@ -13,7 +13,6 @@
 	integrity="sha384-YUe2LzesAfftltw+PEaao2tjU/QATaW/rOitAq67e0CT0Zi2VVRL0oC4+gAaeBKu"
 	crossorigin="anonymous"></script>
 <script th:fragment="js" th:src="@{/js/index.js}"></script>
-<!-- <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/> -->
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
 </head>
 
@@ -62,12 +61,6 @@
 						type="button" role="tab" aria-controls="pills-contact"
 						aria-selected="false">라이더</button>
 				</li>
-				<!-- <li class="nav-item" role="presentation">
-					<button class="nav-link" id="pills-disabled-tab"
-						data-bs-toggle="pill" data-bs-target="#pills-disabled"
-						type="button" role="tab" aria-controls="pills-disabled"
-						aria-selected="false" disabled>Disabled</button>
-				</li> -->
 			</ul>
 			<div class="tab-content" id="pills-tabContent">
 				<div class="tab-pane fade show active" id="pills-home"
@@ -105,11 +98,9 @@
 						</li>
 					</ul>	
 				</div>
-				<!-- <div class="tab-pane fade" id="pills-disabled" role="tabpanel"
-					aria-labelledby="pills-disabled-tab" tabindex="0"></div> -->
 			</div>
 			<div>
-				<a href="userlogin">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
+				<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
 			</div>
 			<div>
 				<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
@@ -140,7 +131,6 @@
 	    	<a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">마이페이지</a>
 	  	</li>
 	</ul>
- 
   </div>
 </div>
 </html>
