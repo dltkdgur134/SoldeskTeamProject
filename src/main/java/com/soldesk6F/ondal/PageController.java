@@ -25,4 +25,6 @@ public class PageController {
 		return "content/mypage";
 	}
 	
+	
+	
 }
