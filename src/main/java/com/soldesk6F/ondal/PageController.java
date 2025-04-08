@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal;
 
+import java.security.Principal;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,5 +14,19 @@ public class PageController {
 		
 		return "login";
 	}
+	
+	@GetMapping (value = "/infopage")
+	public String goInfoPage(Model model) {
+		
+		return "content/infopage";
+	}
+	
+	@GetMapping (value = "/mypage")
+	public String goMyPage(Model model, Principal principal) {
+		
+		return "content/mypage";
+	}
+	
+	
 	
 }

@@ -133,5 +133,10 @@ public class User {
         this.userRole = (userRole != null) ? userRole : UserRole.USER;
         this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNVERIFIED;
     }
+	
+	public User update(String name) {
+	    this.userName = name;
+	    return this;
+	}
 
 }

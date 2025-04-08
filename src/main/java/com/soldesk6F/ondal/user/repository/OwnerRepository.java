@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.user.repository;
 
+<<<<<<< HEAD
 import com.soldesk6F.ondal.user.entity.Owner;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,21 @@ public interface OwnerRepository extends JpaRepository<Owner, UUID> {
 
     // user의 id가 특정 값인지 확인
     boolean existsByUser_UserId(String userId);
+=======
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.soldesk6F.ondal.user.entity.Owner;
+import com.soldesk6F.ondal.user.entity.User;
+
+public interface OwnerRepository extends JpaRepository<Owner, UUID> {
+
+	boolean existsByUser_UserId(String userId);
+    Optional<Owner> findByUser_UserId(String userId);
+		
+	
+	
+>>>>>>> origin/user.register+login
 }

@@ -1,0 +1,110 @@
+@charset "UTF-8";    
+
+	:root {
+      --yellow:  #ffc107; /* 연한 노란색 */
+      --black: #000;
+      --white: #FFF;
+    }
+
+    /* 전체 페이지 스타일 */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background : --white;
+      background-size: 100vw 100vh;
+      background-repeat: no-repeat;
+    }
+    /* 컨테이너 */
+    .login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background-color: var(--white);
+     
+      border: 2px solid var(--yellow);
+      border-radius: 8px;	
+    }	
+
+    /* 헤더 텍스트 */
+    .login-container h1 {
+      text-align: center;
+      color: var(--black);
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    /* 폼 요소 스타일 */
+    .form-group {	
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--black);
+      font-weight: bold;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--yellow);
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* 로그인 버튼 */
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--yellow);
+      color: var(--white);
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .login-btn:hover {
+      background-color: #333333; /* 좀 더 진한 검정 */
+    }
+    
+    .oAuth-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width : 100%;
+    }
+	.oAuthBtnImg {
+		align-self: center;
+		margin-top: 10px;
+		width:100%;
+		height:50px;
+	
+	}
+
+    /* 추가 링크 영역 */
+    .extra-links {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .extra-links a {
+      color: var(--black);
+      text-decoration: none;
+      margin: 0 8px;
+      font-weight: bold;
+    }
+    .extra-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--black);
+      font-size: 14px;
+    }
