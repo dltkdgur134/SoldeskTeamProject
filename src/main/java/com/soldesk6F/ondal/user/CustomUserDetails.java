@@ -39,12 +39,14 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.getKey()));
     }
-
+    
     @Override
-    public String getPassword() {
+    public String getPassword() {	
         return user.getPassword();
     }
+    
 
+    
     @Override
     public String getUsername() {
         return user.getUserId();

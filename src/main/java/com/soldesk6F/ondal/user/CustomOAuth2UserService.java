@@ -36,15 +36,21 @@ import java.util.Map;
 		        OAuth2User oAuth2User = delegate.loadUser(userRequest);
 	
 		        Map<String, Object> attributes = oAuth2User.getAttributes();
-		        String email = (String) attributes.get("account_email");
-		        String name = (String) attributes.get("name");
-		        String id = (String) attributes.get("id");
-		        String profileImg = (String) attributes.get("profile_image");
-		        String tel = (String) attributes.get("phone_number");
-		        String nickName = (String) attributes.get("profile_nickname");
+		        System.out.println(attributes);
+		        String email = (String) ((Map)attributes.get("kakao_account")).get("email");
+		        System.out.println(email);
+		        String name = (String) ((Map)attributes.get("kakao_account")).get("name");
+		        System.out.println(name);
+		        String id = String.valueOf(attributes.get("id"));
+		        System.out.println(id);
+//		        String profileImg = (String) attributes.get("profile_image");
+		        String tel = (String) ((Map)attributes.get("kakao_account")).get("phone_number");
+		        Map<String, Object> profileMap = (Map)((Map)attributes.get("kakao_account")).get("profile");
+		        String nickName = (String) profileMap.get("nickname");
+		        System.out.println(nickName);
 		        
-		        String extension = profileImg.substring(profileImg.lastIndexOf(".") + 1);
-		        String profilePhotoName = profileImg.substring(profileImg.lastIndexOf("/")+1);
+//		        String extension = profileImg.substring(profileImg.lastIndexOf(".") + 1);
+//		        String profilePhotoName = profileImg.substring(profileImg.lastIndexOf("/")+1);
 		        
 		        
 		        
@@ -56,9 +62,9 @@ import java.util.Map;
 			                .userName(name)
 			                .socialLoginProvider(id)
 			                .email(email)
-			                .userProfilePath(profileImg)
-			                .userProfileName(profilePhotoName)
-			                .userProfileExtension(extension)
+//			                .userProfilePath(profileImg)
+//			                .userProfileName(profilePhotoName)
+//			                .userProfileExtension(extension)
 			            	.nickName(nickName)
 			            	.userPhone(tel)
 			                .build()));
