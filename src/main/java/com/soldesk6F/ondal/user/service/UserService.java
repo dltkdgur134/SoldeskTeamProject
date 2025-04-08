@@ -39,8 +39,9 @@ public class UserService {
 	        String filePath = uploadDir + File.separator + fileName;
 	
 	        if (profileImage != null && !profileImage.isEmpty()) {
-	            fileName = profileImage.getOriginalFilename();
-	            extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+	        	String originalFilename = profileImage.getOriginalFilename();
+	        	extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+	        	fileName = userId + "_" + System.currentTimeMillis() + "." + extension;
 	            String savePath = new File(uploadDir).getAbsolutePath();
 	
 	            File saveFolder = new File(savePath);
