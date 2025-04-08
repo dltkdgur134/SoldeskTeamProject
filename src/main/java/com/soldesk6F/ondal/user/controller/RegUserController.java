@@ -48,6 +48,12 @@ public class RegUserController {
             fillUserData(model, userId, userName, nickname, email, userPhone, userAddress, userAddressDetail, socialLoginProvider);
             return "content/register";
         }
+        
+        if (userService.isPhoneDuplicate(userPhone)) {
+            model.addAttribute("error", "이미 등록된 전화번호입니다.");
+            fillUserData(model, userId, userName, nickname, email, userPhone, userAddress, userAddressDetail, socialLoginProvider);
+            return "content/register";
+        }
 
         boolean success = userService.registerUser(
                 userId, userName, nickname, email, password,
@@ -75,5 +81,10 @@ public class RegUserController {
         model.addAttribute("userAddress", userAddress);
         model.addAttribute("userAddressDetail", userAddressDetail);
         model.addAttribute("socialLoginProvider", socialLoginProvider);
+        if (email != null && email.contains("@")) {
+            String[] parts = email.split("@", 2);
+            model.addAttribute("emailId", parts[0]);
+            model.addAttribute("emailDomain", parts[1]);
+        }
     }
 }

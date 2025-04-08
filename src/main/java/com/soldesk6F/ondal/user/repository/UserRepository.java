@@ -7,5 +7,6 @@ import com.soldesk6F.ondal.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
 	boolean existsById(String userId);
-    boolean existsByEmail(String email); // 이메일 중복 체크용
+    boolean existsByEmail(String email);
+    boolean existsByUserPhone(String userPhone);
 }

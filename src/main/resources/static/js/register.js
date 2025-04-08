@@ -40,16 +40,9 @@ function handleEmailDomainChange(select) {
 
 function getFullEmail() {
   const id = document.getElementById("email_id").value.trim();
-  const select = document.getElementById("email_domain");
-  let domain = "";
+  const domainInput = document.getElementById("email_domain_input").value.trim();
 
-  if (select.value === "direct") {
-    domain = document.getElementById("email_domain_input").value.trim();
-  } else {
-    domain = select.value;
-  }
-
-  return id + "@" + domain;
+  return id + "@" + domainInput;
 }
 
 document.querySelector('[name="userPhone"]').addEventListener('input', function () {

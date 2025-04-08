@@ -28,6 +28,10 @@ public class UserService {
     public boolean isEmailDuplicate(String email) {
         return userRepository.existsByEmail(email);
     }
+    
+    public boolean isPhoneDuplicate(String userPhone) {
+        return userRepository.existsByUserPhone(userPhone);
+    }
 
     public boolean registerUser(String userId, String userName, String nickname, String email,
                              String password, String userPhone, String userAddress, String userAddressDetail,

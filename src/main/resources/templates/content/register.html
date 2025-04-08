@@ -13,7 +13,7 @@
 			<h1>회원가입</h1>
 			<div class="error-message" th:if="${error}" th:text="${error}"></div>
 		</div>
-		<form th:action="@{/register}" method="post"
+		<form th:action="@{/content/register}" method="post" 
 			enctype="multipart/form-data">
 			<div class="form-group">
 				<i class="fa-solid fa-user input-icon"></i> <input type="text" name="userId" th:value="${userId}" 
@@ -38,16 +38,16 @@
 
 			<div class="form-group">
 				<i class="fa-solid fa-smile input-icon"></i> <input type="text" name="nickname" th:value="${nickname}" 
-				placeholder="닉네임" pattern="[가-힣a-zA-Z\s]+" title="닉네임은 한글과 영문자만 입력할 수 있어요" maxlength="20" required>
+				placeholder="닉네임" pattern="[가-힣a-zA-Z0-9\s]+" title="닉네임에는 특수문자를 사용할 수 없습니다" maxlength="20" required>
 			</div>
 
 			<div class="form-group email-group">
 				<i class="fa-solid fa-envelope input-icon"></i>
-				<input type="text" id="email_id" placeholder="이메일" pattern="[a-zA-Z0-9]+" title="이메일은 영문자와 숫자만 입력할 수 있어요" maxlength="20" required>
+				<input type="text" id="email_id" th:value="${emailId}" placeholder="이메일" pattern="[a-zA-Z0-9]+" title="이메일은 영문자와 숫자만 입력할 수 있어요" maxlength="20" required>
 			  
 				<span class="email-at">@</span>
 			    
-				<input type="text" id="email_domain_input" placeholder="도메인" readonly>
+				<input type="text" id="email_domain_input" th:value="${emailDomain}" placeholder="도메인" readonly>
 				<select id="email_domain_select" onchange="handleEmailDomainChange(this)">
 				    <option value="" disabled selected>선택</option>
 				    <option value="naver.com">naver.com</option>
