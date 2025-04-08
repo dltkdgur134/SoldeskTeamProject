@@ -1,16 +1,15 @@
 package com.soldesk6F.ondal.useract.order.entity;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.menu.entity.Menu;
-import com.soldesk6F.ondal.rider.entity.DeliverySales;
-import com.soldesk6F.ondal.rider.entity.RiderManagement;
-import com.soldesk6F.ondal.rider.entity.DeliverySales.DeliveryStatus;
-import com.soldesk6F.ondal.store.entity.Store;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -42,6 +41,16 @@ public class OrderDetail {
 	@JoinColumn(name = "menu_id" , nullable = false)
 	private Menu menu;
 	
+	@ElementCollection
+	@CollectionTable(name = "order_detail_option_names", joinColumns = @JoinColumn(name = "order_detail_id"))
+	@Column(name = "option_name")
+	private List<String> optionNames;
+	
+	@ElementCollection
+	@CollectionTable(name = "order_detail_option_prices", joinColumns = @JoinColumn(name = "order_detail_id"))
+	@Column(name = "option_price")
+	private List<Integer> optionPrices;
+	
 	@Column(nullable = false)
 	private int quantity;
 	
@@ -49,12 +58,14 @@ public class OrderDetail {
 	private int price;
 	
 	@Builder
-	public OrderDetail(Order order, Menu menu, int quantity, int price) {
-		super();
-		this.order = order;
-		this.menu = menu;
-		this.quantity = quantity;
-		this.price = price;
+	public OrderDetail(Order order, Menu menu, int quantity, int price,
+	                   List<String> optionNames, List<Integer> optionPrices) {
+	    this.order = order;
+	    this.menu = menu;
+	    this.quantity = quantity;
+	    this.price = calculateTotalPrice();
+	    this.optionNames = optionNames;
+	    this.optionPrices = optionPrices;
 	}
 	
 	public void setPrice(int price) {
@@ -63,6 +74,14 @@ public class OrderDetail {
 	    }
 	    this.price = price;
 	}
+	
+	public int calculateTotalPrice() {
+	    int optionsTotal = optionPrices != null
+	        ? optionPrices.stream().mapToInt(Integer::intValue).sum()
+	        : 0;
+	    return (menu.getPrice() + optionsTotal) * quantity;
+	}
+	
 	
 	
 }

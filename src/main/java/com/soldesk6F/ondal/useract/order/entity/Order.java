@@ -24,107 +24,121 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "orders")  // "order"는 SQL 예약어라서 "orders"로 변경
+@Table(name = "orders")  // 'order'는 예약어이므로 'orders' 사용
 public class Order {
 
     @Id
     @GeneratedValue
     @UuidGenerator
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
-    private UUID orderId;  // 기본키 (UUID 사용)
+    private UUID orderId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // 주문한 사용자 (FK)
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
+
+    @Column(name = "guest_id", length = 36)
+    private String guestId;
 
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
-    private Store store;  // 주문한 가게 (FK)
+    private Store store;
 
     @ManyToOne
     @JoinColumn(name = "rider_id")
-    private Rider rider;  // 배달원 (FK) (배정될 수도, 안 될 수도 있음)
+    private Rider rider;
 
     @CreationTimestamp
     @Column(name = "order_time", nullable = false, updatable = false)
-    private LocalDateTime orderTime;  // 주문 시간 (자동 저장)
+    private LocalDateTime orderTime;
 
     @Column(name = "delivery_address", nullable = false, length = 255)
-    private String deliveryAddress;  // 배달 주소
+    private String deliveryAddress;
 
     @Lob
     @Column(name = "store_request")
-    private String storeRequest;  // 가게 요청사항
-    
+    private String storeRequest;
+
     @Lob
     @Column(name = "delivery_request")
-    private String deliveryRequest;  // 배달 요청사항
+    private String deliveryRequest;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
-    private OrderStatus orderStatus;  // 주문 상태
+    private OrderStatus orderStatus;
 
     @Column(name = "total_price", nullable = false)
-    private int totalPrice;  // 총 주문 금액
+    private int totalPrice;
 
     @Column(name = "order_additional1", length = 255)
-    private String orderAdditional1;  // 추가 옵션 1
+    private String orderAdditional1;
 
     @Column(name = "order_additional2", length = 255)
-    private String orderAdditional2;  // 추가 옵션 2
- 
-    // 🔹 주문 상세 목록 추가 (OrderDetail과 연관 관계 설정)
+    private String orderAdditional2;
+
+    
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDetail> orderDetails = new ArrayList<>();  // 주문 상세 목록
+    @ToString.Exclude
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     public enum OrderStatus {
-    	PENDING,  // 주문 접수 대기
-    	CONFIRMED,  // 주문 확인됨
-    	IN_DELIVERY,  // 배달 중
-    	COMPLETED,  // 배달 완료
-    	CANCELED  // 주문 취소
+        PENDING("주문 요청 중"), 
+        CONFIRMED("주문 확인 완료"), 
+        IN_DELIVERY("배달 중"), 
+        COMPLETED("주문 및 결재 완료"), 
+        CANCELED("주문 취소");
+    	private final String description;
+    	OrderStatus(String description) {
+			this.description = description;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
     }
 
-    
-    
     @Builder
     public Order(User user, Store store, String deliveryAddress, String storeRequest,
-            String deliveryRequest, int totalPrice, String orderAdditional1, String orderAdditional2,
-            OrderStatus orderStatus) {
-   this.user = user;
-   this.store = store;
-   this.deliveryAddress = deliveryAddress;
-   this.storeRequest = storeRequest;
-   this.deliveryRequest = deliveryRequest;
-   this.totalPrice = totalPrice;
-   this.orderAdditional1 = orderAdditional1;
-   this.orderAdditional2 = orderAdditional2;
-   this.orderStatus = OrderStatus.PENDING;
-}
+                 String deliveryRequest, int totalPrice, String orderAdditional1, String orderAdditional2,
+                 OrderStatus orderStatus, String guestId) {
+        this.user = user;
+        this.store = store;
+        this.deliveryAddress = deliveryAddress;
+        this.storeRequest = storeRequest;
+        this.deliveryRequest = deliveryRequest;
+        this.totalPrice = totalPrice;
+        this.orderAdditional1 = orderAdditional1;
+        this.orderAdditional2 = orderAdditional2;
+        this.orderStatus = orderStatus != null ? orderStatus : OrderStatus.PENDING;
+        this.guestId = guestId;
+        
+    }
 
-    // ✅ 주문 상세를 추가하면서 자동으로 총 가격 업데이트
     public void addOrderDetail(OrderDetail orderDetail) {
         orderDetails.add(orderDetail);
         orderDetail.setOrder(this);
         updateTotalPrice();
     }
 
-    // ✅ 총 가격 업데이트 메서드
     public void updateTotalPrice() {
-        this.totalPrice = orderDetails.stream()
-                .mapToInt(od -> od.getQuantity() * od.getPrice())
-                .sum();
+       this.totalPrice = calculateOrderTotal();
+    }
+    
+    public int calculateOrderTotal() {
+        return orderDetails.stream()
+        		.mapToInt(od -> od.getQuantity() * od.getPrice())
+        		.sum();
     }
     
     

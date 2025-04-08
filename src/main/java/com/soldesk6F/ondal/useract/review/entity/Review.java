@@ -11,6 +11,7 @@ import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -72,6 +73,10 @@ public class Review {
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
 
+	
+	@OneToOne(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+	private ReviewReply reviewReply;
+	
 	@Builder
 	public Review(User user, Store store, Order order, double rating, String reviewTitle, String reviewContent) {
 		super();

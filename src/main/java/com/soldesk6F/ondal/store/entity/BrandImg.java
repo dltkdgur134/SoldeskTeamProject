@@ -11,7 +11,7 @@ import java.util.UUID;
 @Table(
     name = "brand_img",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"store_id", "brand_img_file_name"})
+        @UniqueConstraint(columnNames = {"store_id", "brand_img_file_path"})
     }
 )
 public class BrandImg {
@@ -26,21 +26,14 @@ public class BrandImg {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @Column(name = "brand_img_file_name", nullable = false, length = 255)
-    private String brandImgFileName;
-
-    @Column(name = "brand_img_file_extension", nullable = false, length = 10)
-    private String brandImgFileExtension;
 
     @Column(name = "brand_img_file_path", nullable = false, length = 255)
     private String brandImgFilePath;
 
     @Builder
-	public BrandImg(Store store, String brandImgFileName, String brandImgFileExtension, String brandImgFilePath) {
+	public BrandImg(Store store, String brandImgFilePath) {
 		super();
 		this.store = store;
-		this.brandImgFileName = brandImgFileName;
-		this.brandImgFileExtension = brandImgFileExtension;
 		this.brandImgFilePath = brandImgFilePath;
 	}
 

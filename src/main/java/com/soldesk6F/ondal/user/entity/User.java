@@ -59,6 +59,11 @@ public class User {
 	@Column(name = "social_login_provider",nullable = false,length = 30)
 	private String socialLoginProvider;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "user_role",nullable = false ,length = 20)
+	private UserRole userRole = UserRole.USER;
+	
+	
 	@CreationTimestamp
 	@Column(name = "created_date",nullable = false, updatable = false)
 	private LocalDateTime createdDate;
@@ -86,10 +91,33 @@ public class User {
 	        return description;
 	    }
 	}
+	public enum UserRole {
+		USER("유저"),      
+		OWNER("점주"),   
+		RIDER("배달원"),      
+		ALL("모든");   
+		private final String description;
+		
+		UserRole(String description) {
+			this.description = description;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	@Builder
     public User(String userId, String password, String userProfileName, String userProfileExtension,
                 String userProfilePath, String userName, String nickName, String email, 
-                String userPhone, String userAddress, String socialLoginProvider, 
+                String userPhone, String userAddress, String socialLoginProvider,UserRole userRole,
                 UserStatus userStatus) {
         this.userId = userId;
         this.password = password;
@@ -102,6 +130,7 @@ public class User {
         this.userPhone = userPhone;
         this.userAddress = userAddress;
         this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE" : socialLoginProvider;
+        this.userRole = (userRole != null) ? userRole : UserRole.USER;
         this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNVERIFIED;
     }
 
