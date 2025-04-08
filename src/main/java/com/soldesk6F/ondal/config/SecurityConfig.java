@@ -51,6 +51,29 @@ public class SecurityConfig {
                 .build();
     }
 
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//            .authorizeHttpRequests(auth -> auth
+//                  .requestMatchers("/", "/alert", "/login/**", "/register/**", "/css/**", "/js/**").permitAll()
+////                   .requestMatchers("/admin/**").hasRole(Role.OWNER)
+////                   .requestMatchers("/")
+//                   .anyRequest().authenticated()
+//            )
+//            .formLogin(form -> form
+//                .loginPage("/login/tryLogin")
+//                .defaultSuccessUrl("/", true)
+//                .permitAll()
+//            )
+//            .logout(logout -> logout      
+//                .logoutSuccessUrl("/")
+//            ).oauth2Login(oauth2 -> oauth2
+//                    .loginPage("/login/tryLogin") // 커스텀 로그인 페이지 설정
+//                    .userInfoEndpoint(userInfo -> userInfo
+//                    .userService(customOAuth2UserService) // 사용자 정보 처리
+//                    )
+//                );
+    
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     	http
@@ -60,7 +83,7 @@ public class SecurityConfig {
 				)
 			.formLogin(form -> form
 				.loginPage("/login/tryLogin")           // 우리가 만든 로그인 페이지
-				.loginProcessingUrl("/login")  // 로그인 form의 action 주소 (POST)
+//				.loginProcessingUrl("/login")  // 로그인 form의 action 주소 (POST)
 				.defaultSuccessUrl("/",true)        // 로그인 성공 후 이동할 주소
 				.failureUrl("/login?error")    // 로그인 실패 시 주소
 				.permitAll()
@@ -69,6 +92,11 @@ public class SecurityConfig {
 				.logoutUrl("/logout")
 				.logoutSuccessUrl("/login?logout")
 				.permitAll()
+			).oauth2Login(oauth2 -> oauth2
+                    .loginPage("/login/tryOAuthLogin") // 커스텀 로그인 페이지 설정
+                    .userInfoEndpoint(userInfo -> userInfo
+                    .userService(customOAuth2UserService) // 사용자 정보 처리
+                    )
 			)
 			.csrf(csrf -> csrf.disable());
 
