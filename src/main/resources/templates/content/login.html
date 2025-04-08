@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html 
+	lang="ko"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorate="~{layouts/emptyFooterHeader}"
+>
 <head>
   <meta charset="UTF-8" />
-  <title>음식배달 서비스 로그인</title>
-<link rel = "stylesheet" href = "static/login.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>온달 로그인</title>
+<link th:fragment="css" rel = "stylesheet" th:href = "@{/css/login.css}">
 </head>
 <body>
 
-  <div class="login-container">
+  <div layout:fragment = "content" class="login-container">
     <h1>로그인</h1>
-    <form method="POST" action="/loginProc">
+    <form method="post" th:action="@{/login/tryLogin}">
       <div class="form-group">
         <label for="username">아이디</label>
         <input type="text" id="username" name="username" placeholder="아이디를 입력하세요" required />
@@ -20,8 +25,12 @@
       </div>
       <button type="submit" class="login-btn">로그인</button>
     </form>
+    <div class = "oAuth-group" align="center">
+    	<a th:href =@{/oauth2/authorization/kakao}><img th:src="@{/css/imgs/kakaoLoginBtn.png}" class = "oAuthBtnImg"></a>
+    	<a><img th:src="@{/css/imgs/naverLoginBtn.png}" class = "oAuthBtnImg"></a>
+    </div>
     <div class="extra-links">
-      <a href="/signup">회원가입</a> |
+      <a href="/signup">회원가입</a>
       <a href="/find-password">비밀번호 찾기</a>
     </div>
   </div>

@@ -80,5 +80,10 @@ public class User {
 		this.userAddress = userAddress;
 		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE" : socialLoginProvider;
 	}
+	
+	public User update(String name) {
+	    this.userName = name;
+	    return this;
+	}
 
 }
