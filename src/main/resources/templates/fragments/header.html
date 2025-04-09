@@ -21,7 +21,6 @@
 				class="fa-solid fa-bars"></i>
 			</a>
 		</div>
-		<div class="container-fluid"></div>
 	</nav>
 
 	<div class="offcanvas offcanvas-end" tabindex="-1" id="menu-list" data-bs-backdrop="true"
@@ -34,6 +33,38 @@
 			<button type="button" class="btn-close text-reset"
 				data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
+		<div class="container" sec:authorize="isAuthenticated()">
+    <div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
+        <div class="row g-0">
+            <div class="col-md-4 p-3 text-center">
+                <img src="https://randomuser.me/api/portraits/men/64.jpg" class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture">
+                <div class="mt-2">
+                    <span class="badge bg-success">user</span>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title d-flex justify-content-center align-items-center" th:text="${#authentication.principal.user.nickName}">
+                    </h5>
+                	<p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong th:text="${#authentication.principal.user.userAddress}"></strong></p>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-around">
+                <a class="btn btn-link text-decoration-none" href="infopage">
+                        <small><i class="fas fa-edit"></i>마이페이지</small>
+                    </a>
+                <a class="btn btn-link text-decoration-none" href="#">
+                        <small><i class="fas fa-map-marker-alt"></i> 주소관리</small>
+                    </a>
+                <a class="btn btn-link text-decoration-none" href="logout">
+                        <small><i class="fas fa-share"></i> 로그아웃</small>
+                    </a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 		<div class="offcanvas-body">
 			<ul class="nav justify-content-between nav-pills mb-3" id="pills-tab" role="tablist">
 				<li class="nav-item" role="presentation">
