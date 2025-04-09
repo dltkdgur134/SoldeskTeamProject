@@ -32,8 +32,6 @@ class CartIntegrationTest {
         User user = User.builder()
                 .userId("testuser")
                 .password("password123")
-                .userProfileName("testProfile")
-                .userProfileExtension("jpg")
                 .userProfilePath("/images/profile.jpg")
                 .userName("Test User")
                 .nickName("testnick")

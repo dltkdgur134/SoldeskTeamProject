@@ -42,7 +42,7 @@ public class Complain {
     private UUID complainId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_uuid", nullable = true)
     private User user;
 
     @Column(name = "guest_id", length = 36)

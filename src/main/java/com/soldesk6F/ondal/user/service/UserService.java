@@ -68,8 +68,6 @@ public class UserService {
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
 	                .userAddress(userAddress + " " + userAddressDetail)	
-	                .userProfileName(fileName)
-	                .userProfileExtension(extension)
 	                .userProfilePath(filePath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();

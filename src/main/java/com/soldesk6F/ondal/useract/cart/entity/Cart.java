@@ -40,7 +40,7 @@ public class Cart {
 	private UUID cartId;
 	
 	@OneToOne
-	@JoinColumn(name = "user_id" , nullable = false, unique = true)
+	@JoinColumn(name = "user_uuid" , nullable = false, unique = true)
 	private User user;
 	
 	@ManyToOne

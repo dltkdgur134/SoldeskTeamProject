@@ -41,7 +41,7 @@ public class Review {
 	private UUID reviewId;
 	
 	@ManyToOne
-	@JoinColumn(name = "user_id",nullable = false)
+	@JoinColumn(name = "user_uuid",nullable = false)
 	private User user;
 	
 	@ManyToOne

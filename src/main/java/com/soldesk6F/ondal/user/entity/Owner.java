@@ -25,7 +25,7 @@ public class Owner {
     private UUID ownerId;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_uuid", nullable = false, unique = true)
     private User user;
 
     @Column(name = "secondary_password",nullable = false , length = 10)

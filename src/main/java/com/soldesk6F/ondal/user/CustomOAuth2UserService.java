@@ -57,8 +57,6 @@ import java.util.Map;
 			                .socialLoginProvider(id)
 			                .email(email)
 			                .userProfilePath(profileImg)
-			                .userProfileName(profilePhotoName)
-			                .userProfileExtension(extension)
 			            	.nickName(nickName)
 			            	.userPhone(tel)
 			                .build()));
