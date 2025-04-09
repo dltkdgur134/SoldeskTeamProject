@@ -10,8 +10,13 @@
 	src : url('yisunshinB.ttf') format("truetype");
 }
 
+@font-face {
+	font-family: "yisunshinM";
+	src : url('yisunshinM.ttf') format("truetype");
+}
+
 body {
-	font-family: "acloud" , "yisunshin";
+	font-family: "yisunshinM";
 }
 
 .display-5 {
@@ -108,4 +113,11 @@ body {
 
 .badge {
 	font-size: 14px;
+}
+
+.offcanvas-backdrop {
+    z-index: 1040;
+}
+.offcanvas {
+    z-index: 1050;
 }
