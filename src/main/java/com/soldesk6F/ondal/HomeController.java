@@ -15,10 +15,12 @@ public class HomeController {
 	@GetMapping("/login")
 	public String login() {
 		return "content/login";
-		
 	}
 	
-	
+	@GetMapping("/store")
+	public String store() {
+		return "content/store";
+	}
 	
 	
 }
