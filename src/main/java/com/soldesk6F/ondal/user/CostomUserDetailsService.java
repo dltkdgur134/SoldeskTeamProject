@@ -16,13 +16,13 @@ import com.soldesk6F.ondal.user.repository.UserRepository;
 public class CostomUserDetailsService implements UserDetailsService {
 	
 	    private final UserRepository userRepository;
-	    private final OwnerRepository onwerRepository;
+	    private final OwnerRepository ownerRepository;
 	    private final RiderRepository riderRepository;
 	    
     public CostomUserDetailsService(UserRepository userRepository , OwnerRepository ownerRepository,
     		RiderRepository riderRepository) {
         this.userRepository = userRepository;
-        this.onwerRepository = ownerRepository;
+        this.ownerRepository = ownerRepository;
         this.riderRepository = riderRepository;
         
         
@@ -34,11 +34,11 @@ public class CostomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         
-        if(onwerRepository.existsByUser_UserId(userId) || riderRepository.existsByUser_UserId(userId)) {
-        if(onwerRepository.existsByUser_UserId(userId) && riderRepository.existsByUser_UserId(userId)) {
+        if(ownerRepository.existsByUser_UserId(userId) || riderRepository.existsByUser_UserId(userId)) {
+        if(ownerRepository.existsByUser_UserId(userId) && riderRepository.existsByUser_UserId(userId)) {
         	return new CustomUserDetails(user , Role.ALL);
         	}else {
-        		return onwerRepository.existsByUser_UserId(userId) ? new CustomUserDetails(user , Role.OWNER) : new CustomUserDetails(user,Role.RIDER);
+        		return ownerRepository.existsByUser_UserId(userId) ? new CustomUserDetails(user , Role.OWNER) : new CustomUserDetails(user,Role.RIDER);
         	}
         }	
        return new CustomUserDetails(user,Role.USER);	

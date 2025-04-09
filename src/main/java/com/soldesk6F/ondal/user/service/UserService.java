@@ -1,15 +1,18 @@
 package com.soldesk6F.ondal.user.service;
 
-import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -81,4 +84,23 @@ public class UserService {
             return false;
         }
 	}
+    
+    public boolean updateUser(String userId, String userName, String nickname, String email,
+            String password, String userPhone, String userAddress, String userAddressDetail,
+            MultipartFile profileImage, String socialLoginProvider) {
+    	try {
+			
+    		 String fileName = "default.png";
+ 	        String extension = "png";
+ 	        String filePath = uploadDir + File.separator + fileName;
+    		
+    		
+    		
+    		return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+    }
+    
 }
