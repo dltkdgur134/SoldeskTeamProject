@@ -13,6 +13,7 @@ public class RegUserController {
 
     private final UserService userService;
 
+
     @GetMapping("/register")
     public String showRegisterForm() {
         return "content/register";

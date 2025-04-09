@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http//www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+
+</head>
+
+<div layout:fragment="content" class="container py-5">
+    <div class="card info-card p-4">
+      <h2 class="mb-4 text-center">보안 정보</h2>
+     <div class="input-group mb-3">
+  		<span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-user"></i></span>
+  		<input type="text" class="form-control" placeholder="abcd123" aria-label="user_id" aria-describedby="basic-addon1" readonly="readonly">
+	 </div>
+	  <div class="input-group mb-3">
+  		<span class="input-group-text" id="basic-addon2"><i class="fa-solid fa-id-card"></i></span>
+  		<input type="text" class="form-control" placeholder="온달" aria-label="nickname" aria-describedby="basic-addon2" readonly="readonly">
+	 </div>
+		<div class="input-group mb-3">
+  			<span class="input-group-text" id="basic-addon3"><i class="fa-solid fa-envelope"></i></span>
+  			<input type="text" class="form-control" placeholder="abcd@gmail.com" aria-label="email" aria-describedby="basic-addon3" readonly="readonly">
+	 	</div>
+	 	<div class="input-group mb-3">
+  			<span class="input-group-text" id="basic-addon4"><i class="fa-solid fa-phone"></i></span>
+  			<input type="text" class="form-control" placeholder="010-1234-5678" aria-label="user_phone" aria-describedby="basic-addon4" readonly="readonly">
+	 	</div>
+		<div class="input-group mb-3">
+  			<span class="input-group-text" id="basic-addon5"><i class="fa-solid fa-house"></i></span>
+  			<input type="text" class="form-control" placeholder="서울 강남구 봉은사로 119 성옥빌딩 6층" aria-label="user_phone" aria-describedby="basic-addon4" readonly="readonly">
+	 	</div>
+	 
+      <div class="mt-4 text-center">
+        <a class="btn btn-primary">정보 수정</a>
+      </div>
+    </div>
+  </div>
+
+</html>

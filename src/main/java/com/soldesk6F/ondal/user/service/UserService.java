@@ -46,7 +46,7 @@ public class UserService {
 	        	String originalFilename = profileImage.getOriginalFilename();
 	        	extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
 	        	fileName = userId + "_" + System.currentTimeMillis() + "." + extension;
-	            String savePath = new File(uploadDir).getAbsolutePath();
+	            String savePath = new File(uploadDir).getAbsolutePath(); // getRealPath()
 	
 	            File saveFolder = new File(savePath);
 	            if (!saveFolder.exists()) {
@@ -68,8 +68,6 @@ public class UserService {
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
 	                .userAddress(userAddress + " " + userAddressDetail)	
-	                .userProfileName(fileName)
-	                .userProfileExtension(extension)
 	                .userProfilePath(filePath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
