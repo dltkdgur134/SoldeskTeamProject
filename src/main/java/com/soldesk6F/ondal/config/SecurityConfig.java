@@ -6,15 +6,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.soldesk6F.ondal.user.*;
+import com.soldesk6F.ondal.user.CustomUserDetailsService;
+import com.soldesk6F.ondal.user.CustomAuthFailureHandler;
+import com.soldesk6F.ondal.user.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -25,10 +24,11 @@ public class SecurityConfig {
     private final CustomAuthFailureHandler customAuthFailureHandler;
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CostomUserDetailsService costomUserDetailsService;
+    private final CustomUserDetailsService costomUserDetailsService;
 
-    public SecurityConfig(CostomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
-    		CustomAuthFailureHandler customAuthFailureHandler, OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
+
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
+    		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
         this.costomUserDetailsService = customUserDetailsService;
         this.customAuthFailureHandler = customAuthFailureHandler;
         this.customOAuth2UserService = customOAuth2UserService;

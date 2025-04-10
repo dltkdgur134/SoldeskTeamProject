@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +25,7 @@ public class Owner {
     private UUID ownerId;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_uuid", nullable = false, unique = true)
     private User user;
 
     @Column(name = "secondary_password",nullable = false , length = 10)
@@ -37,13 +38,16 @@ public class Owner {
     
     
     // Owner 생성자에 owner_id와 registrationDate가 없는 이유: 이 둘은 자동으로 생성하는 값이기에 없어도 된다.
-	public Owner(User userId, String secondaryPassword) {
+    @Builder
+	public Owner(User user, String secondaryPassword) {
 		super();
-		this.user = userId;
+		this.user = user;
 		this.secondaryPassword = secondaryPassword;
 	}
 
-    
+    public String getOwnerUuidAsString() {
+	    return ownerId != null ? ownerId .toString() : null;
+	}
 	
     
     

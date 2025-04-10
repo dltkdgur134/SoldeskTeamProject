@@ -1,6 +1,9 @@
 package com.soldesk6F.ondal.store.entity;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,6 +11,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.user.entity.Owner;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,8 +21,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,23 +55,11 @@ public class Store {
     @Column(name = "store_phone", nullable = false, length = 13)
     private String storePhone;
 
-    @Column(name = "store_img_name", length = 255)
-    private String storeImgName;
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StoreImg> storeImgs = new ArrayList<>();
 
-    @Column(name = "store_img_extension", length = 10)
-    private String storeImgExtension;
-
-    @Column(name = "store_img_path", length = 255)
-    private String storeImgPath;
-
-    @Column(name = "brand_img_name", length = 255)
-    private String brandImgName;
-
-    @Column(name = "brand_img_extension", length = 10)
-    private String brandImgExtension;
-
-    @Column(name = "brand_img_path", length = 255)
-    private String brandImgPath;
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BrandImg> brandImgs = new ArrayList<>();
 
     @Column(name = "store_address", nullable = false, length = 80)
     private String storeAddress;
@@ -97,41 +92,67 @@ public class Store {
 
     @CreationTimestamp
     @Column(name = "registration_date", updatable = false)
-    private LocalTime registrationDate;
+    private LocalDateTime registrationDate;
 
     public enum StoreStatus {
-        OPEN,   // 영업 중
-        CLOSED  // 영업 종료
+        OPEN("영업중"),
+        CLOSED("영업종료"),
+        SUSPENDED("일시정지"),
+        BANNED("영구정지");
+
+        private final String description;
+
+        StoreStatus(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
-    @PrePersist		//store는 기본적으로 닫힌 상태
-    public void prePersist() {
-        this.storeStatus = (this.storeStatus == null) ? StoreStatus.CLOSED : this.storeStatus;
+    public void addStoreImg(StoreImg img) {
+        img.setStore(this);
+        this.storeImgs.add(img);
     }
 
-	public Store(Owner owner, String storeName, String category, String storePhone, String storeImgName,
-			String storeImgExtension, String storeImgPath, String brandImgName, String brandImgExtension,
-			String brandImgPath, String storeAddress, double latitude, double longitude, double deliveryRange,
-			String storeIntroduce, LocalTime openingTime, LocalTime closingTime, String holiday) {
-		super();
-		this.owner = owner;
-		this.storeName = storeName;
-		this.category = category;
-		this.storePhone = storePhone;
-		this.storeImgName = storeImgName;
-		this.storeImgExtension = storeImgExtension;
-		this.storeImgPath = storeImgPath;
-		this.brandImgName = brandImgName;
-		this.brandImgExtension = brandImgExtension;
-		this.brandImgPath = brandImgPath;
-		this.storeAddress = storeAddress;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.deliveryRange = deliveryRange;
-		this.storeIntroduce = storeIntroduce;
-		this.openingTime = openingTime;
-		this.closingTime = closingTime;
-		this.holiday = holiday;
+    public void addBrandImg(BrandImg img) {
+        img.setStore(this);
+        this.brandImgs.add(img);
+    }
+    
+    @Builder
+    public Store(Owner owner, String storeName, String category, String storePhone,
+                 List<StoreImg> storeImgs, List<BrandImg> brandImgs, String storeAddress,
+                 double latitude, double longitude, double deliveryRange,
+                 String storeIntroduce, LocalTime openingTime, LocalTime closingTime,
+                 String holiday, StoreStatus storeStatus) {
+        this.owner = owner;
+        this.storeName = storeName;
+        this.category = category;
+        this.storePhone = storePhone;
+
+        // 이미지 리스트 추가
+        if (storeImgs != null) {
+            storeImgs.forEach(this::addStoreImg);
+        }
+        if (brandImgs != null) {
+            brandImgs.forEach(this::addBrandImg);
+        }
+
+        this.storeAddress = storeAddress;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.deliveryRange = deliveryRange;
+        this.storeIntroduce = storeIntroduce;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.holiday = holiday;
+        this.storeStatus = storeStatus != null ? storeStatus : StoreStatus.CLOSED;
+    }
+    
+    public String getStoreUuidAsString() {
+	    return storeId != null ? storeId .toString() : null;
 	}
 	
 	

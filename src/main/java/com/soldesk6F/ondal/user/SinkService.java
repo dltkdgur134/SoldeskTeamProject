@@ -24,7 +24,7 @@ public class SinkService {
 		
 		@Transactional
 		public boolean trySink(String id , String password,boolean overRideProfile) {
-			User user = userRepository.findById(id)
+			User user = userRepository.findByUserId(id)
 				    .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음: id=" + id));
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			User nowSessionUser = ((CustomUserDetails) authentication.getPrincipal()).getUser();

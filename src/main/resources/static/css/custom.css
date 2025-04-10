@@ -1,0 +1,123 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "acloud";
+	src: url('acloud.ttf');
+}
+
+@font-face {
+	font-family: "yisunshin";
+	src : url('yisunshinB.ttf') format("truetype");
+}
+
+@font-face {
+	font-family: "yisunshinM";
+	src : url('yisunshinM.ttf') format("truetype");
+}
+
+body {
+	font-family: "yisunshinM";
+}
+
+.display-5 {
+	color: white;
+	font-family: "yisunshin" !important;
+}
+
+:root {
+	--bs-link-color: black;
+	--bs-link-hover-color: #FFDF33;
+}
+
+
+.btn-primary {
+    background-color: #404040 !important;
+    border: none !important;
+    color: #fff !important;
+  }
+
+  .btn-primary:hover {
+    background-color: #FF9A66 !important;
+    border-color: #FF9A66 !important;
+  }
+
+
+.info-card {
+      max-width: 600px;
+      margin: auto;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+
+.navbar-brand {
+	color: black;
+}
+
+.navbar-light {
+    background-color: #FFE766 !important; /* custom background */
+  }
+
+  .navbar-light .navbar-brand,
+  .navbar-light .nav-link {
+    color: #000 !important; /* text color */
+  }
+
+  .navbar-light .nav-link:hover {
+    color: #FFEF99 !important; /* hover color */
+  }
+
+  .nav-pills .nav-link {
+    color: #333 !important; /* base text */
+    background-color: transparent;
+  }
+
+  .nav-pills .nav-link:hover {
+    color: #cc5200 !important;
+    background-color: #ffe0b2 !important;
+  }
+
+  .nav-pills .nav-link.active {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: bold;
+  }
+
+
+.tooltip .tooltip-inner {
+  font-size: 9px; /* Adjust size */
+  padding: 4px 8px; /* Optional: Adjust padding */
+}
+
+.card-title a {
+	color: #ffc107;
+}
+
+
+.footer-sns-link i{
+	color: black;
+	box-shadow: black 5px;
+}
+
+.footer-sns-link i:hover {
+	color: #ffc107;
+}
+
+.footer-sns-link i:active {
+	color: #D39E00;
+}
+
+.footer-sns-link:visited {
+	color: black;
+}
+
+.badge {
+	font-size: 14px;
+}
+
+.offcanvas-backdrop {
+    z-index: 1040;
+}
+.offcanvas {
+    z-index: 1050;
+}
