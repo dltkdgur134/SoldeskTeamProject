@@ -39,7 +39,7 @@
             <div class="col-md-4 p-3 text-center">
                 <img src="https://randomuser.me/api/portraits/men/64.jpg" class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture">
                 <div class="mt-2">
-                    <span class="badge bg-success">user</span>
+                    <span class="badge bg-success" th:text="${#authentication.principal.user.userRole}"></span>
                 </div>
             </div>
             <div class="col-md-8">
@@ -48,6 +48,7 @@
                     </h5>
                 	<p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong th:text="${#authentication.principal.user.userAddress}"></strong></p>
             </div>
+            
         </div>
         <div class="card-footer bg-white">
             <div class="d-flex justify-content-around">
