@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.owner;
+package com.soldesk6F.ondal.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,8 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import com.soldesk6F.ondal.user.User;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "owner")
 public class Owner {
 
     @Id
@@ -26,13 +25,13 @@ public class Owner {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User userId;
+    private User user;
 
-    @Column(name = "secondary_password",nullable = false)
+    @Column(name = "secondary_password",nullable = false , length = 10)
     private String secondaryPassword;  // 비밀번호 해싱 필요
 
     @CreationTimestamp
-    @Column(name = "registration_date")
+    @Column(name = "registration_date" , updatable = false)
     private LocalDateTime registrationDate;
 
     
@@ -40,7 +39,7 @@ public class Owner {
     // Owner 생성자에 owner_id와 registrationDate가 없는 이유: 이 둘은 자동으로 생성하는 값이기에 없어도 된다.
 	public Owner(User userId, String secondaryPassword) {
 		super();
-		this.userId = userId;
+		this.user = userId;
 		this.secondaryPassword = secondaryPassword;
 	}
 

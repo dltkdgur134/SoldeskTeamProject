@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/emptyFooterHeader}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>온달 계정 연동</title>
+  <link th:fragment="css" rel="stylesheet" th:href="@{/css/login.css}" />
+</head>
+<body>
+
+<div layout:fragment="content" class="login-container">
+  <h1>계정 연동</h1>
+
+  <p>
+    기존 이메일로 가입하신 온달 계정이 존재합니다.<br />
+    연동을 위해 비밀번호를 입력해주세요.
+  </p>
+
+  <form method="post" th:action="@{/oauth/trySink}">
+    <input type="hidden" name="email" th:value="${email}" />
+    <input type="hidden" name="userId" th:value="${userId}" />
+
+    <div class="form-group">
+      <label class="form-label">기존 계정 ID</label>
+      <div class="user-id-text" th:text="${userId}">0410Test</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">기존 계정 비밀번호</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" name="overwriteProfile" value="false" />
+        소셜 닉네임과 프로필로 덮어쓰기
+      </label>
+    </div>
+
+    <button type="submit" class="login-btn">연동하기</button>
+  </form>
+
+  <div class="extra-links">
+    <a th:href="@{/login}">로그인 페이지로 돌아가기</a>
+  </div>
+</div>
+
+<div class="footer">
+  © 2025 음식배달서비스
+</div>
+
+</body>
+</html>
