@@ -52,8 +52,8 @@ public class User {
 	@Column(name = "user_phone", nullable = false, length = 13)
 	private String userPhone;
 
-	@Column(name = "user_address", nullable = true, length = 90)
-	private String userAddress;
+	@Column(name = "user_selected_address", nullable = true, length = 90)
+	private String userSelectedAddress;
 
 	@Column(name = "social_login_provider", nullable = false, length = 30)
 	private String socialLoginProvider;
@@ -114,7 +114,7 @@ public class User {
 
 	@Builder
 	public User(String userId, String password, String userProfilePath, String userName, String nickName, String email,
-			String userPhone, String userAddress, String socialLoginProvider, UserRole userRole,
+			String userPhone, String userSelectedAddress, String socialLoginProvider, UserRole userRole,
 			UserStatus userStatus, boolean userProfileLiveUpdate) {
 		this.userId = userId;
 		this.password = password;
@@ -123,7 +123,7 @@ public class User {
 		this.nickName = nickName;
 		this.email = email;
 		this.userPhone = userPhone;
-		this.userAddress = userAddress;
+		this.userSelectedAddress = userSelectedAddress;
 		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE"
 				: socialLoginProvider;
 		this.userRole = (userRole != null) ? userRole : UserRole.USER;

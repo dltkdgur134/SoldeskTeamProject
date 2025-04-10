@@ -34,7 +34,7 @@ public class UserService {
     }
 
     public boolean registerUser(String userId, String userName, String nickname, String email,
-                             String password, String userPhone, String userAddress, String userAddressDetail,
+                             String password, String userPhone, String userSelectedAddres, String userAddressDetail,
                              MultipartFile profileImage, String socialLoginProvider) {
     	try {
 
@@ -67,7 +67,7 @@ public class UserService {
 	                .email(email)
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
-	                .userAddress(userAddress + " " + userAddressDetail)	
+	                .userSelectedAddress(userSelectedAddres + " " + userAddressDetail)	
 	                .userProfilePath(filePath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
