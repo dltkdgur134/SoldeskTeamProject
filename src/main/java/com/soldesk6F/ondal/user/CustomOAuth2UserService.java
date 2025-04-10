@@ -52,7 +52,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		String nickName = (String) profileMap.get("nickname");
 		String userProfilepath = (String)profileMap.get("profile_image");
 //		        String profileImg = (String) attributes.get("profile_image");
-		String tel = (String) ((Map) attributes.get("kakao_account")).get("phone_number");
+		String tel = "0" + ((String) ((Map) attributes.get("kakao_account")).get("phone_number")).split(" ")[1];
+		
 
 //		        String extension = profileImg.substring(profileImg.lastIndexOf(".") + 1);
 //		        String profilePhotoName = profileImg.substring(profileImg.lastIndexOf("/")+1);
@@ -76,7 +77,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				existingUser.updateProvider("waiting:"+provider);
 				return userRepository.save(User.builder().userId("temp_" + UUID.randomUUID()) 
 						.userName(name).socialLoginProvider(provider).email("waiting:"+email)
-						.password("waiting")
+						.password("waiting").userAddress("test")
+						.userProfilePath(userProfilepath)
 //					                .userProfilePath(profileImg)
 //					                .userProfileName(profilePhotoName)
 //					                .userProfileExtension(extension)
@@ -88,6 +90,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				return userRepository.save(User.builder().userId(email) 
 						.userName(name).socialLoginProvider(provider).email(email)
 						.password(String.format("%012d",Integer.parseInt(randString)))
+						.userAddress("test")
+						.userProfilePath(userProfilepath)
 //					                .userProfilePath(profileImg)
 //					                .userProfileName(profilePhotoName)
 //					                .userProfileExtension(extension)

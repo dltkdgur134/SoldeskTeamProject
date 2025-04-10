@@ -21,7 +21,7 @@ import lombok.Setter;
 @Table(name="user")
 public class User {
 	@Id
-	@Column(name = "user_id", nullable = false ,length = 15)
+	@Column(name = "user_id", nullable = false ,length = 50)
 	private String userId;
 	
 	@Column(name = "password",nullable = false,length = 255)

@@ -55,6 +55,13 @@
       box-sizing: border-box;
     }
 
+	
+	input[readonly] {
+	  background-color: var(--white);
+	  color: var(--black);
+	  opacity: 1;
+	  cursor: default;
+	}
     /* 로그인 버튼 */
     .login-btn {
       width: 100%;
