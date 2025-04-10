@@ -102,7 +102,9 @@ public class Payment {
 		this.refundReason = refundReason;
 	}
 	
-
+	public String getPaymentUuidAsString() {
+	    return paymentId != null ? paymentId .toString() : null;
+	}
 	
 	
 }

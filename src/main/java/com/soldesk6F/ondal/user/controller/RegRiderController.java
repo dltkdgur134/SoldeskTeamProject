@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.user.CustomUserDetails;
 import com.soldesk6F.ondal.user.dto.RiderForm;
@@ -26,11 +27,14 @@ public class RegRiderController {
     private final UserRepository userRepository;
 
     @GetMapping("/register")
-    public String showRiderRegistrationForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    public String showRiderRegistrationForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model
+    		,@ModelAttribute("riderExists") String riderExists,RedirectAttributes redirectAttributes) {
         String userId = userDetails.getUser().getUserId();
 
         if (riderService.isAlreadyRider(userId)) {
-            return "redirect:/mypage";
+        	 //model.addAttribute("riderExists", riderExists); // 모델에 넣어줘야 Thymeleaf가 사용 가능
+        	 redirectAttributes.addAttribute("riderExists", riderExists);
+        	 return "redirect:/"; // templates/content/index.html
         }
 
         model.addAttribute("riderForm", new RiderForm());
@@ -39,16 +43,21 @@ public class RegRiderController {
 
     @PostMapping("/register")
     public String registerRider(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                @ModelAttribute RiderForm riderForm) {
+                                @ModelAttribute RiderForm riderForm,
+                                RedirectAttributes redirectAttributes) {
         String userId = userDetails.getUser().getUserId();
-
-        User user = userRepository.findById(userId).orElseThrow();
+     // 이미 라이더로 등록된 경우
+        if (riderService.isAlreadyRider(userId)) {
+            redirectAttributes.addFlashAttribute("riderExists", true);
+            return "redirect:/";
+        }
+        User user = userRepository.findByUserId(userId).orElseThrow();
 
         riderService.registerRider(user, riderForm);
 
         user.setUserRole(UserRole.RIDER);
         userRepository.save(user);
 
-        return "redirect:/mypage";
+        return "redirect:/";
     }
 }

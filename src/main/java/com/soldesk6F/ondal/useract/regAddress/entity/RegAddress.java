@@ -1,9 +1,10 @@
-package com.soldesk6F.ondal.useract.searchHistory.entity;
+package com.soldesk6F.ondal.useract.regAddress.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.user.entity.User;
@@ -21,38 +22,45 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@Table(name = "search_history")
-public class SearchHistory {
+@Table(name = "reg_address")
+public class RegAddress {
 	@Id
 	@GeneratedValue
 	@UuidGenerator
-	@Column(name = "search_history_id" , nullable = false , unique = true)
-	private UUID searchHistoryId;
+	@Column(name = "reg_address_id", nullable = false , unique = true)
+	private UUID regAddressId;
 	
 	@ManyToOne
-	@JoinColumn(name = "user_uuid",nullable = false)
+	@JoinColumn(name = "user_uuid", nullable = false)
 	private User user;
 	
-	@Column(name = "search_name" , nullable = false ,length = 30)
-	private String searchName;
+	@Column(name ="address" , nullable =  false)
+	private String address;
 	
 	@CreationTimestamp
-	@Column(name = "created_date", nullable = false , updatable = false)
+	@Column(name = "created_date" , nullable = false , updatable = false)
 	private LocalDateTime createdDate;
+	
+	@UpdateTimestamp
+	@Column(name = "updated_date", nullable = false)
+	private LocalDateTime updatedDate;
 
 	@Builder
-	public SearchHistory(User user, String searchName) {
+	public RegAddress(User user, String address) {
 		super();
 		this.user = user;
-		this.searchName = searchName;
+		this.address = address;
 	}
 	
-	public String getSearchHistoryUuidAsString() {
-	    return searchHistoryId != null ? searchHistoryId .toString() : null;
+	
+	
+	public String getUserUuidAsString() {
+	    return regAddressId != null ? regAddressId .toString() : null;
 	}
+	
 	
 	
 }

@@ -54,4 +54,9 @@ public class ChatMessage {
         this.sender = sender;
         this.message = message;
     }
+    
+    public String getChatMessageUuidAsString() {
+	    return chatMessageId != null ? chatMessageId .toString() : null;
+	}
+    
 }

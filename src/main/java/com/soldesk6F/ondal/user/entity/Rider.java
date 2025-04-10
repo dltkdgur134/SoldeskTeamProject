@@ -133,7 +133,9 @@ public class Rider {
 		this.riderStatus = riderStatus;
 	}
 
-
+	public String getRiderUuidAsString() {
+	    return riderId != null ? riderId .toString() : null;
+	}
 	
 
 }

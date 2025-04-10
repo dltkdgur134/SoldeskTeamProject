@@ -45,7 +45,9 @@ public class ReviewImg {
 		this.review = review;
 		this.reviewImgFilePath = reviewImgFilePath;
 	}
-	
+	public String getReviewImgUuidAsString() {
+	    return reviewImgId != null ? reviewImgId .toString() : null;
+	}
 	
 	
 }

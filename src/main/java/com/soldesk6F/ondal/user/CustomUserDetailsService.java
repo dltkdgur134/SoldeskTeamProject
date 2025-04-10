@@ -13,13 +13,13 @@ import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
 @Service
-public class CostomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 	
 	    private final UserRepository userRepository;
 	    private final OwnerRepository onwerRepository;
 	    private final RiderRepository riderRepository;
 	    
-    public CostomUserDetailsService(UserRepository userRepository , OwnerRepository ownerRepository,
+    public CustomUserDetailsService(UserRepository userRepository , OwnerRepository ownerRepository,
     		RiderRepository riderRepository) {
         this.userRepository = userRepository;
         this.onwerRepository = ownerRepository;
@@ -30,7 +30,7 @@ public class CostomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         
@@ -49,16 +49,3 @@ public class CostomUserDetailsService implements UserDetailsService {
     
     
 }
-	
-	
-	
-		
-	
-	
-	
-	
-	
-	
-	
-	
-

@@ -31,8 +31,8 @@ public class RiderManagement {
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "r_management_id", updatable = false, nullable = false, unique = true)
-    private UUID rManagementId;  // 배달 관리 PK
+    @Column(name = "rider_management_id", updatable = false, nullable = false, unique = true)
+    private UUID riderManagementId;  // 배달 관리 PK
     
     @OneToOne
     @JoinColumn(name = "rider_id", nullable = false, unique = true)
@@ -67,6 +67,8 @@ public class RiderManagement {
 		this.totalVat = totalVat;
 		this.totalSales = totalSales;
 	}
-    
+    public String getRiderManagementUuidAsString() {
+	    return riderManagementId != null ? riderManagementId .toString() : null;
+	}
     
 }

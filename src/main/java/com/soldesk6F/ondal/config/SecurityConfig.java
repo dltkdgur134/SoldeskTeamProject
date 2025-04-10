@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.soldesk6F.ondal.user.CostomUserDetailsService;
+import com.soldesk6F.ondal.user.CustomUserDetailsService;
 import com.soldesk6F.ondal.user.CustomAuthFailureHandler;
 import com.soldesk6F.ondal.user.CustomOAuth2UserService;
 import com.soldesk6F.ondal.user.Role;
@@ -26,9 +26,9 @@ public class SecurityConfig {
     private final CustomAuthFailureHandler customAuthFailureHandler;
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CostomUserDetailsService costomUserDetailsService;
+    private final CustomUserDetailsService costomUserDetailsService;
 
-    public SecurityConfig(CostomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
     		CustomAuthFailureHandler customAuthFailureHandler) {
         this.costomUserDetailsService = customUserDetailsService;
         this.customAuthFailureHandler = customAuthFailureHandler;

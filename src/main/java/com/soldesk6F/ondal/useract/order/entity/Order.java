@@ -141,6 +141,10 @@ public class Order {
         		.sum();
     }
     
+    public String getOrderUuidAsString() {
+	    return orderId != null ? orderId .toString() : null;
+	}
+    
     
 }
 

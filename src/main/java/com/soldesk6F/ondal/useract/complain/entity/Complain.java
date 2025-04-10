@@ -93,5 +93,8 @@ public class Complain {
     	RESOLVED      // 처리 완료
     }
 	
+	public String getComplainUuidAsString() {
+	    return complainId != null ? complainId .toString() : null;
+	}
 	
 }
