@@ -37,7 +37,7 @@ public class Favorites {
 	private UUID favoritesId;
 	
 	@ManyToOne
-	@JoinColumn(name ="user_id" , nullable = false)
+	@JoinColumn(name ="user_uuid" , nullable = false)
 	private User user;
 	
 	@ManyToOne

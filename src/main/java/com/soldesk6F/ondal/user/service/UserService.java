@@ -2,11 +2,14 @@ package com.soldesk6F.ondal.user.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.soldesk6F.ondal.user.entity.User;
@@ -71,8 +74,6 @@ public class UserService {
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
 	                .userAddress(userAddress + " " + userAddressDetail)	
-	                .userProfileName(fileName)
-	                .userProfileExtension(extension)
 	                .userProfilePath(filePath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
@@ -85,22 +86,24 @@ public class UserService {
         }
 	}
     
-    public boolean updateUser(String userId, String userName, String nickname, String email,
-            String password, String userPhone, String userAddress, String userAddressDetail,
-            MultipartFile profileImage, String socialLoginProvider) {
-    	try {
-			
-    		 String fileName = "default.png";
- 	        String extension = "png";
- 	        String filePath = uploadDir + File.separator + fileName;
+    @Transactional
+    public boolean updateUserNickname(String nickName, User user, Model model) {
+    	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+    	if (findUser.get().getNickName().equals(nickName)) {
+//    		throw new IllegalArgumentException("기존 닉네임과 동일합니다.");
+    		return false;
     		
-    		
-    		
+    	} else {
+    		findUser.ifPresent(U -> U.setNickName(nickName) );
+    		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()) );
     		return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+    	}
+    	
+//    	findUser.ifPresent(value -> value.setNickName(nickName));
     }
+
+    
+    
     
 }
+

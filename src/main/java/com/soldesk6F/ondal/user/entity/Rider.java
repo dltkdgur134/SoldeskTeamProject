@@ -35,7 +35,7 @@ public class Rider {
 	private UUID riderId;
 
 	@OneToOne
-	@JoinColumn(name = "user_id", nullable = false, unique = true)
+	@JoinColumn(name = "user_uuid", nullable = false, unique = true)
 	private User user;
 
 	@Column(name = "secondary_password", nullable = false, length = 10)
@@ -99,10 +99,9 @@ public class Rider {
 		this.vehicleNumber = vehicleNumber;
 		this.riderHubAddress = riderHubAddress;
 		this.riderPhone = riderPhone;
-
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.riderStatus = (this.riderStatus == null) ? RiderStatus.WAITING : this.riderStatus;
-	}
+		this.riderStatus = riderStatus;
+		}
 
 }

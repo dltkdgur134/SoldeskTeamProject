@@ -34,7 +34,7 @@ public class ChatParticipant {
     private ChatRoom chatRoom;  // 채팅방 ID (FK)
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_uuid", nullable = false)
     private User user;  // 사용자 ID (FK)
 
     @Column(name = "joined_date", nullable = false)

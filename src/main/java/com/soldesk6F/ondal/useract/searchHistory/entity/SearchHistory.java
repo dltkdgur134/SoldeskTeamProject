@@ -33,7 +33,7 @@ public class SearchHistory {
 	private UUID searchHistoryId;
 	
 	@ManyToOne
-	@JoinColumn(name = "user_id",nullable = false)
+	@JoinColumn(name = "user_uuid",nullable = false)
 	private User user;
 	
 	@Column(name = "search_name" , nullable = false ,length = 30)
