@@ -11,6 +11,7 @@ import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.OwnerRepository;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import java.util.UUID;
 
 @Service
 public class CostomUserDetailsService implements UserDetailsService {
@@ -30,7 +31,8 @@ public class CostomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        User user = userRepository.findById(userId)
+    	UUID userUUID = UUID.fromString(userId);
+        User user = userRepository.findById(userUUID)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         

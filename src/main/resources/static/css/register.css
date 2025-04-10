@@ -209,3 +209,36 @@ form input {
 	font-size: 16px;
 	color: #333;
 }
+
+.verification-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.verification-group input {
+  flex: 2;
+}
+
+.verification-group button {
+  background-color: #ffc107;
+  border: none;
+  border-radius: 4px;
+  color: black;
+  font-weight: bold;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.verification-group button:hover {
+  background-color: #e0a800;
+}
+
+.verification-success {
+  font-weight: bold;
+  color: red;
+  margin-bottom: 12px;
+  margin-right: 20px;
+  text-align: right;
+  font-size: 16px;
+}

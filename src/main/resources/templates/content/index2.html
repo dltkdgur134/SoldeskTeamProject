@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http//www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
+	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
+</head>
+    <div layout:fragment="content">
+	  	<div class="d-flex justify-content-center px-5">
+        	<div class="search"> 
+        		<input type="text" class="search-input" placeholder="뭐 먹을까?" name=""> 
+        		<a href="#" class="search-icon"> <i class="fa fa-search"></i> </a> 
+        	</div>
+        </div>
+		<div class="food-buttons">
+		    <button onclick="loadCategory('korean')">한식</button>
+		    <button onclick="loadCategory('western')">양식</button>
+		    <button onclick="loadCategory('snack')">분식</button>
+		</div>
+		<div id="gallery-area">
+			<div class="gallery-container">
+				<div><a href="#" class="labels">기본 가게</a><img class="imgs" src="/css/imgs/img1.png"></div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+	function loadCategory(category) {
+		fetch(`/fragments/foods/${category}.html`)
+			.then(res => res.text())
+			.then(html => {
+				document.getElementById("gallery-area").innerHTML = html;
+			})
+			.catch(error => console.error("불러오기 실패: ", error));
+	}
+	</script>
+</html>

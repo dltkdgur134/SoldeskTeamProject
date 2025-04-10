@@ -18,6 +18,11 @@ public class HomeController {
 		return "content/index";
 	}
 	
+	@GetMapping("/index2")
+	public String StoreList() {
+		return "content/index2";
+	}
+	
 	@GetMapping("/login")
 	public String login() {
 		return "content/login";

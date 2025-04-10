@@ -53,7 +53,7 @@ public class User {
 	@Column(name = "user_phone", nullable = false, length = 13)
 	private String userPhone;
 
-	@Column(name = "user_address", nullable = false, length = 90)
+	@Column(name = "user_address", length = 90)
 	private String userAddress;
 
 	@Column(name = "social_login_provider", nullable = false, length = 30)

@@ -22,7 +22,8 @@ public class UserService {
     private String uploadDir;
 
     public boolean isUserIdDuplicate(String userId) {
-        return userRepository.existsById(userId);
+//        return userRepository.existsById(userId);
+        return userRepository.existsByUserId(userId);
     }
 
     public boolean isEmailDuplicate(String email) {

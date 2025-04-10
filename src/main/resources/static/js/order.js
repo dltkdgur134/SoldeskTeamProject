@@ -26,8 +26,3 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.getElementById("today-date").textContent = formatted;
 });
 
-
-function toggleMenuPanel() {
-  const panel = document.getElementById('menuPanel');
-  panel.classList.toggle('visible');
-}

@@ -2,56 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
-	<title>주문 관리</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-	<link rel="stylesheet" th:href="@{/css/order.css}">
-	<script defer th:src="@{/js/order.js}"></script>
+	<title>메뉴 관리</title>
+
 </head>
 <body>
-	<div>
-		<h1>　</h1>
-	</div>
-	<div class="topbar">
-		<button class="menu-btn" onclick="toggleSidebar()">☰</button>
-		<h1>영업중</h1>
-		<div class="date-container">
-			<span id="today-date"></span>
-		</div>
-	</div>
-	<div class="sidebar-wrapper" id="sidebarWrapper">
-		<div class="sidebar" id="sidebar">
-			<div class="sidebar-title">
-				독고배달 사장님
-				<button class="close-btn" onclick="toggleSidebar()">X</button>
-			</div>
-			<div class="sidebar-menu">
-				<button class="sidebar-btn"><i class="fas fa-comment"></i> 공지 · 한마디</button>
-				<button class="sidebar-btn"><i class="fas fa-home"></i> 운영정보 관리</button>
-				<button class="sidebar-btn" onclick="toggleMenuPanel()"><i class="fas fa-clipboard-list"></i> 메뉴 · 품절 관리</button>
-				<button class="sidebar-btn"><i class="fas fa-file-pen"></i> 리뷰 관리</button>
-				<a class="sidebar-btn2"> 운영 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
-				<a class="sidebar-btn2"> 프린터 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
-				<a class="sidebar-btn2"> 알림 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
-				<a class="sidebar-btn2"> 배달대행사 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
-			</div>
-		</div>
-		<div class="menu-panel" id="menuPanel">
-			<h2>메뉴 · 품절 관리</h2>
-		</div>
-	</div>
-	<div class="container">
-		<div class="left-panel">
-			<h3></h3>
-		</div>
-
-		<div class="center-panel">
-			<h3>신규/진행 배달</h3>
-		</div>
-
-		<div class="right-panel">
-			<h3>배달</h3>
-		</div>
-	</div>
+	
 </body>
 </html>
 

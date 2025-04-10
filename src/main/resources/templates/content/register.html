@@ -49,34 +49,29 @@
 			    
 				<input type="text" id="email_domain_input" th:value="${emailDomain}" placeholder="도메인" readonly>
 				<select id="email_domain_select" onchange="handleEmailDomainChange(this)">
-				    <option value="" disabled selected>선택</option>
-				    <option value="naver.com">naver.com</option>
-				    <option value="gmail.com">gmail.com</option>
-				    <option value="daum.net">daum.net</option>
-				    <option value="nate.com">nate.com</option>
-				    <option value="hanmail.net">hanmail.net</option>
-				    <option value="direct">직접입력</option>
+					<option value="" disabled selected>선택</option>
+					<option value="naver.com">naver.com</option>
+					<option value="gmail.com">gmail.com</option>
+					<option value="daum.net">daum.net</option>
+					<option value="nate.com">nate.com</option>
+					<option value="hanmail.net">hanmail.net</option>
+					<option value="direct">직접입력</option>
 				</select>
-
-				<!-- 최종 이메일 hidden -->
 				<input type="hidden" name="email" id="full_email">
+			</div>
+			<div class="form-group verification-group" id="verificationGroup" style="display: flex;">
+				<i class="fa-solid fa-envelope-circle-check input-icon"></i>
+				<input type="text" id="emailCodeInput" placeholder="인증 코드 입력">
+				<button type="send-button" onclick="sendVerificationEmail()" style="width: 105px;">인증 코드 전송</button>
+				<button type="verify-button" onclick="verifyCode()" style="width: 75px;">코드 확인</button>
+			</div>
+			<div id="verificationSuccess" class="verification-success" style="display: none;">
+				인증 완료!
 			</div>
 
 			<div class="form-group">
 				<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="userPhone" th:value="${userPhone}"
 				 placeholder="전화번호" pattern="[0-9\-]+" title="숫자와 (-)만 입력하세요" maxlength="13" required>
-			</div>
-
-			<div class="form-group address-group">
-				<i class="fa-solid fa-house input-icon"></i> <input type="text" name="userAddress" id="address"
-				placeholder="주소" th:value="${userAddress}" readonly required>
-				<button type="button" class="address-btn"
-					onclick="execDaumPostcode()">주소 검색</button>
-			</div>
-
-			<div class="form-group">
-				<i class="fa-solid fa-location-dot input-icon"></i> <input type="text" name="userAddressDetail"
-				placeholder="상세 주소" th:value="${userAddressDetail}" maxlength="15">
 			</div>
 
 <!--			<div class="form-group">

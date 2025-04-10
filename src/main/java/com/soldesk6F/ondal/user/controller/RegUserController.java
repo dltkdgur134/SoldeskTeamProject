@@ -32,8 +32,8 @@ public class RegUserController {
             @RequestParam("email") String email,
             @RequestParam("password") String password,
             @RequestParam("userPhone") String userPhone,
-            @RequestParam("userAddress") String userAddress,
-            @RequestParam("userAddressDetail") String userAddressDetail,
+            @RequestParam(value = "userAddress", required = false) String userAddress,
+            @RequestParam(value = "userAddressDetail", required = false) String userAddressDetail,
             @RequestParam("profileImage") MultipartFile profileImage,
             @RequestParam(value = "socialLoginProvider", required = false) String socialLoginProvider,
             Model model
