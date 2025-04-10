@@ -81,9 +81,19 @@ public class User {
 		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE" : socialLoginProvider;
 	}
 	
-	public User update(String name) {
-	    this.userName = name;
+	public User update(String nickName , String userProfilePath) {
+		this.nickName = nickName;
+		this.userProfilePath = userProfilePath;
 	    return this;
 	}
-
+	public User updateProvider(String socialLoginProvider) {
+			this.socialLoginProvider = socialLoginProvider;
+			return this;
+	
+		}
+	public User updateEmail(String email) {
+		this.email = email;
+		return this;
+	}
+	
 }
