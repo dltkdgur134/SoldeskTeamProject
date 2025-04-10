@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>라이더 등록</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/riderRegister.css}">
+<script src="https://kit.fontawesome.com/20dab02d7e.js"
+	crossorigin="anonymous"></script>
+<!-- Daum 주소 검색 API -->
+<script
+	src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+	<div class="form-container">
+		<div class="title-and-error">
+			<h1>라이더 등록</h1>
+			<div class="error-message" th:if="${error}" th:text="${error}"></div>
+		</div>
+
+		<form th:action="@{/rider/register}" method="post">
+			<div class="form-group password-group">
+				<i class="fa-solid fa-lock input-icon"></i> <input type="password"
+					name="secondaryPassword" placeholder="2차 비밀번호" maxlength="10"
+					required>
+			</div>
+
+			<div class="form-group">
+				<i class="fa-solid fa-car input-icon"></i> <input type="text"
+					name="vehicleNumber" placeholder="차량 번호" maxlength="15" required>
+			</div>
+
+			<div class="form-group address-group">
+				<i class="fa-solid fa-warehouse input-icon"></i> <input type="text"
+					name="riderHubAddress" id="riderHubAddress" placeholder="라이더 허브 주소"
+					maxlength="80" readonly required>
+				<button type="button" class="address-btn"
+					onclick="execDaumPostcode()">주소 검색</button>
+			</div>
+	<div class="form-group">
+    <i class="fa-solid fa-truck input-icon"></i> 
+    <div class="delivery-range-options">
+        <button type="button" class="delivery-range-btn" onclick="selectRange(this, 'ONE_KM')">1 km</button>
+        <button type="button" class="delivery-range-btn" onclick="selectRange(this, 'THREE_KM')">3 km</button>
+        <button type="button" class="delivery-range-btn" onclick="selectRange(this, 'FIVE_KM')">5 km</button>
+    </div>
+    <!-- hidden input to store the selected delivery range -->
+    <input type="hidden" name="deliveryRange" id="deliveryRange" required>
+</div>
+
+			<div class="form-group">
+				<i class="fa-solid fa-phone input-icon"></i> <input type="text"
+					name="riderPhone" placeholder="라이더 전화번호" pattern="[0-9\-]+"
+					maxlength="13" required>
+			</div>
+
+			<div class="form-group">
+				<i class="fa-solid fa-location-crosshairs input-icon"></i> <input
+					type="number" step="any" name="hubAddressLatitude" id="hubAddressLatitude"
+					placeholder="위도" required readonly>
+			</div>
+
+			<div class="form-group">
+				<i class="fa-solid fa-location-crosshairs input-icon"></i> <input
+					type="number" step="any" name="hubAddressLongitude" id="hubAddressLongitude"
+					placeholder="경도" required readonly>
+			</div>
+
+			<div class="form-group">
+				<button class="reg-btn" type="submit">라이더 등록하기</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- 스크립트 추가 -->
+	<script>
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                const address = data.roadAddress || data.jibunAddress;
+                console.log('선택된 주소:', address);
+                document.getElementById('riderHubAddress').value = address;
+
+                // 주소로 좌표 요청
+                fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`, {
+                    headers: {
+                        Authorization: 'KakaoAK c7dd39e36776f90fb259bbd8ac3fcdc6'
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                	console.log('Kakao 응답:', result);
+                    const location = result.documents[0];
+                    if (location) {
+                    	document.getElementById('hubAddressLatitude').value = parseFloat(location.y).toFixed(6);
+                    	document.getElementById('hubAddressLongitude').value = parseFloat(location.x).toFixed(6);
+                    } else {
+                        alert('주소의 위치 정보를 찾을 수 없습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('좌표 변환 에러:', error);
+                });
+            }
+        }).open();
+    }
+</script>
+<script>
+//버튼 클릭 시 선택된 버튼에 'selected' 클래스 추가하고, 선택된 배달 범위를 hidden input에 설정
+function selectRange(button, range) {
+    // 모든 버튼에서 'selected' 클래스 제거
+    const allButtons = document.querySelectorAll('.delivery-range-btn');
+    allButtons.forEach(btn => {
+        btn.classList.remove('selected');
+    });
+
+    // 클릭된 버튼에 'selected' 클래스 추가
+    button.classList.add('selected');
+
+    // hidden input에 선택된 배달 범위 값 저장
+    document.getElementById('deliveryRange').value = range;
+
+    // 선택된 값(배달 범위) 콘솔로 출력
+    console.log('Selected delivery range:', range);
+}
+</script>
+</body>
+</html>

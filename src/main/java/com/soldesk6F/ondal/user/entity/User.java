@@ -26,13 +26,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "user_profile_path" }) })
 public class User {
-	@Id
 	@GeneratedValue
 	@UuidGenerator
 	@Column(name = "user_uuid", nullable = false, unique = true)
 	private UUID user_uuid;
 
-	@Column(name = "user_id", nullable = false, unique = true, length = 15)
+	@Column(name = "user_id", nullable = false, unique = true, length = 50)
 	private String userId;
 
 	@Column(name = "password", nullable = false, length = 255)
@@ -53,7 +52,7 @@ public class User {
 	@Column(name = "user_phone", nullable = false, length = 13)
 	private String userPhone;
 
-	@Column(name = "user_address", nullable = false, length = 90)
+	@Column(name = "user_address", nullable = true, length = 90)
 	private String userAddress;
 
 	@Column(name = "social_login_provider", nullable = false, length = 30)
@@ -79,13 +78,14 @@ public class User {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
-	private UserStatus userStatus = UserStatus.UNVERIFIED;
+	private UserStatus userStatus = UserStatus.UNLINKED;
 
 	public enum UserStatus {
 		ACTIVE("정상"), // 정상 회원
 		SUSPENDED("일시 정지"), // 일시 정지
 		BANNED("영구 정지"), // 영구 정지
-		UNVERIFIED("미 인증"); // 이메일 인증 미완료 (기본값)
+		UNLINKED("미연동");	// 소셜 미연동 상태
+		
 
 		private final String description;
 
@@ -127,7 +127,7 @@ public class User {
 		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE"
 				: socialLoginProvider;
 		this.userRole = (userRole != null) ? userRole : UserRole.USER;
-		this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNVERIFIED;
+		this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNLINKED;
 		this.userProfileLiveUpdate = userProfileLiveUpdate;
 	}
 
