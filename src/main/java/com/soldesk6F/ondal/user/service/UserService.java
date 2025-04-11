@@ -1,18 +1,23 @@
 package com.soldesk6F.ondal.user.service;
 
-import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.UserRepository;
-import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
+import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
+
 import java.util.UUID;
 
 @Service
@@ -86,4 +91,24 @@ public class UserService {
             return false;
         }
 	}
+    
+    @Transactional
+    public boolean updateUserNickname(String nickName, User user, Model model) {
+    	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+    	if (findUser.get().getNickName().equals(nickName)) {
+//    		throw new IllegalArgumentException("기존 닉네임과 동일합니다.");
+    		return false;
+    	} else {
+    		findUser.ifPresent(U -> U.setNickName(nickName) );
+    		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()) );
+    		return true;
+    	}
+    	
+//    	findUser.ifPresent(value -> value.setNickName(nickName));
+    }
+
+    
+    
+    
 }
+

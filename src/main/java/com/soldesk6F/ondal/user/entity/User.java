@@ -136,7 +136,6 @@ public class User {
 	    this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNLINKED;
 	    this.userProfileLiveUpdate = userProfileLiveUpdate;
 	}
-
 	public User update(String name) {
 		this.userName = name;
 		return this;

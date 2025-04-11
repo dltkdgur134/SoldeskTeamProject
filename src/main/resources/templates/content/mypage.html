@@ -10,6 +10,7 @@
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
 <script th:src="@{/js/initialize.js}"></script>
 <script th:src="@{/js/zipcode.js}"></script>
+<script th:src="@{/js/register.js}"></script>
 </head>
 <div layout:fragment="content" class="container py-5">
 	<div class="card info-card p-4">
@@ -31,19 +32,19 @@
 					class="form-control" placeholder="온달" aria-label="nickname"
 					aria-describedby="basic-addon2" th:value="${#authentication.principal.user.nickName}">
 			</div>
-			<div class="input-group mb-3">
+	<!-- 		<div class="input-group mb-3">
 				<span class="input-group-text" id="basic-addon3"><i
 					class="fa-solid fa-envelope"></i></span> <input type="text"
 					class="form-control" placeholder="abcd@gmail.com"
 					aria-label="email" aria-describedby="basic-addon3" th:value="${#authentication.principal.user.email}">
-			</div>
-			<div class="input-group mb-3">
+			</div> -->
+			<!-- <div class="input-group mb-3">
 				<span class="input-group-text" id="basic-addon4"><i
 					class="fa-solid fa-phone"></i></span> <input type="text"
 					class="form-control" placeholder="010-1234-5678"
 					aria-label="user_phone" aria-describedby="basic-addon4" th:value="${#authentication.principal.user.userPhone}">
-			</div>
-			<div class="input-group mb-3">
+			</div> -->
+			<!-- <div class="input-group mb-3">
 				<span class="input-group-text" id="basic-addon6"><i
 					class="fa-solid fa-house"></i></span> <input type="text" 
 					class="form-control" placeholder="서울 강남구 봉은사로 119 성옥빌딩 6층"
@@ -56,11 +57,35 @@
 					class="fa-solid fa-house"></i></span> <input type="text" 
 					class="form-control" placeholder="상세주소"
 					aria-label="user_address2" aria-describedby="basic-addon7"  id="sample6_detailAddress">
-			</div>
-			<div>
+			</div> -->
+			<!-- <div>
 				<input type="text" id="sample6_extraAddress" placeholder="참고항목" hidden>
 				<input type="text" id="sample6_postcode" placeholder="우편번호" hidden>
 			</div>
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="basic-addon7"><i
+					class="fa-solid fa-house"></i></span> <input type="text" 
+					class="form-control" placeholder="상세주소"
+					aria-label="user_address2" aria-describedby="basic-addon7"  id="sample6_detailAddress">			
+			</div> -->
+			<div class="input-group mb-3">
+  				<span class="input-group-text" id="basic-addon7">
+				<i class="fa-solid fa-folder-open input-icon"></i>
+				</span>
+  				<input type="file" class="form-control" id="inputGroupFile01">
+			</div>
+		<!-- 	<div class="form-group file-upload-group">
+			  <i class="fa-solid fa-folder-open input-icon"></i>
+
+			  숨겨진 진짜 파일 input
+			  <input type="file" id="profileImage" name="profileImage" accept="image/*" hidden>
+
+			  사용자가 클릭하는 커스텀 버튼
+			  <label for="profileImage" class="custom-file-label">프로필 사진 선택</label>
+
+			  선택된 파일명 보여주기
+			  <span id="file-name-display" class="file-name">이미지를 선택해주세요</span>
+			</div> -->
 			<div class="d-grid gap-2 col-6 mx-auto">
 			  <button class="btn btn-primary" type="button" >수정하기</button>
 			  <button class="btn btn-primary" type="button">뒤로가기</button>

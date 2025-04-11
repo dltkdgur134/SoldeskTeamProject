@@ -33,6 +33,12 @@
 			<button type="button" class="btn-close text-reset"
 				data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
+		<div sec:authorize="isAnonymous()">
+				<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
+			</div>
+			<div sec:authorize="isAnonymous()">
+				<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
+			</div>
 		<div class="container" sec:authorize="isAuthenticated()">
     <div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
         <div class="row g-0">
@@ -122,12 +128,7 @@
 					</ul>	
 				</div>
 			</div>
-			<div sec:authorize="isAnonymous()">
-				<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
-			</div>
-			<div sec:authorize="isAnonymous()">
-				<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
-			</div>
+			
 		</div>
 	</div>
 </div>
