@@ -36,5 +36,7 @@ public class BrandImg {
 		this.store = store;
 		this.brandImgFilePath = brandImgFilePath;
 	}
+    
+    
 
 }

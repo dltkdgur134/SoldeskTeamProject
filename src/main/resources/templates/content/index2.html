@@ -17,9 +17,12 @@
         	</div>
         </div>
 		<div class="food-buttons">
+			<button class="food-btn" onclick="loadCategory('korean', this)">패스트푸드</button>
+		    <button class="food-btn" onclick="loadCategory('korean', this)">중식</button>
 		    <button class="food-btn" onclick="loadCategory('korean', this)">한식</button>
-		    <button class="food-btn" onclick="loadCategory('western', this)">양식</button>
-		    <button class="food-btn" onclick="loadCategory('snack', this)">분식</button>
+		    <button class="food-btn" onclick="loadCategory('korean', this)">분식</button>
+		    <button class="food-btn" onclick="loadCategory('korean', this)">치킨</button>
+		    <button class="food-btn" onclick="loadCategory('korean', this)">피자</button>
 		</div>
 		<div id="gallery-area">
 			<div class="gallery-container">
@@ -28,18 +31,27 @@
 		</div>
 	</div>
 	<div layout:fragment="js">
-	<script>
-		function loadCategory(category, btn) {
-			fetch(`/fragments/foods/${category}.html`)
-				.then(res => res.text())
-				.then(html => {
-					document.getElementById("gallery-area").innerHTML = html;
-				})
-				.catch(error => console.error("불러오기 실패: ", error));
-	
-			document.querySelectorAll(".food-btn").forEach(b => b.classList.remove("active"));
-			btn.classList.add("active");
-		}
+		<script>
+			function loadCategory(category) {
+			  fetch(`/api/stores/${category}`)
+			    .then(res => res.json())
+			    .then(data => {
+			      const gallery = document.querySelector("#gallery-area");
+			      gallery.innerHTML = `
+			        <div class="gallery-container">
+			          ${
+			            data.map(store => `
+			              <div>
+			                <a href="#" class="labels">${store.storeName}</a>
+			                <img class="imgs" src="${store.imageUrl}" alt="${store.storeName}">
+			              </div>
+			            `).join("")
+			          }
+			        </div>
+			      `;
+			    })
+			    .catch(error => console.error("불러오기 실패: ", error));
+			}
 		</script>
 	</div>
 </html>
