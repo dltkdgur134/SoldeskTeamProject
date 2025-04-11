@@ -125,7 +125,6 @@ public class User {
 		this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNVERIFIED;
 		this.userProfileLiveUpdate = userProfileLiveUpdate;
 	}
-	
 	public User update(String name) {
 		this.userName = name;
 		return this;

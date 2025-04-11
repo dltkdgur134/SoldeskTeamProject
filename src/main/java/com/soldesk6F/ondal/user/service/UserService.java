@@ -92,7 +92,6 @@ public class UserService {
     	if (findUser.get().getNickName().equals(nickName)) {
 //    		throw new IllegalArgumentException("기존 닉네임과 동일합니다.");
     		return false;
-    		
     	} else {
     		findUser.ifPresent(U -> U.setNickName(nickName) );
     		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()) );
