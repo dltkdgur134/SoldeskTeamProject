@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+    <title>업주 페이지</title>
+    <!-- SockJS / STOMP 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<h1>업주 페이지</h1>
+
+<!-- 새 주문이 도착했을 때 띄울 팝업(예: Bootstrap Modal, jQuery UI Dialog 등 활용) -->
+<div id="newOrderPopup" style="display:none; border:1px solid #ccc; padding:20px;">
+    <h3>새 주문 도착!</h3>
+    <div>
+        <p>주문 정보: <span id="orderInfo"></span></p>
+        <p>옵션: <span id="orderOptions"></span></p>
+        <p>수량: <span id="orderCount"></span></p>
+        <p>금액: <span id="orderPrice"></span></p>
+    </div>
+    <div>
+        <p>가게 요청사항: <span id="storeRequest"></span></p>
+        <p>배달 요청사항: <span id="deliveryRequest"></span></p>
+        <p>수저 포함 여부: <span id="needSpoon"></span></p>
+    </div>
+    <div>
+        <p>주문번호: <span id="orderId"></span></p>
+        <p>연락처: <span id="contactNumber"></span></p>
+        <p>배달 주소: <span id="address"></span></p>
+    </div>
+
+    <!-- 배달 완료 예정 시간(5분 간격 조절) -->
+    <div>
+        <button type="button" onclick="changeTime(-5)">-5분</button>
+        <input type="text" id="completionTime" value="0" size="4" />
+        <button type="button" onclick="changeTime(5)">+5분</button>
+    </div>
+
+    <!-- 주문 접수 & 거부 버튼 -->
+    <div>
+        <button id="acceptBtn">접수</button>
+        <button id="rejectBtn">거부</button>
+    </div>
+</div>
+
+<script>
+    let stompClient = null;
+    const storeId = /* [[${storeId}]] */ '1'; // 실제 로그인 업주의 가게 번호로 치환
+
+    // WebSocket 연결
+    function connect() {
+        const socket = new SockJS('/stomp');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function(frame) {
+            console.log('Connected: ' + frame);
+            // /topic/store/가게번호 구독 (새 주문 알림용)
+            stompClient.subscribe('/topic/store/' + storeId, function(message) {
+                const orderData = JSON.parse(message.body);
+                showNewOrderPopup(orderData);
+            });
+        });
+    }
+
+    // 새 주문 팝업 표시
+    function showNewOrderPopup(order) {
+        // 주문 정보 표시
+        $('#orderInfo').text(order.menuNameList);
+        $('#orderOptions').text(order.options);
+        $('#orderCount').text(order.totalCount);
+        $('#orderPrice').text(order.totalPrice);
+
+        $('#storeRequest').text(order.storeRequest);
+        $('#deliveryRequest').text(order.deliveryRequest);
+        $('#needSpoon').text(order.needSpoon ? '예' : '아니오');
+
+        $('#orderId').text(order.id);
+        $('#contactNumber').text(order.contactNumber);
+        $('#address').text(order.address);
+
+        // 팝업 열기 (jQuery 예시)
+        $('#newOrderPopup').show();
+
+        // 버튼 이벤트 등록
+        $('#acceptBtn').off('click').on('click', function() {
+            acceptOrder(order.id, $('#completionTime').val());
+        });
+        $('#rejectBtn').off('click').on('click', function() {
+            rejectOrder(order.id);
+        });
+    }
+
+    // 배달 완료시간 + - 버튼 조절 (5분 단위)
+    function changeTime(minute) {
+        let current = parseInt($('#completionTime').val(), 10);
+        if (isNaN(current)) current = 0;
+        $('#completionTime').val(current + minute);
+    }
+
+    // 주문 접수
+    function acceptOrder(orderId, completionTime) {
+        $.ajax({
+            url: '/owner/order/accept',
+            type: 'POST',
+            data: {
+                orderId: orderId,
+                completionTime: completionTime
+            },
+            success: function(response) {
+                alert('주문 접수가 완료되었습니다.');
+                $('#newOrderPopup').hide();
+            }
+        });
+    }
+
+    // 주문 거부
+    function rejectOrder(orderId) {
+        $.ajax({
+            url: '/owner/order/reject',
+            type: 'POST',
+            data: { orderId: orderId },
+            success: function(response) {
+                alert('주문이 거부되었습니다.');
+                $('#newOrderPopup').hide();
+            }
+        });
+    }
+
+    // 페이지 로드 시 WebSocket 연결
+    $(document).ready(function() {
+        connect();
+    });
+</script>
+
+</body>
+</html>

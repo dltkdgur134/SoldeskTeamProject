@@ -155,5 +155,4 @@ public class Store {
 	    return storeId != null ? storeId .toString() : null;
 	}
 	
-	
 }
