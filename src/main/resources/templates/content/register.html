@@ -61,7 +61,24 @@
 				<!-- 최종 이메일 hidden -->
 				<input type="hidden" name="email" id="full_email">
 			</div>
-
+			<!-- 인증 코드 입력 -->
+			<div class="form-group verification-group">
+			  <div class="input-with-button">
+			    <i class="fa-solid fa-key input-icon"></i>
+			    <input type="text" id="emailCode" placeholder="인증 코드 6자리" pattern="\d{6}" maxlength="6" required>
+			    <button type="button" class="verify-btn" onclick="verifyEmailCode()">이메일 인증</button>
+			  </div>
+			
+			  <!-- 결과 메시지 (아래에 출력) -->
+			  <div id="email-verify-result" class="verify-result"></div>
+			</div>
+			
+			<!-- 숨겨진 email 전체 주소 및 인증 완료 여부 -->
+			<input type="hidden" id="full_email" name="email">
+			<input type="hidden" id="emailVerified" name="emailVerified" value="false">
+			
+			
+			
 			<div class="form-group">
 				<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="userPhone" th:value="${userPhone}"
 				 placeholder="전화번호" pattern="[0-9\-]+" title="숫자와 (-)만 입력하세요" maxlength="13" required>

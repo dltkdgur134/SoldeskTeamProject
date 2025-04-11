@@ -131,3 +131,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
   });
 });
+function handleEmailDomainChange(select) {
+  const domainInput = document.getElementById('email_domain_input');
+  if (select.value === 'direct') {
+    domainInput.value = '';
+    domainInput.readOnly = false;
+    domainInput.style.backgroundColor = '#fff';
+    domainInput.focus();
+  } else {
+    domainInput.value = select.value;
+    domainInput.readOnly = true;
+    domainInput.style.backgroundColor = '#e9ecef';
+  }
+
+  const defaultOption = select.querySelector('option[value=""]');
+  if (defaultOption) select.removeChild(defaultOption);
+}
+
+function verifyEmailCode() {
+  const code = document.getElementById('emailCode').value.trim();
+  const emailId = document.getElementById('email_id').value.trim();
+  const domain = document.getElementById('email_domain_input').value.trim();
+  const email = emailId + '@' + domain;
+
+  const resultDiv = document.getElementById('email-verify-result');
+
+  if (!emailId || !domain || !code) {
+    resultDiv.textContent = '❌ 모든 정보를 입력해주세요.';
+    resultDiv.className = 'verify-result fail';
+    return;
+  }
+
+  fetch('/auth/verifyCode?email=' + email + '&code=' + code)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        resultDiv.textContent = "✅ 인증에 성공했습니다.";
+        resultDiv.className = "verify-result success";
+        document.getElementById('emailVerified').value = 'true';
+      } else {
+        resultDiv.textContent = "❌ 인증 코드가 올바르지 않습니다.";
+        resultDiv.className = "verify-result fail";
+        document.getElementById('emailVerified').value = 'false';
+      }
+    });
+}
