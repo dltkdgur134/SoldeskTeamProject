@@ -43,7 +43,7 @@
     <div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
         <div class="row g-0">
             <div class="col-md-4 p-3 text-center">
-                <img src="https://randomuser.me/api/portraits/men/64.jpg" class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture">
+                <img th:src="@{'/img/userProfiles\\' + ${#strings.setSplit(#authentication.principal.user.userProfilePath, '\\\\')[1]}}" class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture">
                 <div class="mt-2">
                     <span class="badge bg-success" th:text="${#authentication.principal.user.userRole}"></span>
                 </div>

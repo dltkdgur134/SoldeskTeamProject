@@ -10,7 +10,8 @@ body {
 	src : url('yisunshinM.ttf') format("truetype");
 }
 
-#drop_zone {
+
+#drop-zone {
   border: 5px solid #ffef99;
   border-radius: 10px;
   width: 100%;
@@ -19,3 +20,5 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+

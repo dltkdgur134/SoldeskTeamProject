@@ -20,7 +20,7 @@
 		<div class="row justify-content-md-center">
 			<div class="col col-lg-2">
 				<a type="button" class="btn btn-link position-relative" id="profile-pic-btn" data-bs-toggle="modal" data-bs-target="#updateProfilePicModal">
-					<img src="https://randomuser.me/api/portraits/men/64.jpg" class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture" id="profile-pic">
+					<img th:src="@{'/img/userProfiles\\' + ${#strings.setSplit(#authentication.principal.user.userProfilePath, '\\\\')[1]}}"  class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture" id="profile-pic">
 					<span class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle" id="profile-pic-update-btn">
 	    				<i class="fa-solid fa-pen-to-square"></i>
 	  				</span>
@@ -41,10 +41,14 @@
 		</h6>
 		<div class="card-body">
 			<ul class="list-group list-group-flush">
-				<li class="list-group-item d-flex justify-content-between"><Label>아이디</Label><strong th:text="${#authentication.principal.user.userId}"></strong>
+				<li class="list-group-item d-flex justify-content-between align-items-center">
+					<Label>아이디</Label>
+					<strong th:text="${#authentication.principal.user.userId}"></strong>
+					<i data-bs-toggle="tooltip"
+						data-bs-placement="right" title="아이디는 변경하실 수 없습니다." class="fa-solid fa-circle-question"></i>
   				</li>
 				<li class="list-group-item d-flex justify-content-between"><Label>닉네임</Label>
-				<strong th:text="${#authentication.principal.user.nickName}"></strong>
+				<strong  th:text="${#authentication.principal.user.nickName}"></strong>
 					<a type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateNicknameModal">수정</a>
 				</li>
 			</ul>
@@ -92,18 +96,19 @@
      	 		</div>
       			<div class="modal-body">
        				 <form th:action="@{/content/updateProfilePic}" method="post" 
-						autocomplete="off" id="update-profilePic-form">
+						autocomplete="off" id="update-profilePic-form" enctype="multipart/form-data">
 						<div class="input-group mb-3">
   							<label class="input-group-text" for="profileImage"><i class="fa-solid fa-folder-open input-icon"></i></label>
-  							<input type="file" class="form-control" id="profileImage">
+  							<input type="file" class="form-control" id="profileImage" name="profileImage">
 						</div>
 						<div
-  							id="drop_zone"
+  							id="drop-zone"
   							ondrop="dropHandler(event);"
-  							ondragover="dragOverHandler(event);">
+  							ondragover="dragOverHandler(event);"
+  							ondragenter="dragEnterHandler(event);">
   							<p>이미지 파일을 <i>여기에</i> 드래그하여 업로드.</p>
 						</div>
-			  			<div id="file-name-display" class="file-name">이미지를 선택해주세요</div>
+			  			<div id="file-name-display" class="file-name"></div>
 					</form>	
       			</div>
       			<div class="modal-footer">
