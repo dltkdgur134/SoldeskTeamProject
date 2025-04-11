@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "yisunshinM";
+	src : url('yisunshinM.ttf') format("truetype");
+}
+
+body {
+	font-family: "yisunshinM";
+	src : url('yisunshinM.ttf') format("truetype");
+}
+
+#drop_zone {
+  border: 5px solid #ffef99;
+  border-radius: 10px;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
