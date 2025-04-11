@@ -100,3 +100,29 @@ function dragOverHandler(ev) {
   ev.preventDefault();
 }
 
+function checkRiderNicknameValidity() {
+  const oldNickname = document.getElementById("profile-nickName");
+  const newNickname = document.getElementById("rider-nickname-input");
+
+  if (
+    oldNickname.textContent.trim() === newNickname.value.trim() ||
+    newNickname.value.trim() === ""
+  ) {
+    newNickname.classList.add("is-invalid");
+    newNickname.classList.remove("is-valid");
+    return false;
+  } else {
+    newNickname.classList.add("is-valid");
+    newNickname.classList.remove("is-invalid");
+    return true;
+  }
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const nicknameInput = document.getElementById("rider-nickname-input");
+
+  if (nicknameInput) {
+    nicknameInput.addEventListener("input", checkRiderNicknameValidity);
+  }
+});

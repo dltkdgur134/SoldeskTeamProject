@@ -8,6 +8,8 @@ import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,11 @@ public class RiderService {
     	return riderRepository.existsByUser_UserId(userId);
     }
 
+    public Rider getRiderByUserId(String userId) {
+        return riderRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("라이더 정보가 존재하지 않습니다."));
+    }
+    
     
     public void registerRider(User user ,RiderForm form) {
         // 현재 인증된 사용자 가져오기
@@ -54,6 +61,7 @@ public class RiderService {
                 .riderPhone(form.getRiderPhone())
                 .hubAddressLatitude(form.getHubAddressLatitude())
                 .hubAddressLongitude(form.getHubAddressLongitude())
+                .riderNickname(form.getRiderNickname())
                 .build();
 
         // DeliveryRange 값 설정 (Enum 변환)
@@ -67,5 +75,32 @@ public class RiderService {
         riderRepository.save(rider);  // Rider 저장
     }
 
+    @Transactional
+    public void updateRiderInfo(String userId, String riderNickname,String vehicleNumber, 
+    							String riderPhone, String riderHubAddress,
+    							double hubAddressLatitude,double hubAddressLongitude,
+    							DeliveryRange deliveryRange) {
+        Optional<User> optionalUser = userRepository.findByUserId(userId);
+        if (!optionalUser.isPresent()) {
+            throw new IllegalArgumentException("유저가 존재하지 않습니다.");
+        }
+
+        Optional<Rider> optionalRider = riderRepository.findByUser_UserId(userId);
+        if (!optionalRider.isPresent()) {
+            throw new IllegalArgumentException("라이더 정보가 존재하지 않습니다.");
+        }
+
+        Rider rider = optionalRider.get();
+
+        // 값이 null이 아닌 것만 수정
+        if (riderNickname != null) rider.setRiderNickname(riderNickname);
+        if (vehicleNumber != null) rider.setVehicleNumber(vehicleNumber);
+        if (riderHubAddress != null) rider.setRiderHubAddress(riderHubAddress);
+        if (riderPhone != null) rider.setRiderPhone(riderPhone);
+        if (hubAddressLatitude > 0) rider.setHubAddressLatitude(hubAddressLatitude);
+        if (hubAddressLongitude > 0) rider.setHubAddressLongitude(hubAddressLongitude);
+        if (deliveryRange != null) rider.setDeliveryRange(deliveryRange);
+        riderRepository.save(rider);
+    }
 
 }

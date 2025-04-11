@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.User;
 
 import java.util.Collection;
@@ -35,6 +36,8 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
         return user;
     }
 
+    
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.getKey()));

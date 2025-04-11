@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user.controller;
+package com.soldesk6F.ondal.user.controller.user;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
