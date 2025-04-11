@@ -1,95 +1,96 @@
 @charset "UTF-8";
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
+	background-color: #f8f9fa;
+	margin: 0;
+}
+
+.rider-register-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    min-height: calc(100vh - 160px); /* 헤더 + 푸터 높이 고려 (적절히 조정) */
+    padding: 40px 20px;
 }
-
 .form-container { /* 회원가입 */
-    width: 400px;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
+	width: 400px;
+	background-color: #ffffff;
+	padding: 20px;
+	border-radius: 8px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	justify-content: center;
+	align-items: center;
 }
 
 .form-container h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #343a40;
+	font-size: 24px;
+	margin-bottom: 20px;
+	color: #343a40;
 }
 
 .form-group {
-    position: relative;
-    margin-bottom: 15px;
+	position: relative;
+	margin-bottom: 15px;
 }
 
 .input-icon {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #aaa;
-    font-size: 16px;
-    pointer-events: none;
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #aaa;
+	font-size: 16px;
+	pointer-events: none;
 }
 
 .custom-file-label {
-  display: inline-block;
-  padding: 10px 15px;
-  background-color: #ffc107;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  margin-left: 35px;
+	display: inline-block;
+	padding: 10px 15px;
+	background-color: #ffc107;
+	color: white;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: bold;
+	margin-left: 35px;
 }
 
 .custom-file-label:hover {
-  background-color: #d39e00;
+	background-color: #d39e00;
 }
 
 .file-name {
-  margin-left: 10px;
-  font-size: 14px;
-  color: #555;
+	margin-left: 10px;
+	font-size: 14px;
+	color: #555;
 }
 
 .form-group input:not([type="radio"]) {
-    width: 100%;
-    padding: 10px 10px 10px 35px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    color: #495057;
+	width: 100%;
+	padding: 10px 10px 10px 35px;
+	font-size: 16px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+	color: #495057;
 }
 
-
 .title-and-error {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 10px;
-    margin-bottom: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 10px;
+	margin-bottom: 20px;
 }
 
 .title-and-error h1 {
-    margin: 0;
+	margin: 0;
 }
 
 .error-message {
-    color: red;
-    font-size: 16px;
+	color: red;
+	font-size: 16px;
 }
-
-
 
 .address-group {
 	position: relative;
@@ -119,46 +120,45 @@ body {
 }
 
 .reg-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #ffc107;
-    border: none;
-    border-radius: 4px;
-    color: #ffffff;
-    font-size: 16px;
-    cursor: pointer;
+	width: 100%;
+	padding: 10px;
+	background-color: #ffc107;
+	border: none;
+	border-radius: 4px;
+	color: #ffffff;
+	font-size: 16px;
+	cursor: pointer;
 }
 
 .reg-btn:hover {
-    background-color: #D39E00;
+	background-color: #D39E00;
 }
-
 
 /* 기본 스타일 */
 .delivery-range-options {
-    display: flex;
-    justify-content: center; /* 가운데 정렬로 버튼 간격 좁힘 */
-    gap: 30px; /* 각 버튼 간격을 좁히기 위한 값 */
-    margin-top: 10px;
+	display: flex;
+	justify-content: center; /* 가운데 정렬로 버튼 간격 좁힘 */
+	gap: 30px; /* 각 버튼 간격을 좁히기 위한 값 */
+	margin-top: 10px;
 }
 
 .delivery-range-btn {
-    padding: 10px 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f0f0f0;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+	padding: 10px 20px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #f0f0f0;
+	font-size: 16px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* 클릭된 버튼 스타일 */
 .delivery-range-btn.selected {
-    background-color: #ffc107;
-    color: white;
+	background-color: #ffc107;
+	color: white;
 }
 
 /* hover 상태 */
 .delivery-range-btn:hover {
-    background-color: #ddd;
+	background-color: #ddd;
 }
