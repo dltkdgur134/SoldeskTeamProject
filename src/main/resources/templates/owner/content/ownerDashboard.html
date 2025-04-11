@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
     <title>업주 페이지</title>
     <!-- SockJS / STOMP 라이브러리 -->
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/webjars/org.webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
 </head>
-<body>
+<body>	
 <h1>업주 페이지</h1>
 
 <!-- 새 주문이 도착했을 때 띄울 팝업(예: Bootstrap Modal, jQuery UI Dialog 등 활용) -->
@@ -31,14 +31,14 @@
         <p>배달 주소: <span id="address"></span></p>
     </div>
 
-    <!-- 배달 완료 예정 시간(5분 간격 조절) -->
+    배달 완료 예정 시간(5분 간격 조절)
     <div>
         <button type="button" onclick="changeTime(-5)">-5분</button>
         <input type="text" id="completionTime" value="0" size="4" />
         <button type="button" onclick="changeTime(5)">+5분</button>
     </div>
 
-    <!-- 주문 접수 & 거부 버튼 -->
+    주문 접수 & 거부 버튼
     <div>
         <button id="acceptBtn">접수</button>
         <button id="rejectBtn">거부</button>
