@@ -1,21 +1,23 @@
 @charset "UTF-8";
 
 body {
-    font-family: Arial, sans-serif;
+/*    font-family: Arial, sans-serif;*/
     background-color: #f8f9fa;
-    display: flex;
+    /*display: flex;*/
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
 }
 
-.form-container { /* 회원가입 */
+.form-container {
     width: 400px;
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	margin: 30px auto;
+	text-align: start;
 }
 
 .form-container h1 {
@@ -228,6 +230,7 @@ form input {
   font-weight: bold;
   padding: 8px 10px;
   cursor: pointer;
+  font-size: 13.3px;
 }
 
 .verification-group button:hover {

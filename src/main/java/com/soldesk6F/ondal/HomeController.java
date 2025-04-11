@@ -33,6 +33,10 @@ public class HomeController {
 		return "content/store";
 	}
 	
+	@GetMapping("/temp99")
+	public String temp99() {
+		return "content/temp99";
+	}
 
 //	@GetMapping("/")
 //	public String main(Principal principal) {

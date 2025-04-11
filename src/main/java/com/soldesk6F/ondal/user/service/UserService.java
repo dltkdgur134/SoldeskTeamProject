@@ -41,13 +41,15 @@ public class UserService {
 
 	        String fileName = "default.png";
 	        String extension = "png";
-	        String filePath = uploadDir + File.separator + fileName;
+//	        String filePath = uploadDir + File.separator + fileName;
+	        
+	        String webPath = "/img/userProfiles/" + fileName;
 	
 	        if (profileImage != null && !profileImage.isEmpty()) {
 	        	String originalFilename = profileImage.getOriginalFilename();
 	        	extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
 	        	fileName = userId + "_" + System.currentTimeMillis() + "." + extension;
-	            String savePath = new File(uploadDir).getAbsolutePath(); // getRealPath()
+	            String savePath = new File(uploadDir).getAbsolutePath();
 	
 	            File saveFolder = new File(savePath);
 	            if (!saveFolder.exists()) {
@@ -56,7 +58,8 @@ public class UserService {
 	
 	            File saveFile = new File(saveFolder, fileName);
 	            profileImage.transferTo(saveFile);
-	            filePath = uploadDir + File.separator + fileName;
+//	            filePath = uploadDir + File.separator + fileName;
+	            webPath = "/img/userProfiles/" + fileName;
 	        }
 	
 	        String encryptedPassword = passwordEncoder.encode(password);
@@ -69,7 +72,7 @@ public class UserService {
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
 	                .userAddress(userAddress + " " + userAddressDetail)	
-	                .userProfilePath(filePath)
+	                .userProfilePath(webPath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
 	
