@@ -1,112 +1,108 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
 <head>
 <title>회원가입</title>
 <meta charset="UTF-8">
 	<link rel="stylesheet" th:href="@{/css/register.css}">
+	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
 	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script>
 	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
-	<div class="form-container">
-		<div class="title-and-error">
-			<h1>회원가입</h1>
-			<div class="error-message" th:if="${error}" th:text="${error}"></div>
+
+	<div layout:fragment="content">
+		<div class="form-container">
+			<div class="title-and-error">
+				<h1>회원가입</h1>
+				<div class="error-message" th:if="${error}" th:text="${error}"></div>
+			</div>
+			<form th:action="@{/content/register}" method="post" 
+				enctype="multipart/form-data">
+				<div class="form-group">
+					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="userId" th:value="${userId}" 
+					placeholder="아이디" pattern="[a-zA-Z0-9]+" title="아이디는 영문자와 숫자만 입력할 수 있어요" maxlength="15" required>
+				</div>
+	
+				<div class="form-group password-group">
+					<i class="fa-solid fa-lock input-icon"></i> <input type="password" name="password" id="password" placeholder="비밀번호" maxlength="20" required>
+					<span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
+				</div>
+				
+				<div class="form-group password-group">
+				    <i class="fa-solid fa-lock input-icon"></i>
+				    <input type="password" id="confirmPassword" placeholder="비밀번호 확인" maxlength="20" required>
+				    <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">👁️</span>
+				</div>
+	
+				<div class="form-group">
+					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="userName" th:value="${userName}"
+					placeholder="이름" pattern="[가-힣a-zA-Z\s]+" title="이름은 한글과 영문자만 입력할 수 있어요" maxlength="10" required>
+				</div>
+	
+				<div class="form-group">
+					<i class="fa-solid fa-smile input-icon"></i> <input type="text" name="nickname" th:value="${nickname}" 
+					placeholder="닉네임" pattern="[가-힣a-zA-Z0-9\s]+" title="닉네임에는 특수문자를 사용할 수 없습니다" maxlength="20" required>
+				</div>
+	
+				<div class="form-group email-group">
+					<i class="fa-solid fa-envelope input-icon"></i>
+					<input type="text" id="email_id" th:value="${emailId}" placeholder="이메일" pattern="[a-zA-Z0-9]+" title="이메일은 영문자와 숫자만 입력할 수 있어요" maxlength="20" required>
+				  
+					<span class="email-at">@</span>
+				    
+					<input type="text" id="email_domain_input" th:value="${emailDomain}" placeholder="도메인" readonly>
+					<select id="email_domain_select" onchange="handleEmailDomainChange(this)">
+						<option value="" disabled selected>선택</option>
+						<option value="naver.com">naver.com</option>
+						<option value="gmail.com">gmail.com</option>
+						<option value="daum.net">daum.net</option>
+						<option value="nate.com">nate.com</option>
+						<option value="hanmail.net">hanmail.net</option>
+						<option value="direct">직접입력</option>
+					</select>
+					<input type="hidden" name="email" id="full_email">
+				</div>
+				<div class="form-group verification-group" id="verificationGroup" style="display: flex;">
+					<i class="fa-solid fa-envelope-circle-check input-icon"></i>
+					<input type="text" id="emailCodeInput" placeholder="인증 코드 입력">
+					<button type="button" onclick="sendVerificationEmail()" style="width: 105px;">인증 코드 전송</button>
+					<button type="button" onclick="verifyCode()" style="width: 75px;">코드 확인</button>
+				</div>
+				<div id="verificationSuccess" class="verification-success" style="display: none;">
+					인증 완료!
+				</div>
+	
+				<div class="form-group">
+					<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="userPhone" th:value="${userPhone}"
+					 placeholder="전화번호" pattern="[0-9\-]+" title="숫자와 (-)만 입력하세요" maxlength="13" required>
+				</div>
+	
+	<!--			<div class="form-group">
+					<i class="fa-solid fa-folder-open input-icon"></i> <input type="file" name="profileImage" accept="image/*" required>
+				</div>
+				-->
+				<div class="form-group file-upload-group">
+					<i class="fa-solid fa-folder-open input-icon"></i>
+	
+					<input type="file" id="profileImage" name="profileImage" accept="image/*" hidden>
+	
+					<label for="profileImage" class="custom-file-label">프로필 사진 선택</label>
+	
+					<span id="file-name-display" class="file-name">이미지를 선택해주세요</span>
+				</div>
+				
+				<div class="form-group">
+					<button class="reg-btn" type="submit">가입하기</button>
+				</div>
+			</form>
 		</div>
-		<form th:action="@{/content/register}" method="post" 
-			enctype="multipart/form-data">
-			<div class="form-group">
-				<i class="fa-solid fa-user input-icon"></i> <input type="text" name="userId" th:value="${userId}" 
-				placeholder="아이디" pattern="[a-zA-Z0-9]+" title="아이디는 영문자와 숫자만 입력할 수 있어요" maxlength="15" required>
-			</div>
-
-			<div class="form-group password-group">
-				<i class="fa-solid fa-lock input-icon"></i> <input type="password" name="password" id="password" placeholder="비밀번호" maxlength="20" required>
-				<span class="toggle-password" onclick="togglePassword('password', this)">👁️</span>
-			</div>
-			
-			<div class="form-group password-group">
-			    <i class="fa-solid fa-lock input-icon"></i>
-			    <input type="password" id="confirmPassword" placeholder="비밀번호 확인" maxlength="20" required>
-			    <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">👁️</span>
-			</div>
-
-			<div class="form-group">
-				<i class="fa-solid fa-user input-icon"></i> <input type="text" name="userName" th:value="${userName}"
-				placeholder="이름" pattern="[가-힣a-zA-Z\s]+" title="이름은 한글과 영문자만 입력할 수 있어요" maxlength="10" required>
-			</div>
-
-			<div class="form-group">
-				<i class="fa-solid fa-smile input-icon"></i> <input type="text" name="nickname" th:value="${nickname}" 
-				placeholder="닉네임" pattern="[가-힣a-zA-Z0-9\s]+" title="닉네임에는 특수문자를 사용할 수 없습니다" maxlength="20" required>
-			</div>
-
-			<div class="form-group email-group">
-				<i class="fa-solid fa-envelope input-icon"></i>
-				<input type="text" id="email_id" th:value="${emailId}" placeholder="이메일" pattern="[a-zA-Z0-9]+" title="이메일은 영문자와 숫자만 입력할 수 있어요" maxlength="20" required>
-			  
-				<span class="email-at">@</span>
-			    
-				<input type="text" id="email_domain_input" th:value="${emailDomain}" placeholder="도메인" readonly>
-				<select id="email_domain_select" onchange="handleEmailDomainChange(this)">
-				    <option value="" disabled selected>선택</option>
-				    <option value="naver.com">naver.com</option>
-				    <option value="gmail.com">gmail.com</option>
-				    <option value="daum.net">daum.net</option>
-				    <option value="nate.com">nate.com</option>
-				    <option value="hanmail.net">hanmail.net</option>
-				    <option value="direct">직접입력</option>
-				</select>
-
-				<!-- 최종 이메일 hidden -->
-				<input type="hidden" name="email" id="full_email">
-			</div>
-			<!-- 인증 코드 입력 -->
-			<div class="form-group verification-group">
-			  <div class="input-with-button">
-			    <i class="fa-solid fa-key input-icon"></i>
-			    <input type="text" id="emailCode" placeholder="인증 코드 6자리" pattern="\d{6}" maxlength="6" required>
-			    <button type="button" class="verify-btn" onclick="verifyEmailCode()">이메일 인증</button>
-			  </div>
-			
-			  <!-- 결과 메시지 (아래에 출력) -->
-			  <div id="email-verify-result" class="verify-result"></div>
-			</div>
-			
-			<!-- 숨겨진 email 전체 주소 및 인증 완료 여부 -->
-			<input type="hidden" id="full_email" name="email">
-			<input type="hidden" id="emailVerified" name="emailVerified" value="false">
-			
-			
-			
-			<div class="form-group">
-				<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="userPhone" th:value="${userPhone}"
-				 placeholder="전화번호" pattern="[0-9\-]+" title="숫자와 (-)만 입력하세요" maxlength="13" required>
-			</div>
-
-
-<!--			<div class="form-group">
-				<i class="fa-solid fa-folder-open input-icon"></i> <input type="file" name="profileImage" accept="image/*" required>
-			</div>
-			-->
-			<div class="form-group file-upload-group">
-			  <i class="fa-solid fa-folder-open input-icon"></i>
-
-			  <!-- 숨겨진 진짜 파일 input -->
-			  <input type="file" id="profileImage" name="profileImage" accept="image/*" hidden>
-
-			  <!-- 사용자가 클릭하는 커스텀 버튼 -->
-			  <label for="profileImage" class="custom-file-label">프로필 사진 선택</label>
-
-			  <!-- 선택된 파일명 보여주기 -->
-			  <span id="file-name-display" class="file-name">이미지를 선택해주세요</span>
-			</div>
-			
-			<div class="form-group">
-				<button class="reg-btn" type="submit">가입하기</button>
-			</div>
-		</form>
+		
 	</div>
-	<script src="/js/register.js"></script>
+		<div layout:fragment="js">
+		<script src="/js/register.js"></script>
+	</div>
 </body>
 </html>

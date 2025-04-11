@@ -29,7 +29,7 @@ function handleEmailDomainChange(select) {
   } else {
     domainInput.value = select.value;
     domainInput.readOnly = true;
-    domainInput.style.backgroundColor = '#e9ecef';
+    domainInput.style.backgroundColor = '#dcdcdc';
   }
 
   const defaultOption = select.querySelector('option[value=""]');
@@ -131,48 +131,92 @@ document.addEventListener("DOMContentLoaded", function () {
 
   });
 });
-function handleEmailDomainChange(select) {
-  const domainInput = document.getElementById('email_domain_input');
-  if (select.value === 'direct') {
-    domainInput.value = '';
-    domainInput.readOnly = false;
-    domainInput.style.backgroundColor = '#fff';
-    domainInput.focus();
-  } else {
-    domainInput.value = select.value;
-    domainInput.readOnly = true;
-    domainInput.style.backgroundColor = '#e9ecef';
-  }
 
-  const defaultOption = select.querySelector('option[value=""]');
-  if (defaultOption) select.removeChild(defaultOption);
+// 이메일 js
+let isSending = false;
+function sendVerificationEmail() {
+	if (isSending) return;
+	isSending = true;
+	
+	const fullEmail = getFullEmail();
+	if (!fullEmail.includes("@")) {
+		alert("이메일을 올바르게 입력하세요.");
+		isSending = false;
+		return;
+	}
+	
+	const sendBtn = document.querySelector("#verificationGroup button");
+
+	startEmailCooldown(sendBtn);
+
+	fetch(`/email/send?email=${encodeURIComponent(fullEmail)}`)
+		.then(res => res.text())
+		.then(msg => {
+			alert(msg);
+			document.getElementById('verificationGroup').style.display = 'flex';
+		})
+		.catch(err => {
+			console.error(err);
+			alert("이메일 전송 실패!");
+			sendBtn.disabled = false;
+			sendBtn.textContent = '인증 코드 전송';
+		})
+		.finally(() => {
+			isSending = false; // 다시 가능하게
+		});
 }
 
-function verifyEmailCode() {
-  const code = document.getElementById('emailCode').value.trim();
-  const emailId = document.getElementById('email_id').value.trim();
-  const domain = document.getElementById('email_domain_input').value.trim();
-  const email = emailId + '@' + domain;
+let isVerifying = false;
+function verifyCode() {
+	if (isVerifying) return;
+	isVerifying = true;
 
-  const resultDiv = document.getElementById('email-verify-result');
+	const code = document.getElementById("emailCodeInput").value.trim();
+	if (!code) {
+		alert("인증 코드를 입력하세요.");
+		isVerifying = false;
+		return;
+	}
 
-  if (!emailId || !domain || !code) {
-    resultDiv.textContent = '❌ 모든 정보를 입력해주세요.';
-    resultDiv.className = 'verify-result fail';
-    return;
-  }
+	fetch(`/email/verify?code=${encodeURIComponent(code)}`)
+		.then(res => res.text())
+		.then(result => {
+			if (result === "ok") {
+				alert("이메일 인증 완료!");
+				const group = document.getElementById('verificationGroup');
+				group.style.display = 'none';
+				document.getElementById('verificationSuccess').style.display = 'block';
+				document.getElementById('email_id').readOnly = true;
+				document.getElementById('email_id').style.backgroundColor = '#dcdcdc';
+				document.getElementById('email_domain_input').readOnly = true;
+				document.getElementById('email_domain_input').style.backgroundColor = '#dcdcdc';
+				document.getElementById('email_domain_select').disabled = true;
+				const successMsg = document.createElement('span');
+				document.querySelector('.email-group').appendChild(successMsg);
+			} else if (result === "expired") {
+				alert("인증 코드가 만료되었습니다. 다시 시도하세요.");
+			} else {
+				alert("인증 코드가 틀렸습니다.");
+			}
+		})
+		.finally(() => {
+			isVerifying = false;
+		});
+}
 
-  fetch('/auth/verifyCode?email=' + email + '&code=' + code)
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        resultDiv.textContent = "✅ 인증에 성공했습니다.";
-        resultDiv.className = "verify-result success";
-        document.getElementById('emailVerified').value = 'true';
-      } else {
-        resultDiv.textContent = "❌ 인증 코드가 올바르지 않습니다.";
-        resultDiv.className = "verify-result fail";
-        document.getElementById('emailVerified').value = 'false';
-      }
-    });
+function startEmailCooldown(button) {
+	let seconds = 60;
+	button.disabled = true;
+	button.textContent = `${seconds}s`;
+
+	const intervalId = setInterval(() => {
+		seconds--;
+		button.textContent = `${seconds}s`;
+
+		if (seconds <= 0) {
+			clearInterval(intervalId);
+			button.disabled = false;
+			button.textContent = '인증 코드 전송';
+		}
+	}, 1000);
 }
