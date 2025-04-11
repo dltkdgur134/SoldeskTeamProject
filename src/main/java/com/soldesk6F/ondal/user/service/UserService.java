@@ -16,19 +16,25 @@ import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
+	
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
     private String uploadDir;
+    public Optional<User> findUserByUuid(UUID userUuid) {
+    	return userRepository.findByUserUuid(userUuid);
+    }
 
     public boolean isUserIdDuplicate(String userId) {
-        return userRepository.existsById(userId);
+        return userRepository.existsByUserId(userId);
     }
 
     public boolean isEmailDuplicate(String email) {
@@ -40,7 +46,7 @@ public class UserService {
     }
 
     public boolean registerUser(String userId, String userName, String nickname, String email,
-                             String password, String userPhone, String userAddress, String userAddressDetail,
+                             String password, String userPhone, RegAddress userSelectedAddress,
                              MultipartFile profileImage, String socialLoginProvider) {
     	try {
 
@@ -73,7 +79,7 @@ public class UserService {
 	                .email(email)
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
-	                .userAddress(userAddress + " " + userAddressDetail)	
+	                .userSelectedAddress(userSelectedAddress)	
 	                .userProfilePath(filePath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();

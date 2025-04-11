@@ -123,7 +123,9 @@ public class DeliverySales {
 		this.deliveryContent = deliveryContent;
 	}
     
-    
+    public String getDeliverySalesUuidAsString() {
+	    return deliverySalesId != null ? deliverySalesId .toString() : null;
+	}
     
     
 }

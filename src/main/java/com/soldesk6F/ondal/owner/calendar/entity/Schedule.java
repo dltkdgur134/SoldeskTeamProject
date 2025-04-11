@@ -106,4 +106,7 @@ public class Schedule {
 		this.alarmTiming = alarmTiming;
 	}
 
+	public String getScheduleUuidAsString() {
+	    return scheduleId != null ? scheduleId .toString() : null;
+	}
 }

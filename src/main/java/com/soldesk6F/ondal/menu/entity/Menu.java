@@ -146,4 +146,9 @@ public class Menu {
 		this.menuOptions3Price = menuOptions3Price;
 		this.menuStatus = menuStatus != null ? menuStatus : MenuStatus.ACTIVE;
 	}
+	
+	public String getMenuUuidAsString() {
+	    return menuId != null ? menuId .toString() : null;
+	}
+	
 }

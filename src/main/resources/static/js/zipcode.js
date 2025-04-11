@@ -46,3 +46,50 @@ function sample6_execDaumPostcode() {
        }).open();
    }
    
+   function execDaumPostcode() {
+           new daum.Postcode({
+               oncomplete: function(data) {
+                   const address = data.roadAddress || data.jibunAddress;
+                   console.log('선택된 주소:', address);
+                   document.getElementById('riderHubAddress').value = address;
+
+                   // 주소로 좌표 요청
+                   fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`, {
+                       headers: {
+                           Authorization: 'KakaoAK c7dd39e36776f90fb259bbd8ac3fcdc6'
+                       }
+                   })
+                   .then(response => response.json())
+                   .then(result => {
+                   	console.log('Kakao 응답:', result);
+                       const location = result.documents[0];
+                       if (location) {
+                       	document.getElementById('hubAddressLatitude').value = parseFloat(location.y).toFixed(6);
+                       	document.getElementById('hubAddressLongitude').value = parseFloat(location.x).toFixed(6);
+                       } else {
+                           alert('주소의 위치 정보를 찾을 수 없습니다.');
+                       }
+                   })
+                   .catch(error => {
+                       console.error('좌표 변환 에러:', error);
+                   });
+               }
+           }).open();
+       }
+	   //버튼 클릭 시 선택된 버튼에 'selected' 클래스 추가하고, 선택된 배달 범위를 hidden input에 설정
+	   function selectRange(button, range) {
+	       // 모든 버튼에서 'selected' 클래스 제거
+	       const allButtons = document.querySelectorAll('.delivery-range-btn');
+	       allButtons.forEach(btn => {
+	           btn.classList.remove('selected');
+	       });
+
+	       // 클릭된 버튼에 'selected' 클래스 추가
+	       button.classList.add('selected');
+
+	       // hidden input에 선택된 배달 범위 값 저장
+	       document.getElementById('deliveryRange').value = range;
+
+	       // 선택된 값(배달 범위) 콘솔로 출력
+	       console.log('Selected delivery range:', range);
+	   }	   

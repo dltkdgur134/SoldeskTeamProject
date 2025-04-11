@@ -129,11 +129,5 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const address = document.getElementById("address").value.trim();
-    if (address === "") {
-      e.preventDefault();
-      alert("주소를 입력해주세요.");
-      return;
-    }
   });
 });

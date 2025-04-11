@@ -47,6 +47,8 @@ public class ComplainImg {
 		this.complainImgPath = complainImgPath;
 	}
 	
-	
+	public String getComplainImgIdAsString() {
+	    return complainImgId != null ? complainImgId .toString() : null;
+	}
 	
 }

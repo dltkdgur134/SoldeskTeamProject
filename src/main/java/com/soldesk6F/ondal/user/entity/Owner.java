@@ -45,7 +45,9 @@ public class Owner {
 		this.secondaryPassword = secondaryPassword;
 	}
 
-    
+    public String getOwnerUuidAsString() {
+	    return ownerId != null ? ownerId .toString() : null;
+	}
 	
     
     

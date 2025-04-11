@@ -50,5 +50,10 @@ public class AdminActions {
         this.actionDescription = actionDescription;
         this.actionTimestamp = actionTimestamp;
     }
+    
+    
+    public String getAdminActionsUuidAsString() {
+	    return actionId != null ? actionId .toString() : null;
+	}
 }
 

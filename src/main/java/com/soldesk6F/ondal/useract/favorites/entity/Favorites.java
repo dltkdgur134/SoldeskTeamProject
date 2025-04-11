@@ -59,6 +59,8 @@ public class Favorites {
 		this.description = description;
 	}
 	
-	
+	public String getFavoritesUuidAsString() {
+	    return favoritesId != null ? favoritesId .toString() : null;
+	}
 	
 }

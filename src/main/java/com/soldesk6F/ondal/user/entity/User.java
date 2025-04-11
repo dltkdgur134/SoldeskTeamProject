@@ -7,12 +7,16 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
@@ -27,7 +31,12 @@ import lombok.Setter;
 @Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "user_profile_path" }) })
 public class User {
 	@Id
-	@Column(name = "user_id", nullable = false, unique = true, length = 15)
+	@GeneratedValue
+	@UuidGenerator
+	@Column(name = "user_uuid", nullable = false, unique = true)
+	private UUID userUuid;
+
+	@Column(name = "user_id", nullable = false, unique = true, length = 50)
 	private String userId;
 
 	@Column(name = "password", nullable = false, length = 255)
@@ -48,8 +57,9 @@ public class User {
 	@Column(name = "user_phone", nullable = false, length = 13)
 	private String userPhone;
 
-	@Column(name = "user_address", nullable = false, length = 90)
-	private String userAddress;
+	@ManyToOne
+	@JoinColumn(name = "user_selected_address", nullable = true)
+	private RegAddress userSelectedAddress;
 
 	@Column(name = "social_login_provider", nullable = false, length = 30)
 	private String socialLoginProvider;
@@ -74,13 +84,14 @@ public class User {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
-	private UserStatus userStatus = UserStatus.UNVERIFIED;
+	private UserStatus userStatus = UserStatus.UNLINKED;
 
 	public enum UserStatus {
 		ACTIVE("정상"), // 정상 회원
 		SUSPENDED("일시 정지"), // 일시 정지
 		BANNED("영구 정지"), // 영구 정지
-		UNVERIFIED("미 인증"); // 이메일 인증 미완료 (기본값)
+		UNLINKED("미연동");	// 소셜 미연동 상태
+		
 
 		private final String description;
 
@@ -109,25 +120,29 @@ public class User {
 
 	@Builder
 	public User(String userId, String password, String userProfilePath, String userName, String nickName, String email,
-			String userPhone, String userAddress, String socialLoginProvider, UserRole userRole,
-			UserStatus userStatus, boolean userProfileLiveUpdate) {
-		this.userId = userId;
-		this.password = password;
-		this.userProfilePath = userProfilePath;
-		this.userName = userName;
-		this.nickName = nickName;
-		this.email = email;
-		this.userPhone = userPhone;
-		this.userAddress = userAddress;
-		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE"
-				: socialLoginProvider;
-		this.userRole = (userRole != null) ? userRole : UserRole.USER;
-		this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNVERIFIED;
-		this.userProfileLiveUpdate = userProfileLiveUpdate;
+	            String userPhone, RegAddress userSelectedAddress, String socialLoginProvider, UserRole userRole,
+	            UserStatus userStatus, boolean userProfileLiveUpdate) {
+	    this.userId = userId;
+	    this.password = password;
+	    this.userProfilePath = userProfilePath;
+	    this.userName = userName;
+	    this.nickName = nickName;
+	    this.email = email;
+	    this.userPhone = userPhone;
+	    this.userSelectedAddress = userSelectedAddress;
+	    this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE"
+	            : socialLoginProvider;
+	    this.userRole = (userRole != null) ? userRole : UserRole.USER;
+	    this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNLINKED;
+	    this.userProfileLiveUpdate = userProfileLiveUpdate;
 	}
 	public User update(String name) {
 		this.userName = name;
 		return this;
 	}
-
+	
+	public String getUserUuidAsString() {
+	    return userUuid != null ? userUuid.toString() : null;
+	}
+	
 }

@@ -46,4 +46,9 @@ public class ComplainReply {
         this.admin = admin;
         this.replyContent = replyContent;
     }
+    public String getComplainReplyIdAsString() {
+	    return complainReplyId != null ? complainReplyId .toString() : null;
+	}
+    
+    
 }

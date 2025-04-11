@@ -36,6 +36,9 @@ public class StoreImg {
 		this.store = store;
 		StoreImgFilePath = storeImgFilePath;
 	}
-
+    
+    public String getStoreImgUuidAsString() {
+	    return storeImgId != null ? storeImgId .toString() : null;
+	}
     
 }

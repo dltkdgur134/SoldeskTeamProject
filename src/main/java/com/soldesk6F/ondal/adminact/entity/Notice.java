@@ -53,5 +53,9 @@ public class Notice {
         this.title = title;
         this.content = content;
     }
+    
+    public String getNoticeUuidAsString() {
+	    return noticeId != null ? noticeId .toString() : null;
+	}
 }
 

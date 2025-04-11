@@ -49,7 +49,7 @@ import java.util.Map;
 		        
 		        
 		        // attributes로부터 필요한 정보 추출해서 DB 저장 또는 업데이트
-		        User user = userRepository.findById(email)
+		        User user = userRepository.findByUserId(email)
 			            .map(entity -> entity.update(name))
 			            .orElseGet(() -> userRepository.save(User.builder()
 			                .userId(email) // 소셜 이메일을 아이디로 쓴다고 가정

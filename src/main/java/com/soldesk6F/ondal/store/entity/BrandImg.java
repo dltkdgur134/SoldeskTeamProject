@@ -36,5 +36,7 @@ public class BrandImg {
 		this.store = store;
 		this.brandImgFilePath = brandImgFilePath;
 	}
-
+    public String getBrandImgUuidAsString() {
+	    return brandImgId != null ? brandImgId .toString() : null;
+	}
 }

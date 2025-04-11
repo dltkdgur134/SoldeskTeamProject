@@ -150,7 +150,10 @@ public class Store {
         this.holiday = holiday;
         this.storeStatus = storeStatus != null ? storeStatus : StoreStatus.CLOSED;
     }
-
+    
+    public String getStoreUuidAsString() {
+	    return storeId != null ? storeId .toString() : null;
+	}
 	
 	
 }
