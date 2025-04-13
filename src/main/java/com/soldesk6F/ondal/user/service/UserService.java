@@ -116,12 +116,10 @@ public class UserService {
     	try {
     		Optional<User> findUser = userRepository.findByUserId(user.getUserId());
     		String old_profImgPath = findUser.get().getUserProfilePath(); 
-    		System.out.println(old_profImgPath);
     		String old_profImgName = old_profImgPath.split("\\\\")[1];
-    		System.out.println(old_profImgName);
     		String oldSavePath = new File(uploadDir).getAbsolutePath();
     		Path oldImgPath = Paths.get(oldSavePath, old_profImgName);
-    		System.out.println(oldImgPath.toString());
+    		//System.out.println(oldImgPath.toString());
     		if (Files.exists(oldImgPath)) {
     			Files.delete(oldImgPath);
     		}
