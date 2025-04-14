@@ -80,7 +80,7 @@ public class UserService {
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
 	                .userSelectedAddress(userSelectedAddress)	
-	                .userProfilePath(filePath)
+	                .userProfile(filePath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
 	

@@ -30,7 +30,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "user_profile_path" }) })
+@Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "user_profile" }) })
 public class User {
 	@Id
 	@GeneratedValue
@@ -44,8 +44,8 @@ public class User {
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
-	@Column(name = "user_profile_path", length = 255)
-	private String userProfilePath;
+	@Column(name = "user_profile", length = 255)
+	private String userProfile;
 
 	@Column(name = "user_name", nullable = false, length = 15)
 	private String userName;
@@ -122,12 +122,12 @@ public class User {
 	}
 
 	@Builder
-	public User(String userId, String password, String userProfilePath, String userName, String nickName, String email,
+	public User(String userId, String password, String userProfile, String userName, String nickName, String email,
 	            String userPhone, RegAddress userSelectedAddress, String socialLoginProvider, UserRole userRole,
 	            UserStatus userStatus, boolean userProfileLiveUpdate) {
 	    this.userId = userId;
 	    this.password = password;
-	    this.userProfilePath = userProfilePath;
+	    this.userProfile = userProfile;
 	    this.userName = userName;
 	    this.nickName = nickName;
 	    this.email = email;

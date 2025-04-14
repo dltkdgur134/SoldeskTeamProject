@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "schedule")
+@Table(name = "schedule", uniqueConstraints = { @UniqueConstraint(columnNames = { "schedule_id", "schedule_img" }) })
 public class Schedule {
 	@Id
 	@GeneratedValue
@@ -59,14 +60,9 @@ public class Schedule {
 	@Column(name = "updated_date")
 	private LocalDateTime updatedDate;
 
-	@Column(name = "schedule_img_name", length = 255)
-	private String scheduleImgName;
 
-	@Column(name = "schedule_img_extension", length = 10)
-	private String scheduleImgExtension;
-
-	@Column(name = "schedule_img_path", length = 255)
-	private String scheduleImgPath;
+	@Column(name = "schedule_img", length = 255)
+	private String scheduleImg;
 
 	@Column(name = "schedule_address", length = 80)
 	private String scheduleAddress;
@@ -90,16 +86,14 @@ public class Schedule {
         }
     }
 	@Builder
-	public Schedule(OwnerCalendar calendar,Store store, String scheduleTitle, String scheduleContent, String scheduleImgName,
-			String scheduleImgExtension, String scheduleImgPath, String scheduleAddress,
+	public Schedule(OwnerCalendar calendar,Store store, String scheduleTitle, String scheduleContent,
+			String scheduleImg, String scheduleAddress,
 			LocalDateTime scheduleStartTime, LocalDateTime scheduleEndTime, int alarmTiming) {
 		this.ownerCalendar = calendar;
 		this.store = store;
 		this.scheduleTitle = scheduleTitle;
 		this.scheduleContent = scheduleContent;
-		this.scheduleImgName = scheduleImgName;
-		this.scheduleImgExtension = scheduleImgExtension;
-		this.scheduleImgPath = scheduleImgPath;
+		this.scheduleImg = scheduleImg;
 		this.scheduleAddress = scheduleAddress;
 		this.scheduleStartTime = scheduleStartTime;
 		this.scheduleEndTime = scheduleEndTime;

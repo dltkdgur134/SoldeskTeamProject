@@ -49,7 +49,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		// attributes로부터 필요한 정보 추출해서 DB 저장 또는 업데이트
 		User user = userRepository.findByUserId(email).map(entity -> entity.update(name))
 				.orElseGet(() -> userRepository.save(User.builder().userId(email) // 소셜 이메일을 아이디로 쓴다고 가정
-						.userName(name).socialLoginProvider(id).email(email).userProfilePath(profileImg)
+						.userName(name).socialLoginProvider(id).email(email).userProfile(profileImg)
 						.nickName(nickName).userPhone(tel).build()));
 		boolean rider = riderRepository.existsByUser_UserId(email);
 		boolean owner = ownerRepository.existsByUser_UserId(email);
