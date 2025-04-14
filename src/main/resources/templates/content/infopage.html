@@ -24,7 +24,7 @@
 		<div class="row justify-content-md-center">
 			<div class="col col-lg-2">
 				<a type="button" class="btn btn-link position-relative" id="profile-pic-btn" data-bs-toggle="modal" data-bs-target="#updateProfilePicModal">
-					<img th:src="@{'/img/userProfiles\\' + ${#strings.setSplit(#authentication.principal.user.userProfilePath, '\\\\')[1]}}"  class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture" id="profile-pic">
+					<img th:src="@{'/img/userProfiles\\' + ${#strings.setSplit(#authentication.principal.user.userProfile, '\\\\')[1]}}"  class="rounded-circle img-thumbnail img-fluid" alt="Profile Picture" id="profile-pic">
 					<span class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle" id="profile-pic-update-btn">
 	    				<i class="fa-solid fa-pen-to-square"></i>
 	  				</span>
