@@ -4,17 +4,42 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
 <head>
-<script th:fragment="js" th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/index.js}"></script>
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
 </head>
 
 <div th:fragment="header">
 	<nav class="navbar navbar-light">
 		<div class="container-md justify-content-between">
-			<a class="navbar-brand" href="/> <img
-				src="/css/imgs/Logo_ondal.png" alt="" width="40" height="40"
-				class="img-fluid">
-			</a> 
+		<div sec:authorize="isAuthenticated()" 
+		th:with="role=${#authentication.principal.user.userRole.name()}">
+    
+<a href="javascript:void(0);" onclick="toggleRoleLogos()">
+    <img src="/css/imgs/Logo_ondal_Home.png" alt="내 역할 로고 보기" class="img-fluid me-2" width="50" height="50">
+</a>
+
+<!-- 기본 로고: USER, RIDER, OWNER, ALL 역할에서 보이게 -->
+<a href="/" th:if="${role == 'USER' or role == 'RIDER' or role == 'OWNER' or role == 'ALL'}">
+    <img src="/css/imgs/Logo_ondal.png" alt="기본 로고"
+         class="img-fluid me-2 role-logo"
+         width="40" height="40">
+</a>
+
+<!-- RIDER 로고: RIDER, ALL 역할에서 보이게 -->
+<a href="/rider/home" th:if="${role == 'RIDER' or role == 'ALL'}">
+    <img src="/css/imgs/Logo_rider.png" alt="Rider 로고"
+         class="img-fluid me-2 role-logo"
+         width="40" height="40">
+</a>
+
+<a href="/" th:if="${role == 'OWNER' or role == 'ALL'}">
+    <img src="/css/imgs/Logo_owner.png" alt="Owner 로고"
+         class="img-fluid me-2 role-logo"
+         width="40" height="40">
+</a>
+
+</div>
 			<h1 class="display-5"><b class="highlight-title">온</b>라인 배<b class="highlight-title">달</b></h1>
 			<a class="btn btn-primary btn-lg" data-bs-toggle="offcanvas"
 				href="#menu-list" role="button" aria-controls="menu-list"> <i
@@ -50,9 +75,9 @@
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <h5 class="card-title d-flex justify-content-center align-items-center" th:text="${#authentication.principal.rider.riderNickname}">
+                    <h5 class="card-title d-flex justify-content-center align-items-center" th:text="${#authentication.principal.user.nickName}">
                     </h5>
-                	<p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong th:text="${#authentication.principal.rider.riderHubAddress}"></strong></p>
+                	<p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong th:text="${#authentication.principal.user.userSelectedAddress}"></strong></p>
             </div>
             
         </div>
@@ -132,4 +157,5 @@
 		</div>
 	</div>
 </div>
+
 </html>

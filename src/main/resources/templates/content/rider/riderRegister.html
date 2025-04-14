@@ -2,16 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/userLayouts}">
+	layout:decorate="~{layouts/Layouts}">
 <head>
 <th:block layout:fragment="css">
 	<link rel="stylesheet" th:href="@{/css/riderRegister.css}">
 	<link rel="stylesheet" th:href="@{/css/custom.css}">
+	<link rel="stylesheet" th:href="@{/css/index.css}">
 </th:block>
 <th:block layout:fragment="js">
 	<script
 		src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script th:src="@{/js/zipcode.js}"></script>
+	<script th:src="@{/js/index.js}"></script>
 </th:block>
 </head>
 <div layout:fragment="content">

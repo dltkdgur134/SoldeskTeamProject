@@ -2,16 +2,44 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/user/userLayouts}">
+	layout:decorate="~{layouts/Layouts}">
 <head>
+<script th:src="@{/js/index.js}"></script>
 <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
 </head>
 <div layout:fragment="content">
-	<div th:if="${riderExists}" class="alert alert-danger" role="alert"
-		style="margin-bottom: 20px;">
-		<span th:text="'이미 라이더로 등록된 사용자입니다.'"></span>
-	</div>
+	<div th:if="${riderExists}" class="alert alert-danger text-center" role="alert"
+     style="margin-bottom: 20px;" id="riderAlert">
+     
+    <div class="d-flex justify-content-center align-items-center flex-wrap">
+        <span id="alertText" style="margin-right: 10px;">이미 라이더로 등록된 사용자입니다.</span>
+
+        <!-- 버튼 그룹 -->
+        <span id="riderChoice" style="display: none;">
+            <button onclick="goToRiderPage()" class="btn btn-sm btn-primary me-1">Y</button>
+            <button onclick="hideChoice()" class="btn btn-sm btn-secondary">N</button>
+        </span>
+    </div>
+</div>
+
+<script>
+  setTimeout(function() {
+    document.getElementById('alertText').textContent = '라이더 페이지로 이동하시겠습니까?';
+    document.getElementById('riderChoice').style.display = 'inline';
+  }, 2000);
+
+  function goToRiderPage() {
+    window.location.href = '/rider/home'; // 실제 경로로 수정
+  }
+
+  function hideChoice() {
+    document.getElementById('riderAlert').style.display = 'none';
+  }
+</script>
+
+
+	
 	<div th:if="${riderSuccess}" class="alert alert-success" role="alert"
 		style="margin-bottom: 20px;">
 		<span th:text="${riderSuccess}"></span>
