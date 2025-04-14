@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.login;
 
 import java.io.IOException;
 import java.net.URLEncoder;

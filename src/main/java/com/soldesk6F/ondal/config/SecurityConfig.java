@@ -10,10 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.soldesk6F.ondal.login.CustomAuthFailureHandler;
+import com.soldesk6F.ondal.login.CustomOAuth2UserService;
+import com.soldesk6F.ondal.login.CustomUserDetailsService;
+import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
 import com.soldesk6F.ondal.user.*;
-import com.soldesk6F.ondal.user.CustomUserDetailsService;
-import com.soldesk6F.ondal.user.CustomAuthFailureHandler;
-import com.soldesk6F.ondal.user.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity

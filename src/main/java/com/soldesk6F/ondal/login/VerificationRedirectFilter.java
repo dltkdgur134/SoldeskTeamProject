@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.login;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ public class VerificationRedirectFilter extends OncePerRequestFilter {
             String uri = request.getRequestURI();
 
             // 인증 안 됐고, /verify 페이지가 아니면
-            if (!isVerified && !uri.startsWith("/verify")) {
+            if (!isVerified && !uri.startsWith("/verify")) {	
                 response.sendRedirect("/verify"); // 강제 리다이렉트
                 return;
             }

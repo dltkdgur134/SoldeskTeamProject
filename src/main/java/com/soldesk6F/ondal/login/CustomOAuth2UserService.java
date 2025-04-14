@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.login;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -17,7 +17,8 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soldesk6F.ondal.user.entity.User;
-	import com.soldesk6F.ondal.user.repository.OwnerRepository;
+import com.soldesk6F.ondal.user.entity.User.UserRole;
+import com.soldesk6F.ondal.user.repository.OwnerRepository;
 	import com.soldesk6F.ondal.user.repository.RiderRepository;
 	import com.soldesk6F.ondal.user.repository.UserRepository;
 
@@ -30,14 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 	private final UserRepository userRepository;
-	private final RiderRepository riderRepository;
-	private final OwnerRepository ownerRepository;
+//	private final RiderRepository riderRepository;
+//	private final OwnerRepository ownerRepository;
 
 	public CustomOAuth2UserService(UserRepository userRepository, RiderRepository riderRepository,
 			OwnerRepository ownerRepository) {
 		this.userRepository = userRepository;
-		this.riderRepository = riderRepository;
-		this.ownerRepository = ownerRepository;
+//		this.riderRepository = riderRepository;
+//		this.ownerRepository = ownerRepository;
 	}
 
 	@Override
@@ -74,9 +75,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 		User user = userRepository.findBySocialLoginProvider(provider).map(entity -> {
 
-			if (true) {
+			if (entity.isUserProfileLiveUpdate()) {
 				entity.update(nickName, userProfilepath);
-				
 			}
 			return entity;
 			
@@ -113,27 +113,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			        .userProfilePath(userProfilepath)
 			        .nickName(nickName)
 			        .userPhone(tel)
+			        .userRole(UserRole.USER)
 			        .build());
 			}
 			
-	
 			});
-		boolean rider = riderRepository.existsByUser_UserId(email);
-		boolean owner = ownerRepository.existsByUser_UserId(email);
-
-		if (rider) {
-			if (owner) {
-				return new CustomUserDetails(user, attributes, Role.ALL);
-
-			} else {
-				return new CustomUserDetails(user, attributes, Role.RIDER);
-			}
-
-		} else if (owner) {
-			return new CustomUserDetails(user, attributes, Role.OWNER);
-		} else {
-			return new CustomUserDetails(user, attributes, Role.USER);
-		}
+		return new CustomUserDetails(user,user.getUserRole());
+			
+			
 
 	}
 

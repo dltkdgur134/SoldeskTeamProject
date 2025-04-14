@@ -1,15 +1,19 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.login;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class SinkService {
@@ -23,7 +27,7 @@ public class SinkService {
 		private final UserRepository userRepository;
 		
 		@Transactional
-		public boolean trySink(String id , String password,boolean overRideProfile) {
+		public boolean trySink(String id , String password,boolean overRideProfile ,HttpServletRequest request) {
 			User user = userRepository.findByUserId(id)
 				    .orElseThrow(() -> new UsernameNotFoundException("해당 유저 없음: id=" + id));
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -31,7 +35,7 @@ public class SinkService {
 			
 			String nowSessionProvider = nowSessionUser.getSocialLoginProvider();
 		
-			CustomUserDetails userDetails = new CustomUserDetails(user,Role.USER);
+			CustomUserDetails userDetails = new CustomUserDetails(user,user.getUserRole());
 			
 			//TO DO 권한 컬럼 생기면 권한에 넣고 세션 바꿔주기
 			if(user.getSocialLoginProvider().equals("waiting:"+nowSessionProvider)&&
@@ -45,6 +49,11 @@ public class SinkService {
 				}
 				SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDetails,
 					null,userDetails.getAuthorities()));
+				
+				request.getSession().setAttribute(
+			    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+			    SecurityContextHolder.getContext());
+				
 				userRepository.deleteBySocialLoginProvider(nowSessionProvider);
 				user.setSocialLoginProvider(nowSessionProvider);
 				System.out.println("새 소셜 대기용계정 삭제후 세션 변경 성공");

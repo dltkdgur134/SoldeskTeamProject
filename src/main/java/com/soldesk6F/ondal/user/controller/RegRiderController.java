@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.soldesk6F.ondal.user.CustomUserDetails;
+import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.dto.RiderForm;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserRole;

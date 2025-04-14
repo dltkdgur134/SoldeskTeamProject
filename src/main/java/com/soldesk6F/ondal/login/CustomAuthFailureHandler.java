@@ -2,7 +2,7 @@
  * 제작자 : 곽준영
  * 클래스 설명 : 로그인 실패 원인 로그로 출력
  */
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.login;
 
 import java.io.IOException;
 import java.net.URLEncoder;

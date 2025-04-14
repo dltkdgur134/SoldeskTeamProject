@@ -64,9 +64,8 @@ public class EmailService {
         body.add("from","온달 서비스 <noreply@" + domain + ">");
         body.add("to", email);
         body.add("subject", "온달 이메일 인증");
-        body.add("html", htmlContent); // 🔥 여기에 HTML 그대로!
+        body.add("html", htmlContent); 
 
-        // inline 첨부 (cid:logo.png와 연결됨)
 
 
 

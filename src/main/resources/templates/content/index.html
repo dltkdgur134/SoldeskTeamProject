@@ -6,14 +6,24 @@
 <head>
 	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
 	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
+	<script type="text/javascript" th:src = "@{/js/index.js}"></script>	
+
 </head>
-    <div layout:fragment="content">
-	  	<div class="d-flex justify-content-center px-5">
-        	<div class="search"> 
-        		<input type="text" class="search-input" placeholder="뭐 먹을까?" name=""> 
-        		<a href="#" class="search-icon"> <i class="fa fa-search"></i> </a> 
-        	</div>
-        </div>
+<div layout:fragment="content" class="w-100">
+  <div class="d-flex flex-column align-items-center px-5 w-100" sec:authorize="isAnonymous()">
+    
+    <!-- 검색창 전체 래퍼 -->
+    <div id="search-wrapper" class="w-100 d-flex justify-content-center align-items-center mt-3">
+      <!-- 주소 다시 입력 버튼 (처음엔 숨김) -->
+      <button id="reenter-address-btn" class="btn btn-outline-secondary me-2" style="display:none;">주소 다시 입력</button>
+
+      <div class="search">
+        <input id="main-input" type="text" class="search-input" placeholder="배달받을 주소를 입력하세요">
+        <a href="#" class="search-icon" id="main-btn"><i class="fa fa-search"></i></a>
+      </div>
+    </div>
+  </div>
+
 	  	<div class="gallery-container">
 			<div><a href="#" class="labels">패스트푸드</a><img class="imgs" th:src="@{/css/imgs/img1.png}"></div>
 			<div><a href="#" class="labels">중식</a><img class="imgs" th:src="@{/css/imgs/img2.png}"></div>
