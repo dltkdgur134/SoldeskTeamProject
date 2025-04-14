@@ -2,20 +2,44 @@
 
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
 <head>
-<script th:fragment="js" th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/index.js}"></script>
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
 </head>
 
 <div th:fragment="header">
 	<nav class="navbar navbar-light">
 		<div class="container-md justify-content-between">
-			<a class="navbar-brand" href="/"> <img
-				src="/css/imgs/Logo_ondal.png" alt="" width="40" height="40"
-				class="img-fluid">
-			</a> 
-			<h1 class="display-5"><b class="highlight-title">온</b>라인 배<b class="highlight-title">달</b></h1>
+			<div sec:authorize="isAuthenticated()"
+				th:with="role=${#authentication.principal.user.userRole.name()}">
+
+				<a href="javascript:void(0);" onclick="toggleRoleLogos()"> <img
+					src="/css/imgs/Logo_ondal_Home.png" alt="내 역할 로고 보기"
+					class="img-fluid me-2" width="50" height="50">
+				</a>
+
+				<!-- 기본 로고: USER, RIDER, OWNER, ALL 역할에서 보이게 -->
+				<a href="/"
+					th:if="${role == 'USER' or role == 'RIDER' or role == 'OWNER' or role == 'ALL'}">
+					<img src="/css/imgs/Logo_ondal.png" alt="기본 로고"
+					class="img-fluid me-2 role-logo" width="40" height="40">
+				</a>
+
+				<!-- RIDER 로고: RIDER, ALL 역할에서 보이게 -->
+				<a href="/rider/home" th:if="${role == 'RIDER' or role == 'ALL'}">
+					<img src="/css/imgs/Logo_rider.png" alt="Rider 로고"
+					class="img-fluid me-2 role-logo" width="40" height="40">
+				</a> <a href="/" th:if="${role == 'OWNER' or role == 'ALL'}"> <img
+					src="/css/imgs/Logo_owner.png" alt="Owner 로고"
+					class="img-fluid me-2 role-logo" width="40" height="40">
+				</a>
+
+			</div>
+			<h1 class="display-5">
+				<b class="highlight-title">온</b>라인 배<b class="highlight-title">달</b>
+			</h1>
 			<a class="btn btn-primary btn-lg" data-bs-toggle="offcanvas"
 				href="#menu-list" role="button" aria-controls="menu-list"> <i
 				class="fa-solid fa-bars"></i>
@@ -23,8 +47,8 @@
 		</div>
 	</nav>
 
-	<div class="offcanvas offcanvas-end" tabindex="-1" id="menu-list" data-bs-backdrop="true"
-		aria-labelledby="menu-label">
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="menu-list"
+		data-bs-backdrop="true" aria-labelledby="menu-label">
 		<div class="offcanvas-header">
 			<h5 class="offcanvas-title" id="menu-label">
 				<img src="/css/imgs/Logo_ondal.png" alt="" width="30" height="30"
@@ -33,64 +57,72 @@
 			<button type="button" class="btn-close text-reset"
 				data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
+		<div sec:authorize="isAnonymous()">
+			<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
+		</div>
+		<div sec:authorize="isAnonymous()">
+			<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
+		</div>
 		<div class="container" sec:authorize="isAuthenticated()">
-    <div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
-        <div class="row g-0">
-            <div class="col-md-4 p-3 text-center">
-	<img th:src="@{__${#strings.isEmpty(#authentication.principal.user.userProfilePath) 
-              ? '/img/userProfiles/default.png' 
-              : (#strings.startsWith(#authentication.principal.user.userProfilePath, 'http') 
-                  ? #authentication.principal.user.userProfilePath 
-                  : '\img\userProfiles\' + #strings.substring(#authentication.principal.user.userProfilePath, 43))}__}"
-  				class="rounded-circle img-thumbnail img-fluid"
- 				 alt="Profile Picture" />
-     
-                <div class="mt-2">
-                    <span class="badge bg-success" th:text="${#authentication.principal.user.userRole}"></span>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title d-flex justify-content-center align-items-center" th:text="${#authentication.principal.user.nickName}">
-                    </h5>
-                	<p class="card-text"><i class="fas fa-map-marker-alt"></i> <strong th:text="${#authentication.principal.user.userSelectedAddress}"></strong></p>
-            </div>
-            
-        </div>
-        <div class="card-footer bg-white">
-            <div class="d-flex justify-content-around">
-                <a class="btn btn-link text-decoration-none" href="infopage">
-                        <small><i class="fas fa-edit"></i>마이페이지</small>
-                    </a>
-                <a class="btn btn-link text-decoration-none" href="#">
-                        <small><i class="fas fa-map-marker-alt"></i> 주소관리</small>
-                    </a>
-                <a class="btn btn-link text-decoration-none" href="logout">
-                        <small><i class="fas fa-share"></i> 로그아웃</small>
-                    </a>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
+			<div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
+				<div class="row g-0">
+					<div class="col-md-4 p-3 text-center">
+
+						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
+             ? #authentication.principal.user.userProfile 
+             : '/img/userProfiles/' + #authentication.principal.user.userProfile}"
+							class="rounded-circle img-thumbnail img-fluid"
+							alt="Profile Picture">
+
+						<div class="mt-2">
+							<span class="badge bg-success"
+								th:text="${#authentication.principal.user.userRole}"></span>
+						</div>
+					</div>
+					<div class="col-md-8">
+						<div class="card-body">
+							<h5
+								class="card-title d-flex justify-content-center align-items-center"
+								th:text="${#authentication.principal.user.nickName}"></h5>
+							<p class="card-text">
+								<i class="fas fa-map-marker-alt"></i> <strong
+									th:text="${#authentication.principal.user.userSelectedAddress}"></strong>
+							</p>
+						</div>
+
+					</div>
+					<div class="card-footer bg-white">
+						<div class="d-flex justify-content-around">
+							<a class="btn btn-link text-decoration-none" href="infopage">
+								<small><i class="fas fa-edit"></i>마이페이지</small>
+							</a> <a class="btn btn-link text-decoration-none" href="#"> <small><i
+									class="fas fa-map-marker-alt"></i> 주소관리</small>
+							</a> <a class="btn btn-link text-decoration-none" href="/logout">
+								<small><i class="fas fa-share"></i> 로그아웃</small>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="offcanvas-body">
-			<ul class="nav justify-content-between nav-pills mb-3" id="pills-tab" role="tablist">
+			<ul class="nav justify-content-between nav-pills mb-3" id="pills-tab"
+				role="tablist">
 				<li class="nav-item" role="presentation">
 					<button class="nav-link active" id="pills-home-tab"
-						data-bs-toggle="pill" data-bs-target="#pills-home" type="button" tabindex="1"
-						role="tab" aria-controls="pills-home" aria-selected="true">유저</button>
+						data-bs-toggle="pill" data-bs-target="#pills-home" type="button"
+						tabindex="1" role="tab" aria-controls="pills-home"
+						aria-selected="true">유저</button>
 				</li>
 				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="pills-owner-tab"
-						data-bs-toggle="pill" data-bs-target="#pills-owner"
-						type="button" role="tab" aria-controls="pills-owner" tabindex="2"
-						aria-selected="false">사장님</button>
+					<button class="nav-link" id="pills-owner-tab" data-bs-toggle="pill"
+						data-bs-target="#pills-owner" type="button" role="tab"
+						aria-controls="pills-owner" tabindex="2" aria-selected="false">사장님</button>
 				</li>
 				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="pills-rider-tab"
-						data-bs-toggle="pill" data-bs-target="#pills-rider"
-						type="button" role="tab" aria-controls="pills-rider" tabindex="3"
-						aria-selected="false">라이더</button>
+					<button class="nav-link" id="pills-rider-tab" data-bs-toggle="pill"
+						data-bs-target="#pills-rider" type="button" role="tab"
+						aria-controls="pills-rider" tabindex="3" aria-selected="false">라이더</button>
 				</li>
 			</ul>
 			<div class="tab-content" id="pills-tabContent">
@@ -101,8 +133,8 @@
 							href="#">주소 선택</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">찜 목록</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">주문 내역</a></li>
-						<li class="nav-item"><a class="nav-link" href="infopage" sec:authorize="isAuthenticated()">마이페이지</a>
-						</li>
+						<li class="nav-item"><a class="nav-link" href="infopage"
+							sec:authorize="isAuthenticated()">마이페이지</a></li>
 					</ul>
 				</div>
 				<div class="tab-pane fade" id="pills-profile" role="tabpanel"
@@ -112,9 +144,11 @@
 							href="#">대시보드 이동</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">공지</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">운영정보 관리</a></li>
-						<li class="nav-item"><a class="nav-link" href="#">메뉴 품질 관리</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">메뉴 품질
+								관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">리뷰 관리</a></li>
-						<li class="nav-item"><a class="nav-link" href="infopage" sec:authorize="isAuthenticated()">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" href="infopage"
+							sec:authorize="isAuthenticated()">마이페이지</a></li>
 					</ul>
 				</div>
 				<div class="tab-pane fade" id="pills-contact" role="tabpanel"
@@ -124,18 +158,14 @@
 							href="#">공지</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">운영정보 관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">배달 관리</a></li>
-						<li class="nav-item"><a class="nav-link" href="infopage" sec:authorize="isAuthenticated()">마이페이지</a>
-						</li>
-					</ul>	
+						<li class="nav-item"><a class="nav-link" href="infopage"
+							sec:authorize="isAuthenticated()">마이페이지</a></li>
+					</ul>
 				</div>
 			</div>
-			<div sec:authorize="isAnonymous()">
-				<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
-			</div>
-			<div sec:authorize="isAnonymous()">
-				<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
-			</div>
+
 		</div>
 	</div>
 </div>
+
 </html>

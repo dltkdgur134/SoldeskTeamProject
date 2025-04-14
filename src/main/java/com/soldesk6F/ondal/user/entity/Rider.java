@@ -31,17 +31,20 @@ public class Rider {
 	@Id
 	@GeneratedValue
 	@UuidGenerator
-	@Column(name = "rider_id", updatable = false, nullable = false, unique = true)
+	@Column(name = "rider_id", updatable = false, nullable = false)
 	private UUID riderId;
 
 	@OneToOne
 	@JoinColumn(name = "user_uuid", nullable = false, unique = true)
 	private User user;
 
+	@Column(name = "rider_nickname" ,nullable = false , length = 30)
+	private String riderNickname;
+	
 	@Column(name = "secondary_password", nullable = false, length = 10)
 	private String secondaryPassword;
 
-	@Column(name = "vehicle_number", nullable = false, length = 15)
+	@Column(name = "vehicle_number", nullable = false, length = 20)
 	private String vehicleNumber;
 
 	@Column(name = "rider_hub_address", nullable = false, length = 80)
@@ -66,7 +69,7 @@ public class Rider {
 	private LocalDateTime registrationDate;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "rider_status", nullable = false)
+	@Column(name = "rider_status", nullable = false ,length = 10)
 	private RiderStatus riderStatus;
 
 	public enum RiderStatus {
@@ -120,7 +123,7 @@ public class Rider {
 	@Builder
 	public Rider(User user, String secondaryPassword, String vehicleNumber, String riderHubAddress,
 			DeliveryRange deliveryRange, String riderPhone, double hubAddressLatitude, double hubAddressLongitude,
-			RiderStatus riderStatus) {
+			RiderStatus riderStatus,String riderNickname) {
 		super();
 		this.user = user;
 		this.secondaryPassword = secondaryPassword;
@@ -131,6 +134,7 @@ public class Rider {
 		this.hubAddressLatitude = hubAddressLatitude;
 		this.hubAddressLongitude = hubAddressLongitude;
 		this.riderStatus = riderStatus;
+		this.riderNickname = riderNickname;
 	}
 
 	public String getRiderUuidAsString() {

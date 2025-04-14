@@ -40,6 +40,16 @@ public class RegAddress {
 	@Column(name ="address" , nullable =  false)
 	private String address;
 	
+	@Column(name = "detail_address" , nullable = false)
+	private String detailAddress;
+	
+	
+	@Column(name = "user_address_latitude", nullable = false)
+	private double userAddressLatitude;
+
+	@Column(name = "user_address_longitude", nullable = false)
+	private double userAddressLongitude;
+	
 	@CreationTimestamp
 	@Column(name = "created_date" , nullable = false , updatable = false)
 	private LocalDateTime createdDate;
@@ -49,10 +59,13 @@ public class RegAddress {
 	private LocalDateTime updatedDate;
 
 	@Builder
-	public RegAddress(User user, String address) {
+	public RegAddress(User user, String address,String detailAddress, double userAddressLatitude, double userAddressLongitude) {
 		super();
 		this.user = user;
 		this.address = address;
+		this.detailAddress = detailAddress;
+		this.userAddressLatitude = userAddressLatitude;
+		this.userAddressLongitude = userAddressLongitude;
 	}
 	
 	
@@ -60,6 +73,10 @@ public class RegAddress {
 	public String getUserUuidAsString() {
 	    return regAddressId != null ? regAddressId .toString() : null;
 	}
+
+
+
+
 	
 	
 	

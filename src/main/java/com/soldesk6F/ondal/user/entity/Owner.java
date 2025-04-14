@@ -21,13 +21,17 @@ public class Owner {
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "owner_id", updatable = false, nullable = false, unique = true)
+    @Column(name = "owner_id", updatable = false, nullable = false)
     private UUID ownerId;
 
     @OneToOne
     @JoinColumn(name = "user_uuid", nullable = false, unique = true)
     private User user;
 
+    @Column(name = "owner_nickname" , nullable = false , length = 30)
+    private String ownerNickname;
+    
+    
     @Column(name = "secondary_password",nullable = false , length = 10)
     private String secondaryPassword;  // 비밀번호 해싱 필요
 

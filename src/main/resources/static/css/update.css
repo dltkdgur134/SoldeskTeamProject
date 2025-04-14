@@ -1,0 +1,89 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "yisunshinM";
+	src: url('yisunshinM.ttf') format("truetype");
+}
+
+body {
+	font-family: "yisunshinM";
+	src: url('yisunshinM.ttf') format("truetype");
+}
+
+#drop_zone {
+	border: 5px solid #ffef99;
+	border-radius: 10px;
+	width: 100%;
+	height: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.reg-buttonContainer {
+	width : 100%;
+}
+
+.reg-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.riderBtn,
+.ownerBtn {
+  flex: 1;
+  height: 50px;
+  background-color: #FFDF33;
+  border: none !important;
+  border-radius: 7px;
+  text-align: center;
+  line-height: 50px;
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.riderBtn:hover{
+	background-color: #6C0C0C;  /* 갈색 */
+}
+.ownerBtn:hover{
+	background-color: #2D7121;	/* 초록색 */
+}
+/* @font-face {
+    font-family: 'yssdotum';
+    src: url('ysssdotum.eot');
+    src: url('yssdotum.eot?#iefix') format('embedded-opentype'),
+        url('yssdotum.woff2') format('woff2'),
+        url('yssdotum.woff') format('woff'),
+        url('yssdotum.ttf') format('truetype'),
+        url('yssdotum.svg#YiSunShinDotumM') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+	font-family: "yssdotum" !important; 
+} */
+
+
+#drop-zone {
+  border: 5px solid #ffef99;
+  border-radius: 10px;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.check-exists-btn {
+	color: black;
+	text-decoration: none;
+	border: none;
+	background-color: transparent;
+}

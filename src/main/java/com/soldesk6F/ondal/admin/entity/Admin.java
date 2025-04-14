@@ -1,6 +1,5 @@
 package com.soldesk6F.ondal.admin.entity;
 
-import java.util.UUID;
 
 import jakarta.persistence.*;
 import lombok.*;

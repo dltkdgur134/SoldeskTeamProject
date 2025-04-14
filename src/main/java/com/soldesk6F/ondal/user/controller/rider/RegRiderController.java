@@ -1,6 +1,9 @@
-package com.soldesk6F.ondal.user.controller;
+package com.soldesk6F.ondal.user.controller.rider;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+
 import com.soldesk6F.ondal.user.dto.RiderForm;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserRole;
@@ -33,12 +37,12 @@ public class RegRiderController {
 
         if (riderService.isAlreadyRider(userId)) {
         	 //model.addAttribute("riderExists", riderExists); // 모델에 넣어줘야 Thymeleaf가 사용 가능
-        	 redirectAttributes.addAttribute("riderExists", riderExists);
+        	redirectAttributes.addFlashAttribute("riderExists", true);
         	 return "redirect:/"; // templates/content/index.html
         }
 
         model.addAttribute("riderForm", new RiderForm());
-        return "content/rider_register";
+        return "content/rider/riderRegister";
     }
 
     @PostMapping("/register")
@@ -57,7 +61,21 @@ public class RegRiderController {
 
         user.setUserRole(UserRole.RIDER);
         userRepository.save(user);
+     // 🔁 4. 세션의 Authentication 갱신
+        // 변경된 사용자 정보를 다시 로딩
+        User updatedUser = userRepository.findByUserId(userId).orElseThrow();
 
+        // 새로운 CustomUserDetails 생성
+        CustomUserDetails updatedDetails = new CustomUserDetails(updatedUser, UserRole.valueOf(updatedUser.getUserRole().name()));
+
+        // 새로운 Authentication 객체 생성
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+            updatedDetails, null, updatedDetails.getAuthorities()
+        );
+
+        // SecurityContext에 설정
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+        redirectAttributes.addFlashAttribute("riderSuccess", "라이더 등록이 완료되었습니다!");
         return "redirect:/";
     }
 }

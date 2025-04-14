@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+<script th:src="@{/js/index.js}"></script>
+<th:block layout:fragment="css">
+<link rel="stylesheet"  th:href="@{/css/index.css}">
+<link rel="stylesheet" th:href="@{/css/custom.css}">
+</th:block>
+</head>
+
+<div layout:fragment="content">
+	<!-- 지도 영역 -->
+	<div id="map" style="width: 100%; height: 400px;"></div>
+</div>
+
+<!-- JavaScript Fragment -->
+<th:block layout:fragment="js">
+	<!-- Kakao Maps API -->
+	<script
+		src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
+
+	<!-- Thymeleaf에서 위도 경도 값을 넘겨받기 -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var lat = parseFloat('[[${rider.hubAddressLatitude}]]');
+		var lng = parseFloat('[[${rider.hubAddressLongitude}]]');
+		console.log("Latitude: ", lat);
+		console.log("Longitude: ", lng);
+		/*]]>*/
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var mapContainer = document.getElementById('map'), mapOption = {
+				center : new kakao.maps.LatLng(lat, lng),
+				level : 3
+			};
+			var map = new kakao.maps.Map(mapContainer, mapOption);
+		});
+	</script>
+</th:block>
+
+</html>

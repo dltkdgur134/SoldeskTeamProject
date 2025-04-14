@@ -2,6 +2,9 @@ package com.soldesk6F.ondal.adminact.entity;
 
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.admin.entity.Admin;
 
@@ -26,9 +29,10 @@ import lombok.Setter;
 public class AdminActions {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
+    @UuidGenerator
     @Column(name = "action_id", nullable = false, unique = true)
-    private Long actionId;  // 활동 ID (PK)
+    private UUID actionId;  // 활동 ID (PK)
 
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = false)

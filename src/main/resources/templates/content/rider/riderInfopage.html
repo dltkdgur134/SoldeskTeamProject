@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+<script
+	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/update.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/initialize.js}"></script>
+<script th:src="@{/js/zipcode.js}"></script>
+<script th:src="@{/js/update.js}"></script>
+</head>
+<div layout:fragment="content" class="container py-5">
+	<div class="container text-center">
+		<div class="row justify-content-md-center">
+			<div class="col col-lg-2">
+				<a type="button" class="btn btn-link position-relative"
+					id="profile-pic-btn" data-bs-toggle="modal"
+					data-bs-target="#updateProfilePicModal"> <img
+					src="https://randomuser.me/api/portraits/men/64.jpg"
+					class="rounded-circle img-thumbnail img-fluid"
+					alt="Profile Picture" id="profile-pic"> <span
+					class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle"
+					id="profile-pic-update-btn"> <i
+						class="fa-solid fa-pen-to-square"></i>
+				</span>
+				</a>
+			</div>
+			<div class="col col-lg-2">
+				<h5 id="profile-nickName" th:text="${rider.riderNickname}"></h5>
+				<span
+					class="badge rounded-pill text-bg-primary justify-content-center"
+					th:text="${#authentication.principal.user.UserRole}"></span>
+			</div>
+			<!-- <div class="col col-lg-2"><img th:src="@{${#authentication.principal.user.userProfilePath}}" class="img-thumbnail" alt="프로필 사진"></div> -->
+			<div class="col col-lg-2"></div>
+		</div>
+	</div>
+	<br>
+	<div class="card info-card p-4">
+		<h6 class="card-title">
+			프로필 <a href="riderMypage" data-bs-toggle="tooltip"
+				data-bs-placement="right" title="프로필 수정"><i
+				class="fa-solid fa-pen-to-square"></i></a>
+		</h6>
+		<div class="card-body">
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item d-flex justify-content-between"><Label>아이디</Label><strong
+					th:text="${#authentication.principal.user.userId}"></strong></li>
+				<li class="list-group-item d-flex justify-content-between"><Label>라이더
+						닉네임</Label> <strong th:text="${rider.riderNickname}"></strong> <a
+					type="button" class="btn btn-secondary btn-sm"
+					data-bs-toggle="modal" data-bs-target="#updateRiderNicknameModal">수정</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="modal fade" id="updateRiderNicknameModal"
+		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="updateRiderNicknameModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="updateRiderNicknameModalLabel">라이더
+						닉네임 변경</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/updateRiderNickname}" method="post"
+						name="updateRiderNicknameForm" autocomplete="off"
+						class="needs-validation" id="update-rider-nickname-form"
+						novalidate>
+
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2"> <i
+								class="fa-solid fa-id-card"></i>
+							</span> <input type="text" class="form-control" placeholder="라이더 닉네임"
+								aria-label="riderNickname" name="riderNickname"
+								id="rider-nickname-input" aria-describedby="basic-addon2"
+								maxlength="30" th:value="${rider.riderNickname}">
+
+							<div class="invalid-feedback">
+								닉네임을 확인해주세요. <i data-bs-toggle="tooltip"
+									data-bs-placement="right"
+									title="닉네임은 최소 1글자이어야 하며 기존 닉네임과 다르게 입력해주세요."
+									class="fa-solid fa-circle-question"></i>
+							</div>
+							<div class="valid-feedback">닉네임 변경이 가능합니다.</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary"
+						form="update-rider-nickname-form" id="update-rider-nickname-btn">변경</button>
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="updateProfilePicModal"
+		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="updateProfilePicModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="updateProfilePicModalLabel">프로필
+						사진 변경</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/content/updateProfilePic}" method="post"
+						autocomplete="off" id="update-profilePic-form">
+						<div class="input-group mb-3">
+							<label class="input-group-text" for="profileImage"><i
+								class="fa-solid fa-folder-open input-icon"></i></label> <input
+								type="file" class="form-control" id="profileImage">
+						</div>
+						<div id="drop_zone" ondrop="dropHandler(event);"
+							ondragover="dragOverHandler(event);">
+							<p>
+								이미지 파일을 <i>여기에</i> 드래그하여 업로드.
+							</p>
+						</div>
+						<div id="file-name-display" class="file-name">이미지를 선택해주세요</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary"
+						form="update-profilePic-form">변경</button>
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<br>
+	<div class="card info-card p-4">
+		<h6 class="card-title">
+			라이더 정보 <a href="updateRiderInfo" data-bs-toggle="tooltip"
+				data-bs-placement="right" title="라이더 정보 수정"> <i
+				class="fa-solid fa-pen-to-square"></i>
+			</a>
+		</h6>
+		<div class="card-body">
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item d-flex justify-content-between"><label>허브
+						주소</label> <strong th:text="${rider.riderHubAddress}">허브 주소</strong></li>
+				<li class="list-group-item d-flex justify-content-between"><label>차량
+						번호</label> <strong th:text="${rider.vehicleNumber}">차량번호</strong></li>
+				<li class="list-group-item d-flex justify-content-between"><label>전화번호</label>
+					<strong th:text="${rider.riderPhone}">전화번호</strong></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+
+</html>

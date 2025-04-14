@@ -13,7 +13,6 @@ import com.soldesk6F.ondal.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -31,7 +30,7 @@ import lombok.Setter;
 public class UserWarning {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     @UuidGenerator
     @Column(name = "warning_id", nullable = false, unique = true)
     private UUID warningId;  // 경고 ID (PK)

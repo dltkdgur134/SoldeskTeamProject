@@ -95,7 +95,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			        .email("waiting:" + email)
 			        .password("waiting")
 			        .userSelectedAddress(null)
-			        .userProfilePath(userProfilepath)
+			        .userProfile(userProfilepath)
 			        .nickName(nickName)
 			        .userPhone("waiting" + provider.substring(3, 6))
 			        .build());
@@ -110,7 +110,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			        .email(email)
 			        .password(randString)
 			        .userSelectedAddress(null)
-			        .userProfilePath(userProfilepath)
+			        .userProfile(userProfilepath)
 			        .nickName(nickName)
 			        .userPhone(tel)
 			        .userRole(UserRole.USER)
