@@ -125,7 +125,7 @@ public class UserService {
     	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
     		
    		try {
-    		String old_profImgPath = findUser.get().getUserProfilePath(); 
+    		String old_profImgPath = findUser.get().getUserProfile(); 
     		String old_profImgName = old_profImgPath.split("\\\\")[1];
     		String oldSavePath = new File(uploadDir).getAbsolutePath();
     		Path oldImgPath = Paths.get(oldSavePath, old_profImgName);
@@ -162,7 +162,7 @@ public class UserService {
 	            
 	            final String finalFilePath = new String(filePath);
 //	            final String finalFileName = new String(fileName);
-	            findUser.ifPresent(U -> U.setUserProfilePath(finalFilePath));
+	            findUser.ifPresent(U -> U.setUserProfile(finalFilePath));
 //	            findUser.ifPresent(U -> U.setUserProfilePath(finalFileName));
 	            findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
 	            return true;

@@ -76,7 +76,7 @@ public class UpdateUserController {
 			rAttr.addFlashAttribute("result", "프로필 이미지 변경 실패!");
 			return "redirect:/infopage";
 		}
-		customUserDetails.getUser().setUserProfilePath(userRepository.findByUserId(user.getUserId()).get().getUserProfilePath());
+		customUserDetails.getUser().setUserProfile(userRepository.findByUserId(user.getUserId()).get().getUserProfile());
 		rAttr.addFlashAttribute("result", "프로필 이미지 변경 성공!");
 		return "redirect:/infopage";
 	}
