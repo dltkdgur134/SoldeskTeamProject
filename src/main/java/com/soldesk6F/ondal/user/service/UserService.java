@@ -175,6 +175,29 @@ public class UserService {
     	
     }
     
+//    @Transactional
+//    public boolean updateUserPhone(String userPhone, User user, Model model) {
+//    	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+//    	
+//    	if (findUser.isEmpty()) {
+//    		throw new IllegalArgumentException("존재하지 않는 아이디 입니다.");
+//    	}
+//    	
+//    	User currentUser = findUser.get();
+//    	
+//   		if (currentUser.getNickName().equals(userPhone)) {
+//    		model.addAttribute("error", "기존 닉네임과 동일합니다.");
+//    		return false;
+//    	} else {
+////    		findUser.ifPresent(U -> U.setNickName(nickName) );
+////    		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
+//    		currentUser.setNickName(userPhone);
+//    		currentUser.setUpdatedDate(LocalDateTime.now());
+//    		return true;
+//    	}
+//    }
+    
+    
     
 }
 
