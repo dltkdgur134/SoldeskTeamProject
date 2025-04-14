@@ -100,12 +100,21 @@ public class UserService {
     @Transactional
     public boolean updateUserNickname(String nickName, User user, Model model) {
     	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
-    	if (findUser.get().getNickName().equals(nickName)) {
-//    		throw new IllegalArgumentException("기존 닉네임과 동일합니다.");
+    	
+    	if (findUser.isEmpty()) {
+    		throw new IllegalArgumentException("존재하지 않는 아이디 입니다.");
+    	}
+    	
+    	User currentUser = findUser.get();
+    	
+   		if (currentUser.getNickName().equals(nickName)) {
+    		model.addAttribute("error", "기존 닉네임과 동일합니다.");
     		return false;
     	} else {
-    		findUser.ifPresent(U -> U.setNickName(nickName) );
-    		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()) );
+//    		findUser.ifPresent(U -> U.setNickName(nickName) );
+//    		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
+    		currentUser.setNickName(nickName);
+    		currentUser.setUpdatedDate(LocalDateTime.now());
     		return true;
     	}
     }
@@ -113,8 +122,9 @@ public class UserService {
     
     @Transactional
     public boolean updateUserPicture(User user, MultipartFile profileImage, Model model) {
-    	try {
-    		Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+    	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+    		
+   		try {
     		String old_profImgPath = findUser.get().getUserProfilePath(); 
     		String old_profImgName = old_profImgPath.split("\\\\")[1];
     		String oldSavePath = new File(uploadDir).getAbsolutePath();
@@ -123,7 +133,12 @@ public class UserService {
     		if (Files.exists(oldImgPath)) {
     			Files.delete(oldImgPath);
     		}
-    		
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", "존재하지 않는 파일입니다.");
+		}
+    	
+    	try {
     		String fileName = "default.png";
 	        String extension = "png";
 	        String filePath = uploadDir + File.separator + fileName;
@@ -155,8 +170,9 @@ public class UserService {
 	        return false;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;	
+			return false;
 		}
+    	
     }
     
     
