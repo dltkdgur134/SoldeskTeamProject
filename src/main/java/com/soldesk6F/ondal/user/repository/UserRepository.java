@@ -7,14 +7,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 import com.soldesk6F.ondal.user.entity.User;
+import java.util.List;
+
 
 
 public interface UserRepository extends JpaRepository<User,UUID> {
 	boolean existsByUserId(String userId);
     boolean existsByEmail(String email);
     boolean existsByUserPhone(String userPhone);
+    boolean existsByNickName(String nickName);
     Optional<User> findByEmail(String email);  		
     Optional<User> findByUserId(String userId);
     Optional<User> findByUserUuid(UUID userUuid);
-    
+    Optional<User> findByNickName(String nickName);
 }

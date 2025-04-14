@@ -1,14 +1,21 @@
 @charset "UTF-8";
 
-@font-face {
-	font-family: "yisunshinM";
-	src : url('yisunshinM.ttf') format("truetype");
+/* @font-face {
+    font-family: 'yssdotum';
+    src: url('ysssdotum.eot');
+    src: url('yssdotum.eot?#iefix') format('embedded-opentype'),
+        url('yssdotum.woff2') format('woff2'),
+        url('yssdotum.woff') format('woff'),
+        url('yssdotum.ttf') format('truetype'),
+        url('yssdotum.svg#YiSunShinDotumM') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 body {
-	font-family: "yisunshinM";
-	src : url('yisunshinM.ttf') format("truetype");
-}
+	font-family: "yssdotum" !important; 
+} */
 
 
 #drop-zone {
@@ -22,3 +29,9 @@ body {
 }
 
 
+.check-exists-btn {
+	color: black;
+	text-decoration: none;
+	border: none;
+	background-color: transparent;
+}

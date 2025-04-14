@@ -12,11 +12,12 @@
 
 @font-face {
 	font-family: "yisunshinM";
-	src : url('yisunshinM.ttf') format("truetype");
+	src : url('../css/yssM.ttf') format("truetype");
 }
 
 body {
-	font-family: "acloud";
+	font-family: "acloud"; 
+	font-family: "yisunshinM";
 }
 
 .display-5 {

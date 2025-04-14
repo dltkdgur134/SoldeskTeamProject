@@ -1,13 +1,63 @@
 
 $(function(){
 	'use strict'
+	 var flashDurationInSeconds = 5;
+	 var flashContainerId = 'flash-messages';
+
+	 function removeFlashMessages() {
+	    $('#' + flashContainerId).remove();
+	 }
+	 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
 
 	 document.getElementById('update-nickname-btn').addEventListener('click', event => {
-		if (!checkNicknameValidity()) {
+		if (!checkNicknameValidity() || document.getElementById('nickname-input').dataset.status === "no") {
 			event.preventDefault();
 			event.stopPropagation();
 		}
 	 });
+	 
+	 document.getElementById('nickname-exists').addEventListener('click', event => {
+		/*let status = $('#nickname-input').attr('status');*/
+		const nickname = document.upNickForm.nickname;
+		/*let nickname = $('#nickname-input').val();*/
+		$('.invalid-feedback').empty();
+
+		if (nickname.value.trim() === '') {
+			nickname.classList.add("is-invalid");
+			nickname.classList.remove("is-valid");
+			document.getElementById('nickname-input').dataset.status = "no";
+			$('.invalid-feedback').html("닉네임이 비어있습니다.");
+			return;
+		} 	
+		
+		$.ajax({
+			url: "checkNickname",
+			type: "POST",
+			async: true,
+			data: {
+				nickname : nickname.value
+			},
+			success: function(data) {
+				// 기존 닉네임 있음 (사용 불가능)
+				if (data.count > 0) {
+					document.getElementById('nickname-input').dataset.status = "no";
+					console.log($('#nickname-input').attr('data-status')); // 중복 유무 로그
+					nickname.classList.add("is-invalid");
+					nickname.classList.remove("is-valid");
+					$('.invalid-feedback').html('닉네임이 이미 존재합니다.');
+				// 기존 닉네임 없음 (사용 가능)
+				} else {
+					document.getElementById('nickname-input').dataset.status = "yes";
+					console.log($('#nickname-input').attr('data-status')); // 중복 유무 로그
+					nickname.classList.add("is-valid");
+					nickname.classList.remove("is-invalid");
+				}
+			},
+			error: function(e) {
+				alert("error : " + e);
+			}
+		});
+	})
 	 
 	 document.getElementById('profileImage').addEventListener('change', function () {
 	   const maxSize = 1024 * 1024;
@@ -50,28 +100,93 @@ $(function(){
 	       document.getElementById('file-name-display').textContent = '450x450 이하로 해주세요';
 	     } else {
 	       /*document.getElementById('file-name-display').textContent = file.name;*/
-		   document.getElementById('file-name-display').style.color = 'black';
+		   document.getElementById('file-name-display').style.color = 'green';
 		   document.getElementById('file-name-display').textContent = '프로필 이미지 등록이 가능합니다';
 	     }
 	     URL.revokeObjectURL(objectUrl);
 	   };
-
 	   img.src = objectUrl;
 	 });
+	 
+	 document.getElementById('update-phone-btn').addEventListener('click', event => {
+	 		if (!checkPhonenumValidity() || document.getElementById('phone-input').dataset.status === "no") {
+	 			event.preventDefault();
+	 			event.stopPropagation();
+	 		}
+	 	 });
+	 
+	 document.getElementById('phonenum-exists').addEventListener('click', event => {
+	 		const phoneNum = document.upPhoneForm.userPhone;
+	 		$('.invalid-feedback').empty();
+
+	 		if (phoneNum.value.trim() === '') {
+	 			phoneNum.classList.add("is-invalid");
+	 			phoneNum.classList.remove("is-valid");
+	 			document.getElementById('phone-input').dataset.status = "no";
+	 			$('.invalid-feedback').html("닉네임이 비어있습니다.");
+	 			return;
+	 		} 	
+	 		
+	 		$.ajax({
+	 			url: "checkPhoneNum",
+	 			type: "POST",
+	 			async: true,
+	 			data: {
+	 				user_phone: phoneNum.value
+	 			},
+	 			success: function(data) {
+	 				// 기존 전화번호 없음
+	 				if (data.count > 0) {
+	 					document.getElementById('phone-input').dataset.status = "no";
+	 					console.log($('#phone-input').attr('data-status')); // 중복 유무 로그
+	 					nickname.classList.add("is-invalid");
+	 					nickname.classList.remove("is-valid");
+	 					$('.invalid-feedback').html('닉네임이 이미 존재합니다.');
+	 				// 기존 전화번호 있음
+	 				} else {
+	 					document.getElementById('phone-input').dataset.status = "yes";
+	 					console.log($('#phone-input').attr('data-status')); // 중복 유무 로그
+	 					nickname.classList.add("is-valid");
+	 					nickname.classList.remove("is-invalid");
+	 				}
+	 			},
+	 			error: function(e) {
+	 				alert("error : " + e);
+	 			}
+	 		});
+	 	})
 	 
 });
 
 function checkNicknameValidity() {
 	'use strict'
-	const oldNickname = document.getElementById('profile-nickName');
-	const newNickname = document.upnickform.nickname;
-	if (oldNickname.textContent === newNickname.value || newNickname.value.trim() === '') {
+	const newNickname = document.upNickForm.nickname;
+	
+	if (newNickname.dataset.status === "no") {
 		newNickname.classList.add("is-invalid");
 		newNickname.classList.remove("is-valid");
+		$('.invalid-feedback').html("중복확인이 필요합니다.");
 		return false;
-	} else {
+	}
+	else {
 		newNickname.classList.add("is-valid");
 		newNickname.classList.remove("is-invalid");
+		return true;
+	}
+}
+
+function checkPhonenumValidity() {
+	'use strict'
+	const phoneNum = document.upPhoneForm.userPhone;
+	
+	if (phoneNum.dataset.status === "no") {
+		phoneNum.classList.add("is-invalid");
+		phoneNum.classList.remove("is-valid");
+		$('.invalid-feedback').html("중복확인이 필요합니다.");
+		return false;
+	} else {
+		phoneNum.classList.add("is-valid");
+		phoneNum.classList.add("is-invalid");
 		return true;
 	}
 }
@@ -83,7 +198,6 @@ function dropHandler(ev) {
   const dropZone = ev.target;
   const validTypes = ["image/jpeg", "image/png", "image/gif"];
   const maxSize = 5 * 1024 * 1024; // 5 MB
-  
 
   if (ev.dataTransfer.items) {
     [...ev.dataTransfer.items].forEach((item, i) => {
