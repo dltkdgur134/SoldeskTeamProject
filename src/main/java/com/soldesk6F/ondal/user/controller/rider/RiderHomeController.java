@@ -1,6 +1,6 @@
 package com.soldesk6F.ondal.user.controller.rider;
 
-import com.soldesk6F.ondal.user.CustomUserDetails;
+import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 
