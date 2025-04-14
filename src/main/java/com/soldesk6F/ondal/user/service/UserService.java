@@ -160,10 +160,10 @@ public class UserService {
 	            filePath = uploadDir + File.separator + fileName;
 	            filePath.replace("/", File.separator);
 	            
-	            final String finalFilePath = new String(filePath);
-//	            final String finalFileName = new String(fileName);
-	            findUser.ifPresent(U -> U.setUserProfile(finalFilePath));
-//	            findUser.ifPresent(U -> U.setUserProfilePath(finalFileName));
+	            //final String finalFilePath = new String(filePath);
+	            final String finalFileName = new String(fileName);
+	            //findUser.ifPresent(U -> U.setUserProfile(finalFilePath));
+	            findUser.ifPresent(U -> U.setUserProfile(finalFileName));
 	            findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
 	            return true;
 	        }

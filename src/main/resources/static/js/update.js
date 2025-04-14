@@ -108,10 +108,6 @@ $(function(){
 	   img.src = objectUrl;
 	 });
 	 
-	 document.querySelector('[name="userPhone"]').addEventListener('input', function () {
-	   this.value = this.value.replace(/[^0-9\-]/g, '');
-	 });
-	 
 	 document.getElementById('update-phone-btn').addEventListener('click', event => {
 	 		if (!checkPhonenumValidity() || document.getElementById('phone-input').dataset.status === "no") {
 	 			event.preventDefault();
@@ -120,8 +116,9 @@ $(function(){
 	 	 });
 	 
 	 document.getElementById('phonenum-exists').addEventListener('click', event => {
-	 		const phoneNum = document.upPhoneForm.userPhone;
-			
+			const phoneNum = document.querySelector('form[name="upPhoneForm"] input[name="userPhone"]');
+			phoneNum.value = phoneNum.value.replace(/[^0-9\-]/g, '');
+			phoneNum.value = phoneNum.value.replace(/-/g, '');
 	 		$('.invalid-feedback').empty();
 
 	 		if (phoneNum.value.trim() === '') {
@@ -183,7 +180,6 @@ function checkNicknameValidity() {
 function checkPhonenumValidity() {
 	'use strict'
 	const phoneNum = document.upPhoneForm.userPhone;
-	
 	if (phoneNum.dataset.status === "no") {
 		phoneNum.classList.add("is-invalid");
 		phoneNum.classList.remove("is-valid");
