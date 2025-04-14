@@ -41,7 +41,7 @@ public class Rider {
 	@Column(name = "rider_nickname" ,nullable = false , length = 30)
 	private String riderNickname;
 	
-	@Column(name = "secondary_password", nullable = false, length = 10)
+	@Column(name = "secondary_password", nullable = false, length = 255)
 	private String secondaryPassword;
 
 	@Column(name = "vehicle_number", nullable = false, length = 20)
@@ -124,7 +124,6 @@ public class Rider {
 	public Rider(User user, String secondaryPassword, String vehicleNumber, String riderHubAddress,
 			DeliveryRange deliveryRange, String riderPhone, double hubAddressLatitude, double hubAddressLongitude,
 			RiderStatus riderStatus,String riderNickname) {
-		super();
 		this.user = user;
 		this.secondaryPassword = secondaryPassword;
 		this.vehicleNumber = vehicleNumber;

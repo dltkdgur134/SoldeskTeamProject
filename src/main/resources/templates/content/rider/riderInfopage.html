@@ -4,6 +4,15 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
+<style>
+input[type="password"] {
+    border: none;
+    background: transparent; /* 배경도 없애기 */
+    outline: none; /* 포커스 시 나오는 윤곽선 제거 */
+	text-align: right;
+	
+}
+</style>
 <script
 	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <link
@@ -19,6 +28,14 @@
 <script th:src="@{/js/update.js}"></script>
 </head>
 <div layout:fragment="content" class="container py-5">
+   <div th:if="${SecondaryPWError}" class="alert alert-danger text-center" role="alert"
+	style="margin-bottom: 20px;">
+	<span th:text="${SecondaryPWError}"></span>
+	</div>
+<div th:if="${SecondaryPWSuccess}" class="alert alert-success" role="alert"
+		style="margin-bottom: 20px;">
+		<span th:text="${SecondaryPWSuccess}"></span>
+	</div>
 	<div class="container text-center">
 		<div class="row justify-content-md-center">
 			<div class="col col-lg-2">
@@ -156,16 +173,23 @@
 		</h6>
 		<div class="card-body">
 			<ul class="list-group list-group-flush">
-				<li class="list-group-item d-flex justify-content-between"><label>허브
-						주소</label> <strong th:text="${rider.riderHubAddress}">허브 주소</strong></li>
-				<li class="list-group-item d-flex justify-content-between"><label>차량
-						번호</label> <strong th:text="${rider.vehicleNumber}">차량번호</strong></li>
-				<li class="list-group-item d-flex justify-content-between"><label>전화번호</label>
-					<strong th:text="${rider.riderPhone}">전화번호</strong></li>
+				<li class="list-group-item d-flex justify-content-between">
+   				<label>2차 비밀번호</label> 
+    			<input type="password" th:value="${#strings.substring(rider.secondaryPassword, 0, 6)}" maxlength="6" disabled />
+				</li>
+				<li class="list-group-item d-flex justify-content-between">
+				<label>허브주소</label> 
+				<strong th:text="${rider.riderHubAddress}">허브 주소</strong></li>
+				<li class="list-group-item d-flex justify-content-between">
+				<label>차량번호</label> 
+				<strong th:text="${rider.vehicleNumber}">차량번호</strong></li>
+				<li class="list-group-item d-flex justify-content-between">
+				<label>전화번호</label>
+				<strong th:text="${rider.riderPhone}">전화번호</strong></li>
 			</ul>
 		</div>
 	</div>
 </div>
-
+</div>
 
 </html>
