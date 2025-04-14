@@ -4,7 +4,6 @@ import com.soldesk6F.ondal.store.entity.StoreDto;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
@@ -37,8 +36,7 @@ public class StoreService {
     	                    .storeIntroduce(store.getStoreIntroduce())
     	                    .storeStatus(store.getStoreStatus().getDescription())
     	                    .imageUrl(store.getBrandImgs() != null && !store.getBrandImgs().isEmpty()
-    	                            ? store.getBrandImgs().get(0).getBrandImgFilePath()
-    	                            : "/img/default.png")
+    	                            ? store.getBrandImgs().get(0).getBrandImgFilePath() : "/img/default.png")
     	                    .build();
     	            return dto;
     	        })

@@ -21,7 +21,7 @@
 		    <button class="food-btn" onclick="loadCategory('korean', this)">중식</button>
 		    <button class="food-btn" onclick="loadCategory('korean', this)">한식</button>
 		    <button class="food-btn" onclick="loadCategory('korean', this)">분식</button>
-		    <button class="food-btn" onclick="loadCategory('korean', this)">치킨</button>
+		    <button class="food-btn" onclick="loadCategory('chicken', this)">치킨</button>
 		    <button class="food-btn" onclick="loadCategory('korean', this)">피자</button>
 		</div>
 		<div id="gallery-area">
@@ -32,25 +32,27 @@
 	</div>
 	<div layout:fragment="js">
 		<script>
-			function loadCategory(category) {
-			  fetch(`/api/stores/${category}`)
-			    .then(res => res.json())
-			    .then(data => {
-			      const gallery = document.querySelector("#gallery-area");
-			      gallery.innerHTML = `
-			        <div class="gallery-container">
-			          ${
-			            data.map(store => `
-			              <div>
-			                <a href="#" class="labels">${store.storeName}</a>
-			                <img class="imgs" src="${store.imageUrl}" alt="${store.storeName}">
-			              </div>
-			            `).join("")
-			          }
-			        </div>
-			      `;
-			    })
-			    .catch(error => console.error("불러오기 실패: ", error));
+			function loadCategory(category, btn) {
+				document.querySelectorAll(".food-btn").forEach(b => b.classList.remove("active"));
+				btn.classList.add("active");
+				fetch(`/api/stores/${category}`)
+					.then(res => res.json())
+					.then(data => {
+						const gallery = document.querySelector("#gallery-area");
+						gallery.innerHTML = `
+							<div class="gallery-container">
+								${
+									data.map(store => `
+										<div>
+											<a href="#" class="labels">${store.storeName}</a>
+											<img class="imgs" src="${store.imageUrl}" alt="${store.storeName}">
+										</div>
+									`).join("")
+								}
+							</div>
+						`;
+					})
+					.catch(error => console.error("가게 리스트 불러오기 실패: ", error));
 			}
 		</script>
 	</div>
