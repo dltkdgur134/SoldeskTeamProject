@@ -19,7 +19,16 @@ import lombok.RequiredArgsConstructor;
 public class UpdateRiderController {
 	private final RiderService riderService;
 
-	@GetMapping("/updateRiderInfo")
+	@GetMapping("rider/riderMypage")
+    public String showEditPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+		String userId = userDetails.getUser().getUserId();
+		Rider rider = riderService.getRiderByUserId(userId); // rider 정보 불러오기
+		model.addAttribute("rider", rider);
+		return "content/rider/riderMypage"; 
+    }
+	
+	
+	@GetMapping("rider/updateRiderInfo")
 	public String showUpdateRiderInfoForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		String userId = userDetails.getUser().getUserId();
 		Rider rider = riderService.getRiderByUserId(userId); // rider 정보 불러오기
@@ -32,7 +41,7 @@ public class UpdateRiderController {
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		String userId = userDetails.getUser().getUserId();
 		riderService.updateRiderInfo(userId, riderNickname, null, null, null, 0, 0, null);
-		return "redirect:/rider/profile"; // 혹은 리다이렉션할 페이지 경로
+		return "redirect:/rider/riderInfopage"; // 혹은 리다이렉션할 페이지 경로
 	}
 
 	@PostMapping("/updateRiderInfo")
@@ -48,7 +57,7 @@ public class UpdateRiderController {
 		DeliveryRange rangeEnum = DeliveryRange.valueOf(deliveryRange);
 		riderService.updateRiderInfo(userId, null, vehicleNumber,riderPhone, riderHubAddress,  hubAddressLatitude,
 				hubAddressLongitude, rangeEnum);
-		return "redirect:/rider/profile";
+		return "redirect:/rider/riderInfopage";
 		
 	}
 

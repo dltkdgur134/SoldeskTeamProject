@@ -48,7 +48,8 @@ public class RiderHomeController {
     public String showMyPage() {
     	return "redirect:/infopage"; // templates/user/infopage.html 이라는 뷰 파일을 반환
     }
-    @GetMapping("/profile")
+    
+    @GetMapping("/riderInfopage")
     public String showRiderMyPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
     	String userId = userDetails.getUser().getUserId();
     	
@@ -64,13 +65,10 @@ public class RiderHomeController {
     	
     	
     	
-    	return "content/rider/riderMypage"; // templates/user/infopage.html 이라는 뷰 파일을 반환
+    	return "content/rider/riderInfopage"; // templates/user/infopage.html 이라는 뷰 파일을 반환
     }
     
-    @GetMapping("/mypage")
-    public String showEditPage() {
-    	return "redirect:/mypage"; // templates/user/infopage.html 이라는 뷰 파일을 반환
-    }
+    
     
     
 }

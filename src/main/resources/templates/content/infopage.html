@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/userLayouts}">
+	layout:decorate="~{layouts/user/userLayouts}">
 <head>
 <script
 	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
@@ -216,7 +216,7 @@
 			<div class="reg-buttons">
 				<!-- 라이더이거나 ALL인 경우: 라이더 정보 보기 -->
 				<a th:if="${userRole == 'RIDER' or userRole == 'ALL'}"
-					th:href="@{/rider/profile}" class="riderBtn">라이더 정보 보기</a>
+					th:href="@{/rider/riderInfopage}" class="riderBtn">라이더 정보 보기</a>
 
 				<!-- 점주이거나 ALL인 경우: 점주 정보 보기 -->
 				<a th:if="${userRole == 'OWNER' or userRole == 'ALL'}"
