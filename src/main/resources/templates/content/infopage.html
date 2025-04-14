@@ -144,14 +144,14 @@
         			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
      	 		</div>
       			<div class="modal-body">
-       				 <form th:action="@{/content/updatePhone}" method="post" name="upPhoneForm"
+       				 <form th:action="@{/content/updatePhoneNum}" method="post" name="upPhoneForm"
 						autocomplete="off" class="needs-validation" id="update-phone-form"
 						novalidate>
 						<div class="input-group mb-3">
 							<span class="input-group-text" id="basic-addon2">
 							<i class="fa-solid fa-id-card"></i></span> 
 							<input type="text" class="form-control" aria-label="userPhone" name="userPhone" id="phone-input" data-status="no"
-								aria-describedby="basic-addon2" maxlength="30" th:value="${#authentication.principal.user.userPhone}">
+								aria-describedby="basic-addon2" maxlength="13" pattern="[0-9\-]+" title="숫자와 (-)만 입력하세요" th:value="${#authentication.principal.user.userPhone}">
 							<span class="input-group-text" id="basic-addon2">
 								<button type="button" class="check-exists-btn" id="phonenum-exists">중복확인</button>
 							</span>

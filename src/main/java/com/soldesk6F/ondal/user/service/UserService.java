@@ -76,7 +76,7 @@ public class UserService {
 	        }
 	
 	        String encryptedPassword = passwordEncoder.encode(password);
-	
+	        
 	        User user = User.builder()
 	                .userId(userId)
 	                .userName(userName)

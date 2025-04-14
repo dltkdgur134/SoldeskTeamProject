@@ -88,7 +88,7 @@ public class UpdateUserController {
 		
 		Map<Object, Object> map = new HashMap<>();
 		
-		if (userRepository.existsByUserPhone(userPhone)) {
+		if (userRepository.existsByUserPhone(userPhone) == true) {
 			map.put("count", 1);
 		} else {
 			map.put("count", 0);

@@ -108,6 +108,10 @@ $(function(){
 	   img.src = objectUrl;
 	 });
 	 
+	 document.querySelector('[name="userPhone"]').addEventListener('input', function () {
+	   this.value = this.value.replace(/[^0-9\-]/g, '');
+	 });
+	 
 	 document.getElementById('update-phone-btn').addEventListener('click', event => {
 	 		if (!checkPhonenumValidity() || document.getElementById('phone-input').dataset.status === "no") {
 	 			event.preventDefault();
@@ -117,13 +121,14 @@ $(function(){
 	 
 	 document.getElementById('phonenum-exists').addEventListener('click', event => {
 	 		const phoneNum = document.upPhoneForm.userPhone;
+			
 	 		$('.invalid-feedback').empty();
 
 	 		if (phoneNum.value.trim() === '') {
 	 			phoneNum.classList.add("is-invalid");
 	 			phoneNum.classList.remove("is-valid");
 	 			document.getElementById('phone-input').dataset.status = "no";
-	 			$('.invalid-feedback').html("닉네임이 비어있습니다.");
+	 			$('.invalid-feedback').html("전화번호가 비어있습니다.");
 	 			return;
 	 		} 	
 	 		
@@ -132,22 +137,22 @@ $(function(){
 	 			type: "POST",
 	 			async: true,
 	 			data: {
-	 				user_phone: phoneNum.value
+	 				userPhone: phoneNum.value
 	 			},
 	 			success: function(data) {
 	 				// 기존 전화번호 없음
 	 				if (data.count > 0) {
 	 					document.getElementById('phone-input').dataset.status = "no";
 	 					console.log($('#phone-input').attr('data-status')); // 중복 유무 로그
-	 					nickname.classList.add("is-invalid");
-	 					nickname.classList.remove("is-valid");
-	 					$('.invalid-feedback').html('닉네임이 이미 존재합니다.');
+	 					phoneNum.classList.add("is-invalid");
+	 					phoneNum.classList.remove("is-valid");
+	 					$('.invalid-feedback').html('전화번호가 이미 존재합니다.');
 	 				// 기존 전화번호 있음
 	 				} else {
 	 					document.getElementById('phone-input').dataset.status = "yes";
 	 					console.log($('#phone-input').attr('data-status')); // 중복 유무 로그
-	 					nickname.classList.add("is-valid");
-	 					nickname.classList.remove("is-invalid");
+	 					phoneNum.classList.add("is-valid");
+	 					phoneNum.classList.remove("is-invalid");
 	 				}
 	 			},
 	 			error: function(e) {
