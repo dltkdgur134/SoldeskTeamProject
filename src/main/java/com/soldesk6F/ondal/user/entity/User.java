@@ -83,6 +83,24 @@ public class User {
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
+	
+	
+	
+	public User update(String nickName , String userProfile) {
+		this.nickName = nickName;
+		this.userProfile= userProfile;
+	    return this;
+	}
+	public User updateProvider(String socialLoginProvider) {
+			this.socialLoginProvider = socialLoginProvider;
+			return this;
+	
+		}
+	public User updateEmail(String email) {
+		this.email = email;
+		return this;
+	}
+	
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
