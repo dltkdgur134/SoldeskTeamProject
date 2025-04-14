@@ -96,17 +96,23 @@ public class UpdateUserController {
 		return map;
 	}
 	
-//	@PostMapping("/content/updatePhoneNum")
-//	public String updatePhoneNum(
-//			@RequestParam("userPhone") String userPhone,
-//			RedirectAttributes rAttr) {
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-//		User user = customUserDetails.getUser();
-//		
-//		
-//		
-//	}
+	@PostMapping("/content/updatePhoneNum")
+	public String updatePhoneNum(
+			@RequestParam("userPhone") String userPhone,
+			RedirectAttributes rAttr,
+			Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+		User user = customUserDetails.getUser();
+		
+		if (!userService.updateUserPhone(userPhone, user, model)) {
+			rAttr.addFlashAttribute("result", "전화번호 변경 실패!");
+			return "redirect:/infopage";
+		}
+		customUserDetails.getUser().setUserPhone(userRepository.findByUserId(user.getUserId()).get().getUserPhone());
+		rAttr.addFlashAttribute("result", "전화번호 변경 성공!");
+		return "redirect:/infopage";
+	}
 	
 	
 }
