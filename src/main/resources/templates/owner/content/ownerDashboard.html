@@ -2,54 +2,267 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
-    <title>업주 페이지</title>
-    <!-- SockJS / STOMP 라이브러리 -->
+	    <!-- Bootstrap CSS -->
+    <link
+	  rel="stylesheet"
+	  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
+	/>
+	<!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- SockJS / STOMP 라이브러리 -->    
 	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/webjars/org.webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+	<!-- Popper and Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/js/bootstrap.bundle.min.js"></script>
+    
 </head>
 <body>	
-<h1>업주 페이지</h1>
+<div style="background-color: #eee; padding: 10px;">
+    <!-- 상단 Header -->
+    <h2>음식점 이름</h2>
+</div>
 
-<!-- 새 주문이 도착했을 때 띄울 팝업(예: Bootstrap Modal, jQuery UI Dialog 등 활용) -->
-<div id="newOrderPopup" style="display:none; border:1px solid #ccc; padding:20px;">
-    <h3>새 주문 도착!</h3>
-    <div>
+<div style="display: flex;">
+    <!-- 왼쪽 주문 리스트 영역 -->
+    <div id="orderList" style="width: 50%; border-right: 1px solid #ccc; padding: 10px;">
+        <h3>주문 리스트</h3>
+        <div id="newOrdersArea">
+            <h4>신규 주문</h4>
+            <ul id="newOrderList"></ul>
+        </div>
+        <div id="processingOrdersArea">
+            <h4>진행중 주문</h4>
+            <ul id="processingOrderList"></ul>
+        </div>
+    </div>
+    
+    <!-- 오른쪽 주문 상세 영역 -->
+    <div id="orderDetail" style="width: 50%; padding: 10px;">
+        <h3>주문 상세</h3>
+        <div>주문번호: <span id="detailOrderId"></span></div>
+        <div>주소: <span id="detailAddress"></span></div>
+        <div>상태: <span id="detailStatus"></span></div>
+        <div>가게 요청사항: <span id="detailStoreRequest"></span></div>
+        <div>배달 요청사항: <span id="detailDeliveryRequest"></span></div>
+        <div>총 금액: <span id="detailTotalPrice"></span></div>
+        
+        <button id="confirmBtn" style="display:none;">접수하기</button>
+        <button id="cancelBtn" style="display:none;">주문취소</button>
+        <button id="completeBtn" style="display:none;">조리완료</button>
+    </div>
+</div>
+<!-- 새 주문 도착 모달 (Bootstrap Modal) -->
+<div
+  class="modal fade"
+  id="newOrderPopup"
+  tabindex="-1"
+  aria-labelledby="newOrderPopupLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- 모달 헤더 -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="newOrderPopupLabel">새 주문 도착!</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <!-- 모달 바디 -->
+      <div class="modal-body">
         <p>주문 정보: <span id="orderInfo"></span></p>
         <p>옵션: <span id="orderOptions"></span></p>
         <p>수량: <span id="orderCount"></span></p>
         <p>금액: <span id="orderPrice"></span></p>
-    </div>
-    <div>
+        <hr />
         <p>가게 요청사항: <span id="storeRequest"></span></p>
         <p>배달 요청사항: <span id="deliveryRequest"></span></p>
         <p>수저 포함 여부: <span id="needSpoon"></span></p>
-    </div>
-    <div>
+        <hr />
         <p>주문번호: <span id="orderId"></span></p>
         <p>연락처: <span id="contactNumber"></span></p>
         <p>배달 주소: <span id="address"></span></p>
+        <hr />
+        <!-- 배달 완료 예정 시간(5분 간격 조절) -->
+        <div class="mb-3">
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm"
+            onclick="changeTime(-5)"
+          >
+            -5분
+          </button>
+          <input
+            type="text"
+            id="completionTime"
+            value="0"
+            size="4"
+            class="text-center"
+          />
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm"
+            onclick="changeTime(5)"
+          >
+            +5분
+          </button>
+        </div>
+      </div>
+      <!-- 모달 푸터 -->
+      <div class="modal-footer">
+        <!-- 주문 접수 & 거부 버튼 -->
+        <button
+          type="button"
+          class="btn btn-success"
+          id="acceptBtn"
+        >
+          접수
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          id="rejectBtn"
+        >
+          거부
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          닫기
+        </button>
+      </div>
     </div>
-
-    배달 완료 예정 시간(5분 간격 조절)
-    <div>
-        <button type="button" onclick="changeTime(-5)">-5분</button>
-        <input type="text" id="completionTime" value="0" size="4" />
-        <button type="button" onclick="changeTime(5)">+5분</button>
-    </div>
-
-    주문 접수 & 거부 버튼
-    <div>
-        <button id="acceptBtn">접수</button>
-        <button id="rejectBtn">거부</button>
-    </div>
+  </div>
 </div>
 
 <script>
-    let stompClient = null;
-    const storeId = /* [[${storeId}]] */ '1'; // 실제 로그인 업주의 가게 번호로 치환
+$(function() {
+    // 1) 페이지 로드 시, 서버에서 전체 주문 목록을 불러옴
+    loadOrderList();
+    
+    // 2) 왼쪽 목록 클릭 시 -> 오른쪽 상세 표시
+    //    (동적 li 태그이므로, 이벤트 위임)
+    $(document).on('click', '.order-item', function() {
+        const orderId = $(this).data('orderid');
+        loadOrderDetail(orderId);
+    });
+    
+    // 3) 버튼 클릭 이벤트
+    $('#confirmBtn').on('click', function() {
+        const orderId = $('#detailOrderId').text();
+        updateOrderStatus(orderId, '/owner/order/accept');
+    });
+    $('#cancelBtn').on('click', function() {
+        const orderId = $('#detailOrderId').text();
+        updateOrderStatus(orderId, '/owner/order/reject');
+    });
+    $('#completeBtn').on('click', function() {
+        const orderId = $('#detailOrderId').text();
+        updateOrderStatus(orderId, '/owner/order/complete');
+    });
+});
 
-    // WebSocket 연결
+// 주문 목록 불러오기
+function loadOrderList() {
+    $.ajax({
+        url: '/owner/order/list',
+        method: 'GET',
+        success: function(orderList) {
+            renderOrderList(orderList);
+        },
+        error: function(err) {
+            console.error(err);
+        }
+    });
+}
+
+// 왼쪽 주문 리스트 렌더링
+function renderOrderList(orderList) {
+    $('#newOrderList').empty();
+    $('#processingOrderList').empty();
+    
+    orderList.forEach(order => {
+        const li = $('<li>')
+            .addClass('order-item')
+            .attr('data-orderid', order.orderId)
+            .text('주문번호: ' + order.orderId + ', 총금액: ' + order.totalPrice);
+        
+        if (order.orderStatus === 'PENDING') {
+            $('#newOrderList').append(li);
+        } else if (order.orderStatus === 'CONFIRMED' || order.orderStatus === 'IN_DELIVERY') {
+            $('#processingOrderList').append(li);
+        }
+        // 필요하면 COMPLETED, CANCELED 섹션도 만들 수 있음
+    });
+}
+
+// 특정 주문 상세 불러오기
+function loadOrderDetail(orderId) {
+    // 이미 /owner/order/list 로 받아온 목록에서 찾는 식으로 해도 되고,
+    // 서버 API를 만들어도 됩니다. 여기선 간단히 하나의 주문 불러오기 API 예시
+    $.ajax({
+        url: '/owner/order/detail?orderId=' + orderId,
+        method: 'GET',
+        success: function(order) {
+            renderOrderDetail(order);
+        },
+        error: function(err) {
+            console.error(err);
+        }
+    });
+}
+
+// 주문 상세 표시
+function renderOrderDetail(order) {
+    $('#detailOrderId').text(order.orderId);
+    $('#detailAddress').text(order.deliveryAddress);
+    $('#detailStatus').text(order.orderStatus);
+    $('#detailStoreRequest').text(order.storeRequest);
+    $('#detailDeliveryRequest').text(order.deliveryRequest);
+    $('#detailTotalPrice').text(order.totalPrice);
+    
+    // 버튼 노출 제어 (예시)
+    $('#confirmBtn').hide();
+    $('#cancelBtn').hide();
+    $('#completeBtn').hide();
+    
+    if (order.orderStatus === 'PENDING') {
+        $('#confirmBtn').show();  // 접수하기
+        $('#cancelBtn').show();   // 주문취소
+    } else if (order.orderStatus === 'CONFIRMED') {
+        $('#completeBtn').show(); // 조리완료
+        $('#cancelBtn').show();   // 주문취소
+    }
+    // 그 외 COMPLETED, CANCELED 는 버튼 숨김
+}
+
+// 주문 상태 업데이트
+function updateOrderStatus(orderId, url) {
+    $.ajax({
+        url: url,
+        method: 'POST',
+        data: { orderId: orderId },
+        success: function(updatedOrder) {
+            // alert('주문 상태 변경 성공: ' + updatedOrder.orderStatus);
+            renderOrderDetail(updatedOrder); // 상세 영역 갱신
+            
+            // 리스트도 다시 불러옴
+            loadOrderList();
+        },
+        error: function(err) {
+            console.error(err);
+        }
+    });
+}
+//    let stompClient = null;
+//    const storeId = /* [[${storeId}]] */ '1'; // 실제 로그인 업주의 가게 번호로 치환
+
+/*     // WebSocket 연결
     function connect() {
         const socket = new SockJS('/stomp');
         stompClient = Stomp.over(socket);
@@ -61,11 +274,33 @@
                 showNewOrderPopup(orderData);
             });
         });
+    } */
+    
+    let stompClient = null;
+    const storeId = '11111111-1111-1111-1111-111111111111'; // 테스트용 가게 UUID
+
+    function connect() {
+        const socket = new SockJS('/stomp');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function(frame) {
+            console.log('Connected: ' + frame);
+            // /topic/store/{storeId} 구독
+            stompClient.subscribe('/topic/store/' + storeId, function(message) {
+                const orderData = JSON.parse(message.body);
+                showNewOrderPopup(orderData);
+            });
+        });
     }
+    
+    function showNewOrderPopup(order) {
+        alert('새 주문 도착: ' + JSON.stringify(order));
+        // 여기서 팝업 등을 띄우는 로직 수행
+    }
+
 
     // 새 주문 팝업 표시
     function showNewOrderPopup(order) {
-        // 주문 정보 표시
+    	// 주문 정보 표시
         $('#orderInfo').text(order.menuNameList);
         $('#orderOptions').text(order.options);
         $('#orderCount').text(order.totalCount);
@@ -79,8 +314,11 @@
         $('#contactNumber').text(order.contactNumber);
         $('#address').text(order.address);
 
-        // 팝업 열기 (jQuery 예시)
-        $('#newOrderPopup').show();
+        // 모달 열기
+        newOrderModal.show();
+        
+     	// 2) 리스트에도 추가 (신규 주문이므로 PENDING 상태 가정)
+        addOrderToList(order);
 
         // 버튼 이벤트 등록
         $('#acceptBtn').off('click').on('click', function() {
@@ -89,6 +327,32 @@
         $('#rejectBtn').off('click').on('click', function() {
             rejectOrder(order.id);
         });
+    }
+	
+    function addOrderToList(order) {
+        // orderStatus 확인 (예: PENDING, CONFIRMED, IN_DELIVERY ...)
+        // 만약 order.orderStatus가 없으면 "PENDING"으로 간주 (새 주문)
+        const status = order.orderStatus || 'PENDING';
+
+        // li 태그 생성
+        const li = $('<li>')
+            .addClass('order-item')
+            .attr('data-orderid', order.id)
+            .text('주문번호: ' + order.id + ', 총금액: ' + order.totalPrice);
+
+        if (status === 'PENDING') {
+            $('#newOrderList').append(li);
+        } else if (status === 'CONFIRMED' || status === 'IN_DELIVERY') {
+            $('#processingOrderList').append(li);
+        }
+        // 필요하면 COMPLETED, CANCELED 섹션도 처리
+    }
+    
+    function closeNewOrderPopup() {
+        // 모달 닫기
+        if (newOrderModal) {
+            newOrderModal.hide();
+        }
     }
 
     // 배달 완료시간 + - 버튼 조절 (5분 단위)
@@ -99,38 +363,159 @@
     }
 
     // 주문 접수
-    function acceptOrder(orderId, completionTime) {
-        $.ajax({
-            url: '/owner/order/accept',
-            type: 'POST',
-            data: {
-                orderId: orderId,
-                completionTime: completionTime
-            },
-            success: function(response) {
-                alert('주문 접수가 완료되었습니다.');
-                $('#newOrderPopup').hide();
-            }
-        });
-    }
+	function acceptOrder(orderId, completionTime) {
+    $.ajax({
+        url: '/owner/order/accept',
+        type: 'POST',
+        data: { orderId, completionTime },
+        success: function(updatedOrder) {
+            alert('주문 접수가 완료되었습니다.');
+            closeNewOrderPopup();
+            
+            // 1) 왼쪽 리스트에서 해당 주문의 li 제거
+            removeOrderFromList(updatedOrder.id);
+
+            // 2) 진행중 상태로 업데이트된 주문을 다시 추가
+            //    updatedOrder.orderStatus가 "CONFIRMED"일 것으로 가정
+            addOrderToList(updatedOrder);
+	        }
+	    });
+	}
+    
+	function removeOrderFromList(orderId) {
+	    // data-orderid 속성이 orderId인 li 요소를 찾아 제거
+	    $('#newOrderList li, #processingOrderList li').each(function() {
+	        if ($(this).data('orderid') === orderId) {
+	            $(this).remove();
+	        }
+	    });
+	}
 
     // 주문 거부
-    function rejectOrder(orderId) {
-        $.ajax({
-            url: '/owner/order/reject',
-            type: 'POST',
-            data: { orderId: orderId },
-            success: function(response) {
-                alert('주문이 거부되었습니다.');
-                $('#newOrderPopup').hide();
-            }
-        });
-    }
+	function rejectOrder(orderId) {
+	    $.ajax({
+	        url: '/owner/order/reject',
+	        type: 'POST',
+	        data: { orderId: orderId },
+	        success: function(response) {
+	            alert('주문이 거부되었습니다.');
+	            closeNewOrderPopup();
+	        }
+	    });
+	}
+    
+	function extendTime(orderId, minutes) {
+	    $.ajax({
+	        url: '/owner/order/extendTime',
+	        method: 'POST',
+	        data: { orderId: orderId, minutes: minutes },
+	        success: function(updatedOrder) {
+	            alert('시간 추가 완료.');
+	            // updatedOrder에 새로운 완료 시간이 있으면 상세화면 등 업데이트 가능
+	            loadOrderList();
+	        }	
+	    });
+	}
+
+	function completeOrder(orderId) {
+	    $.ajax({
+	        url: '/owner/order/complete',
+	        method: 'POST',
+	        data: { orderId: orderId },
+	        success: function(updatedOrder) {
+	            alert('조리 완료');
+	            loadOrderList();
+	        }
+	    });
+	}
 
     // 페이지 로드 시 WebSocket 연결
     $(document).ready(function() {
+        // Bootstrap Modal 객체 생성
+        const modalElem = document.getElementById('newOrderPopup');
+        newOrderModal = new bootstrap.Modal(modalElem, {
+            backdrop: 'static', // 모달 밖 클릭해도 닫히지 않도록
+            keyboard: false     // ESC로 닫히지 않도록
+        });
+        
+        // WebSocket 연결, etc.
         connect();
     });
+    
+    ///////////////////////////////오더 리스트 버튼////////////////////////////////////
+    
+    function renderOrderList(orderList) {
+        $('#newOrderList').empty();
+        $('#processingOrderList').empty();
+
+        orderList.forEach(order => {
+            const li = $('<li>')
+                .addClass('order-item')
+                .attr('data-orderid', order.orderId)
+                .text('주문번호: ' + order.orderId + ' / 총금액: ' + order.totalPrice + ' ');
+
+            // 주문 상태별 버튼 추가
+            if (order.orderStatus === 'PENDING') {
+                // [접수], [거부] 버튼
+                const acceptBtn = $('<button>')
+                    .addClass('acceptBtn')
+                    .attr('data-orderid', order.orderId)
+                    .text('접수');
+                const rejectBtn = $('<button>')
+                    .addClass('rejectBtn')
+                    .attr('data-orderid', order.orderId)
+                    .text('거부');
+
+                li.append(acceptBtn).append(' ').append(rejectBtn);
+
+                // 신규 주문 목록
+                $('#newOrderList').append(li);
+
+            } else if (order.orderStatus === 'CONFIRMED' || order.orderStatus === 'IN_DELIVERY') {
+                // [시간 추가], [조리 완료] 버튼
+                const extendTimeBtn = $('<button>')
+                    .addClass('extendTimeBtn')
+                    .attr('data-orderid', order.orderId)
+                    .text('시간 추가');
+                const completeBtn = $('<button>')
+                    .addClass('completeBtn')
+                    .attr('data-orderid', order.orderId)
+                    .text('조리 완료');
+
+                li.append(extendTimeBtn).append(' ').append(completeBtn);
+
+                // 진행중 목록
+                $('#processingOrderList').append(li);
+            } else {
+                // COMPLETED, CANCELED 등은 별도 섹션이 필요하다면 구성
+            }
+        });
+    }
+    
+    $(document).on('click', '.acceptBtn', function() {
+        const orderId = $(this).data('orderid');
+        // 접수 처리
+        acceptOrder(orderId);
+    });
+
+    $(document).on('click', '.rejectBtn', function() {
+        const orderId = $(this).data('orderid');
+        // 거부 처리
+        rejectOrder(orderId);
+    });
+
+    $(document).on('click', '.extendTimeBtn', function() {
+        const orderId = $(this).data('orderid');
+        // 시간 추가 처리 함수
+        extendTime(orderId, 5); // 임의로 5분 추가하는 예시
+    });
+
+    $(document).on('click', '.completeBtn', function() {
+        const orderId = $(this).data('orderid');
+        // 조리 완료 처리
+        completeOrder(orderId);
+    });
+    
 </script>
 
 </body>

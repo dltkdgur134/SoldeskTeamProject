@@ -1,9 +1,11 @@
 package com.soldesk6F.ondal.owner.order;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto.OrderDetailDto;
@@ -24,6 +26,7 @@ public class OrderService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     // 필요한 경우 OrderDetailRepository, UserRepository 등 추가로 주입
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * 1) 주문 DTO -> Order 엔티티 변환
@@ -72,5 +75,45 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         return savedOrder;
+    }
+    
+    @Transactional
+    public Order updateOrderStatus(UUID orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+        // 주문 상태 변경
+        order.setOrderStatus(newStatus);
+        // orderRepository.save(order) -> 영속성 컨텍스트가 flush될 때 반영됨
+        Order savedOrder = orderRepository.save(order);
+
+        // (1) 유저 채널로 알림
+        if (savedOrder.getUser() != null) {
+            String userId = savedOrder.getUser().getUserUuidAsString(); 
+            // 혹은 savedOrder.getUser().getId() 등 실제 필드
+            String userDestination = "/topic/user/" + userId;
+            messagingTemplate.convertAndSend(userDestination, savedOrder);
+        }
+
+        // (2) 라이더 채널로 알림
+        if (savedOrder.getRider() != null) {
+            String riderId = savedOrder.getRider().getRiderUuidAsString(); 
+            // 혹은 savedOrder.getRider().getId()
+            String riderDestination = "/topic/rider/" + riderId;
+            messagingTemplate.convertAndSend(riderDestination, savedOrder);
+        }
+
+        return savedOrder;
+    }
+    
+    public Order findOrder(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+    }
+    
+    @Transactional(readOnly = true)
+    public List<Order> findAllByOwner() {
+        // 실제로는 로그인한 업주의 storeId로 필터링
+        // return orderRepository.findAllByStoreId(...);
+        return orderRepository.findAll();
     }
 }
