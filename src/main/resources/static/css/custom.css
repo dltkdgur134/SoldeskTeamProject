@@ -175,4 +175,20 @@ body {
 	font-size: 18px;
 }
 
+.alert {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #e6f9e6;
+  color: #2e7d32;
+}
+
+.alert-danger {
+  background-color: #fdecea;
+  color: #c62828;
+}
 

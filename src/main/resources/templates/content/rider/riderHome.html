@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
 <script th:src="@{/js/hideLogo.js}"></script>
-</head>
-
-<div layout:fragment="content">
-	<!-- 지도 영역 -->
-	<div id="map" style="width: 100%; height: 400px;"></div>
-</div>
-
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/initialize.js}"></script>
+<script th:src="@{/js/zipcode.js}"></script>
+<script th:src="@{/js/update.js}"></script>
 <!-- JavaScript Fragment -->
 <th:block layout:fragment="js">
 	<!-- Kakao Maps API -->
@@ -36,5 +41,11 @@
 		});
 	</script>
 </th:block>
+</head>
+<div layout:fragment="content">
+	<!-- 지도 영역 -->
+	<div id="map" style="width: 100%; height: 400px;"></div>
+</div>
+
 
 </html>

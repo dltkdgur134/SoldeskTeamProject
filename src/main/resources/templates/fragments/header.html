@@ -78,10 +78,6 @@
 			<div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
 				<div class="row g-0">
 					<div class="col-md-4 p-3 text-center">
-						<img src="https://randomuser.me/api/portraits/men/64.jpg"
-							class="rounded-circle img-thumbnail img-fluid"
-							alt="Profile Picture">
-
 						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
              ? #authentication.principal.user.userProfile 
              : '/img/userProfiles/' + #authentication.principal.user.userProfile}"
