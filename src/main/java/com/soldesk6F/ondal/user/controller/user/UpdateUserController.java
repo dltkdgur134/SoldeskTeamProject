@@ -26,7 +26,26 @@ public class UpdateUserController {
     private final UserRepository userRepository;
 	
 	private final UserService userService;
-
+	
+	@PostMapping("/content/passwordCheck")
+	public String checkPassword(
+			@RequestParam("oldPassword") String oldPassword,
+			@RequestParam("password") String password,
+			RedirectAttributes rAttr) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+		User user = customUserDetails.getUser();
+		
+		if (!userService.updatePassword(oldPassword, password, user, rAttr)) {
+			return "redirect:/mySecurity";
+		}
+		customUserDetails.getUser().setPassword(password);
+		rAttr.addFlashAttribute("resultMsg", "비밀번호 변경 성공!");
+		return "redirect:/infopage";
+	}
+	
+	
+	
 	@PostMapping("/checkNickname") 
 	@ResponseBody
 	public Map<Object, Object> checkNickname(@RequestParam("nickname") String nickName,
