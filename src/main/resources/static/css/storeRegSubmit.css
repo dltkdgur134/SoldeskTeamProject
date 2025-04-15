@@ -121,17 +121,15 @@ form input {
 }
 
 .address-btn {
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	height: 30px;
-	font-size: 12px;
-	padding: 0 10px;
+	height: 45px;
+	width: 120px;
+	font-size: 15px;
+	padding: 0 12px;
 	background-color: #ffc107;
 	border: none;
 	border-radius: 4px;
 	color: #fff;
+	margin: auto;
 	cursor: pointer;
 }
 

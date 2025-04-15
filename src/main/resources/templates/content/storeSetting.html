@@ -3,26 +3,26 @@
 <head>
 	<meta charset="UTF-8">
 	<title>설정 페이지</title>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" th:href="@{/css/storeSetting.css}">
 </head>
 <body>
-
-	<div class="setting-header">
-		<span class="back-btn">❮ 이전</span>
-		<span class="datetime" id="today-date"></span>
+	<div class="setting-container">
+		<div class="setting-header">
+			<span class="back-btn">❮ 이전</span>
+			<span class="datetime" id="today-date"></span>
+		</div>
+	
+		<div class="tab-buttons">
+			<button onclick="loadSetting('/setting/operation', this)">운영 설정</button>
+			<button onclick="loadSetting('/setting/printer', this)">프린터 설정</button>
+			<button onclick="loadSetting('/setting/alarm', this)">알림 설정</button>
+			<button onclick="loadSetting('/setting/delivery', this)">배달대행사 설정</button>
+		</div>
+	
+		<div class="content" id="setting-content">
+			
+		</div>
 	</div>
-
-	<div class="tab-buttons">
-		<button onclick="loadSetting('/content/setting/operation', this)">운영 설정</button>
-		<button onclick="loadSetting('/content/setting/printer', this)">프린터 설정</button>
-		<button onclick="loadSetting('/content/setting/alarm', this)">알림 설정</button>
-		<button onclick="loadSetting('/content/setting/deliveryAgency', this)">배달대행사 설정</button>
-	</div>
-
-	<div class="content" id="setting-content">
-		
-	</div>
-
 	<script>
 	    function loadSetting(url, btn) {
 	        document.querySelectorAll(".tab-buttons button").forEach(b => b.classList.remove("active"));
@@ -58,9 +58,25 @@
 	    }
 
 	    document.addEventListener("DOMContentLoaded", () => {
-	        updateTime();
-	        setInterval(updateTime, 1000);
-	    });
+			updateTime();
+			setInterval(updateTime, 1000);
+			const params = new URLSearchParams(window.location.search);
+				const tab = params.get("tab");
+
+				if (tab) {
+					const buttonMap = {
+						operation: 0,
+						printer: 1,
+						alarm: 2,
+						delivery: 3
+					};
+					const btnIndex = buttonMap[tab];
+					if (btnIndex !== undefined) {
+						const buttons = document.querySelectorAll(".tab-buttons button");
+						buttons[btnIndex].click(); // 자동 클릭
+					}
+				}
+		});
 	</script>
 
 </body>
