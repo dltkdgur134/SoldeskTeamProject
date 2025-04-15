@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.login;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,15 +33,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
+        return new CustomUserDetails(user, user.getUserRole());
         
-        if(onwerRepository.existsByUser_UserId(userId) || riderRepository.existsByUser_UserId(userId)) {
-        if(onwerRepository.existsByUser_UserId(userId) && riderRepository.existsByUser_UserId(userId)) {
-        	return new CustomUserDetails(user , Role.ALL);
-        	}else {
-        		return onwerRepository.existsByUser_UserId(userId) ? new CustomUserDetails(user , Role.OWNER) : new CustomUserDetails(user,Role.RIDER);
-        	}
-        }	
-       return new CustomUserDetails(user,Role.USER);	
+        
         
     }
     

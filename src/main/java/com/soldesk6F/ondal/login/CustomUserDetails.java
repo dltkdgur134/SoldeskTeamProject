@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user;
+package com.soldesk6F.ondal.login;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.entity.User.UserRole;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -17,16 +18,16 @@ import java.util.Map;
 public class CustomUserDetails implements UserDetails , OAuth2User {
     private final User user;
     private Map<String, Object> attributes;
-    private Role role;
+    private UserRole role;
     
     
-    public CustomUserDetails(User user ,  Role role) {
+    public CustomUserDetails(User user ,  UserRole role) {
         this.user = user;
         this.role = role;
         
     }
     
-    public CustomUserDetails(User user, Map<String, Object> attributes,Role role) {
+    public CustomUserDetails(User user, Map<String, Object> attributes,UserRole role) {
         this.user = user;
         this.attributes = attributes;
         this.role = role;
@@ -40,14 +41,16 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(role.getKey()));
+        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
-
+    
     @Override
-    public String getPassword() {
+    public String getPassword() {	
         return user.getPassword();
     }
+    
 
+    
     @Override
     public String getUsername() {
         return user.getUserId();
@@ -73,14 +76,16 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
         return true;
     }
 
-	@Override
-	public Map<String, Object> getAttributes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 	@Override
 	public String getName() {
         return attributes != null ? attributes.get("sub").toString() : user.getUserId();
+	}
+
+	@Override
+	public Map<String, Object> getAttributes() {
+		return attributes;
+		
 	}
 }
