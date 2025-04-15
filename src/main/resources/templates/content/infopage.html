@@ -9,9 +9,9 @@
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
 	rel="stylesheet">
-<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
-<link th:fragment="css" th:href="@{/css/update.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
 <script th:src="@{/js/index.js}"></script>
 <script th:src="@{/js/initialize.js}"></script>
 <script th:src="@{/js/zipcode.js}"></script>
@@ -191,7 +191,7 @@
 		th:with="userRole=${#authentication.principal.user.userRole.name()}">
 		<div class="reg-buttonContainer">
 			<h6 class="card-title">업종</h6>
-			<div class="reg-buttons">
+			<div class="new-role-buttons">
 				<!-- 라이더 등록 버튼: user 또는 owner인 경우 보여줌 -->
 				<a th:href="@{/rider/register}" class="riderBtn">라이더 등록하러 가기</a>
 
@@ -213,7 +213,7 @@
 		th:with="userRole=${#authentication.principal.user.userRole.name()}">
 		<div class="reg-buttonContainer">
 			<h6 class="card-title">역할</h6>
-			<div class="reg-buttons">
+			<div class="new-role-buttons">
 				<!-- 라이더이거나 ALL인 경우: 라이더 정보 보기 -->
 				<a th:if="${userRole == 'RIDER' or userRole == 'ALL'}"
 					th:href="@{/rider/riderInfopage}" class="riderBtn">라이더 정보 보기</a>

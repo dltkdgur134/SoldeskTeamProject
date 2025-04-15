@@ -12,9 +12,15 @@
   	<script th:src="@{/js/jQuery.js}"></script>
   	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script> 
 	<!-- 각 페이지의 script가 작성될 위치 -->
-    <th:block layout:fragment="js"></th:block>
+    <th:block layout:fragment="js">
+    <script th:src="@{/js/hideLogo.js}"></script>
+    </th:block>
     <!-- 각 페이지의 css가 작성될 위치 -->
-    <th:block layout:fragment="css"></th:block>
+    <th:block layout:fragment="css">
+    <link  th:href="@{/css/header.css}" rel="stylesheet" />
+    <link  th:href="@{/css/alert.css}" rel="stylesheet" />
+    <link  th:href="@{/css/custom.css}" rel="stylesheet" />
+    </th:block>
 </head>
 
 <body>
