@@ -151,4 +151,7 @@ body {
 	font-size: 18px;
 }
 
-
+#kakao-logo {
+	width: 30%;
+}
+.grayscale { filter: grayscale(100%); }

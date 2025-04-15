@@ -125,14 +125,16 @@ public class UserService {
     	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
     		
    		try {
-    		String old_profImgPath = findUser.get().getUserProfile(); 
-    		String old_profImgName = old_profImgPath.split("\\\\")[1];
-    		String oldSavePath = new File(uploadDir).getAbsolutePath();
-    		Path oldImgPath = Paths.get(oldSavePath, old_profImgName);
-    		//System.out.println(oldImgPath.toString());
-    		if (Files.exists(oldImgPath)) {
-    			Files.delete(oldImgPath);
-    		}
+   			String old_profImgName = findUser.get().getUserProfile();
+//    		String old_profImgName = old_profImgPath.split("\\\\")[1];
+   			if (!old_profImgName.equals("default.png")) {
+   				String oldSavePath = new File(uploadDir).getAbsolutePath();
+   				Path oldImgPath = Paths.get(oldSavePath, old_profImgName);
+   				//System.out.println(oldImgPath.toString());
+   				if (Files.exists(oldImgPath)) {
+   					Files.delete(oldImgPath);
+   				}
+   			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("error", "존재하지 않는 파일입니다.");
@@ -167,7 +169,10 @@ public class UserService {
 	            findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
 	            return true;
 	        }
-	        return false;
+	        final String finalFileName = new String(fileName);
+	        findUser.ifPresent(U -> U.setUserProfile(finalFileName));
+	        findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
+	        return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

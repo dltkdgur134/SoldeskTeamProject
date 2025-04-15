@@ -254,7 +254,6 @@ function checkRiderNicknameValidity() {
   }
 }
 
-
 document.addEventListener("DOMContentLoaded", function () {
   const nicknameInput = document.getElementById("rider-nickname-input");
 
