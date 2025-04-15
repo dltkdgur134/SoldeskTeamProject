@@ -20,9 +20,17 @@ function formatDate(date) {
 	return `${month}.${day} (${weekday}) ${ampm} ${hours}:${minutes}`;
 }
 
+function updateTime() {
+	const now = new Date();
+	const formatted = formatDate(now);
+	document.getElementById("today-date").textContent = formatted;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 	const now = new Date();
 	const formatted = formatDate(now);
 	document.getElementById("today-date").textContent = formatted;
+	updateTime();
+	setInterval(updateTime, 1000);
 });
 

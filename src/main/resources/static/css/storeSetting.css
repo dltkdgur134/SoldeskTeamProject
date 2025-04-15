@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #f5dcc4;
+}
+
+.setting-header {
+    background-color: #b9d6ec;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    font-weight: bold;
+}
+
+.tab-buttons {
+    display: flex;
+    background-color: #f4caaa;
+    border-bottom: 2px solid #888;
+}
+
+.tab-buttons button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.tab-buttons button.active {
+    border-bottom: 3px solid #000;
+    font-weight: bold;
+}
+
+.content {
+    padding: 20px;
+    font-size: 18px;
+}

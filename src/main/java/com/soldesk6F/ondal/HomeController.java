@@ -28,11 +28,6 @@ public class HomeController {
 		return "content/login";
 	}
 	
-	@GetMapping("/store")
-	public String store() {
-		return "content/store";
-	}
-	
 	@GetMapping("/temp99")
 	public String temp99() {
 		return "content/temp99";
