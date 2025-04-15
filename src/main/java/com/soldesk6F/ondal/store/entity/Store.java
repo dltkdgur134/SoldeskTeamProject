@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.user.entity.Owner;
+import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -46,9 +47,15 @@ public class Store {
 	@JoinColumn(name = "owner_id" , nullable = false)
 	private Owner owner;
 	
+	@Column(name = "business_num" , nullable = false , length = 10)
+	private String businessNum;
+	
+	
 	@Column(name = "store_name", nullable = false, length = 20)
     private String storeName;
 
+	
+	
     @Column(name = "category", nullable = false, length = 20)
     private String category;
 
@@ -70,17 +77,18 @@ public class Store {
     @Column(name = "store_longitude", nullable = false)
     private double storeLongitude;
 
-    @Column(name = "delivery_range", nullable = false)
-    private double deliveryRange;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_range")
+    private DeliveryRange deliveryRange;
 
     @Lob
     @Column(name = "store_introduce")
     private String storeIntroduce;
 
-    @Column(name = "opening_time", nullable = false)
+    @Column(name = "opening_time")
     private LocalTime openingTime;
 
-    @Column(name = "closing_time", nullable = false)
+    @Column(name = "closing_time")
     private LocalTime closingTime;
 
     @Column(name = "holiday", length = 50)
@@ -111,6 +119,27 @@ public class Store {
         }
     }
 
+    public enum DeliveryRange {
+		ONE_KM(1), THREE_KM(3), FIVE_KM(5);
+
+		private final int km;
+
+		DeliveryRange(int km) {
+			this.km = km;
+		}
+
+		public int getKm() {
+			return km;
+		}
+
+		public static DeliveryRange fromKm(int km) {
+			for (DeliveryRange range : values()) {
+				if (range.km == km)
+					return range;
+			}
+			throw new IllegalArgumentException("Invalid delivery range: " + km);
+		}
+	}
     public void addStoreImg(StoreImg img) {
         img.setStore(this);
         this.storeImgs.add(img);
@@ -122,12 +151,13 @@ public class Store {
     }
     
     @Builder
-    public Store(Owner owner, String storeName, String category, String storePhone,
+    public Store(Owner owner,String businessNum, String storeName, String category, String storePhone,
                  List<StoreImg> storeImgs, List<BrandImg> brandImgs, String storeAddress,
-                 double storeLatitude, double storeLongitude, double deliveryRange,
+                 double storeLatitude, double storeLongitude, DeliveryRange deliveryRange,
                  String storeIntroduce, LocalTime openingTime, LocalTime closingTime,
                  String holiday, StoreStatus storeStatus) {
         this.owner = owner;
+        this.businessNum = businessNum;
         this.storeName = storeName;
         this.category = category;
         this.storePhone = storePhone;

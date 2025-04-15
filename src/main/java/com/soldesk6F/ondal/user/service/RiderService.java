@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,6 @@ public class RiderService {
                 .hubAddressLongitude(form.getHubAddressLongitude())
                 .riderNickname(form.getRiderNickname())
                 .build();
-
         // DeliveryRange 값 설정 (Enum 변환)
         try {
             DeliveryRange deliveryRange = DeliveryRange.valueOf(form.getDeliveryRange());
@@ -79,6 +79,7 @@ public class RiderService {
         }
 
         riderRepository.save(rider);  // Rider 저장
+        
     }
 
 
