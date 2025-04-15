@@ -4,17 +4,42 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
 <head>
-<script th:fragment="js" th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/index.js}"></script>
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
 </head>
 
 <div th:fragment="header">
 	<nav class="navbar navbar-light">
 		<div class="container-md justify-content-between">
-			<a class="navbar-brand" href="/"> <img
-				src="/css/imgs/Logo_ondal.png" alt="" width="40" height="40"
-				class="img-fluid">
-			</a> 
+		<div sec:authorize="isAuthenticated()" 
+		th:with="role=${#authentication.principal.user.userRole.name()}">
+    
+<a href="javascript:void(0);" onclick="toggleRoleLogos()">
+    <img src="/css/imgs/Logo_ondal_Home.png" alt="내 역할 로고 보기" class="img-fluid me-2" width="50" height="50">
+</a>
+
+<!-- 기본 로고: USER, RIDER, OWNER, ALL 역할에서 보이게 -->
+<a href="/" th:if="${role == 'USER' or role == 'RIDER' or role == 'OWNER' or role == 'ALL'}">
+    <img src="/css/imgs/Logo_ondal.png" alt="기본 로고"
+         class="img-fluid me-2 role-logo"
+         width="40" height="40">
+</a>
+
+<!-- RIDER 로고: RIDER, ALL 역할에서 보이게 -->
+<a href="/rider/home" th:if="${role == 'RIDER' or role == 'ALL'}">
+    <img src="/css/imgs/Logo_rider.png" alt="Rider 로고"
+         class="img-fluid me-2 role-logo"
+         width="40" height="40">
+</a>
+
+<a href="/" th:if="${role == 'OWNER' or role == 'ALL'}">
+    <img src="/css/imgs/Logo_owner.png" alt="Owner 로고"
+         class="img-fluid me-2 role-logo"
+         width="40" height="40">
+</a>
+
+</div>
 			<h1 class="display-5"><b class="highlight-title">온</b>라인 배<b class="highlight-title">달</b></h1>
 			<a class="btn btn-primary btn-lg" data-bs-toggle="offcanvas"
 				href="#menu-list" role="button" aria-controls="menu-list"> <i
@@ -33,6 +58,12 @@
 			<button type="button" class="btn-close text-reset"
 				data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
+		<div sec:authorize="isAnonymous()">
+				<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
+			</div>
+			<div sec:authorize="isAnonymous()">
+				<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
+			</div>
 		<div class="container" sec:authorize="isAuthenticated()">
     <div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
         <div class="row g-0">
@@ -129,13 +160,9 @@
 					</ul>	
 				</div>
 			</div>
-			<div sec:authorize="isAnonymous()">
-				<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
-			</div>
-			<div sec:authorize="isAnonymous()">
-				<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
-			</div>
+			
 		</div>
 	</div>
 </div>
+
 </html>

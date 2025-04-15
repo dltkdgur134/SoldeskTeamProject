@@ -29,7 +29,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "menu", uniqueConstraints = { @UniqueConstraint(columnNames = { "menu_id", "menu_img_file_path" }) })
+@Table(name = "menu", uniqueConstraints = { @UniqueConstraint(columnNames = { "menu_id", "menu_img" }) })
 public class Menu {
 
 	@Id
@@ -52,8 +52,8 @@ public class Menu {
 	@Column(name = "price", nullable = false)
 	private int price;
 
-	@Column(name = "menu_img_file_path", length = 255)
-	private String menuImgFilePath;
+	@Column(name = "menu_img", length = 255)
+	private String menuImg;
 
 	@Column(name = "menu_options1", length = 255)
 	private String menuOptions1;
@@ -130,14 +130,14 @@ public class Menu {
 	}
 
 	@Builder
-	public Menu(Store store, String menuName, String description, int price, String menuImgFilePath,
+	public Menu(Store store, String menuName, String description, int price, String menuImg,
 			String menuOptions1, String menuOptions1Price, String menuOptions2, String menuOptions2Price,
 			String menuOptions3, String menuOptions3Price, MenuStatus menuStatus) {
 		this.store = store;
 		this.menuName = menuName;
 		this.description = description;
 		this.price = price;
-		this.menuImgFilePath = menuImgFilePath;
+		this.menuImg = menuImg;
 		this.menuOptions1 = menuOptions1;
 		this.menuOptions1Price = menuOptions1Price;
 		this.menuOptions2 = menuOptions2;

@@ -64,11 +64,11 @@ public class Store {
     @Column(name = "store_address", nullable = false, length = 80)
     private String storeAddress;
 
-    @Column(name = "latitude", nullable = false)
-    private double latitude;
+    @Column(name = "store_latitude", nullable = false)
+    private double storeLatitude;
 
-    @Column(name = "longitude", nullable = false)
-    private double longitude;
+    @Column(name = "store_longitude", nullable = false)
+    private double storeLongitude;
 
     @Column(name = "delivery_range", nullable = false)
     private double deliveryRange;
@@ -124,7 +124,7 @@ public class Store {
     @Builder
     public Store(Owner owner, String storeName, String category, String storePhone,
                  List<StoreImg> storeImgs, List<BrandImg> brandImgs, String storeAddress,
-                 double latitude, double longitude, double deliveryRange,
+                 double storeLatitude, double storeLongitude, double deliveryRange,
                  String storeIntroduce, LocalTime openingTime, LocalTime closingTime,
                  String holiday, StoreStatus storeStatus) {
         this.owner = owner;
@@ -141,8 +141,8 @@ public class Store {
         }
 
         this.storeAddress = storeAddress;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.storeLatitude = storeLatitude;
+        this.storeLongitude = storeLongitude;
         this.deliveryRange = deliveryRange;
         this.storeIntroduce = storeIntroduce;
         this.openingTime = openingTime;

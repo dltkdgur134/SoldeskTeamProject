@@ -9,6 +9,8 @@ public class RiderForm {
     private String riderHubAddress;
     private String riderPhone;
     private String deliveryRange;
+    private String riderNickname;
     private double hubAddressLatitude;
     private double hubAddressLongitude;
+    
 }

@@ -98,7 +98,6 @@ body {
     transition: width 0.4s linear;
 }
 
-
 .search-icon {
         height: 34px;
     width: 34px;
@@ -125,5 +124,36 @@ body {
 a:link {
     text-decoration: none
 }
+.alert {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #e6f9e6;
+  color: #2e7d32;
+}
+
+.alert-danger {
+  background-color: #fdecea;
+  color: #c62828;
+}
+/* role-logo의 기본 설정: opacity와 visibility로 보이기/숨기기 */
+.role-logo {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    display: inline-block;      /* inline-block으로 배치 */
+    margin-right: 0.5rem;       /* 로고 간 간격 */
+}
+
+.role-logo.show {
+    opacity: 1; /* 보이게 설정 */
+}
 
 
+/* .highlight-title 텍스트가 밀리지 않도록 padding-left를 충분히 줌 */
+.highlight-title {
+    padding-left: 20px; /* 이미지를 보일 공간을 확보 */
+}

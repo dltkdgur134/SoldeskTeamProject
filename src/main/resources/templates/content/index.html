@@ -1,33 +1,98 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/default}">
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
 <head>
-	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
-	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
+<script th:src="@{/js/index.js}"></script>
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
 </head>
-    <div layout:fragment="content">
-	  	<div class="d-flex justify-content-center px-5">
-        	<div class="search"> 
-        		<input type="text" class="search-input" placeholder="뭐 먹을까?" name=""> 
-        		<a href="#" class="search-icon"> <i class="fa fa-search"></i> </a> 
-        	</div>
-        </div>
-	  	<div class="gallery-container">
-			<div><a href="#" class="labels">패스트푸드</a><img class="imgs" th:src="@{/css/imgs/img1.png}"></div>
-			<div><a href="#" class="labels">중식</a><img class="imgs" th:src="@{/css/imgs/img2.png}"></div>
-			<div><a href="#" class="labels">한식</a><img class="imgs" th:src="@{/css/imgs/img3.png}"></div>
-			<div><a href="#" class="labels">분식</a><img class="imgs" th:src="@{/css/imgs/img4.png}"></div>
-			<div><a href="#" class="labels">치킨</a><img class="imgs" th:src="@{/css/imgs/img5.png}"></div>
-			<div><a href="#" class="labels">피자</a><img class="imgs" th:src="@{/css/imgs/img6.png}"></div>
-			<div><a href="#" class="labels">찜 탕</a><img class="imgs" th:src="@{/css/imgs/img7.png}"></div>
-			<div><a href="#" class="labels">일식</a><img class="imgs" th:src="@{/css/imgs/img8.png}"></div>
-			<div><a href="#" class="labels">구이</a><img class="imgs" th:src="@{/css/imgs/img9.png}"></div>
-			<div><a href="#" class="labels">카페</a><img class="imgs" th:src="@{/css/imgs/img10.png}"></div>
-		</div>
+<div layout:fragment="content">
+	<div th:if="${riderExists}" class="alert alert-danger text-center" role="alert"
+     style="margin-bottom: 20px;" id="riderAlert">
+     
+    <div class="d-flex justify-content-center align-items-center flex-wrap">
+        <span id="alertText" style="margin-right: 10px;">이미 라이더로 등록된 사용자입니다.</span>
+
+        <!-- 버튼 그룹 -->
+        <span id="riderChoice" style="display: none;">
+            <button onclick="goToRiderPage()" class="btn btn-sm btn-primary me-1">Y</button>
+            <button onclick="hideChoice()" class="btn btn-sm btn-secondary">N</button>
+        </span>
     </div>
-<script th:if="${riderExists}">
-    alert('이미 라이더로 등록된 사용자입니다.');
+</div>
+
+<script>
+  setTimeout(function() {
+    document.getElementById('alertText').textContent = '라이더 페이지로 이동하시겠습니까?';
+    document.getElementById('riderChoice').style.display = 'inline';
+  }, 2000);
+
+  function goToRiderPage() {
+    window.location.href = '/rider/home'; // 실제 경로로 수정
+  }
+
+  function hideChoice() {
+    document.getElementById('riderAlert').style.display = 'none';
+  }
 </script>
+
+
+	
+	<div th:if="${riderSuccess}" class="alert alert-success" role="alert"
+		style="margin-bottom: 20px;">
+		<span th:text="${riderSuccess}"></span>
+	</div>
+	<div class="d-flex justify-content-center px-5">
+		<div class="search">
+			<input type="text" class="search-input" placeholder="뭐 먹을까?" name="">
+			<a href="#" class="search-icon"> <i class="fa fa-search"></i>
+			</a>
+		</div>
+	</div>
+	<div class="gallery-container">
+		<div>
+			<a href="#" class="labels">패스트푸드</a><img class="imgs"
+				th:src="@{/css/imgs/img1.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">중식</a><img class="imgs"
+				th:src="@{/css/imgs/img2.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">한식</a><img class="imgs"
+				th:src="@{/css/imgs/img3.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">분식</a><img class="imgs"
+				th:src="@{/css/imgs/img4.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">치킨</a><img class="imgs"
+				th:src="@{/css/imgs/img5.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">피자</a><img class="imgs"
+				th:src="@{/css/imgs/img6.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">찜 탕</a><img class="imgs"
+				th:src="@{/css/imgs/img7.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">일식</a><img class="imgs"
+				th:src="@{/css/imgs/img8.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">구이</a><img class="imgs"
+				th:src="@{/css/imgs/img9.png}">
+		</div>
+		<div>
+			<a href="#" class="labels">카페</a><img class="imgs"
+				th:src="@{/css/imgs/img10.png}">
+		</div>
+	</div>
+</div>
+
 </html>

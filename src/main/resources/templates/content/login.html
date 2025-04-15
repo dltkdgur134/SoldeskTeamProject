@@ -2,13 +2,18 @@
 <html 
 	lang="ko"
 	xmlns:th="http://www.thymeleaf.org"
-	layout:decorate="~{layouts/emptyFooterHeader}"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}"
 >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>온달 로그인</title>
+<script th:src="@{/js/index.js}"></script>
 <link th:fragment="css" rel = "stylesheet" th:href = "@{/css/login.css}">
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/update.css}" rel="stylesheet" />
 </head>
 <body>
 

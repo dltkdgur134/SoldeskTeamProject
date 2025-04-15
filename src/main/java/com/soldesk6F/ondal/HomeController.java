@@ -36,6 +36,7 @@ public class HomeController {
 		
 	}
 	
+<<<<<<< HEAD
 
 //	@GetMapping("/")
 //	public String main(Principal principal) {
@@ -58,4 +59,6 @@ public class HomeController {
 //	}
 	
 	
+=======
+>>>>>>> b170f4c01296930ad27892f0586c726bf33d44b4
 }

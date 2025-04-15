@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user.controller;
+package com.soldesk6F.ondal.user.controller.user;
 
 import com.soldesk6F.ondal.user.service.UserService;
 import lombok.RequiredArgsConstructor;
