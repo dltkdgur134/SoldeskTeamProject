@@ -47,6 +47,19 @@ body {
 	color: #fff !important;
 }
 
+.btn-success {
+	background-color: #FFE766;
+	border: none !important;
+	color: black !important;
+	font-size: 18pt;
+	font-weight: 800;
+	width: 100%;
+}
+
+.btn-success:hover {
+	background-color: #FFEF99;
+}
+
 .info-card {
       max-width: 600px;
       margin: auto;

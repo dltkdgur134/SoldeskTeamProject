@@ -12,9 +12,7 @@
   	<script th:src="@{/js/jQuery.js}"></script>
   	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script> 
 	<!-- 각 페이지의 script가 작성될 위치 -->
-    <th:block layout:fragment="js">
-    <script th:src="@{/js/hideLogo.js}"></script>
-    </th:block>
+   
     <!-- 각 페이지의 css가 작성될 위치 -->
     <th:block layout:fragment="css">
     </th:block>
@@ -26,6 +24,9 @@
 	<div layout:fragment="content" class="content"></div>
 
 	<div th:replace="~{fragments/footer::footer}"></div>
+	 <th:block layout:fragment="js">
+    	<script th:src="@{/js/hideLogo.js}"></script>
+    </th:block>
 </body>
 
 </html>
