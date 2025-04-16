@@ -12,12 +12,6 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 @Controller
 public class PageController {
 	
-	@GetMapping (value = "/userlogin")
-	public String goUserLogin(Model model) {
-		
-		return "login";
-	}
-	
 	@GetMapping (value = "/infopage")
 	public String goInfoPage(Model model) {
 		
@@ -27,6 +21,11 @@ public class PageController {
 	@GetMapping (value = "/mypage")
 	public String goMyPage(Model model) {
 		return "content/mypage";
+	}
+	
+	@GetMapping (value = "/mySecurity")
+	public String enterPass() {
+		return "content/mySecurity";
 	}
 	
 }

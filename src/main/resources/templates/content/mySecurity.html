@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http//www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/Layouts}">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
 <head>
-
+	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+	<script th:src="@{/js/update.js}"></script>
 </head>
 
 <div layout:fragment="content" class="container py-5">
@@ -35,5 +37,61 @@
       </div>
     </div>
   </div>
+		<h5 class="card-title">
+		</h5>
+		<div class="card-body">
+			<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+				<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+			</div>
+			<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+				<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+			</div>
+			<div class="form-floating mb-3">
+				<form class="form-floating" th:action="@{/content/passwordCheck}" method="post" name="checkPasswordForm"
+						autocomplete="off" id="check-password-form" onsubmit="return checkPassword();" novalidate>
+					 <div class="form-floating">
+  					 	<input type="password" name="oldPassword" class="form-control" id="check-prev-pass" placeholder="기존 비밀번호 입력" maxlength="20">
+ 					 	<label for="check-prev-pass"> 기존 비밀번호</label>
+ 					 	<div class="invalid-feedback">
+     							기존 비밀번호를 입력해주세요.
+   			 			</div>
+   			 			<div class="valid-feedback">
+   			 				맞음
+   			 			</div>
+					 </div>
+ 					 <br>
+ 					 <div class="form-floating">
+ 					 	<input type="password" name="password" class="form-control" id="new-pass" placeholder="새 비밀번호 입력" maxlength="20">
+ 					 	<label for="new-pass"> 새 비밀번호</label>
+ 					 	<div class="invalid-feedback" id="new-pw-invalid">
+     							새 비밀번호를 입력해주세요
+   			 			</div>
+   			 			<div class="valid-feedback">
+   			 				맞음
+   			 			</div>
+ 					 </div>
+ 					 <br>
+ 					 <div class="form-floating">
+ 					 	<input type="password" name="passwordCheck" class="form-control" id="new-pass-check" placeholder="새 비밀번호 입력" maxlength="20">
+ 					 	<label for="new-pass-check"> 새 비밀번호 확인</label>	 
+ 					 	<div class="invalid-feedback">
+     							비밀번호가 일치하지 않습니다.
+   			 			</div>
+   			 			<div class="valid-feedback">
+   			 				맞음
+   			 			</div> 
+ 					 </div>
+ 					 <br>
+				</form>
+				<div class="d-flex justify-content-evenly">
+		 			<button type="submit" class="btn btn-primary btn-lg"
+						form="check-password-form" id="check-password-btn"><strong>확인</strong></button>
+					<button type="button" class="btn btn-secondary btn-lg" id="check-password-back-btn" 
+						onclick="return history.back();"><strong>뒤로가기</strong></button>	
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 </html>

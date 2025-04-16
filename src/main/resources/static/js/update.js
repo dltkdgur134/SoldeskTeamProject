@@ -1,5 +1,6 @@
 
 $(function(){
+	// 결과 상태창 표시
 	'use strict'
 	 var flashDurationInSeconds = 5;
 	 var flashContainerId = 'flash-messages';
@@ -8,7 +9,8 @@ $(function(){
 	    $('#' + flashContainerId).remove();
 	 }
 	 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
-
+	
+	 // 닉네임 변경 버튼 클릭
 	 document.getElementById('update-nickname-btn').addEventListener('click', event => {
 		if (!checkNicknameValidity() || document.getElementById('nickname-input').dataset.status === "no") {
 			event.preventDefault();
@@ -16,10 +18,9 @@ $(function(){
 		}
 	 });
 	 
+	 // 닉네임 중복 확인 버튼 클릭
 	 document.getElementById('nickname-exists').addEventListener('click', event => {
-		/*let status = $('#nickname-input').attr('status');*/
 		const nickname = document.upNickForm.nickname;
-		/*let nickname = $('#nickname-input').val();*/
 		$('.invalid-feedback').empty();
 
 		if (nickname.value.trim() === '') {
@@ -59,6 +60,7 @@ $(function(){
 		});
 	})
 	 
+	// 프로필 이미지 변경 버튼 클릭
 	 document.getElementById('profileImage').addEventListener('change', function () {
 	   const maxSize = 1024 * 1024;
 	   const maxWidth = 450;
@@ -108,13 +110,15 @@ $(function(){
 	   img.src = objectUrl;
 	 });
 	 
+	 // 전화번호 변경 버튼 클릭
 	 document.getElementById('update-phone-btn').addEventListener('click', event => {
 	 		if (!checkPhonenumValidity() || document.getElementById('phone-input').dataset.status === "no") {
 	 			event.preventDefault();
 	 			event.stopPropagation();
 	 		}
-	 	 });
+	 });
 	 
+	// 전화번호 중복 확인 버튼 클릭
 	 document.getElementById('phonenum-exists').addEventListener('click', event => {
 			const phoneNum = document.querySelector('form[name="upPhoneForm"] input[name="userPhone"]');
 			phoneNum.value = phoneNum.value.replace(/[^0-9\-]/g, '');
@@ -157,9 +161,45 @@ $(function(){
 	 			}
 	 		});
 	 	})
-	 
+	
 });
 
+function checkPassword() {
+	const oldPassword = document.checkPasswordForm.oldPassword;
+	const password = document.checkPasswordForm.password;
+	const passwordCheck = document.checkPasswordForm.passwordCheck;
+	
+	oldPassword.classList.remove("is-invalid");
+	oldPassword.classList.remove("is-valid");
+	password.classList.remove("is-valid");
+	password.classList.remove("is-invalid");
+	passwordCheck.classList.remove("is-valid");
+	passwordCheck.classList.remove("is-invalid");
+	
+	if (oldPassword.value.trim() === '') {
+		oldPassword.classList.add("is-invalid");
+		oldPassword.classList.remove("is-valid");
+		oldPassword.focus();
+		return false;
+	}
+	if (password.value.trim() === '') {
+		password.classList.add("is-invalid");
+		password.classList.remove("is-valid")
+		password.focus();
+		return false;
+	}
+	if (password.value !== passwordCheck.value) {
+		passwordCheck.classList.add("is-invalid");
+		passwordCheck.classList.remove("is-valid");
+		passwordCheck.focus();
+		return false;
+ 	}
+	else {
+		return true;
+	}
+}
+
+// 닉네임 유효성 검사
 function checkNicknameValidity() {
 	'use strict'
 	const newNickname = document.upNickForm.nickname;
@@ -177,6 +217,7 @@ function checkNicknameValidity() {
 	}
 }
 
+// 전화번호 유효성 검사
 function checkPhonenumValidity() {
 	'use strict'
 	const phoneNum = document.upPhoneForm.userPhone;
@@ -192,8 +233,9 @@ function checkPhonenumValidity() {
 	}
 }
 
+// 드래그앤드롭 기능 드롭핸들러
 function dropHandler(ev) {
-  console.log("File(s) dropped");
+  console.log("파일 드롭 완료");
   ev.preventDefault();
 
   const dropZone = ev.target;
@@ -230,8 +272,9 @@ function dropHandler(ev) {
   }
 }
 
+// 드래그앤드롭 기능 드래그오버핸들러
 function dragOverHandler(ev) {
-  console.log("File(s) in drop zone");
+  console.log("드랍존에 파일 들어옴");
   // 디폴트 행동 방지
   ev.preventDefault();
 }
@@ -254,7 +297,6 @@ function checkRiderNicknameValidity() {
   }
 }
 
-
 document.addEventListener("DOMContentLoaded", function () {
   const nicknameInput = document.getElementById("rider-nickname-input");
 
@@ -263,6 +305,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// 드래그앤드롭 기능 드래그엔터핸들러 (드롭존 안에 들어올 때)
 function dragEnterHandler(ev) {
 	console.log("File(s) entered drop zone")
 	ev.dataTransfer.clearData();
@@ -270,6 +313,7 @@ function dragEnterHandler(ev) {
 	ev.target.style.backgroundColor = "#99A9FF";
 }
 
+// 드래그앤드롭 기능 드래그리브핸들러 (드롭존 나갈 때)
 function dragLeaveHandler(ev) {
 	console.log("File(s) left drop zone")
 	ev.target.style.backgroundColor = "white";
