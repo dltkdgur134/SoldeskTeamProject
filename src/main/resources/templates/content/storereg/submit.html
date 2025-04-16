@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/default}">
+<html xmlns:th="http://www.thymeleaf.org" 
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity" 
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+    layout:decorate="~{layouts/default}">
 <head>
 	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
 	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
 	<link rel="stylesheet" th:href="@{/css/storeRegSubmit.css}">
 	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=여기에_카카오_API_KEY_입력&libraries=services"></script>
+	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0888431cff1af50a88706bb2bd8773bc&libraries=services"></script>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -29,45 +29,50 @@
 				</div>
 
 				<div class="form-group">
-					<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="store_phone" th:value="${store_phone}"
+					<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="storePhone" th:value="${storePhone}"
 					 placeholder="점포 전화번호" pattern="[0-9\-]+" title="숫자와 (-)만 입력하세요" maxlength="13" required>
 				</div>
 				
 				<div class="form-group">
-				    <div style="display: flex; gap: 5px;">
-				        <input type="text" id="postcode" placeholder="우편번호" readonly required>
-				        <button class="address-btn" type="button" onclick="execDaumPostcode()">주소 검색</button>
+				    <div  class="input-wrapper" style="display: flex; gap: 5px;">
+						<i class="fa-solid fa-signs-post input-icon"></i><input type="text" id="postcode" placeholder="우편번호" readonly required>
+						<button class="address-btn" type="button" onclick="execDaumPostcode()">주소 검색</button>
 				    </div>
-				    <input type="text" id="roadAddress" name="store_address" placeholder="도로명 주소" readonly required>
-				    <input type="text" id="detailAddress" name="store_detailAddress" placeholder="상세 주소" required>
+					<div class="input-wrapper">
+						<i class="fa-solid fa-road input-icon"></i><input type="text" id="store_roadAddress" name="store_roadAddress" placeholder="도로명 주소" readonly required>
+					</div>
+					<div class="input-wrapper">
+						<i class="fa-solid fa-house input-icon"></i><input type="text" id="sotre_detailAddress" name="store_detailAddress" placeholder="상세 주소" required>
+					</div>
 				    <input type="hidden" id="latitude" name="latitude">
 				    <input type="hidden" id="longitude" name="longitude">
 				</div>
 				
-				<div class="form-group">
+				<div class="form-group" style="padding-left: 35px;">
+					<i class="fa-solid fa-list-ul input-icon"></i>
 					<label>카테고리</label>
 					<select name="category" required>
 						<option value="" disabled selected>선택</option>
 						<option value="fastfood">패스트푸드</option>
-						<option value="chinese">중식</option>
-						<option value="korean">한식</option>
+						<option value="cn">중식</option>
+						<option value="kr">한식</option>
 						<option value="bunsik">분식</option>
 						<option value="chicken">치킨</option>
 						<option value="pizza">피자</option>
-						<option value="jjim,tang">찜,탕</option>
-						<option value="roast	">구이</option>
-						<option value="japanese">일식</option>
+						<option value="jjimtang">찜,탕</option>
+						<option value="roast">구이</option>
+						<option value="jp">일식</option>
 					</select>
 				</div>
 				
-				<div class="form-group">
+				<!--<div class="form-group">
 					<label>배달 가능 거리 (km)</label>
 					<select name="delivery_range" required>
 						<option value="1">1km</option>
 						<option value="3">3km</option>
 						<option value="5">5km</option>
 					</select>
-				</div>
+				</div>-->
 				
 				<div class="form-group file-upload-group">
 					<i class="fa-solid fa-folder-open input-icon"></i>
@@ -79,7 +84,7 @@
 					<span id="file-name-display" class="file-name">이미지를 선택해주세요</span>
 				</div>
 				
-				<div class="form-group file-upload-group">
+				<!--<div class="form-group file-upload-group">
 					<i class="fa-solid fa-folder-open input-icon"></i>
 	
 					<input type="file" id="profileImage" name="busiImgs" accept="image/*" hidden>
@@ -87,7 +92,7 @@
 					<label for="profileImage" class="custom-file-label">영업신고증</label>
 	
 					<span id="file-name-display" class="file-name">파일을 첨부 해주세요</span>
-				</div>
+				</div>-->
 				
 				<div class="form-group">
 					<button class="reg-btn" type="submit">신청하기</button>

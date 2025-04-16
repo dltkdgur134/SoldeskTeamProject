@@ -1,20 +1,10 @@
-function togglePassword(inputId, iconElement) {
-  const input = document.getElementById(inputId);
-  if (input.type === "password") {
-    input.type = "text";
-    iconElement.textContent = "🙈";
-  } else {
-    input.type = "password";
-    iconElement.textContent = "👁️";
-  }
-}
 
 function execDaumPostcode() {
     new daum.Postcode({
         oncomplete: function(data) {
             document.getElementById('postcode').value = data.zonecode;
-            document.getElementById('roadAddress').value = data.roadAddress || data.jibunAddress;
-            document.getElementById('detailAddress').focus();
+            document.getElementById('sotre_roadAddress').value = data.roadAddress || data.jibunAddress;
+            document.getElementById('store_detailAddress').focus();
 
             getLatLngFromAddress(data.roadAddress || data.jibunAddress);
         }
@@ -85,33 +75,10 @@ document.getElementById('profileImage').addEventListener('change', function () {
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.querySelector("form");
-  const password = document.getElementById("password");
-  const confirmPassword = document.getElementById("confirmPassword");
 
   form.addEventListener("submit", function (e) {
-    if (password.value !== confirmPassword.value) {
-      e.preventDefault();
-      alert("비밀번호가 일치하지 않습니다!");
-      confirmPassword.focus();
-      return;
-    }
 
-    const fullEmail = getFullEmail();
-    if (!fullEmail.includes('@') || fullEmail.endsWith('@')) {
-      e.preventDefault();
-      alert("이메일 도메인을 입력해주세요.");
-      return;
-    }
-    document.getElementById("full_email").value = fullEmail;
-
-    const nickname = document.querySelector('[name="nickname"]').value.trim();
-    if (nickname.length === 0) {
-      e.preventDefault();
-      alert("닉네임을 입력해주세요.");
-      return;
-    }
-
-    const phoneInput = document.querySelector('[name="userPhone"]');
+    const phoneInput = document.querySelector('[name="storePhone"]');
     phoneInput.value = phoneInput.value.replace(/-/g, '');
     if (!/^\d{9,10}$/.test(phoneInput.value)) {
       e.preventDefault();

@@ -27,6 +27,7 @@ body {
 .form-group {
     position: relative;
     margin-bottom: 15px;
+	color: gray;
 }
 
 .input-icon {
@@ -93,33 +94,6 @@ form input {
     font-size: 16px;
 }
 
-.password-group {
-    position: relative;
-}
-
-.password-group input[type="password"],
-.password-group input[type="text"] {
-    padding-right: 40px;
-}
-
-.toggle-password {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 18px;
-    color: #888;
-}
-
-.address-group {
-	position: relative;
-}
-
-.address-group input {
-	padding-right: 90px; /* 버튼 들어갈 공간 */
-}
-
 .address-btn {
 	height: 45px;
 	width: 120px;
@@ -152,92 +126,12 @@ form input {
     background-color: #D39E00;
 }
 
-.email-group {
-	display: flex;
-	align-items: center;
-	gap: 5px;
+.input-wrapper {
 	position: relative;
 }
 
-.email-group input[type="text"] {
-	height: 40px;
-	font-size: 16px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	box-sizing: border-box;
-	color: #495057;
+select {
+	color: gray;
+	margin-left: 10px;
 }
 
-#email_domain_input {
-	width: 100px;
-	padding: 0 10px;
-}
-
-#email_domain_select {
-	width: 100px;
-}
-
-.email-group select {
-	height: 40px;
-	font-size: 16px;
-	padding: 0 10px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	background-color: #fff;
-	appearance: none;
-	box-sizing: border-box;
-	color: #495057;
-	cursor: pointer;
-}
-
-.email-group select:focus {
-	border-color: #66afe9;
-	outline: none;
-}
-
-.email-group select:hover {
-	background-color: #f1f1f1;
-}
-
-.email-group select::-ms-expand {
-	display: none;
-}
-
-.email-at {
-	font-size: 16px;
-	color: #333;
-}
-
-.verification-group {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.verification-group input {
-  flex: 2;
-}
-
-.verification-group button {
-  background-color: #ffc107;
-  border: none;
-  border-radius: 4px;
-  color: black;
-  font-weight: bold;
-  padding: 8px 10px;
-  cursor: pointer;
-  font-size: 13.3px;
-}
-
-.verification-group button:hover {
-  background-color: #e0a800;
-}
-
-.verification-success {
-  font-weight: bold;
-  color: red;
-  margin-bottom: 12px;
-  margin-right: 20px;
-  text-align: right;
-  font-size: 16px;
-}
