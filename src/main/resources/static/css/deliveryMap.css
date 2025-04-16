@@ -1,0 +1,32 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "acloud";
+	src: url(acloud.ttf);
+}
+
+body {
+	font-family: "yisunshinM";
+}
+
+.delivery-request {
+	z-index: 9999;
+	position: relative;
+	width: 90px;
+	height: 40px;
+	right: 10px;
+	bottom: 85px;
+	border-radius: 6px;
+	text-align: center;
+	float: left;
+	background: #fff;
+	font-size: 14px;
+}
+
+.title {
+	display: block;
+	text-align: center;
+	margin-right: 35px;
+	padding: 10px 15px;
+	font-size: 14px;
+}

@@ -55,7 +55,6 @@ public class Store {
     private String storeName;
 
 	
-	
     @Column(name = "category", nullable = false, length = 20)
     private String category;
 
@@ -64,9 +63,12 @@ public class Store {
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StoreImg> storeImgs = new ArrayList<>();
-
+    
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BrandImg> brandImgs = new ArrayList<>();
+    private List<StoreIntroduceImg> StoreIntroduceImgs = new ArrayList<>();
+    
+    @Column(name = "brand_img", length = 255)
+    private String brandImg;
 
     @Column(name = "store_address", nullable = false, length = 80)
     private String storeAddress;
@@ -85,6 +87,14 @@ public class Store {
     @Column(name = "store_introduce")
     private String storeIntroduce;
 
+    @Lob
+    @Column(name = "store_event")
+    private String storeEvent;
+
+    @Lob
+    @Column(name = "food_origin",nullable = false)
+    private String foodOrigin;
+
     @Column(name = "opening_time")
     private LocalTime openingTime;
 
@@ -99,7 +109,7 @@ public class Store {
     private StoreStatus storeStatus;
 
     @CreationTimestamp
-    @Column(name = "registration_date", updatable = false)
+    @Column(name = "registration_date", updatable = false,nullable = false)
     private LocalDateTime registrationDate;
 
     public enum StoreStatus {
@@ -144,17 +154,19 @@ public class Store {
         img.setStore(this);
         this.storeImgs.add(img);
     }
-
-    public void addBrandImg(BrandImg img) {
-        img.setStore(this);
-        this.brandImgs.add(img);
+    
+    public void addStoreIntroduceImg(StoreIntroduceImg img) {
+    	img.setStore(this);
+    	this.StoreIntroduceImgs.add(img);
     }
+
     
     @Builder
     public Store(Owner owner,String businessNum, String storeName, String category, String storePhone,
-                 List<StoreImg> storeImgs, List<BrandImg> brandImgs, String storeAddress,
+                 List<StoreImg> storeImgs,List<StoreIntroduceImg> StoreIntroduceImgs, String brandImg, String storeAddress,
                  double storeLatitude, double storeLongitude, DeliveryRange deliveryRange,
-                 String storeIntroduce, LocalTime openingTime, LocalTime closingTime,
+                 String storeIntroduce, String storeEvent , String foodOrigin,
+                 LocalTime openingTime, LocalTime closingTime,
                  String holiday, StoreStatus storeStatus) {
         this.owner = owner;
         this.businessNum = businessNum;
@@ -166,15 +178,18 @@ public class Store {
         if (storeImgs != null) {
             storeImgs.forEach(this::addStoreImg);
         }
-        if (brandImgs != null) {
-            brandImgs.forEach(this::addBrandImg);
+       
+        if (StoreIntroduceImgs != null) {
+        	StoreIntroduceImgs.forEach(this::addStoreIntroduceImg);
         }
-
+        this.brandImg = brandImg;
         this.storeAddress = storeAddress;
         this.storeLatitude = storeLatitude;
         this.storeLongitude = storeLongitude;
         this.deliveryRange = deliveryRange;
         this.storeIntroduce = storeIntroduce;
+        this.storeEvent = storeEvent;
+        this.foodOrigin = foodOrigin;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.holiday = holiday;
