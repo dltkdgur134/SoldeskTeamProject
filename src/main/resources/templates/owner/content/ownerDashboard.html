@@ -110,6 +110,13 @@
 	      flex: 1;
 	      min-width: 0;
 	    }
+	    #deliveringOrdersArea h4 {
+		  background-color: #0056b3;
+		  color: white;
+		  padding: 10px;
+		  border-radius: 5px;
+		  margin-top: 20px;
+		}
     </style>
 </head>
 <body>	
@@ -125,6 +132,10 @@
           <h4 class="fw-bold text-primary mb-3">진행중 주문</h4>
           <ul id="processingOrderList" class="list-unstyled m-0"></ul>
         </div>
+        <div id="deliveringOrdersArea" class="p-3 rounded shadow-sm" style="background-color: #fff3cd;">
+          <h4 class="fw-bold text-warning mb-3">배달중 주문</h4>
+          <ul id="deliveringOrderList" class="list-unstyled m-0"></ul>
+        </div>
       </div>
       <div class="col-md-6" id="orderDetail">
         <h3 class="mb-4">주문 상세</h3>
@@ -137,7 +148,8 @@
         <div class="text-end mt-4">
           <button id="confirmBtn" class="btn btn-outline-success btn-sm me-2" style="display:none;">접수하기</button>
           <button id="cancelBtn" class="btn btn-outline-danger btn-sm me-2" style="display:none;">주문취소</button>
-          <button id="completeBtn" class="btn btn-outline-primary btn-sm" style="display:none;">조리완료</button>
+          <button id="completeBtn" class="btn btn-outline-primary btn-sm me-2" style="display:none;">조리완료</button>
+          <button id="startDeliveryBtn" class="btn btn-outline-warning btn-sm" style="display:none;">배달시작</button>
         </div>
       </div>
     </div>
@@ -274,8 +286,7 @@ function loadOrderList() {
 
 // 왼쪽 주문 리스트 렌더링
 function renderOrderList(orderList) {
-  $('#newOrderList').empty();
-  $('#processingOrderList').empty();
+	$('#newOrderList, #processingOrderList, #deliveringOrderList').empty();
 
   orderList.forEach(order => {
     const orderText = $('<div>').addClass('order-text')
@@ -326,7 +337,7 @@ function renderOrderList(orderList) {
       $('#newOrderList').prepend(li);
     }
 
-    else if (order.orderStatus === 'CONFIRMED' || order.orderStatus === 'IN_DELIVERY') {
+    else if (order.orderStatus === 'CONFIRMED') {
     	  const extendTimeBtn = $('<button>')
     	    .addClass('extendTimeBtn')
     	    .attr('data-orderid', order.orderId)
@@ -362,6 +373,13 @@ function renderOrderList(orderList) {
     	  // ✅ 타이머 시작 (예: 기본 20분으로 세팅)
     	  startCountdown(timerContainer[0], 20);
     	}
+    
+    else if (order.orderStatus === 'IN_DELIVERY') {
+        const startBtn = $('<button>').addClass('startDeliveryBtn').attr('data-orderid', order.orderId).text('배달시작');
+        buttonWrap.append(startBtn);
+        li.append(orderText, buttonWrap);
+        $('#deliveringOrderList').append(li);
+      }
   });
 }
 
@@ -426,25 +444,22 @@ function loadOrderDetail(orderId) {
 
 // 주문 상세 표시
 function renderOrderDetail(order) {
-    $('#detailOrderId').text(order.orderId);
-    $('#detailAddress').text(order.deliveryAddress);
-    $('#detailStatus').text(order.orderStatus);
-    $('#detailStoreRequest').text(order.storeRequest);
-    $('#detailDeliveryRequest').text(order.deliveryRequest);
-    $('#detailTotalPrice').text(order.totalPrice);
+  $('#detailOrderId').text(order.orderId);
+  $('#detailAddress').text(order.deliveryAddress);
+  $('#detailStatus').text(order.orderStatus);
+  $('#detailStoreRequest').text(order.storeRequest);
+  $('#detailDeliveryRequest').text(order.deliveryRequest);
+  $('#detailTotalPrice').text(order.totalPrice);
 
-    // 버튼 노출 제어
-    $('#confirmBtn').hide();
-    $('#cancelBtn').hide();
-    $('#completeBtn').hide();
+  $('#confirmBtn, #cancelBtn, #completeBtn, #startDeliveryBtn').hide();
 
-    if (order.orderStatus === 'PENDING') {
-        $('#confirmBtn').show();
-        $('#cancelBtn').show();
-    } else if (order.orderStatus === 'CONFIRMED') {
-        $('#completeBtn').show();
-        $('#cancelBtn').show();
-    }
+  if (order.orderStatus === 'PENDING') {
+    $('#confirmBtn, #cancelBtn').show();
+  } else if (order.orderStatus === 'CONFIRMED') {
+    $('#completeBtn, #cancelBtn').show();
+  } else if (order.orderStatus === 'IN_DELIVERY') {
+    $('#startDeliveryBtn').show();
+  }
 }
 
 // 주문 상태 업데이트

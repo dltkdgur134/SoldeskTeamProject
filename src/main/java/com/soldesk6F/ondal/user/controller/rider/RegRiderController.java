@@ -5,15 +5,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.soldesk6F.ondal.user.CustomUserDetails;
-import com.soldesk6F.ondal.user.Role;
+import com.soldesk6F.ondal.login.CustomUserDetails;
+
 import com.soldesk6F.ondal.user.dto.RiderForm;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserRole;
@@ -31,17 +30,15 @@ public class RegRiderController {
     private final UserRepository userRepository;
 
     @GetMapping("/register")
-    public String showRiderRegistrationForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model
-    		,@ModelAttribute("riderExists") String riderExists,RedirectAttributes redirectAttributes) {
+    public String showRiderRegistrationForm(@AuthenticationPrincipal CustomUserDetails userDetails,
+    		RedirectAttributes redirectAttributes) {
         String userId = userDetails.getUser().getUserId();
 
         if (riderService.isAlreadyRider(userId)) {
-        	 //model.addAttribute("riderExists", riderExists); // 모델에 넣어줘야 Thymeleaf가 사용 가능
         	redirectAttributes.addFlashAttribute("riderExists", true);
-        	 return "redirect:/"; // templates/content/index.html
+        	 return "redirect:/"; 
         }
 
-        model.addAttribute("riderForm", new RiderForm());
         return "content/rider/riderRegister";
     }
 
@@ -66,7 +63,7 @@ public class RegRiderController {
         User updatedUser = userRepository.findByUserId(userId).orElseThrow();
 
         // 새로운 CustomUserDetails 생성
-        CustomUserDetails updatedDetails = new CustomUserDetails(updatedUser, Role.valueOf(updatedUser.getUserRole().name()));
+        CustomUserDetails updatedDetails = new CustomUserDetails(updatedUser, UserRole.valueOf(updatedUser.getUserRole().name()));
 
         // 새로운 Authentication 객체 생성
         Authentication newAuth = new UsernamePasswordAuthenticationToken(

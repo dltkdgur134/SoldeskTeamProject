@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.soldesk6F.ondal.user.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.User;
 
 @Controller
@@ -30,11 +29,14 @@ public class HomeController {
 		return "owner/content/ownerDashboard";
 	}
 	
+	@GetMapping("/index2")
+	public String StoreList() {
+		return "content/index2";
+	}
+	
 	@GetMapping("/login")
 	public String login() {
 		return "content/login";
-		
 	}
 	
-
 }

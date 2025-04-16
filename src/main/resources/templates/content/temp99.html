@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/default}">
+<head>
+<meta charset="UTF-8">
+	<link rel="stylesheet" th:href="@{/css/regAgreement.css}">
+	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="agreement-container">
+			<h2>약관 동의</h2>
+	    
+			<div class="checkbox-group">
+				<label><input type="checkbox" id="checkAll"> 전체 동의하기</label>
+				<p class="small">필수 및 선택 약관에 모두 동의합니다.</p>
+			</div>
+
+			<div class="checkbox-group">
+				<label><input type="checkbox" class="required"> [필수] 이용약관 동의</label>
+				<textarea readonly>여러분을 환영합니다. 본 약관은 온달 서비스를 이용함에 있어 ...</textarea>
+			</div>
+
+			<div class="checkbox-group">
+				<label><input type="checkbox" class="required"> [필수] 개인정보 수집 및 이용 동의</label>
+				<textarea readonly>온달은 회원가입 시 개인정보를 다음과 같이 수집하며, ...</textarea>
+			</div>
+
+			<div class="checkbox-group">
+				<label><input type="checkbox" class="optional"> [선택] 위치기반 서비스 이용 동의</label>
+				<textarea readonly>위치정보를 활용한 광고/서비스를 위해 위치기반 서비스를 ...</textarea>
+			</div>
+
+			<div class="checkbox-group">
+				<label><input type="checkbox" class="optional"> [선택] 이벤트/혜택 수신 동의</label>
+				<textarea readonly>회원님께 더 많은 혜택을 드리기 위해 이메일/문자 수신을 ...</textarea>
+			</div>
+
+			<form action="/register" method="get">
+				<button type="submit" class="submit-btn" id="agreeBtn" disabled>다음</button>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		const checkAll = document.getElementById("checkAll");
+		const requiredChecks = document.querySelectorAll(".required");
+		const allChecks = document.querySelectorAll("input[type='checkbox']:not(#checkAll)");
+		const agreeBtn = document.getElementById("agreeBtn");
+
+		checkAll.addEventListener("change", () => {
+			allChecks.forEach(chk => chk.checked = checkAll.checked);
+			updateButtonState();
+		});
+
+		allChecks.forEach(chk => {
+			chk.addEventListener("change", () => {
+				checkAll.checked = [...allChecks].every(chk => chk.checked);
+				updateButtonState();
+			});
+		});
+
+		function updateButtonState() {
+			const allRequiredChecked = [...requiredChecks].every(chk => chk.checked);
+			agreeBtn.disabled = !allRequiredChecked;
+		}
+	</script>
+</body>
+</html>

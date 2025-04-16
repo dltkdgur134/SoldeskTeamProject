@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.useract.order.entity;
 
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,6 +64,18 @@ public class Order {
     @Column(name = "order_time", nullable = false, updatable = false)
     private LocalDateTime orderTime;
 
+    @Column(name = "expect_cooking_time")
+    private LocalTime expectCookingTime;
+    
+    @Column(name = "real_cooking_time", updatable = false)
+    private LocalTime realCookingTime;
+    
+    @Column(name = "expect_delivery_time")
+    private LocalTime expectDeliveryTime;
+    
+    @Column(name = "real_delivery_time", updatable = false)
+    private LocalTime realDeliveryTime;
+    
     @Column(name = "delivery_address", nullable = false, length = 255)
     private String deliveryAddress;
 

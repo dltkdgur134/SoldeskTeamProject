@@ -6,14 +6,12 @@
 <head>
 <th:block layout:fragment="css">
 	<link rel="stylesheet" th:href="@{/css/riderRegister.css}">
-	<link rel="stylesheet" th:href="@{/css/custom.css}">
-	<link rel="stylesheet" th:href="@{/css/index.css}">
+	<link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
 </th:block>
 <th:block layout:fragment="js">
 	<script
 		src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script th:src="@{/js/zipcode.js}"></script>
-	<script th:src="@{/js/index.js}"></script>
 </th:block>
 </head>
 <div layout:fragment="content">

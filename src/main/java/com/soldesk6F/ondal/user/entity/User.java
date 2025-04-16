@@ -13,12 +13,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
@@ -71,11 +69,11 @@ public class User {
 	private UserRole userRole = UserRole.USER;
 
 	@Column(name = "user_profile_live_update", nullable = false)
-	private boolean userProfileLiveUpdate =false;
+	private boolean userProfileLiveUpdate = false;
 
 	@Column(name = "login_fail_count", nullable = false)
 	private int loginFailCount = 0;
-	
+
 	@CreationTimestamp
 	@Column(name = "created_date", nullable = false, updatable = false)
 	private LocalDateTime createdDate;
@@ -83,36 +81,34 @@ public class User {
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
-	
-	
-	
-	public User update(String nickName , String userProfile) {
+
+	public User update(String nickName, String userProfilePath) {
 		this.nickName = nickName;
-		this.userProfile = userProfile;
-	    return this;
+		this.userProfile = userProfilePath;
+
+		return this;
 	}
+
 	public User updateProvider(String socialLoginProvider) {
-			this.socialLoginProvider = socialLoginProvider;
-			return this;
-	
-		}
+		this.socialLoginProvider = socialLoginProvider;
+		return this;
+
+	}
+
 	public User updateEmail(String email) {
 		this.email = email;
 		return this;
 	}
-	
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
 
-	
 	public enum UserStatus {
 		ACTIVE("정상"), // 정상 회원
 		SUSPENDED("일시 정지"), // 일시 정지
 		BANNED("영구 정지"), // 영구 정지
-		UNLINKED("미연동");	// 소셜 미연동 상태
-		
+		UNLINKED("미연동"); // 소셜 미연동 상태
 
 		private final String description;
 
@@ -141,30 +137,30 @@ public class User {
 
 	@Builder
 	public User(String userId, String password, String userProfile, String userName, String nickName, String email,
-	            String userPhone, RegAddress userSelectedAddress, String socialLoginProvider, UserRole userRole,
-	            UserStatus userStatus, boolean userProfileLiveUpdate) {
-	    this.userId = userId;
-	    this.password = password;
-	    this.userProfile = userProfile;
-	    this.userName = userName;
-	    this.nickName = nickName;
-	    this.email = email;
-	    this.userPhone = userPhone;
-	    this.userSelectedAddress = userSelectedAddress;
-	    this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE"
-	            : socialLoginProvider;
-	    this.userRole = (userRole != null) ? userRole : UserRole.USER;
-	    this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNLINKED;
-	    this.userProfileLiveUpdate = userProfileLiveUpdate;
+			String userPhone, RegAddress userSelectedAddress, String socialLoginProvider, UserRole userRole,
+			UserStatus userStatus, boolean userProfileLiveUpdate) {
+		this.userId = userId;
+		this.password = password;
+		this.userProfile = userProfile;
+		this.userName = userName;
+		this.nickName = nickName;
+		this.email = email;
+		this.userPhone = userPhone;
+		this.userSelectedAddress = userSelectedAddress;
+		this.socialLoginProvider = (socialLoginProvider == null || socialLoginProvider.isBlank()) ? "NONE"
+				: socialLoginProvider;
+		this.userRole = (userRole != null) ? userRole : UserRole.USER;
+		this.userStatus = (userStatus != null) ? userStatus : UserStatus.UNLINKED;
+		this.userProfileLiveUpdate = userProfileLiveUpdate;
 	}
+
 	public User update(String name) {
 		this.userName = name;
 		return this;
 	}
-	
+
 	public String getUserUuidAsString() {
-	    return userUuid != null ? userUuid.toString() : null;
+		return userUuid != null ? userUuid.toString() : null;
 	}
-	
-	
+
 }

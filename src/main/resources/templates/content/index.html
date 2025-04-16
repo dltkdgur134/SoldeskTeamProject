@@ -3,11 +3,13 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
+	
 <head>
 <script th:src="@{/js/index.js}"></script>
 <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
 </head>
+
 <div layout:fragment="content">
 	<div th:if="${riderExists}" class="alert alert-danger text-center" role="alert"
      style="margin-bottom: 20px;" id="riderAlert">
@@ -37,20 +39,25 @@
     document.getElementById('riderAlert').style.display = 'none';
   }
 </script>
-
-
 	
 	<div th:if="${riderSuccess}" class="alert alert-success" role="alert"
 		style="margin-bottom: 20px;">
 		<span th:text="${riderSuccess}"></span>
 	</div>
-	<div class="d-flex justify-content-center px-5">
-		<div class="search">
-			<input type="text" class="search-input" placeholder="뭐 먹을까?" name="">
-			<a href="#" class="search-icon"> <i class="fa fa-search"></i>
-			</a>
-		</div>
-	</div>
+	
+  <div class="d-flex flex-column align-items-center px-5 w-100" sec:authorize="isAnonymous()">
+    
+    <!-- 검색창 전체 래퍼 -->
+    <div id="search-wrapper" class="w-100 d-flex justify-content-center align-items-center mt-3">
+      <!-- 주소 다시 입력 버튼 (처음엔 숨김) -->
+      <button id="reenter-address-btn" class="btn btn-outline-secondary me-2" style="display:none;">주소 다시 입력</button>
+
+      <div class="search">
+        <input id="main-input" type="text" class="search-input" placeholder="배달받을 주소를 입력하세요">
+        <a href="#" class="search-icon" id="main-btn"><i class="fa fa-search"></i></a>
+      </div>
+    </div>
+  </div>
 	<div class="gallery-container">
 		<div>
 			<a href="#" class="labels">패스트푸드</a><img class="imgs"
@@ -93,6 +100,6 @@
 				th:src="@{/css/imgs/img10.png}">
 		</div>
 	</div>
-</div>
+	</div>
 
 </html>
