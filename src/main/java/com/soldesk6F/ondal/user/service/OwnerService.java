@@ -5,7 +5,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.soldesk6F.ondal.user.entity.Owner;
-import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.repository.OwnerRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
