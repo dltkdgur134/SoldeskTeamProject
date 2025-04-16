@@ -20,7 +20,7 @@ public class StoreRegController {
 
 	@GetMapping("/storeReg/submit")
 	public String storeSubmit() {
-		return "content/storeReg/submit";
+		return "content/storereg/submit";
 	}
 	
 }
