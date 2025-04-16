@@ -12,10 +12,11 @@
 
 @font-face {
 	font-family: "yisunshinM";
-	src : url('yisunshinM.ttf') format("truetype");
+	src : url('../css/yssM.ttf') format("truetype");
 }
 
 body {
+	font-family: "acloud"; 
 	font-family: "yisunshinM";
 }
 
@@ -37,18 +38,21 @@ body {
   }
 
   .btn-primary:hover {
-    background-color: #FF9A66 !important;
-    border-color: #FF9A66 !important;
+    background-color: black !important;
   }
 
+.btn-secondary {
+	background-color: grey;
+	border: none !important;
+	color: #fff !important;
+}
 
 .info-card {
       max-width: 600px;
       margin: auto;
       border-radius: 1rem;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-
+}
 
 .navbar-brand {
 	color: black;
@@ -82,6 +86,30 @@ body {
     color: #000 !important;
     font-weight: bold;
   }
+/* role-logo의 기본 설정: opacity와 visibility로 보이기/숨기기 */
+.role-logo {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    display: inline-block;      /* inline-block으로 배치 */
+    margin-right: 0.5rem;       /* 로고 간 간격 */
+}
+.logo{
+	text-decoration: none;
+    color: white;
+	
+	
+}
+.role-logo.show {
+    opacity: 1; /* 보이게 설정 */
+    text-decoration: none;
+    color: white;
+}
+
+
+/* .highlight-title 텍스트가 밀리지 않도록 padding-left를 충분히 줌 */
+.highlight-title {
+    padding-left: 20px; /* 이미지를 보일 공간을 확보 */
+}
 
 
 .tooltip .tooltip-inner {
@@ -92,7 +120,6 @@ body {
 .card-title a {
 	color: #ffc107;
 }
-
 
 .footer-sns-link i{
 	color: black;
@@ -118,6 +145,66 @@ body {
 .offcanvas-backdrop {
     z-index: 1040;
 }
+
 .offcanvas {
     z-index: 1050;
+}
+
+#profile-pic {
+	width: 100px;
+	top: -3em;
+}
+
+#profile-pic:hover {
+	background-color: #ffef99;
+	opacity: 0.7;
+	cursor: pointer;
+} 
+
+#profile-pic-update-btn {
+	background-color: #F5F5F5 !important;
+	border: none !important;
+	border-radius:50%;
+	width:30px;
+	height:30px;
+	justify-content: center;
+	vertical-align: middle;
+}
+
+#profile-pic-update-btn i {
+	font-size: 18px;
+}
+
+.alert {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #e6f9e6;
+  color: #2e7d32;
+}
+
+.alert-danger {
+  background-color: #fdecea;
+  color: #c62828;
+}
+#kakao-logo {
+	width: 30%;
+}
+.grayscale { filter: grayscale(100%); }
+
+#login-reg-card .list-group-item {
+	background-color: #FFEF99;
+	color: black;
+}
+
+#login-reg-card .list-group-item:hover {
+	background-color: #FFE766;
+} 
+
+.modal-header {
+	background-color: #FFEF99;
 }

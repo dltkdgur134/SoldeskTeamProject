@@ -6,33 +6,34 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.soldesk6F.ondal.user.CostomUserDetailsService;
-import com.soldesk6F.ondal.user.CustomAuthFailureHandler;
-import com.soldesk6F.ondal.user.CustomOAuth2UserService;
-import com.soldesk6F.ondal.user.Role;
+import com.soldesk6F.ondal.login.CustomAuthFailureHandler;
+import com.soldesk6F.ondal.login.CustomOAuth2UserService;
+import com.soldesk6F.ondal.login.CustomUserDetailsService;
+import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
+import com.soldesk6F.ondal.user.*;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
+
     private final CustomAuthFailureHandler customAuthFailureHandler;
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CostomUserDetailsService costomUserDetailsService;
+    private final CustomUserDetailsService costomUserDetailsService;
 
-    public SecurityConfig(CostomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
-    		CustomAuthFailureHandler customAuthFailureHandler) {
+
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
+    		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
         this.costomUserDetailsService = customUserDetailsService;
         this.customAuthFailureHandler = customAuthFailureHandler;
         this.customOAuth2UserService = customOAuth2UserService;
+        this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
         
 
     }
@@ -93,10 +94,11 @@ public class SecurityConfig {
 				.logoutSuccessUrl("/login?logout")
 				.permitAll()
 			).oauth2Login(oauth2 -> oauth2
-                    .loginPage("/login/tryOAuthLogin") // 커스텀 로그인 페이지 설정
+                    .loginPage("/login/tryOAuthLogin")
                     .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService) // 사용자 정보 처리
-                    )
+                    .userService(customOAuth2UserService)
+                    
+                    ).successHandler(OAuth2LoginSuccessHandler)
 			)
 			.csrf(csrf -> csrf.disable());
 

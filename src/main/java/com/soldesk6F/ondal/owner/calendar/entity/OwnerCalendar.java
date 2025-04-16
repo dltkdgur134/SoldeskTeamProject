@@ -42,4 +42,8 @@ public class OwnerCalendar {
         this.owner = owner;
         this.calendarName = calendarName;
     }
+    
+    public String getOwnerCalendarUuidAsString() {
+	    return calendarId != null ? calendarId .toString() : null;
+	}
 }

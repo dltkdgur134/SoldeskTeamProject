@@ -47,4 +47,8 @@ public class ChatRoom {
         this.participants = participants;
         this.createdDate = LocalDateTime.now();
     }
+    
+    public String getChatRoomUuidAsString() {
+	    return chatRoomId != null ? chatRoomId .toString() : null;
+	}
 }

@@ -2,6 +2,9 @@ package com.soldesk6F.ondal.adminact.entity;
 
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.admin.entity.Admin;
 import com.soldesk6F.ondal.store.entity.Store;
@@ -10,7 +13,6 @@ import com.soldesk6F.ondal.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -28,9 +30,10 @@ import lombok.Setter;
 public class UserWarning {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
+    @UuidGenerator
     @Column(name = "warning_id", nullable = false, unique = true)
-    private Long warningId;  // 경고 ID (PK)
+    private UUID warningId;  // 경고 ID (PK)
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -62,5 +65,11 @@ public class UserWarning {
         this.warningMessage = warningMessage;
         this.warningDate = warningDate;
     }
+    
+    public String getUserWarningUuidAsString() {
+	    return warningId != null ? warningId .toString() : null;
+	}
+    
+    
 }
 

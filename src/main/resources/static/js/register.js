@@ -139,7 +139,9 @@ function sendVerificationEmail() {
 	isSending = true;
 	
 	const fullEmail = getFullEmail();
-	if (!fullEmail.includes("@")) {
+	let vaildCheck = fullEmail.split("@");
+	
+	if (vaildCheck.length !== 2 || vaildCheck[0] === "" || vaildCheck[1] === "") {
 		alert("이메일을 올바르게 입력하세요.");
 		isSending = false;
 		return;

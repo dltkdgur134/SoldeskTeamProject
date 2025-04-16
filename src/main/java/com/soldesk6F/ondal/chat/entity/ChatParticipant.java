@@ -46,4 +46,8 @@ public class ChatParticipant {
         this.user = user;
         this.joinedDate = LocalDateTime.now();
     }
+    
+    public String getChatParticipantUuidAsString() {
+	    return chatParticipantId != null ? chatParticipantId .toString() : null;
+	}
 }

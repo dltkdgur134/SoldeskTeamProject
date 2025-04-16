@@ -98,7 +98,6 @@ body {
     transition: width 0.4s linear;
 }
 
-
 .search-icon {
         height: 34px;
     width: 34px;
@@ -125,5 +124,7 @@ body {
 a:link {
     text-decoration: none
 }
-
-
+#reenter-address-btn {
+  height: 50px;
+  white-space: nowrap;
+}

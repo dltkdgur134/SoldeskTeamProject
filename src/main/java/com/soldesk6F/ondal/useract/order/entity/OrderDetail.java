@@ -82,6 +82,8 @@ public class OrderDetail {
 	    return (menu.getPrice() + optionsTotal) * quantity;
 	}
 	
-	
+	public String getOrderDetailUuidAsString() {
+	    return orderDetailId != null ? orderDetailId .toString() : null;
+	}
 	
 }

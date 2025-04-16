@@ -116,4 +116,9 @@ public class CartItems {
 
         this.optionTotalPrice = total;
     }
+    
+    
+    public String getCartItemUuidAsString() {
+	    return cartItemsId != null ? cartItemsId .toString() : null;
+	}
 }

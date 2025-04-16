@@ -1,28 +1,46 @@
 package com.soldesk6F.ondal.user.service;
 
-import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
-import java.io.IOException;
+import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+	
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
     private String uploadDir;
 
+    public Optional<User> findUserByUuid(UUID userUuid) {
+    	return userRepository.findByUserUuid(userUuid);
+    }
+
     public boolean isUserIdDuplicate(String userId) {
-//        return userRepository.existsById(userId);
         return userRepository.existsByUserId(userId);
     }
 
@@ -35,13 +53,13 @@ public class UserService {
     }
 
     public boolean registerUser(String userId, String userName, String nickname, String email,
-                             String password, String userPhone, String userAddress, String userAddressDetail,
+                             String password, String userPhone, RegAddress userSelectedAddress,
                              MultipartFile profileImage, String socialLoginProvider) {
     	try {
 
 	        String fileName = "default.png";
 	        String extension = "png";
-//	        String filePath = uploadDir + File.separator + fileName;
+	        String filePath = uploadDir + File.separator + fileName;
 	        
 	        String webPath = "/img/userProfiles/" + fileName;
 	
@@ -63,7 +81,7 @@ public class UserService {
 	        }
 	
 	        String encryptedPassword = passwordEncoder.encode(password);
-	
+	        
 	        User user = User.builder()
 	                .userId(userId)
 	                .userName(userName)
@@ -71,8 +89,8 @@ public class UserService {
 	                .email(email)
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
-	                .userAddress(userAddress + " " + userAddressDetail)	
-	                .userProfilePath(webPath)
+	                .userSelectedAddress(userSelectedAddress)	
+	                .userProfile(filePath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
 	
@@ -83,4 +101,141 @@ public class UserService {
             return false;
         }
 	}
+    
+    @Transactional
+    public boolean updatePassword(String oldPassword, String password, User user, RedirectAttributes rAttr) {
+    	Optional<User> findUser = userRepository.findById(user.getUserUuid());
+    	try {
+    		User currentUser = findUser.get();
+    		if (passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
+    			if (password.equals(oldPassword)) {
+    				rAttr.addFlashAttribute("result", 1);
+    				rAttr.addFlashAttribute("resultMsg", "비밀번호 변경사항이 없습니다." );
+    				return false;
+    			}
+    			String encryptedPassword = passwordEncoder.encode(password);
+    			
+    			currentUser.setPassword(encryptedPassword);
+//    			rAttr.addFlashAttribute("result", 0);
+//    			rAttr.addFlashAttribute("resultMsg", "비밀번호 일치");
+    			return true;
+    		}
+    		rAttr.addFlashAttribute("result", 1);
+    		rAttr.addFlashAttribute("resultMsg", "기존 비밀번호가 일치하지 않습니다.");
+    		return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+    }
+    
+    
+    @Transactional
+    public boolean updateUserNickname(String nickName, User user, Model model) {
+    	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+    	
+    	if (findUser.isEmpty()) {
+    		throw new IllegalArgumentException("존재하지 않는 아이디 입니다.");
+    	}
+    	
+    	User currentUser = findUser.get();
+    	
+   		if (currentUser.getNickName().equals(nickName)) {
+    		model.addAttribute("error", "기존 닉네임과 동일합니다.");
+    		return false;
+    	} else {
+//    		findUser.ifPresent(U -> U.setNickName(nickName) );
+//    		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
+    		currentUser.setNickName(nickName);
+    		currentUser.setUpdatedDate(LocalDateTime.now());
+    		return true;
+    	}
+    }
+    
+    
+    @Transactional
+    public boolean updateUserPicture(User user, MultipartFile profileImage, Model model) {
+    	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+    		
+   		try {
+   			String old_profImgName = findUser.get().getUserProfile();
+//    		String old_profImgName = old_profImgPath.split("\\\\")[1];
+   			if (!old_profImgName.equals("default.png")) {
+   				String oldSavePath = new File(uploadDir).getAbsolutePath();
+   				Path oldImgPath = Paths.get(oldSavePath, old_profImgName);
+   				//System.out.println(oldImgPath.toString());
+   				if (Files.exists(oldImgPath)) {
+   					Files.delete(oldImgPath);
+   				}
+   			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("error", "존재하지 않는 파일입니다.");
+		}
+    	
+    	try {
+    		String fileName = "default.png";
+	        String extension = "png";
+	        String filePath = uploadDir + File.separator + fileName;
+	
+	        if (profileImage != null && !profileImage.isEmpty()) {
+	        	String originalFilename = profileImage.getOriginalFilename();
+	        	extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+	        	fileName = findUser.get().getUserId() + "_" + System.currentTimeMillis() + "." + extension;
+//	        	fileName = findUser.get().getUserUuidAsString() + "." + extension;
+	            String savePath = new File(uploadDir).getAbsolutePath(); // getRealPath()
+	            System.out.println(savePath);
+	            File saveFolder = new File(savePath);
+	            if (!saveFolder.exists()) {
+	                saveFolder.mkdirs();
+	            }
+	
+	            File saveFile = new File(saveFolder, fileName);
+	            profileImage.transferTo(saveFile);
+	            filePath = uploadDir + File.separator + fileName;
+	            filePath.replace("/", File.separator);
+	            
+	            //final String finalFilePath = new String(filePath);
+	            final String finalFileName = new String(fileName);
+	            //findUser.ifPresent(U -> U.setUserProfile(finalFilePath));
+	            findUser.ifPresent(U -> U.setUserProfile(finalFileName));
+	            findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
+	            return true;
+	        }
+	        final String finalFileName = new String(fileName);
+	        findUser.ifPresent(U -> U.setUserProfile(finalFileName));
+	        findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
+	        return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+    	
+    }
+    
+    @Transactional
+    public boolean updateUserPhone(String userPhone, User user, Model model) {
+    	Optional<User> findUser = userRepository.findByUserId(user.getUserId());
+    	
+    	if (findUser.isEmpty()) {
+    		throw new IllegalArgumentException("존재하지 않는 아이디 입니다.");
+    	}
+    	
+    	User currentUser = findUser.get();
+    	
+   		if (currentUser.getUserPhone().equals(userPhone)) {
+    		model.addAttribute("error", "기존 전화번호와 동일합니다.");
+    		return false;
+    	} else {
+//    		findUser.ifPresent(U -> U.setNickName(nickName) );
+//    		findUser.ifPresent(U -> U.setUpdatedDate(LocalDateTime.now()));
+    		currentUser.setUserPhone(userPhone);
+    		currentUser.setUpdatedDate(LocalDateTime.now());
+    		return true;
+    	}
+    }
+    
+    
+    
 }
+

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link th:fragment="css" th:href="@{/css/deliveryMap.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
+<script th:src="@{/js/hideLogo.js}"></script>
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/initialize.js}"></script>
+<script th:src="@{/js/zipcode.js}"></script>
+<script th:src="@{/js/update.js}"></script>
+<!-- JavaScript Fragment -->
+<th:block layout:fragment="js">
+	<!-- Kakao Maps API -->
+	<script
+		src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
+
+	<!-- Thymeleaf에서 위도 경도 값을 넘겨받기 -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var lat = parseFloat('[[${rider.hubAddressLatitude}]]');
+		var lng = parseFloat('[[${rider.hubAddressLongitude}]]');
+		console.log("Latitude: ", lat);
+		console.log("Longitude: ", lng);
+		/*]]>*/
+	</script>
+	<script>
+	let map;
+	let intervalId = null;
+
+	document.addEventListener("DOMContentLoaded", function () {
+	    const mapContainer = document.getElementById('map');
+	    const mapOption = {
+	        center: new kakao.maps.LatLng(lat, lng),
+	        level: 3
+	    };
+	    map = new kakao.maps.Map(mapContainer, mapOption);
+
+	    startGenerating(); // 시작 시 자동 생성
+
+	    document.getElementById('stopBtn').addEventListener('click', stopGenerating);
+	    document.getElementById('startBtn').addEventListener('click', startGenerating);
+	});
+
+	function startGenerating() {
+	    if (intervalId === null) {
+	        intervalId = setInterval(() => {
+	            addRandomMarker(lat, lng);
+	        }, 5000);
+	    }
+	}
+
+	function stopGenerating() {
+	    if (intervalId !== null) {
+	        clearInterval(intervalId);
+	        intervalId = null;
+	    }
+	}
+
+	function addRandomMarker(baseLat, baseLng) {
+	    let randomLat = baseLat + (Math.random() - 0.5) * 0.01;
+	    let randomLng = baseLng + (Math.random() - 0.5) * 0.01;
+
+	    let imageSrc = 'https://ifh.cc/g/HMrtaC.png',
+	        imageSize = new kakao.maps.Size(30, 30),
+	        imageOption = { offset: new kakao.maps.Point(27, 69) };
+
+	    let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+	        markerPosition = new kakao.maps.LatLng(randomLat, randomLng);
+
+	    let marker = new kakao.maps.Marker({
+	        position: markerPosition,
+	        image: markerImage
+	    });
+	    marker.setMap(map);
+
+	    const storeName = "랜덤식당";
+	    const price = Math.floor(Math.random() * 5000) + 1000;
+
+	    let content = `
+	        <div class="delivery-request" style="background:white;padding:5px;border:1px solid #333;border-radius:5px;">
+	            <strong>${storeName}</strong><br>${price}원
+	        </div>
+	    `;
+
+	    let customOverlay = new kakao.maps.CustomOverlay({
+	        map: map,
+	        content: content,
+	        position: markerPosition
+	    });
+
+	}
+
+	// 오버레이 클릭 시 해당 정보를 페이지 하단에 표시
+	function displayOrderInfo(storeName, price) {
+	    // 정보 표시 영역을 찾고 값을 갱신
+	    document.getElementById('order-name').textContent = '식당 이름: ' + storeName;
+	    document.getElementById('order-price').textContent = '가격: ' + price + '원';
+	}
+
+</script>
+
+</th:block>
+</head>
+<div layout:fragment="content">
+	<!-- 지도 영역 -->
+	<div id="map" style="width: 100%; height: 400px;"></div>
+<div style="margin: 10px;">
+  <button id="stopBtn">주문 그만 생성하기</button>
+  <button id="startBtn">다시 시작</button>
+</div>
+<div id="order-info" style="padding: 20px; margin-top: 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
+    <h4>주문 정보</h4>
+    <p id="order-name">식당 이름: <span>없음</span></p>
+    <p id="order-price">가격: <span>없음</span></p>
+</div>
+</div>
+
+</html>

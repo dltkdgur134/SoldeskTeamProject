@@ -71,4 +71,9 @@ public class Cart {
 	                .sum();
 	    }
 
+	    public String getCartUuidAsString() {
+		    return cartId != null ? cartId .toString() : null;
+		}
+	    
+	    
 }

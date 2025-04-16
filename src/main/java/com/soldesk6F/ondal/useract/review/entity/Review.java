@@ -87,7 +87,9 @@ public class Review {
 		this.reviewTitle = reviewTitle;
 		this.reviewContent = reviewContent;
 	}
-	
+	public String getReviewUuidAsString() {
+	    return reviewId != null ? reviewId .toString() : null;
+	}
 	
 	
 	

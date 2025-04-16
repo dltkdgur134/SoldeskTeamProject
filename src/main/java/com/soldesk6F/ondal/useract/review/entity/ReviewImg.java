@@ -23,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "review_img",
 uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"review_id", "review_img_file_path"})
+        @UniqueConstraint(columnNames = {"review_id", "review_img"})
     })
 public class ReviewImg {
 	@Id
@@ -36,16 +36,18 @@ public class ReviewImg {
 	@JoinColumn(name = "review_id",nullable = false)
 	private Review review;
 	
-	@Column(name = "review_img_file_path", nullable = false , length = 255)
-	private String reviewImgFilePath;
+	@Column(name = "review_img", nullable = false , length = 255)
+	private String reviewImg;
 
 	@Builder
-	public ReviewImg(Review review, String reviewImgFilePath) {
+	public ReviewImg(Review review, String reviewImg) {
 		super();
 		this.review = review;
-		this.reviewImgFilePath = reviewImgFilePath;
+		this.reviewImg = reviewImg;
 	}
-	
+	public String getReviewImgUuidAsString() {
+	    return reviewImgId != null ? reviewImgId .toString() : null;
+	}
 	
 	
 }

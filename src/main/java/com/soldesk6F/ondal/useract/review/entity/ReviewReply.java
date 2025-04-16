@@ -62,7 +62,9 @@ public class ReviewReply {
 		this.reviewReplyContent = reviewReplyContent;
 	}
 
-	
+	public String getReviewReplyUuidAsString() {
+	    return reviewReplyId != null ? reviewReplyId .toString() : null;
+	}
 	
 	
 }

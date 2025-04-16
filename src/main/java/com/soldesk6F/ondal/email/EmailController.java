@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal.email;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +19,14 @@ public class EmailController {
 
 	@GetMapping("/send")
 	public String sendVerificationEmail(@RequestParam("email") String email, HttpSession session) {
-    	String code = emailService.sendEmail(email);
-        session.setAttribute("emailVerificationCode", code);
-        session.setAttribute("emailCodeTime", System.currentTimeMillis());
+    	String code;
+		try {
+			code = emailService.sendVerificationMailWithCid(email);
+			session.setAttribute("emailVerificationCode", code);
+			session.setAttribute("emailCodeTime", System.currentTimeMillis());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         return "인증 메일이 전송되었습니다.";
 	}
 

@@ -50,6 +50,9 @@ public class SearchHistory {
 		this.searchName = searchName;
 	}
 	
+	public String getSearchHistoryUuidAsString() {
+	    return searchHistoryId != null ? searchHistoryId .toString() : null;
+	}
 	
 	
 }
