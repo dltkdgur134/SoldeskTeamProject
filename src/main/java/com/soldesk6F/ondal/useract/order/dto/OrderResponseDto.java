@@ -1,29 +1,29 @@
 package com.soldesk6F.ondal.useract.order.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
-public class OrderRequestDto {
-    private UUID storeId;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
+public class OrderResponseDto {
+    private UUID orderId;
     private String deliveryAddress;
     private String storeRequest;
     private String deliveryRequest;
-    private String orderAdditional1;
-    private String orderAdditional2;
+    private String orderStatus;
+    private int totalPrice;
+    private LocalDateTime orderTime;
+
     private List<OrderDetailDto> orderDetails;
 
-    @Getter
-    @Setter	
+    @Getter @Setter
     public static class OrderDetailDto {
-        private UUID menuId;
+        private String menuName;
         private int quantity;
         private int price;
         private List<String> optionNames;
-        private List<Integer> optionPrices;
     }
 }

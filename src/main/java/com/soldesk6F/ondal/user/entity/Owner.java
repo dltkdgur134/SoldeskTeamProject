@@ -43,10 +43,11 @@ public class Owner {
     
     // Owner 생성자에 owner_id와 registrationDate가 없는 이유: 이 둘은 자동으로 생성하는 값이기에 없어도 된다.
     @Builder
-	public Owner(User user, String secondaryPassword) {
+	public Owner(User user, String secondaryPassword, String ownerNickname) {
 		super();
 		this.user = user;
 		this.secondaryPassword = secondaryPassword;
+		this.ownerNickname = ownerNickname;
 	}
 
     public String getOwnerUuidAsString() {

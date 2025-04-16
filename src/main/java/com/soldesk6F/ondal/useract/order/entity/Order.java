@@ -40,7 +40,7 @@ public class Order {
 
     @Id
     @GeneratedValue
-    @UuidGenerator
+    @UuidGenerator	
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;
 

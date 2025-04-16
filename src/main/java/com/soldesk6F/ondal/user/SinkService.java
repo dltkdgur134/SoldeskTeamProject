@@ -37,10 +37,10 @@ public class SinkService {
 			if(user.getSocialLoginProvider().equals("waiting:"+nowSessionProvider)&&
 				passwordEncoder.matches(password, user.getPassword())) {
 				if(overRideProfile) {
-					String nowSessionProfileImg = nowSessionUser.getUserProfilePath();
+					String nowSessionProfileImg = nowSessionUser.getUserProfile();
 					String nowSessionNickName = nowSessionUser.getNickName();
 					user.setNickName(nowSessionNickName);
-					user.setUserProfilePath(nowSessionProfileImg);
+					user.setUserProfile(nowSessionProfileImg);
 					
 				}
 				SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDetails,

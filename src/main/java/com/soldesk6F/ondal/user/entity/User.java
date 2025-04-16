@@ -86,9 +86,9 @@ public class User {
 	
 	
 	
-	public User update(String nickName , String userProfilePath) {
+	public User update(String nickName , String userProfile) {
 		this.nickName = nickName;
-		this.userProfilePath = userProfilePath;
+		this.userProfile = userProfile;
 	    return this;
 	}
 	public User updateProvider(String socialLoginProvider) {
