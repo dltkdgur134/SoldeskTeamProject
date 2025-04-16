@@ -1,15 +1,20 @@
 package com.soldesk6F.ondal.user.controller.rider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.util.StringUtils;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
+import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.service.RiderService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,8 +22,12 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class UpdateRiderController {
+	private final RiderRepository riderRepository;
 	private final RiderService riderService;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder; // 필드 주입
+	
 	@GetMapping("rider/riderMypage")
     public String showEditPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		String userId = userDetails.getUser().getUserId();
@@ -37,28 +46,109 @@ public class UpdateRiderController {
 	}
 
 	@PostMapping("/updateRiderNickname")
-	public String updateRiderNickname(@RequestParam("riderNickname") String riderNickname,
-			@AuthenticationPrincipal CustomUserDetails userDetails) {
-		String userId = userDetails.getUser().getUserId();
-		riderService.updateRiderInfo(userId, riderNickname, null, null, null, 0, 0, null);
-		return "redirect:/rider/riderInfopage"; // 혹은 리다이렉션할 페이지 경로
+	public String updateRiderNickname(
+	        @RequestParam("riderNickname") String riderNickname,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        RedirectAttributes redirectAttributes) {
+
+	    String userId = userDetails.getUser().getUserId();
+
+	    try {
+	        // 닉네임만 업데이트 (다른 필드는 null 또는 기본값)
+	        riderService.updateRiderInfo(
+	            userId,
+	            riderNickname,  // 닉네임
+	            null,           // vehicleNumber
+	            null,           // riderPhone
+	            null,           // riderHubAddress
+	            0.0,            // hubAddressLatitude
+	            0.0,            // hubAddressLongitude
+	            null            // deliveryRange
+	        );
+	        redirectAttributes.addFlashAttribute("InfoUpdateSuccess", "닉네임이 정상적으로 변경되었습니다.");
+	    } catch (DataIntegrityViolationException ex) {
+	        // 길이 초과, null 위반, unique 제약 등
+	        redirectAttributes.addFlashAttribute("InfoUpdateError",
+	                "정보 변경이 실패했습니다.");
+	    } catch (Exception ex) {
+	        // 그 외 예외
+	        redirectAttributes.addFlashAttribute("InfoUpdateError",
+	                "정보 변경이 실패했습니다.");
+	    }
+
+	    return "redirect:/rider/riderInfopage";
 	}
 
 	@PostMapping("/updateRiderInfo")
 	public String updateRiderInfo(
-			@RequestParam("vehicleNumber") String vehicleNumber,
-			@RequestParam("riderPhone") String riderPhone,
-			@RequestParam("riderHubAddress") String riderHubAddress, 
-			@RequestParam("hubAddressLatitude") double hubAddressLatitude,
-			@RequestParam("hubAddressLongitude") double hubAddressLongitude,
-			@RequestParam("deliveryRange") String deliveryRange,
-			@AuthenticationPrincipal CustomUserDetails userDetails) {
-		String userId = userDetails.getUser().getUserId();
-		DeliveryRange rangeEnum = DeliveryRange.valueOf(deliveryRange);
-		riderService.updateRiderInfo(userId, null, vehicleNumber,riderPhone, riderHubAddress,  hubAddressLatitude,
-				hubAddressLongitude, rangeEnum);
-		return "redirect:/rider/riderInfopage";
-		
+	        @RequestParam(value = "currentSecondaryPassword", required = false) String currentSecondaryPassword,
+	        @RequestParam(value = "newSecondaryPassword",     required = false) String newSecondaryPassword,
+	        @RequestParam(value = "confirmNewSecondaryPassword", required = false) String confirmNewSecondaryPassword,
+	        @RequestParam("vehicleNumber") String vehicleNumber,
+	        @RequestParam("riderPhone") String riderPhone,
+	        @RequestParam("riderHubAddress") String riderHubAddress, 
+	        @RequestParam("hubAddressLatitude") double hubAddressLatitude,
+	        @RequestParam("hubAddressLongitude") double hubAddressLongitude,
+	        @RequestParam("deliveryRange") String deliveryRange,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        RedirectAttributes redirectAttributes) {
+
+	    String userId = userDetails.getUser().getUserId();
+	    Rider rider = riderRepository.findByUser_UserId(userId)
+	            .orElseThrow(() -> new IllegalArgumentException("라이더 정보가 존재하지 않습니다."));
+
+	    boolean wantChangePw = StringUtils.hasText(newSecondaryPassword) || StringUtils.hasText(confirmNewSecondaryPassword);
+
+	    // 1) 2차 비밀번호 변경을 시도했으면, 미리 검증하고 실패 시 리턴
+	    if (wantChangePw) {
+	        if (!newSecondaryPassword.equals(confirmNewSecondaryPassword)) {
+	            redirectAttributes.addFlashAttribute("InfoUpdateError", "새로운 2차 비밀번호와 확인이 일치하지 않습니다.");
+	            return "redirect:/rider/riderInfopage";
+	        }
+	        if (!StringUtils.hasText(currentSecondaryPassword) ||
+	            !passwordEncoder.matches(currentSecondaryPassword, rider.getSecondaryPassword())) {
+	            redirectAttributes.addFlashAttribute("InfoUpdateError", "현재 2차 비밀번호가 일치하지 않습니다.");
+	            return "redirect:/rider/riderInfopage";
+	        }
+	    }
+
+	    try {
+	        // 2) (선택) 2차 비밀번호 업데이트
+	        if (wantChangePw) {
+	            riderService.updateRiderSecondaryPassword(rider, currentSecondaryPassword, newSecondaryPassword);
+	            redirectAttributes.addFlashAttribute("InfoUpdateSuccess", "2차 비밀번호가 정상적으로 변경되었습니다.");
+	        }
+
+	        // 3) 라이더 정보 업데이트
+	        DeliveryRange rangeEnum = DeliveryRange.valueOf(deliveryRange);
+	        riderService.updateRiderInfo(
+	            userId,
+	            null,
+	            vehicleNumber,
+	            riderPhone,
+	            riderHubAddress,
+	            hubAddressLatitude,
+	            hubAddressLongitude,
+	            rangeEnum
+	        );
+
+	        // 4) 비밀번호 변경 없이 정보만 수정했으면 성공 메시지
+	        if (!wantChangePw) {
+	            redirectAttributes.addFlashAttribute("InfoUpdateSuccess", "정보가 정상적으로 변경되었습니다.");
+	        }
+
+	    } catch (DataIntegrityViolationException ex) {
+	        // DB 제약조건 위반 (길이, null, unique 등)
+	        redirectAttributes.addFlashAttribute("InfoUpdateError",
+	                "정보 변경이 실패했습니다.");
+	    } catch (Exception ex) {
+	        // 기타 예외
+	        redirectAttributes.addFlashAttribute("InfoUpdateError",
+	                "정보 변경이 실패했습니다.");
+	    }
+
+	    return "redirect:/rider/riderInfopage";
 	}
+
 
 }

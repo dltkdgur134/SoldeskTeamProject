@@ -31,17 +31,15 @@ public class RegRiderController {
     private final UserRepository userRepository;
 
     @GetMapping("/register")
-    public String showRiderRegistrationForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model
-    		,@ModelAttribute("riderExists") String riderExists,RedirectAttributes redirectAttributes) {
+    public String showRiderRegistrationForm(@AuthenticationPrincipal CustomUserDetails userDetails,
+    		RedirectAttributes redirectAttributes) {
         String userId = userDetails.getUser().getUserId();
 
         if (riderService.isAlreadyRider(userId)) {
-        	 //model.addAttribute("riderExists", riderExists); // 모델에 넣어줘야 Thymeleaf가 사용 가능
         	redirectAttributes.addFlashAttribute("riderExists", true);
-        	 return "redirect:/"; // templates/content/index.html
+        	 return "redirect:/"; 
         }
 
-        model.addAttribute("riderForm", new RiderForm());
         return "content/rider/riderRegister";
     }
 

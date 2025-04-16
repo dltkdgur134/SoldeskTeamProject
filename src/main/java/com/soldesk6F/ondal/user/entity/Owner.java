@@ -31,10 +31,9 @@ public class Owner {
     @Column(name = "owner_nickname" , nullable = false , length = 30)
     private String ownerNickname;
     
-    
     @Column(name = "secondary_password",nullable = false , length = 10)
     private String secondaryPassword;  // 비밀번호 해싱 필요
-
+    
     @CreationTimestamp
     @Column(name = "registration_date" , updatable = false)
     private LocalDateTime registrationDate;

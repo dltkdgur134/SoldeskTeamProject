@@ -20,6 +20,23 @@ body {
   margin-top: 10px;
 }
 
+/* @font-face {
+    font-family: 'yssdotum';
+    src: url('ysssdotum.eot');
+    src: url('yssdotum.eot?#iefix') format('embedded-opentype'),
+        url('yssdotum.woff2') format('woff2'),
+        url('yssdotum.woff') format('woff'),
+        url('yssdotum.ttf') format('truetype'),
+        url('yssdotum.svg#YiSunShinDotumM') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+	font-family: "yssdotum" !important; 
+} */
+
 .riderBtn,
 .ownerBtn {
   flex: 1;
