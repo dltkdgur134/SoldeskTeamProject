@@ -14,24 +14,26 @@
         rel="stylesheet" />
     <link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
     <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+    <link th:fragment="css" th:href="@{/css/RiderIndex.css}" rel="stylesheet" />
     <link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
     <script th:src="@{/js/hideLogo.js}"></script>
 
     <!-- JavaScript Fragment -->
         <!-- Kakao Maps API -->
-        <!-- <script
-            src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script> -->
+         <script
+            src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
 
         <!-- Thymeleaf에서 위도 경도 값을 넘겨받기 -->
-        <!-- <script>
+        
+         <script>
             /*<![CDATA[*/
             var lat = parseFloat('[[${rider.hubAddressLatitude}]]');
             var lng = parseFloat('[[${rider.hubAddressLongitude}]]');
             console.log("Latitude: ", lat);
             console.log("Longitude: ", lng);
             /*]]>*/
-        </script> -->
-       <!--  <script>
+        </script>
+         <script>
             // map 변수를 처음에 한 번만 선언
             let map;
             let intervalId = null;
@@ -67,8 +69,8 @@
             }
 
             function displayOrderInfo(storeName, price) {
-                const orderNameElement = document.getElementById("order-name").getElementsByTagName("span")[0];
-                const orderPriceElement = document.getElementById("order-price").getElementsByTagName("span")[0];
+                const orderNameElement = document.getElementById("storeName").getElementsByTagName("span")[0];
+                const orderPriceElement = document.getElementById("deliveryFee").getElementsByTagName("span")[0];
 
                 orderNameElement.textContent = storeName;  // 식당 이름 표시
                 orderPriceElement.textContent = price + "원";  // 가격 표시
@@ -95,7 +97,7 @@
                 const price = Math.floor(Math.random() * 5000) + 1000;
 
                 // 유니크한 order ID 생성
-                const orderId = 'order-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+                const orderId = 'order-' + crypto.randomUUID();
 
                 let content = `
                     <div class="delivery-request" id="${orderId}" 
@@ -119,43 +121,72 @@
                             displayOrderInfo(storeName, price);
                         });
                     }
-                }, 0); // DOM이 붙는 걸 기다림
+                }, 50); // DOM이 붙는 걸 기다림
             }
-        </script> -->
+        </script> 
 </head>
 
 <div layout:fragment="content">
     <!-- 지도 영역 -->
-<!--     <div id="map" style="width: 100%; height: 400px;"></div> -->
+      <div id="map" style="width: 100%; height: 400px;"></div> 
     <div style="margin: 10px;">
         <button id="stopBtn">주문 그만 생성하기</button>
         <button id="startBtn">다시 시작</button>
     </div>
-    <div id="order-info"
-        style="padding: 20px; margin-top: 20px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
-        <h4>주문 정보</h4>
-        <p id="store-name">
-            상호명: <span></span>
-        </p>
-        <p id="delivery-fee">
-            배달료: <span></span>
-        </p>
-        <p id="how-to-pay-fee">
-            배달료 지불 방식: <span></span>
-        </p>
-        <p id="request-content">
-            요청 사항: <span></span>
-        </p>
-        <p id="departures">
-            출발지: <span></span>
-        </p>
-        <p id="arrivals">
-            도착지: <span></span>
-        </p>
-        <p id="distance">
-            운행거리: <span></span>
-        </p>
+    <div id="order-info">
+    <h4>주문 정보</h4>
+
+    <div class="info-header">
+        <div id="storeName"><span>업장명</span><br><small id="orderDate">주문일자</small></div>
+        <div id="orderId">배달 번호</div>
     </div>
+
+     <div class="info-grid">
+        <div class="info-box" id="deliveryFee">
+            <span>배달료</span>
+            <span class="value" id="deliveryFee"></span>
+        </div>
+        <div class="info-box">
+            <span class="label">조리 완료 예상 시간</span><br>
+            <span class="value" id="cookingTime"></span>
+        </div>
+    </div>
+
+    <div class="textarea-box">
+        <span class="label">주문 요청 사항</span><br>
+        <span class="value" id="storeRequest"></span>
+    </div>
+    <div class="textarea-box">
+        <span class="label">배달 요청 사항</span><br>
+        <span class="value" id="deliveryRequest"></span>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-box">
+            <span class="label">출발지</span><br>
+            <span class="value" id="startAddress"></span>
+        </div>
+        <div class="info-box">
+            <span class="label">도착지</span><br>
+            <span class="value" id="endAddress"></span>
+        </div>
+    </div>
+	<div class="info-grid">
+        <div class="info-box">
+            <span class="label">운행 거리</span><br>
+            <span class="value" id="distance"></span>
+        </div>
+        <div class="info-box">
+            <span class="label">결제 종류</span><br>
+            <span class="value" id="paymentType"></span>
+        </div>
+    </div>
+
+     <div class="action-buttons">
+        <button id="assignBtn">배차</button>
+        <button class="cancel">취소</button>
+    </div>
+</div>
 </div>
 
 </html>

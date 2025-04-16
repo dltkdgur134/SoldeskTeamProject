@@ -51,7 +51,7 @@ public class User {
 	@Column(name = "nickname", nullable = false, length = 30)
 	private String nickName;
 
-	@Column(name = "email", nullable = false, unique = true, length = 50)
+	@Column(name = "email", nullable = false, length = 50)
 	private String email;
 
 	@Column(name = "user_phone", nullable = false, length = 13)
