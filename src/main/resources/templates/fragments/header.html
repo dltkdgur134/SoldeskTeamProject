@@ -5,6 +5,8 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
 <head>
 <script th:src="@{/js/index.js}"></script>
+<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<!-- <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" /> -->
 </head>
 
 <div th:fragment="header">
@@ -68,11 +70,32 @@
 			<button type="button" class="btn-close text-reset"
 				data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
-		<div sec:authorize="isAnonymous()">
-			<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
+		<div class="container" sec:authorize="isAnonymous()">
+			<!-- <div class="d-flex justify-content-between">
+					<div class="col-md-4 text-center">
+						<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
+						<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
+					</div>
+			</div> -->
+			<!-- <div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
+				<div class="card-body">
+					<p class="card-text">
+						<a href="login">로그인 <i class="fa-solid fa-right-to-bracket"></i></a>
+					</p>
+					<p class="card-text"	>	
+						<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
+					</p>
+				</div>
+			</div> -->
+			<div class="list-group" id="login-reg-card">
+  				<a href="login" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">로그인 <i class="fa-solid fa-right-to-bracket"></i></strong></a>
+  				<a href="regAgreement" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">회원가입 <i class="fa-solid fa-user-plus"></i></strong></a>
+			</div>
+			
+			
+			
 		</div>
 		<div sec:authorize="isAnonymous()">
-			<a href="register">회원가입 <i class="fa-solid fa-user-plus"></i></a>
 		</div>
 		<div class="container" sec:authorize="isAuthenticated()">
 			<div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">

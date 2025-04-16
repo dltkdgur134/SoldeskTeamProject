@@ -191,4 +191,20 @@ body {
   background-color: #fdecea;
   color: #c62828;
 }
+#kakao-logo {
+	width: 30%;
+}
+.grayscale { filter: grayscale(100%); }
 
+#login-reg-card .list-group-item {
+	background-color: #FFEF99;
+	color: black;
+}
+
+#login-reg-card .list-group-item:hover {
+	background-color: #FFE766;
+} 
+
+.modal-header {
+	background-color: #FFEF99;
+}
