@@ -11,6 +11,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 
@@ -48,6 +49,7 @@ public class Store {
 	
 	@ManyToOne
 	@JoinColumn(name = "owner_id" , nullable = false)
+	@JsonIgnoreProperties({"user"})
 	private Owner owner;
 	
 	@Column(name = "business_num" , nullable = false , length = 10)

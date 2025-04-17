@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.soldesk6F.ondal.useract.order.entity.Order;
-import com.soldesk6F.ondal.useract.order.entity.Order.OrderStatus;
+import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.store.entity.Store;
 
 import java.util.UUID;

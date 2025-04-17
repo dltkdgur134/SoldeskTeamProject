@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.owner.order;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto.OrderDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
-import com.soldesk6F.ondal.useract.order.entity.Order.OrderStatus;
+import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.store.entity.Store;
@@ -60,20 +61,31 @@ public class OrderService {
         return orderRepository.save(order);
     }
     
-    @Transactional
-    public Order acceptOrder(UUID orderId) {
+    public Order acceptOrder(UUID orderId, int completionTime) {
         Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다: " + orderId));
+            .orElseThrow(() -> new RuntimeException("주문 없음"));
 
-        // 상태 변경
-        order.setOrderStatus(Order.OrderStatus.CONFIRMED);
-
-        // 필요한 경우 예상 완료 시간도 설정 (예: 현재 시간 + 20분)
-        // order.setExpectedCompletionTime(LocalDateTime.now().plusMinutes(20));
+        order.setOrderStatus(OrderStatus.CONFIRMED);
+        order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
+        order.setCookingStartTime(LocalDateTime.now());
 
         return orderRepository.save(order);
     }
 
+    public Order extendCookingTime(UUID orderId, int addMinutes) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("주문 없음"));
+
+        LocalTime current = order.getExpectCookingTime();
+        if (current == null) {
+            current = LocalTime.of(0, 0); // 기본값: 00:00
+        }
+
+        LocalTime updated = current.plusMinutes(addMinutes);
+        order.setExpectCookingTime(updated);
+
+        return orderRepository.save(order);
+    }
 
     // 조리 완료
     @Transactional
@@ -81,7 +93,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
-        order.setOrderStatus(OrderStatus.COMPLETED);
+        order.setOrderStatus(OrderStatus.IN_DELIVERY);
         return orderRepository.save(order);
     }
 
@@ -126,26 +138,31 @@ public class OrderService {
     public List<Order> findAllByOwner() {
     	return orderRepository.findAll();
     }
-
+    
+    public List<Order> getOrdersByStore(UUID storeId) {
+        return orderRepository.findByStore_StoreId(storeId);
+    }
+    
     private OrderResponseDto convertToDto(Order order) {
-        OrderResponseDto dto = new OrderResponseDto();
-        dto.setOrderId(order.getOrderId());
-        dto.setDeliveryAddress(order.getDeliveryAddress());
-        dto.setStoreRequest(order.getStoreRequest());
-        dto.setDeliveryRequest(order.getDeliveryRequest());
-        dto.setOrderStatus(order.getOrderStatus().name());
-        dto.setTotalPrice(order.getTotalPrice());
-        dto.setOrderTime(order.getOrderTime());
+        List<OrderResponseDto.OrderDetailDto> detailDtos = order.getOrderDetails().stream()
+            .map(detail -> OrderResponseDto.OrderDetailDto.builder()
+                .menuName(detail.getMenu().getMenuName())
+                .quantity(detail.getQuantity())
+                .price(detail.getPrice())
+                .optionNames(detail.getOptionNames())
+                .build())
+            .collect(Collectors.toList());
 
-        dto.setOrderDetails(order.getOrderDetails().stream().map(detail -> {
-            OrderResponseDto.OrderDetailDto detailDto = new OrderResponseDto.OrderDetailDto();
-            detailDto.setMenuName(detail.getMenu().getMenuName());
-            detailDto.setQuantity(detail.getQuantity());
-            detailDto.setPrice(detail.getPrice());
-            detailDto.setOptionNames(detail.getOptionNames());
-            return detailDto;
-        }).collect(Collectors.toList()));
-
-        return dto;
+        return OrderResponseDto.builder()
+            .orderId(order.getOrderId())
+            .deliveryAddress(order.getDeliveryAddress())
+            .storeRequest(order.getStoreRequest())
+            .deliveryRequest(order.getDeliveryRequest())
+            .orderStatus(order.getOrderStatus()) // .name() 필요 없음 (enum 그대로 DTO에 선언되어 있으면)
+            .totalPrice(order.getTotalPrice())
+            .orderTime(order.getOrderTime())
+            .expectCookingTime(order.getExpectCookingTime()) // 이거도 있으면 넣어줘
+            .orderDetails(detailDtos)
+            .build();
     }
 }

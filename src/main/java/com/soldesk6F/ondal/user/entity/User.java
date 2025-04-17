@@ -108,7 +108,9 @@ public class User {
 		ACTIVE("정상"), // 정상 회원
 		SUSPENDED("일시 정지"), // 일시 정지
 		BANNED("영구 정지"), // 영구 정지
-		UNLINKED("미연동"); // 소셜 미연동 상태
+		UNLINKED("미연동"), // 소셜 미연동 상태
+		LEAVED("탈퇴"),	// 회원 탈퇴 상태(1년간 보관)
+		DORMANCY("휴면 상태"); //장기간 비활동 상태
 
 		private final String description;
 

@@ -15,6 +15,7 @@ import com.soldesk6F.ondal.useract.order.dto.GuestOrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.GuestOrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
+import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
@@ -50,7 +51,7 @@ public class GuestOrderController {
                 .deliveryRequest(dto.getDeliveryRequest())
                 .orderAdditional1(dto.getOrderAdditional1())
                 .orderAdditional2(dto.getOrderAdditional2())
-                .orderStatus(Order.OrderStatus.PENDING)
+                .orderStatus(OrderStatus.PENDING)
                 .totalPrice(0)
                 .build();
 
