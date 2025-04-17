@@ -87,24 +87,27 @@ body {
     font-weight: bold;
   }
 /* role-logo의 기본 설정: opacity와 visibility로 보이기/숨기기 */
-.role-logo {
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    display: inline-block;      /* inline-block으로 배치 */
-    margin-right: 0.5rem;       /* 로고 간 간격 */
-}
 .logo{
 	text-decoration: none;
     color: white;
-	
-	
 }
-.role-logo.show {
-    opacity: 1; /* 보이게 설정 */
-    text-decoration: none;
-    color: white;
+.role-logo-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px); /* 살짝 위로 숨겨놓음 */
+    transition: all 1s ease-in-out;
+    pointer-events: none; /* 클릭 막기 */
+    position: static;  /* 레이아웃에 영향 안 주게 */
 }
 
+.role-logo-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: all 1s ease-in-out;
+    pointer-events: auto;
+    position: inherit;
+}
 
 /* .highlight-title 텍스트가 밀리지 않도록 padding-left를 충분히 줌 */
 .highlight-title {

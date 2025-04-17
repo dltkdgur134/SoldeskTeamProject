@@ -17,6 +17,7 @@
 <script th:src="@{/js/initialize.js}"></script>
 <script th:src="@{/js/zipcode.js}"></script>
 <script th:src="@{/js/update.js}"></script>
+<script th:src="@{/js/hideLogo.js}"></script>
 </head>
 
 <div layout:fragment="content" class="container py-5">
@@ -247,7 +248,7 @@
 
 				<!-- 점주이거나 ALL인 경우: 점주 정보 보기 -->
 				<a th:if="${userRole == 'OWNER' or userRole == 'ALL'}"
-					th:href="@{/owner/profile}" class="ownerBtn">점주 정보 보기</a>
+					th:href="@{/owner/ownerInfopage}" class="ownerBtn">점주 정보 보기</a>
 			</div>
 		</div>
 	</div>

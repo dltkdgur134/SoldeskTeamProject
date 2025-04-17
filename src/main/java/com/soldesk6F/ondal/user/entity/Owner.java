@@ -34,6 +34,9 @@ public class Owner {
     @Column(name = "secondary_password",nullable = false , length = 255)
     private String secondaryPassword;  // 비밀번호 해싱 필요
     
+    @Column(name = "owner_wallet",nullable = true )
+    private int ownerWallet;
+    
     @CreationTimestamp
     @Column(name = "registration_date" , updatable = false)
     private LocalDateTime registrationDate;

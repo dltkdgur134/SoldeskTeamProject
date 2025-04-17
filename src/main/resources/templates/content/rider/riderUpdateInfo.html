@@ -3,17 +3,22 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-<link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
-<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
-<script th:src="@{/js/index.js}"></script>
-<script th:src="@{/js/initialize.js}"></script>
-<script th:src="@{/js/zipcode.js}"></script>
-<script th:src="@{/js/update.js}"></script>
+	<link rel="stylesheet" th:href="@{/css/riderRegister.css}">
+	<link th:fragment="css" th:href="@{/css/RiderCustom.css}"
+		rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
+	<link
+		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
+		rel="stylesheet">
+<th:block layout:fragment="js">
+	<script
+		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<script th:src="@{/js/index.js}"></script>
+	<script th:src="@{/js/initialize.js}"></script>
+	<script th:src="@{/js/zipcode.js}"></script>
+	<script th:src="@{/js/update.js}"></script>
+	<script th:src="@{/js/hideLogo.js}"></script>
 	<script
 		src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </th:block>
@@ -32,9 +37,9 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <style>
 .selected {
-    background-color: #0d6efd !important;
-    color: white !important;
-    border-color: #0d6efd !important;
+	background-color: #0d6efd !important;
+	color: white !important;
+	border-color: #0d6efd !important;
 }
 </style>
 </head>
@@ -42,19 +47,23 @@ document.addEventListener("DOMContentLoaded", function () {
 	<div layout:fragment="content" class="container py-5">
 		<div class="card info-card p-4">
 			<h2 class="mb-4 text-center">라이더 정보 수정</h2>
-			<form th:action="@{/updateRiderInfo}" id="riderForm" method="post" autocomplete="off">
-				 <div class="input-group mb-3">
-                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" class="form-control" placeholder="현재 2차 비밀번호" name="currentSecondaryPassword">
-                </div>
+			<form th:action="@{/updateRiderInfo}" id="riderForm" method="post"
+				autocomplete="off">
 				<div class="input-group mb-3">
-                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" class="form-control" placeholder="새로운 2차 비밀번호" name="newSecondaryPassword">
-                </div>
+					<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+					<input type="password" class="form-control"
+						placeholder="현재 2차 비밀번호" name="currentSecondaryPassword">
+				</div>
 				<div class="input-group mb-3">
-                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" class="form-control" placeholder="새로운 2차 비밀번호 확인" name="confirmNewSecondaryPassword">
-                </div>
+					<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+					<input type="password" class="form-control"
+						placeholder="새로운 2차 비밀번호" name="newSecondaryPassword">
+				</div>
+				<div class="input-group mb-3">
+					<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+					<input type="password" class="form-control"
+						placeholder="새로운 2차 비밀번호 확인" name="confirmNewSecondaryPassword">
+				</div>
 				<div class="input-group mb-3">
 					<span class="input-group-text"><i
 						class="fa-solid fa-motorcycle"></i></span> <input type="text"
@@ -91,28 +100,31 @@ document.addEventListener("DOMContentLoaded", function () {
 				</div>
 				<div class="input-group mb-3">
 					<i class="fa-solid fa-truck input-icon"></i>
-					<div class="delivery-range-options" style="display: flex; width: 100%;">
+					<div class="delivery-range-options"
+						style="display: flex; width: 100%;">
 						<button type="button" class="btn btn-secondary delivery-range-btn"
-							onclick="selectRange(this, 'ONE_KM')"  style="flex: 1;">1 km</button>
+							onclick="selectRange(this, 'ONE_KM')" style="flex: 1;">1
+							km</button>
 						<button type="button" class="btn btn-secondary delivery-range-btn"
-							onclick="selectRange(this, 'THREE_KM')"  style="flex: 1;">3 km</button>
+							onclick="selectRange(this, 'THREE_KM')" style="flex: 1;">3
+							km</button>
 						<button type="button" class="btn btn-secondary delivery-range-btn"
-							onclick="selectRange(this, 'FIVE_KM')"  style="flex: 1;">5 km</button>
+							onclick="selectRange(this, 'FIVE_KM')" style="flex: 1;">5
+							km</button>
 
 					</div>
 					<!-- hidden input to store the selected delivery range -->
 					<input type="hidden" name="deliveryRange" id="deliveryRange"
 						th:value="${rider.deliveryRange}" required>
 				</div>
-
 				<div class="d-grid gap-2 col-6 mx-auto">
-					<button class="btn btn-primary" type="submit" >수정하기</button>
+					<button class="btn btn-primary" type="submit">수정하기</button>
 					<a class="btn btn-secondary" href="javascript:history.back()">뒤로가기</a>
 				</div>
 			</form>
 		</div>
 	</div>
-	
-	
+
+
 </body>
 </html>
