@@ -5,7 +5,7 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
 <head>
 <script th:src="@{/js/index.js}"></script>
-<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+<script th:src="@{/js/hideLogo.js}"></script>
 <!-- <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" /> -->
 </head>
 
@@ -13,40 +13,41 @@
 	<nav class="navbar navbar-light">
 		<div class="container-md justify-content-between">
 			<!-- 로그인 안한 사람들을 위한 로고 -->
-			<div sec:authorize="isAnonymous()">
+			<div sec:authorize="isAnonymous()" style="position: relative;">
 				<a href="javascript:void(0);" class = logo onclick="toggleRoleLogos()">
 				<img src="/css/imgs/Logo_ondal_Home.png"
-					class="img-fluid me-2" width="50" height="50">
+					class="img-fluid me-2" width="50" height="50" style="position: relative;">
 				</a> 
-				<a href="/" class = logo> <img src="/css/imgs/Logo_ondal.png" 
-					class="img-fluid me-2 role-logo" width="40" height="40">
+				<a href="/" class = "logo role-logo-hidden"> <img src="/css/imgs/Logo_ondal.png" 
+					class="img-fluid me-2" width="40" height="40">
 				</a>
 			</div>
 			<!-- 로그인한 사람들을 위한 로고 -->
 			<div sec:authorize="isAuthenticated()"
-				th:with="role=${#authentication.principal.user.userRole.name()}">
+				th:with="role=${#authentication.principal.user.userRole.name()}" style="position: relative;">
 
 				<a href="javascript:void(0);" onclick="toggleRoleLogos()" class = logo>
 				<img src="/css/imgs/Logo_ondal_Home.png" 
 					class="img-fluid me-2" width="50" height="50">
 				</a>
 				<!-- 기본 로고: USER, RIDER, OWNER, ALL 역할에서 보이게 -->
-				<a href="/" class = logo
+				<a href="/" class = "logo role-logo-hidden"
 					th:if="${role == 'USER' or role == 'RIDER' or role == 'OWNER' or role == 'ALL'}">
 					<img src="/css/imgs/Logo_ondal.png" 
-					class="img-fluid me-2 role-logo" width="40" height="40">
+					class="img-fluid me-2" width="40" height="40">
 				</a>
 
 				<!-- RIDER 로고: RIDER, ALL 역할에서 보이게 -->
-				<a href="/rider/home" class = logo
+				<a href="/rider/home" class = "logo role-logo-hidden"
 				th:if="${role == 'RIDER' or role == 'ALL'}">
 					<img src="/css/imgs/Logo_rider.png" 
-					class="img-fluid me-2 role-logo" width="40" height="40">
-				</a> 
-				<a href="/" class = logo
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+				<!-- RIDER 로고: OWNER, ALL 역할에서 보이게 --> 
+				<a href="/owner/home" class = "logo role-logo-hidden"
 				 th:if="${role == 'OWNER' or role == 'ALL'}"> 
 					<img src="/css/imgs/Logo_owner.png" 
-					class="img-fluid me-2 role-logo" width="40" height="40">
+					class="img-fluid me-2" width="40" height="40">
 				</a>
 
 			</div>

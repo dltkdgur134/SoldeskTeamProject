@@ -27,7 +27,7 @@ body {
 
 :root {
 	--bs-link-color: black;
-	--bs-link-hover-color: #FFDF33;
+	--bs-link-hover-color: #2D7121;
 }
 
 
@@ -59,7 +59,7 @@ body {
 }
 
 .navbar-light {
-    background-color: #FFE766 !important; /* custom background */
+    background-color: #2D7121 !important; /* custom background */
   }
 
   .navbar-light .navbar-brand,
@@ -68,7 +68,7 @@ body {
   }
 
   .navbar-light .nav-link:hover {
-    color: #FFEF99 !important; /* hover color */
+    color: #2D7121 !important; /* hover color */
   }
 
   .nav-pills .nav-link {
@@ -82,7 +82,7 @@ body {
   }
 
   .nav-pills .nav-link.active {
-    background-color: #ffc107 !important;
+    background-color: #2D7121 !important;
     color: #000 !important;
     font-weight: bold;
   }
@@ -114,6 +114,11 @@ body {
     padding-left: 20px; /* 이미지를 보일 공간을 확보 */
 }
 
+/* .highlight-title 텍스트가 밀리지 않도록 padding-left를 충분히 줌 */
+.highlight-title {
+    padding-left: 20px; /* 이미지를 보일 공간을 확보 */
+}
+
 
 .tooltip .tooltip-inner {
   font-size: 9px; /* Adjust size */
@@ -121,7 +126,7 @@ body {
 }
 
 .card-title a {
-	color: #ffc107;
+	color: #2D7121;
 }
 
 .footer-sns-link i{
@@ -130,7 +135,7 @@ body {
 }
 
 .footer-sns-link i:hover {
-	color: #ffc107;
+	color: #2D7121;
 }
 
 .footer-sns-link i:active {
@@ -194,20 +199,4 @@ body {
   background-color: #fdecea;
   color: #c62828;
 }
-#kakao-logo {
-	width: 30%;
-}
-.grayscale { filter: grayscale(100%); }
 
-#login-reg-card .list-group-item {
-	background-color: #FFEF99;
-	color: black;
-}
-
-#login-reg-card .list-group-item:hover {
-	background-color: #FFE766;
-} 
-
-.modal-header {
-	background-color: #FFEF99;
-}

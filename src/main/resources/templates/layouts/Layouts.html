@@ -22,11 +22,10 @@
 	<div layout:fragment="content" class="content"></div>
 
 	<div th:replace="~{fragments/footer::footer}"></div>
-	
-	<!-- 각 페이지의 script가 작성될 위치 -->
+
     <th:block layout:fragment="js">
-		<script th:src="@{/js/hideLogo.js}"></script>
-	</th:block>
+    	<script th:src="@{/js/hideLogo.js}"></script>
+    </th:block>
 </body>
 
 </html>

@@ -51,7 +51,7 @@ public class User {
 	@Column(name = "nickname", nullable = false, length = 30)
 	private String nickName;
 
-	@Column(name = "email", nullable = false, unique = true, length = 50)
+	@Column(name = "email", nullable = false, length = 50)
 	private String email;
 
 	@Column(name = "user_phone", nullable = false, length = 13)
@@ -108,7 +108,9 @@ public class User {
 		ACTIVE("정상"), // 정상 회원
 		SUSPENDED("일시 정지"), // 일시 정지
 		BANNED("영구 정지"), // 영구 정지
-		UNLINKED("미연동"); // 소셜 미연동 상태
+		UNLINKED("미연동"), // 소셜 미연동 상태
+		LEAVED("탈퇴"),	// 회원 탈퇴 상태(1년간 보관)
+		DORMANCY("휴면 상태"); //장기간 비활동 상태
 
 		private final String description;
 
