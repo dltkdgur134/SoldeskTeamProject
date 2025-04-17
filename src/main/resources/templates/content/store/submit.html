@@ -21,7 +21,6 @@
 				<h1>점포 입점</h1>
 				<div class="error-message" th:if="${error}" th:text="${error}"></div>
 			</div>
-			< th:action="@{/store/register}" method="post" enctype="multipart/form-data">
 				<div class="form-group">
 					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="storeName" th:value="${storeName}" 
 					placeholder="점포 이름" pattern="[a-zA-Z0-9]+" title="점포 이름은 영문자와 숫자만 입력할 수 있어요" maxlength="15" required>
