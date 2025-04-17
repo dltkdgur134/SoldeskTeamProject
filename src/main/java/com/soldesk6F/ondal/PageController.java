@@ -22,9 +22,4 @@ public class PageController {
 		return "content/myAddress";
 	}
 	
-	@GetMapping(value = "/checkMyPass")
-	public String checkMyPassword() {
-		return "content/myPassCheck";
-	}
-	
 }

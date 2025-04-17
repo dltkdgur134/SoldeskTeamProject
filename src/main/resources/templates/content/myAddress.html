@@ -4,8 +4,9 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-
-<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<script th:src="@{/js/zipcode.js}" defer></script>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
 <div layout:fragment="content" class="container py-5">
@@ -21,7 +22,7 @@
  					 	<input type="text" name="address" class="form-control" id="sample2_address" placeholder="새 비밀번호 입력" maxlength="20">
  					 	<label for="sample2_address"> 주소</label>
  					 	<div class="invalid-feedback" id="new-pw-invalid">
-     							새 비밀번호를 입력해주세요
+     							주소 입력해주세요
    			 			</div>
    			 			<div class="valid-feedback">
    			 				맞음
@@ -32,7 +33,7 @@
  					 	<input type="text" name="address2" class="form-control" id="sample2_detailAddress" placeholder="새 비밀번호 입력" maxlength="20">
  					 	<label for="sample2_detailAddress"> 상세 주소</label>
  					 	<div class="invalid-feedback" id="new-pw-invalid">
-     							새 비밀번호를 입력해주세요
+     							주소 틀림
    			 			</div>
    			 			<div class="valid-feedback">
    			 				맞음
@@ -63,11 +64,6 @@
 
 <!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
 		
-		
-<script th:src="@{/js/zipcode.js}"></script>
-<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-		
-	
 
 </div>
 

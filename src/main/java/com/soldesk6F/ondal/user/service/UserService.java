@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.entity.User.UserStatus;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -268,29 +269,53 @@ public class UserService {
 		}
     }
     
+    // 비밀번호 확인
+    @Transactional(readOnly = true)
+    public boolean checkPassword( 
+    		CustomUserDetails cud,
+    		String password,
+    		RedirectAttributes rAttr) {
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	if (findUser.isEmpty()) {
+    		rAttr.addFlashAttribute("result", 1);
+			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+    		return false;
+    	}
+    	System.out.println(password);
+    	System.out.println(findUser.get().getPassword());
+    	if (passwordEncoder.matches(password, findUser.get().getPassword())) {
+    		rAttr.addFlashAttribute("result", 0);
+			rAttr.addFlashAttribute("resultMsg", "비밀번호가 맞습니다!");
+			return true;
+    	}
+    	rAttr.addFlashAttribute("result", 1);
+		rAttr.addFlashAttribute("resultMsg", "비밀번호가 틀렸습니다.");
+    	return false;
+    }
+    
     @Transactional
-    public void deleteUser(CustomUserDetails cud, 
-    		String oldPassword, 
-    		String password, 
+    public boolean deleteUserTemp(CustomUserDetails cud, 
     		RedirectAttributes rAttr) {
     	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
     	
     	if (findUser.isEmpty()) {
     		rAttr.addFlashAttribute("result", 1);
 			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+			return false;
     	}
     	
     	try {
-			
-    		
-    		
-    		
-    		
-    		
+    		findUser.get().setUserStatus(UserStatus.LEAVED);
+    		findUser.get().updateUpdatedDate(LocalDateTime.now());
+    		cud.getUser().setUserStatus(UserStatus.LEAVED);
+    		rAttr.addFlashAttribute("result", 0);
+    		rAttr.addFlashAttribute("resultMsg", "회원 탈퇴 성공");
+    		return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			rAttr.addFlashAttribute("result", 1);
     		rAttr.addFlashAttribute("resultMsg", "회원 탈퇴 실패.");
+    		return false;
 		}
     	
     }

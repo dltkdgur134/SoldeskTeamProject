@@ -1,5 +1,5 @@
 
-$(function () {
+/*$(function () {
 	$(".nav-item > .active").css("color", "red");
 	
 	$(".nav-link").click(function (){
@@ -9,9 +9,17 @@ $(function () {
 		$(this).addClass('active');
 		$(".nav-item > .active").css("color", "red");
 	});
-});
+});*/
 
 document.addEventListener('DOMContentLoaded', function () {
+	var flashDurationInSeconds = 5;
+	var flashContainerId = 'flash-messages';
+
+	 function removeFlashMessages() {
+	    $('#' + flashContainerId).remove();
+	 }
+	 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
+	
   const input = document.getElementById('main-input');
   const btn = document.getElementById('main-btn');
   const reenterBtn = document.getElementById('reenter-address-btn');
