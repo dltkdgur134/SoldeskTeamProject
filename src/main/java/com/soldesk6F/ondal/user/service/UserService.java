@@ -102,8 +102,11 @@ public class UserService {
         }
 	}
     
+    // 유저 닉네임 업데이트
     @Transactional
-    public boolean updateUserNickname(CustomUserDetails cud, String nickName, RedirectAttributes rAttr) {
+    public boolean updateUserNickname(CustomUserDetails cud, 
+    		String nickName, 
+    		RedirectAttributes rAttr) {
     	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
     	
     	if (findUser.isEmpty()) {
@@ -117,7 +120,6 @@ public class UserService {
     		return false;
     	} else {
     		findUser.get().updateNickname(nickName);
-//    		findUser.get().setUpdatedDate(LocalDateTime.now());
     		findUser.get().updateUpdatedDate(LocalDateTime.now());
     		cud.getUser().setNickName(nickName);
     		rAttr.addFlashAttribute("result", 0);
@@ -126,6 +128,7 @@ public class UserService {
     	}
     }
     
+    // 유저 프로필 이미지 업데이트
     @Transactional
     public boolean updateUserPicture(CustomUserDetails cud, 
     		MultipartFile profileImage, 
@@ -199,11 +202,13 @@ public class UserService {
 			rAttr.addFlashAttribute("resultMsg", "프로필 이미지 변경 실패!");
 			return false;
 		}
-    	
     }
     
+    // 유저 전화번호 업데이트
     @Transactional
-    public boolean updateUserPhone(CustomUserDetails cud, String userPhone, RedirectAttributes rAttr) {
+    public boolean updateUserPhone(CustomUserDetails cud, 
+    		String userPhone, 
+    		RedirectAttributes rAttr) {
     	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
 
     	if (findUser.isEmpty()) {
@@ -225,8 +230,12 @@ public class UserService {
     	}
     }
     
+    // 유저 비밀번호 업데이트
     @Transactional
-    public boolean updatePassword(CustomUserDetails cud, String oldPassword, String password, RedirectAttributes rAttr) {
+    public boolean updatePassword(CustomUserDetails cud, 
+    		String oldPassword, 
+    		String password, 
+    		RedirectAttributes rAttr) {
     	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
     	
     	if (findUser.isEmpty()) {
@@ -258,6 +267,35 @@ public class UserService {
 			return false;
 		}
     }
+    
+    @Transactional
+    public void deleteUser(CustomUserDetails cud, 
+    		String oldPassword, 
+    		String password, 
+    		RedirectAttributes rAttr) {
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	
+    	if (findUser.isEmpty()) {
+    		rAttr.addFlashAttribute("result", 1);
+			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+    	}
+    	
+    	try {
+			
+    		
+    		
+    		
+    		
+    		
+		} catch (Exception e) {
+			e.printStackTrace();
+			rAttr.addFlashAttribute("result", 1);
+    		rAttr.addFlashAttribute("resultMsg", "회원 탈퇴 실패.");
+		}
+    	
+    }
+    
+    
     
 }
 

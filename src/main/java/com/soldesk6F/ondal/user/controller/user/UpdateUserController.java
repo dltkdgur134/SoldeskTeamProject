@@ -71,8 +71,8 @@ public class UpdateUserController {
 		return "redirect:/myPage";
 	}
 	
-	@PostMapping("/content/passwordCheck")
-	public String checkPassword(
+	@PostMapping("/content/updatePassword")
+	public String updatePassword(
 			@AuthenticationPrincipal CustomUserDetails cud,
 			@RequestParam("oldPassword") String oldPassword,
 			@RequestParam("password") String password,
@@ -80,7 +80,7 @@ public class UpdateUserController {
 		if (!userService.updatePassword(cud, oldPassword, password, rAttr)) {
 			return "redirect:/mySecurity";
 		}
-		return "redirect:/myPage";
+		return "redirect:/logout";
 	}
 }
 

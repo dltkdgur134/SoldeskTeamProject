@@ -21,7 +21,7 @@
 				<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
 			</div>
 			<div class="form-floating mb-3">
-				<form class="form-floating" th:action="@{/content/passwordCheck}" method="post" name="checkPasswordForm"
+				<form class="form-floating" th:action="@{/content/updatePassword}" method="post" name="checkPasswordForm"
 						autocomplete="off" id="check-password-form" onsubmit="return checkPassword();" novalidate>
 					 <div class="form-floating">
   					 	<input type="password" name="oldPassword" class="form-control" id="check-prev-pass" placeholder="기존 비밀번호 입력" maxlength="20">

@@ -4,9 +4,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
 <head>
-<script th:src="@{/js/index.js}"></script>
+<script th:fragment="js" th:src="@{/js/index.js}"></script>
 <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
-<!-- <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" /> -->
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" /> 
 </head>
 
 <div th:fragment="header">
@@ -75,9 +75,6 @@
   				<a href="login" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">로그인 <i class="fa-solid fa-right-to-bracket"></i></strong></a>
   				<a href="regAgreement" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">회원가입 <i class="fa-solid fa-user-plus"></i></strong></a>
 			</div>
-			
-			
-			
 		</div>
 		<div sec:authorize="isAnonymous()">
 		</div>
@@ -86,8 +83,8 @@
 				<div class="row g-0">
 					<div class="col-md-4 p-3 text-center">
 						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
-             ? #authentication.principal.user.userProfile 
-             : '/img/userProfiles/' + #authentication.principal.user.userProfile}"
+             				? #authentication.principal.user.userProfile 
+             				: '/img/userProfiles/' + #authentication.principal.user.userProfile}"
 							class="rounded-circle img-thumbnail img-fluid"
 							alt="Profile Picture">
 
@@ -114,7 +111,6 @@
 								<small><i class="fas fa-edit"></i>마이페이지</small>
 							</a> <a class="btn btn-link text-decoration-none" href="#"> <small><i
 									class="fas fa-map-marker-alt"></i> 주소관리</small>
-							</a> <a class="btn btn-link text-decoration-none" href="logout">
 							</a> <a class="btn btn-link text-decoration-none" href="/logout">
 								<small><i class="fas fa-share"></i> 로그아웃</small>
 							</a>
