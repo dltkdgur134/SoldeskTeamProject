@@ -12,6 +12,10 @@
 </head>
 <body>
 	<div layout:fragment="content">
+	<div th:if="${ownerSuccess}" class="alert alert-success" role="alert"
+		style="margin-bottom: 20px;">
+		<span th:text="${ownerSuccess}"></span>
+	</div>
 		<div class="form-container">
 			<div class="title-and-error">
 				<h1>점포 입점</h1>
@@ -103,6 +107,7 @@
 	</div>
 	<div layout:fragment="js">
 		<script src="/js/storeReg.js"></script>
+		<script src="/js/hideLogo.js"></script>
 	</div>
 </body>
 </html>

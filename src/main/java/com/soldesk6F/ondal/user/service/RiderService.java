@@ -4,6 +4,7 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.dto.RiderForm;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
+import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
@@ -27,7 +28,6 @@ public class RiderService {
     private RiderRepository riderRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     
     
     // 이미 라이더가 등록되어 있는지 확인하는 메서드
@@ -58,7 +58,6 @@ public class RiderService {
 
         // secondaryPassword 암호화
         String encodedSecondaryPassword = passwordEncoder.encode(form.getSecondaryPassword());
-
         // Rider 객체 생성
         Rider rider = Rider.builder()
                 .user(user)
@@ -77,7 +76,6 @@ public class RiderService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("배달 반경이 올바르지 않습니다.");
         }
-
         riderRepository.save(rider);  // Rider 저장
         
     }
