@@ -17,16 +17,16 @@
 				<h1>점포 입점</h1>
 				<div class="error-message" th:if="${error}" th:text="${error}"></div>
 			</div>
-			<form th:action="@{/content/register}" method="post" enctype="multipart/form-data">
+			< th:action="@{/store/register}" method="post" enctype="multipart/form-data">
 				<div class="form-group">
 					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="storeName" th:value="${storeName}" 
 					placeholder="점포 이름" pattern="[a-zA-Z0-9]+" title="점포 이름은 영문자와 숫자만 입력할 수 있어요" maxlength="15" required>
 				</div>
 	
-				<!--<div class="form-group">
-					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="busi_regNo" th:value="${busi_regNo}" 
+				<div class="form-group">
+					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="businessNum" th:value="${businessNum}" 
 					placeholder="사업자등록번호" pattern="[a-zA-Z0-9]+" title="사업자등록번호는 영문자와 숫자만 입력할 수 있어요" maxlength="15" required>
-				</div>-->
+				</div>
 
 				<div class="form-group">
 					<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="storePhone" th:value="${storePhone}"
@@ -42,8 +42,9 @@
 						<i class="fa-solid fa-road input-icon"></i><input type="text" id="store_roadAddress" name="store_roadAddress" placeholder="도로명 주소" readonly required>
 					</div>
 					<div class="input-wrapper">
-						<i class="fa-solid fa-house input-icon"></i><input type="text" id="sotre_detailAddress" name="store_detailAddress" placeholder="상세 주소" required>
+						<i class="fa-solid fa-house input-icon"></i><input type="text" id="store_detailAddress" name="store_detailAddress" placeholder="상세 주소" required>
 					</div>
+					<input type="hidden" id="storeAddress" name="storeAddress">
 				    <input type="hidden" id="latitude" name="latitude">
 				    <input type="hidden" id="longitude" name="longitude">
 				</div>

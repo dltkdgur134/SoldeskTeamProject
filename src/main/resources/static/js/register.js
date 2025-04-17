@@ -41,7 +41,6 @@ function handleEmailDomainChange(select) {
 function getFullEmail() {
   const id = document.getElementById("email_id").value.trim();
   const domainInput = document.getElementById("email_domain_input").value.trim();
-
   return id + "@" + domainInput;
 }
 
