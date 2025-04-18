@@ -199,16 +199,8 @@
 	<div class="card info-card p-4">
 		<h5 class="card-title">주소 관리 <span class="mypage-title-icon"><i class="fa-solid fa-house"></i></span></h5>
 		<div class="card-body">
-			<!-- <div th:if="${#authentication.principal.user.homeAddress == null}">
-				<a href="regAddress" type="button" class="btn btn-success" id="regAddress-btn">주소 등록하러 가기</a>
-			</div>
-			<div th:if="${#authentication.principal.user.homeAddress != null}">
-				<strong th:text="${#authentication.principal.user.homeAddress.address}"></strong><br>
-				<strong th:text="${#authentication.principal.user.homeAddress.detailAddress}"></strong>
-				<a href="myAddress" type="button" class="btn btn-success" id="myAddress-btn">내 주소 관리</a>
-			</div> -->
 			<div th:if="${#authentication.principal.user.userSelectedAddress == null}">
-				<a href="regAddress" type="button" class="btn btn-success" id="regAddress-btn">주소 등록하러 가기</a>
+				<a href="myAddress" type="button" class="btn btn-success" id="regAddress-btn">주소 등록하러 가기</a>
 			</div>
 		</div>
 	</div>
