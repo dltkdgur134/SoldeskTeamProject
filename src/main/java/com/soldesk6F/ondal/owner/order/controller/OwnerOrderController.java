@@ -60,9 +60,10 @@ public class OwnerOrderController {
     }
     
     @PostMapping("/complete")
-    public ResponseEntity<OrderResponseDto> completeOrder(@RequestParam("orderId") UUID	 orderId) {
+    public ResponseEntity<OrderResponseDto> completeOrder(@RequestBody Map<String, String> payload) {
+        UUID orderId = UUID.fromString(payload.get("orderId"));
         Order updated = orderService.completeOrder(orderId);
-        return ResponseEntity.ok(convertToDto(updated));
+        return ResponseEntity.ok(OrderResponseDto.from(updated));
     }
 
     @PostMapping("/extendTime")

@@ -247,52 +247,84 @@
 $(function() {
     // 1) 페이지 로드 시, 서버에서 전체 주문 목록을 불러옴
     loadOrderList();
-    
-    // 2) 왼쪽 목록 클릭 시 -> 오른쪽 상세 표시
-    //    (동적 li 태그이므로, 이벤트 위임)
-    $(document).on('click', '.order-item', function() {
-        const orderId = $(this).data('orderid');
-        loadOrderDetail(orderId);
-    });
-    
-    // 3) 버튼 클릭 이벤트
-    $('#confirmBtn').on('click', function() {
-	    const orderId = $('#detailOrderId').text();
-	    acceptOrder(orderId, selectedOrderTime); // ✅ renderOrderList()에서 저장한 시간 사용
-	});
-    $('#cancelBtn').on('click', function() {
-        const orderId = $('#detailOrderId').text();
-        updateOrderStatus(orderId, '/owner/order/reject');
-    });
-    $('#completeBtn').on('click', function() {
-        const orderId = $('#detailOrderId').text();
-        updateOrderStatus(orderId, '/owner/order/complete');
-    });
-    
-	 // ✅ 버튼 클릭 이벤트 바인딩 (동적으로 생긴 버튼에도 작동하도록)
-	$(document).on('click', '.acceptBtn', function () {
-	    const orderId = $(this).data('orderid');
-	    const time = $(this).siblings('.time-adjust').find('input').val();
-	
-	    console.log("접수버튼 클릭됨! orderId =", orderId, ", time =", time); // ✅ 여기도 중요!
-	    acceptOrder(orderId, time);
-	});
-
-    $(document).on('click', '.rejectBtn', function () {
-        const orderId = $(this).data('orderid');
-        rejectOrder(orderId);
-    });
-
-    $(document).on('click', '.extendTimeBtn', function () {
-        const orderId = $(this).data('orderid');
-        extendTime(orderId, 5); // 기본 5분 추가
-    });
-
-    $(document).on('click', '.completeBtn', function () {
-        const orderId = $(this).data('orderid');
-        completeOrder(orderId);
-    });
+    setupOrderButtons();  // ✅ 버튼 바인딩
 });
+
+function handleOrderAction(orderId, action, extra = {}) {
+    let url = '';
+    let payload = { orderId };
+
+    switch (action) {
+        case 'accept':
+            url = '/owner/order/accept';
+            payload.completionTime = extra.completionTime || 15;
+            break;
+        case 'reject':
+            url = '/owner/order/reject';
+            break;
+        case 'complete':
+            url = '/owner/order/complete';
+            break;
+        case 'startDelivery':
+            url = '/owner/order/startDelivery';
+            break;
+        default:
+            console.warn('Unsupported action:', action);
+            return;
+    }
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function(updatedOrder) {
+            alert(`주문 상태 변경 완료: ${action}`);
+            renderOrderDetail(updatedOrder);
+            removeOrderFromList(updatedOrder.orderId);
+            addOrderToList(updatedOrder);
+        },
+        error: function(err) {
+            console.error(`${action} 실패:`, err);
+            alert(`${action} 실패: ` + err.responseText);
+        }
+    });
+}
+
+function getOrderId(elem) {
+    // 리스트 or 상세에서 동작 가능하게 처리
+    return $(elem).data('orderid') || $('#detailOrderId').text();
+}
+
+function getCompletionTime(elem) {
+    // 리스트의 input 또는 상세 completionTime input
+    const input = $(elem).closest('li').find('.time-adjust input');
+    return input.length ? input.val() : $('#completionTime').val();
+}
+
+function setupOrderButtons() {
+    $(document).on('click', '.acceptBtn, #confirmBtn', function () {
+        const orderId = getOrderId(this);
+        const time = getCompletionTime(this);
+        const parsedTime = parseInt(time, 10);
+        handleOrderAction(orderId, 'accept', { completionTime: isNaN(parsedTime) ? 15 : parsedTime });
+    });
+
+    $(document).on('click', '.rejectBtn, #cancelBtn', function () {
+        const orderId = getOrderId(this);
+        handleOrderAction(orderId, 'reject');
+    });
+
+    $(document).on('click', '.completeBtn, #completeBtn', function () {
+        const orderId = getOrderId(this);
+        handleOrderAction(orderId, 'complete');
+    });
+
+    $(document).on('click', '.startDeliveryBtn, #startDeliveryBtn', function () {
+        const orderId = getOrderId(this);
+        handleOrderAction(orderId, 'startDelivery');
+    });
+}
 
 function updateTemporaryCookingTime(orderId, minutes) {
     $.ajax({
@@ -325,39 +357,30 @@ function loadOrderList() {
 
 let selectedOrderTime = 15;
 
-// 왼쪽 주문 리스트 렌더링
-function renderOrderList(orderList) {
-    $('#newOrderList, #processingOrderList, #deliveringOrderList').empty();
-    
-    
-    
-    orderList.forEach(order => {
-        const status = (order.orderStatus || 'PENDING').toUpperCase();
-        const orderText = $('<div>').addClass('order-text')
-            .html(`주문번호: ${order.orderId}<br>총 금액: ${order.totalPrice}원`);
-        const buttonWrap = $('<div>').addClass('order-buttons ms-auto d-flex align-items-center');
-        let li;
+function createOrderListItem(order) {
+    const status = (order.orderStatus || 'PENDING').toUpperCase();
+    const orderText = $('<div>').addClass('order-text')
+        .html(`주문번호: ${order.orderId}<br>총 금액: ${order.totalPrice}원`);
+    const buttonWrap = $('<div>').addClass('order-buttons ms-auto d-flex align-items-center');
+    let li;
 
-        if (status === 'PENDING') {
-            const acceptBtn = $('<button>').addClass('acceptBtn').data('orderid', order.orderId).text('접수');
-            const rejectBtn = $('<button>').addClass('rejectBtn').data('orderid', order.orderId).text('거부');
+    if (status === 'PENDING') {
+        const acceptBtn = $('<button>').addClass('acceptBtn').data('orderid', order.orderId).text('접수');
+        const rejectBtn = $('<button>').addClass('rejectBtn').data('orderid', order.orderId).text('거부');
 
-            const timeAdjust = $('<div>').addClass('time-adjust d-inline-flex align-items-center ms-2');
-            const minusBtn = $('<button>').addClass('btn btn-sm btn-outline-secondary px-2').text('-')
+        const timeAdjust = $('<div>').addClass('time-adjust d-inline-flex align-items-center ms-2');
+        const minusBtn = $('<button>').addClass('btn btn-sm btn-outline-secondary px-2').text('-')
             .on('click', function () {
                 const input = $(this).siblings('input');
                 const newVal = Math.max(0, parseInt(input.val()) - 5);
                 input.val(newVal);
                 updateTemporaryCookingTime(order.orderId, newVal);
             });
-            const timeInput = $('<input>')
-            .attr({ type: 'text', value: '15', size: '2', readonly: true }) // 기본값 15분
-            .addClass('form-control form-control-sm text-center mx-1')
-            .on('change', function () {
-                const val = parseInt($(this).val());
-                if (!isNaN(val)) updateTemporaryCookingTime(orderId, val); // ✅ 서버 세션에 저장
-            });
-            const plusBtn = $('<button>').addClass('btn btn-sm btn-outline-secondary px-2').text('+')
+
+        const timeInput = $('<input>').attr({ type: 'text', value: '15', size: '2', readonly: true })
+            .addClass('form-control form-control-sm text-center mx-1');
+
+        const plusBtn = $('<button>').addClass('btn btn-sm btn-outline-secondary px-2').text('+')
             .on('click', function () {
                 const input = $(this).siblings('input');
                 const newVal = parseInt(input.val()) + 5;
@@ -365,83 +388,93 @@ function renderOrderList(orderList) {
                 updateTemporaryCookingTime(order.orderId, newVal);
             });
 
-            timeAdjust.append(minusBtn, timeInput, plusBtn);
-            buttonWrap.append(acceptBtn, rejectBtn, timeAdjust);
+        timeAdjust.append(minusBtn, timeInput, plusBtn);
+        buttonWrap.append(acceptBtn, rejectBtn, timeAdjust);
+    }
 
-            li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
-                .append(orderText, buttonWrap);
+    else if (status === 'CONFIRMED') {
+        const extendTimeBtn = $('<button>').addClass('extendTimeBtn').data('orderid', order.orderId).text('시간 추가');
+        const completeBtn = $('<button>').addClass('completeBtn').data('orderid', order.orderId).text('조리 완료');
+        const timerContainer = $('<div>').addClass('countdown-timer').append(
+            $('<div>').addClass('circle').append(
+                $('<div>').addClass('inside-text').text('--')
+            )
+        );
+        buttonWrap.append(timerContainer, extendTimeBtn, completeBtn);
 
+        // 🕓 진행중 타이머 시작
+        startCountdown(timerContainer[0], order.cookingStartTime, order.expectCookingTime);
+    }
+
+    else if (status === 'IN_DELIVERY') {
+        const startBtn = $('<button>').addClass('startDeliveryBtn').data('orderid', order.orderId).text('배달시작');
+        buttonWrap.append(startBtn);
+    }
+
+    li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
+        .append(orderText, buttonWrap);
+
+    return { status, li };
+}
+
+// 왼쪽 주문 리스트 렌더링
+function renderOrderList(orderList) {
+    $('#newOrderList, #processingOrderList, #deliveringOrderList').empty();
+
+    orderList.forEach(order => {
+        const { status, li } = createOrderListItem(order);
+
+        if (status === 'PENDING') {
             $('#newOrderList').prepend(li);
-        }
-
-        else if (status === 'CONFIRMED') {
-            const extendTimeBtn = $('<button>').addClass('extendTimeBtn').data('orderid', order.orderId).text('시간 추가');
-            const completeBtn = $('<button>').addClass('completeBtn').data('orderid', order.orderId).text('조리 완료');
-            const timerContainer = $('<div>').addClass('countdown-timer').append(
-                $('<div>').addClass('circle').append(
-                    $('<div>').addClass('inside-text').text('--')
-                )
-            );
-            buttonWrap.append(timerContainer, extendTimeBtn, completeBtn);
-            li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
-                .append(orderText, buttonWrap);
-
+        } else if (status === 'CONFIRMED') {
             $('#processingOrderList').prepend(li);
-            
-            const remainingTime = getRemainingMinutes(order.cookingStartTime, order.expectCookingTime);
-            startCountdown(timerContainer[0], remainingTime);
-        }
-
-        else if (status === 'IN_DELIVERY') {
-            const startBtn = $('<button>').addClass('startDeliveryBtn').data('orderid', order.orderId).text('배달시작');
-            buttonWrap.append(startBtn);
-            li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
-                .append(orderText, buttonWrap);
+        } else if (status === 'IN_DELIVERY') {
             $('#deliveringOrderList').prepend(li);
-        }
-
-        else {
-            li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
-                .append(orderText)
-                .append($('<div>').text('알 수 없는 상태: ' + order.orderStatus));
-            $('#newOrderList').prepend(li);
         }
     });
 }
 
-function startCountdown(timerElem, minutesLeft) {
+function startCountdown(timerElem, cookingStartTime, expectCookingTime) {
     const circle = timerElem.querySelector('.circle');
     const text = timerElem.querySelector('.inside-text');
-    const endTime = Date.now() + minutesLeft * 60000;
 
-    // ✅ 기존 타이머 중단 (중복 실행 방지)
+    if (!cookingStartTime || !expectCookingTime) {
+        text.textContent = '--';
+        return;
+    }
+
+    const start = new Date(cookingStartTime);  // 정확한 시작 시간
+    const [h, m] = expectCookingTime.split(':').map(Number);
+    const totalMinutes = h * 60 + m;
+
+    const endTime = new Date(start.getTime() + totalMinutes * 60000);
+
     if (timerElem._intervalId) {
         clearInterval(timerElem._intervalId);
     }
 
     function update() {
-        const remaining = endTime - Date.now();
-        const percent = Math.max((remaining / (minutesLeft * 60000)) * 100, 0);
-        const min = Math.floor(remaining / 60000);
+        const now = new Date();
+        const elapsedMs = now - start;
+        const remainingMs = endTime - now;
+
+        const remainingMinutes = Math.floor(remainingMs / 60000);
+        const percent = Math.max((1 - (elapsedMs / (totalMinutes * 60000))) * 100, 0);
         circle.style.setProperty('--progress', percent);
 
-        if (remaining <= 0) {
+        if (remainingMinutes < 0) {
             circle.classList.add('overdue');
-            text.textContent = '+' + Math.abs(min) + '분';
+            text.textContent = '+' + Math.abs(remainingMinutes) + '분';
         } else {
-            text.textContent = min + '분';
+            circle.classList.remove('overdue');
+            text.textContent = remainingMinutes + '분';
         }
     }
 
-    // ✅ 초기 실행
     update();
 
-    // ✅ 새로운 타이머 저장
     timerElem._intervalId = setInterval(() => {
         update();
-        if (Date.now() - endTime > 600000) {
-            clearInterval(timerElem._intervalId);
-        }
     }, 1000);
 }
 
@@ -571,64 +604,16 @@ function updateOrderStatus(orderId, url) {
    }
 
    function addOrderToList(order) {
-   	  const status = (order.orderStatus || 'PENDING').toUpperCase();
-   	  const orderText = $('<div>').addClass('order-text')
-   	    .html(`주문번호: ${order.orderId}<br>총 금액: ${order.totalPrice}원`);
-   	  const buttonWrap = $('<div>').addClass('order-buttons ms-auto d-flex align-items-center');
-   	  let li;
+	    const { status, li } = createOrderListItem(order);
 
-   	  if (status === 'PENDING') {
-   	    const acceptBtn = $('<button>').addClass('acceptBtn').data('orderid', order.orderId).text('접수');
-   	    const rejectBtn = $('<button>').addClass('rejectBtn').data('orderid', order.orderId).text('거부');
-
-   	    const timeAdjust = $('<div>').addClass('time-adjust d-inline-flex align-items-center ms-2');
-   	    const minusBtn = $('<button>').addClass('btn btn-sm btn-outline-secondary px-2').text('-')
-   	      .on('click', function () {
-   	        const input = $(this).siblings('input');
-   	        input.val(Math.max(0, parseInt(input.val()) - 5));
-   	      });
-   	    const timeInput = $('<input>').attr({ type: 'text', value: '0', size: '2', readonly: true })
-   	      .addClass('form-control form-control-sm text-center mx-1');
-   	    const plusBtn = $('<button>').addClass('btn btn-sm btn-outline-secondary px-2').text('+')
-   	      .on('click', function () {
-   	        const input = $(this).siblings('input');
-   	        input.val(parseInt(input.val()) + 5);
-   	      });
-
-   	    timeAdjust.append(minusBtn, timeInput, plusBtn);
-   	    buttonWrap.append(acceptBtn, rejectBtn, timeAdjust);
-
-   	    li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
-   	      .append(orderText, buttonWrap);
-   	    $('#newOrderList').prepend(li);
-   	  }
-
-   	  else if (status === 'CONFIRMED') {
-   	    const extendTimeBtn = $('<button>').addClass('extendTimeBtn').data('orderid', order.orderId).text('시간 추가');
-   	    const completeBtn = $('<button>').addClass('completeBtn').data('orderid', order.orderId).text('조리 완료');
-
-   	    const timerContainer = $('<div>').addClass('countdown-timer').append(
-   	      $('<div>').addClass('circle').append(
-   	        $('<div>').addClass('inside-text').text('--')
-   	      )
-   	    );
-   	    buttonWrap.append(timerContainer, extendTimeBtn, completeBtn);
-   	    li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
-   	      .append(orderText, buttonWrap);
-
-   	    $('#processingOrderList').prepend(li);
-   	    const minutes = order.expectCookingTime ? parseInt(order.expectCookingTime.split(":")[1]) : 20;
-   	    startCountdown(timerContainer[0], minutes);
-   	  }
-
-   	  else if (status === 'IN_DELIVERY') {
-   	    const startBtn = $('<button>').addClass('startDeliveryBtn').data('orderid', order.orderId).text('배달시작');
-   	    buttonWrap.append(startBtn);
-   	    li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
-   	      .append(orderText, buttonWrap);
-   	    $('#deliveringOrderList').prepend(li);
-   	  }
-   	}
+	    if (status === 'PENDING') {
+	        $('#newOrderList').prepend(li);
+	    } else if (status === 'CONFIRMED') {
+	        $('#processingOrderList').prepend(li);
+	    } else if (status === 'IN_DELIVERY') {
+	        $('#deliveringOrderList').prepend(li);
+	    }
+	}
    
    function closeNewOrderPopup() {
        // 모달 닫기
@@ -687,6 +672,7 @@ function rejectOrder(orderId) {
         success: function(response) {
             alert('주문이 거부되었습니다.');
             closeNewOrderPopup();
+            removeOrderFromList(orderId);
         },
         error: function(err) {
             console.error('거부 실패:', err);
@@ -704,23 +690,22 @@ function extendTime(orderId, minutes) {
         success: function(updatedOrder) {
             alert('시간 추가 완료.');
 
-            // ✅ 타이머 다시 시작
             const $li = $(`li[data-orderid='${orderId}']`);
             const timerElem = $li.find('.countdown-timer')[0];
 
             if (timerElem) {
-                // ⛔ 기존 타이머 제거
+                // 기존 타이머 제거
                 if (timerElem._intervalId) clearInterval(timerElem._intervalId);
 
-                // ⛔ 빨간색 표시 제거
                 timerElem.querySelector('.circle')?.classList.remove('overdue');
 
-                // ✅ 새로운 시간으로 타이머 시작
-                const minutesLeft = updatedOrder.expectCookingTime
-                    ? updatedOrder.expectCookingTime.split(":").reduce((acc, val, i) => acc + (parseInt(val) * (i === 0 ? 60 : 1)), 0)
-                    : 20;
+                // ✅ ⬇️ 정확한 남은 시간 계산
+                const remainingTime = getRemainingMinutes(
+                    updatedOrder.cookingStartTime,
+                    updatedOrder.expectCookingTime
+                );
 
-                startCountdown(timerElem, minutesLeft);
+                startCountdown(timerElem, remainingTime);
             }
         },
         error: function(err) {
@@ -732,37 +717,49 @@ function extendTime(orderId, minutes) {
 
 function getRemainingMinutes(cookingStartTime, expectCookingTime) {
     if (!cookingStartTime || !expectCookingTime) {
-        return 20; // 기본값
+        console.warn('⚠️ cookingStartTime or expectCookingTime is missing.');
+        return 0;
     }
 
-    // 1. UTC 기반 문자열 처리
     const start = new Date(cookingStartTime);
-    const startTimeMs = start.getTime(); // UTC 기준
-
-    if (isNaN(startTimeMs)) {
-        console.warn('⚠️ Invalid cookingStartTime:', cookingStartTime);
-        return 20;
+    if (isNaN(start.getTime())) {
+        console.warn('⚠️ Invalid cookingStartTime format:', cookingStartTime);
+        return 0;
     }
 
-    // 2. expectCookingTime = "00:35:00" → 시간 계산
-    const [h, m, s] = expectCookingTime.split(':').map(Number);
+    const timeParts = expectCookingTime.split(':');
+    if (timeParts.length < 2) {
+        console.warn('⚠️ Invalid expectCookingTime format:', expectCookingTime);
+        return 0;
+    }
+
+    const [h, m, s] = timeParts.map(part => parseInt(part, 10) || 0);
     const durationMs = ((h * 60 + m) * 60000) + (s * 1000);
 
-    const endTime = startTimeMs + durationMs;
-    const now = new Date().getTime();
+    const endTime = start.getTime() + durationMs;
+    const now = Date.now();
 
     const remainingMs = endTime - now;
-    return Math.max(Math.floor(remainingMs / 60000), 0);
+    const remainingMinutes = Math.floor(remainingMs / 60000); // ✅ 음수도 유지
+
+    return remainingMinutes;
 }
 
 function completeOrder(orderId) {
     $.ajax({
         url: '/owner/order/complete',
         method: 'POST',
-        data: { orderId: orderId },
+        contentType: 'application/json',
+        data: JSON.stringify({ orderId: orderId }),
         success: function(updatedOrder) {
             alert('조리 완료');
+            renderOrderDetail(updatedOrder);
+            removeOrderFromList(orderId);
+            addOrderToList(updatedOrder);
             loadOrderList();
+        },
+        error: function(err) {
+            console.error('조리 완료 실패:', err);
         }
     });
 }
