@@ -108,7 +108,9 @@ public class UserService {
     public boolean updateUserNickname(CustomUserDetails cud, 
     		String nickName, 
     		RedirectAttributes rAttr) {
-    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	//Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
+    	System.out.println(cud.getUsername());
     	
     	if (findUser.isEmpty()) {
     		rAttr.addFlashAttribute("result", 1);
@@ -134,7 +136,7 @@ public class UserService {
     public boolean updateUserPicture(CustomUserDetails cud, 
     		MultipartFile profileImage, 
     		RedirectAttributes rAttr) {
-    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
     		
     	if (findUser.isEmpty()) {
     		rAttr.addFlashAttribute("result", 1);
@@ -210,7 +212,7 @@ public class UserService {
     public boolean updateUserPhone(CustomUserDetails cud, 
     		String userPhone, 
     		RedirectAttributes rAttr) {
-    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
 
     	if (findUser.isEmpty()) {
     		rAttr.addFlashAttribute("result", 1);
@@ -237,7 +239,7 @@ public class UserService {
     		String oldPassword, 
     		String password, 
     		RedirectAttributes rAttr) {
-    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
     	
     	if (findUser.isEmpty()) {
     		rAttr.addFlashAttribute("result", 1);
@@ -275,7 +277,7 @@ public class UserService {
     		CustomUserDetails cud,
     		String password,
     		RedirectAttributes rAttr) {
-    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
     	if (findUser.isEmpty()) {
     		rAttr.addFlashAttribute("result", 1);
 			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
@@ -296,7 +298,7 @@ public class UserService {
     @Transactional
     public boolean deleteUserTemp(CustomUserDetails cud, 
     		RedirectAttributes rAttr) {
-    	Optional<User> findUser = userRepository.findByUserId(cud.getUser().getUserId());
+    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
     	
     	if (findUser.isEmpty()) {
     		rAttr.addFlashAttribute("result", 1);
