@@ -11,12 +11,12 @@ public class OwnerController {
 
 	@GetMapping("/store")
 	public String store() {
-		return "content/store_menu";
+		return "content/store/storeMenu";
 	}
 	
 	@GetMapping("/storesetting")
 	public String storeSetting() {
-		return "content/storeSetting";
+		return "content/store/storeSetting";
 	}
 
     @GetMapping("/setting/operation")

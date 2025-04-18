@@ -47,7 +47,7 @@ public class UserService {
     public boolean isEmailDuplicate(String email) {
         return userRepository.existsByEmail(email);
     }
-    
+
     public boolean isPhoneDuplicate(String userPhone) {
         return userRepository.existsByUserPhone(userPhone);
     }
@@ -59,9 +59,10 @@ public class UserService {
 
 	        String fileName = "default.png";
 	        String extension = "png";
-	        String filePath = uploadDir + File.separator + fileName;
+//	        String filePath = uploadDir + File.separator + fileName;
 	        
-	        String webPath = "/img/userProfiles/" + fileName;
+//	        String webPath = "/img/userProfiles/" + fileName;
+	        String webPath = fileName;
 	
 	        if (profileImage != null && !profileImage.isEmpty()) {
 	        	String originalFilename = profileImage.getOriginalFilename();
@@ -77,7 +78,8 @@ public class UserService {
 	            File saveFile = new File(saveFolder, fileName);
 	            profileImage.transferTo(saveFile);
 //	            filePath = uploadDir + File.separator + fileName;
-	            webPath = "/img/userProfiles/" + fileName;
+//	            webPath = "/img/userProfiles/" + fileName;
+	            webPath = fileName;
 	        }
 	
 	        String encryptedPassword = passwordEncoder.encode(password);
@@ -89,8 +91,8 @@ public class UserService {
 	                .email(email)
 	                .password(encryptedPassword)
 	                .userPhone(userPhone)
-	                .userSelectedAddress(userSelectedAddress)	
-	                .userProfile(filePath)
+	                .userSelectedAddress(userSelectedAddress)
+	                .userProfile(webPath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
 	

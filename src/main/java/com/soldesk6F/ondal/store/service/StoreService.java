@@ -33,6 +33,11 @@ public class StoreService {
 	private final OwnerRepository ownerRepository;
     
 	public void registerStore(StoreRegisterDto dto, User user) {
+		log.info("DTO 값: {}", dto);
+		log.info("사용자 정보: {}", user.getUserId());
+		log.info("가게 이름: {}", dto.getStoreName());
+		log.info("전화번호: {}", dto.getStorePhone());
+		log.info("첨부파일: {}", dto.getStoreImgs() != null ? dto.getStoreImgs().getOriginalFilename() : "null");
 		String userId = user.getUserId();
 		Owner owner = ownerRepository.findByUser_UserId(userId)
 			.orElseThrow(() -> new IllegalStateException("해당 userId로 등록된 점주 정보가 없습니다."));
@@ -42,6 +47,11 @@ public class StoreService {
 
         if (file != null && !file.isEmpty()) {
         	try {
+        		String originalName = file.getOriginalFilename();
+        		if (originalName == null || originalName.isBlank()) {
+        			throw new RuntimeException("파일 이름이 유효하지 않습니다.");
+        		}
+        		
         		String uploadDir = "src/main/resources/static/img/store/";
 				Path uploadPath = Paths.get(uploadDir);
 				
@@ -56,7 +66,7 @@ public class StoreService {
 
     			StoreImg storeImg = StoreImg.builder()
     					.storeImg("/img/store/" + uuidName)
-    					.store(null)
+//    					.store(null)
     					.build();
 
     			imgList.add(storeImg);
@@ -95,6 +105,11 @@ public class StoreService {
 		
 		return storeRepository.findByCategory(category).stream()
 			.map(store -> {
+				String imageUrl = "/img/store/default.png";
+				
+		        if (store.getStoreImgs() != null && !store.getStoreImgs().isEmpty()) {
+		            imageUrl = store.getStoreImgs().get(0).getStoreImg();
+		        }
 				StoreDto dto = StoreDto.builder()
 					.storeName(store.getStoreName())
 					.category(store.getCategory())
@@ -102,8 +117,7 @@ public class StoreService {
 					.storeAddress(store.getStoreAddress())
 					.storeIntroduce(store.getStoreIntroduce())
 					.storeStatus(store.getStoreStatus().getDescription())
-//    	                    .imageUrl(store.getBrandImgs() != null && !store.getBrandImgs().isEmpty()
-//    	                            ? store.getBrandImgs().get(0).getBrandImgFilePath() : "/img/default.png")
+    	            .imageUrl(imageUrl)
 					.build();
 				return dto;
 			})
