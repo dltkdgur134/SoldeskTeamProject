@@ -7,7 +7,7 @@
 	<link th:href="@{/css/custom.css}" rel="stylesheet" />
 	<link th:href="@{/css/myAddress.css}" rel="stylesheet">
 	<script th:src="@{/js/zipcode.js}" defer></script>
-	<script th:src="@{/js/myAddress.js}"></script>
+	<script th:src="@{/js/myAddress.js}" defer></script>
 	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
@@ -18,60 +18,53 @@
 		</h5>
 		<div class="card-body">
 			<div class="form-floating mb-3">
-				<form class="form-floating " th:action="@{/content/regAddress}" method="post" name="regAddressForm"
+				<form th:action="@{/content/regAddress}" method="post" name="regAddressForm"
 						autocomplete="off" id="reg-address-form">
- 					  <div class="form-floating">
- 					 	<input type="text" name="address" class="form-control" id="sample2_address" placeholder="새 비밀번호 입력" maxlength="20">
- 					 	<label for="sample2_address"> 주소</label>
- 					 	<div class="invalid-feedback" id="new-pw-invalid">
-     							주소 입력해주세요
-   			 			</div>
-   			 			<div class="valid-feedback">
-   			 				맞음
-   			 			</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-map-location-dot"></i></span> 
+							<input type="text" class="form-control" aria-label="regAddress" name="address" id="userAddress" placeholder="주소" readonly>
+								<input type="button" onclick="regUserAddress()" value="주소 찾기" class="btn btn-warning btn">
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-house-user"></i></span> 
+							<input type="text" class="form-control" aria-label="detailAddress" name="detailAddress" id="detailAddress" placeholder="상세주소">
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-location-crosshairs"></i></span>
+							<input type="text" name="userAddresslongitude" class="form-control" id="UserAddresslongitude" placeholder="경도" readonly>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-location-crosshairs"></i></span> 
+							<input type="text" name="userAddresslatitude" class="form-control" id="UserAddresslatitude" placeholder="위도" readonly>
+						</div>
+ 					 <br>
+ 					 <div class="container d-flex justify-content-evenly">
+	 					 <!-- <input type="button" onclick="sample2_execDaumPostcode()" value="주소 찾기" class="btn btn-info btn-lg">
+	 					 <input type="button" id="coord-btn" value="좌표 받기" class="btn btn-info btn-lg"> -->
  					 </div>
  					 <br>
- 					 <div class="form-floating">
- 					 	<input type="text" name="address2" class="form-control" id="sample2_detailAddress" placeholder="새 비밀번호 입력" maxlength="20">
- 					 	<label for="sample2_detailAddress"> 상세 주소</label>
- 					 	<div class="invalid-feedback" id="new-pw-invalid">
-     							주소 틀림
-   			 			</div>
-   			 			<div class="valid-feedback">
-   			 				맞음
-   			 			</div>
- 					 </div>
+ 					 <hr>
  					 <br>
- 					 	<input type="text" id="sample2_postcode" placeholder="우편번호">
-
-						<!-- <input type="text" id="sample2_address" placeholder="주소"><br> -->
-						<!-- <input type="text" id="sample2_detailAddress" placeholder="상세주소"> -->
-						<!-- <input type="text" id="sample2_extraAddress" placeholder="참고항목"> -->
- 					 
- 					 <input type="button" onclick="sample2_execDaumPostcode()" value="우편번호 찾기">
- 					 <br>
- 					 <br>
- 					<div id="iframe-layer" style="display:none; position:absolute; overflow:hidden; z-index:1; -webkit-overflow-scrolling:touch;">
+ 					<div id="iframe-layer" >
 						<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
 					</div>			 
 					<br>
  					 <button type="submit" class="btn btn-primary"
-						form="check-password-form" id="check-password-btn">확인</button>
+						form="reg-address-form" id="reg-address-btn">확인</button> 
 				</form>
 			</div> 
 		</div>
-		
-		<div class="search-container">
-  				<input
-   			 		type="text"
-    				id="search-bar"
-    				placeholder="Search..."
-  				/>
-    				<!-- oninput="fetchSearchResults(this.value)" -->
+		<!-- <div class="address-search-container">
+  				<input type="text" id="address-search-bar"	placeholder="주소검색"	/>
+				oninput="fetchSearchResults(this.value)"  				
  			 <ul id="dropdown-results" class="dropdown-menu"></ul>
-			</div>
+		</div> -->
+		<br>
 	</div> 
-			
 
 <!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
 		

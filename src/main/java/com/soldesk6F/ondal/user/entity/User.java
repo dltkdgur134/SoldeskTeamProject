@@ -9,7 +9,10 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -81,6 +84,17 @@ public class User {
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
+	
+	// 나은석 - 단순히 데이터를 조회하는 ' ~details ' 같은 'entity'는 별도의 table 보다 이렇게
+	@Embedded
+	@AttributeOverrides({
+		@AttributeOverride(name = "address", column = @Column(name = "home_address")) , 
+		@AttributeOverride(name = "detailAddress", column = @Column(name = "home_detail_address")),
+		@AttributeOverride(name = "latitude", column = @Column(name = "home_latitude")),
+		@AttributeOverride(name = "longitude", column = @Column(name = "home_longitude"))
+	})
+	private HomeAddress HomeAddress;
+	
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)

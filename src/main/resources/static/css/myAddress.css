@@ -1,13 +1,20 @@
 @charset "UTF-8";
 
-
-
-.search-container {
-  position: relative;
-  width: 300px;
+#iframe-layer {
+	display:none; 
+	position: relative; 
+	overflow:hidden; 
+	z-index:1; 
+	-webkit-overflow-scrolling:touch;
+	width:100%;
 }
 
-#search-bar {
+.address-search-container {
+  position: relative;
+  width: 100%;
+} 
+
+#address-search-bar {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;

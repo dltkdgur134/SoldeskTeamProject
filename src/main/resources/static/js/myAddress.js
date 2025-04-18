@@ -1,19 +1,116 @@
 
 $(function() {
 	
-	document.getElementById('search-bar').addEventListener('change', event => {
-		const keyword = document.getElementById('search-bar').value;
-		console.log(keyword);
+	/*document.getElementById('address-search-bar').addEventListener('change', event => {
+		var results = [];
+		let address = {
+			place_name : "",
+			address_name : "",
+			road_address_name : "",
+			xCoordinate : "",
+			yCoordinate: ""
+		}
 		
-	});
+		const keyword = document.getElementById('address-search-bar').value;
+		//console.log(keyword)
+		$.ajax({
+			url: "https://dapi.kakao.com/v2/local/search/keyword.json",
+			data: {
+				query: keyword,
+				size : 10
+			},
+			headers: {
+				Authorization: "KakaoAK c7dd39e36776f90fb259bbd8ac3fcdc6" 
+			},
+			success: function(response) {
+				const places = response.documents;
+				//const resultList = $('#resultList');
+				console.log(response.meta.total_count);
+				
+				places.forEach(place => {
+					//resultList.append(`<li>${place.place_name} - ${place.address_name}</li>`);
+					//results.push(place.place_name + "-" + place.address_name);
+					address.place_name = place.place_name;
+					address.address_name = place.address_name;
+					address.road_address_name = place.road_address_name;
+					address.xCoordinate = place.x;
+					address.yCoordinate = place.y;
+					results.push(address);
+				});
+				
+				
+				const query = keyword;
+				
+				const dropdown = document.getElementById('dropdown-results');
+					  
+				if (!query) {
+					dropdown.style.display = 'none';
+					dropdown.innerHTML = '';
+					return;
+				}
+				
+				if (places.length === 0) {
+					resultList.append("<li>검색 결과가 없습니다.</li>");
+					results.push("검색결과가 없습니다.");
+				}
+					  
+				// Simulating a search API call with sample data
+				const filteredData = results.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+
+				// Show results in the dropdown
+				dropdown.innerHTML = filteredData.map(item => `<li onclick="handleSelection('${item}')">${item}</li>`).join('');
+
+				dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
+			}
+		})
+		
+	});*/
 	
+	document.getElementById('좌표 받기').addEventListener('click', event => {
+			var results = [];
+			let address = {
+				place_name : "",
+				address_name : "",
+				road_address_name : "",
+				xCoordinate : "",
+				yCoordinate: ""
+			}
+			
+			const keyword = document.getElementById('sample2_address').value;
+			//console.log(keyword)
+			$.ajax({
+				url: "https://dapi.kakao.com/v2/local/search/keyword.json",
+				data: {
+					query: keyword,
+					size : 10
+				},
+				headers: {
+					Authorization: "KakaoAK 004973e06271b159ad20691c7671ad88" 
+				},
+				success: function(response) {
+					const places = response.documents;
+					//const resultList = $('#resultList');
+					/*console.log(response.meta.total_count);*/
+					
+					places.forEach(place => {
+						//resultList.append(`<li>${place.place_name} - ${place.address_name}</li>`);
+						//results.push(place.place_name + "-" + place.address_name);
+						const x = place.x;
+						const y = place.y;
+						$('#longitude').val(x);
+						$('#latitude').val(y);
+					});
+					
+				}
+			})
+			
+		});
 	
 });
 
 
 
-
-function fetchSearchResults(query) {
+function fetchSearchResults(query, sampleData) {
 	  const dropdown = document.getElementById('dropdown-results');
 	  
 	  if (!query) {
@@ -21,20 +118,23 @@ function fetchSearchResults(query) {
 	    dropdown.innerHTML = '';
 	    return;
 	  }
-		
+	  
 	  // Simulating a search API call with sample data
-	  const sampleData = ['Apple', 'Banana', 'Cherry', 'Date', 'Grape', 'Kiwi', 'Mango', "서초구", "강남구", "관악구"];
+	  //const sampleData = ['Apple', 'Banana', 'Cherry', 'Date', 'Grape', 'Kiwi', 'Mango', '서초구', '강남구', '관악구'];
 	  const filteredData = sampleData.filter(item => item.toLowerCase().includes(query.toLowerCase()));
 
 	  // Show results in the dropdown
 	  dropdown.innerHTML = filteredData.map(item => `<li onclick="handleSelection('${item}')">${item}</li>`).join('');
 
 	  dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
-	}
+}
 
 	function handleSelection(selectedValue) {
-	  const searchBar = document.getElementById('search-bar');
+	  const searchBar = document.getElementById('address-search-bar');
 	  const dropdown = document.getElementById('dropdown-results');
 	  searchBar.value = selectedValue;
 	  dropdown.style.display = 'none';
 	}
+	
+
+
