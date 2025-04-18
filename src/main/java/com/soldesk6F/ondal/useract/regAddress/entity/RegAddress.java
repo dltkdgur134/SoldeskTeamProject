@@ -68,8 +68,6 @@ public class RegAddress {
 		this.userAddressLongitude = userAddressLongitude;
 	}
 	
-	
-	
 	public String getUserUuidAsString() {
 	    return regAddressId != null ? regAddressId .toString() : null;
 	}

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.user.entity.Address;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserStatus;
 import com.soldesk6F.ondal.user.repository.UserRepository;
@@ -308,7 +309,6 @@ public class UserService {
 			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
 			return false;
     	}
-    	
     	try {
     		findUser.get().setUserStatus(UserStatus.LEAVED);
     		findUser.get().updateUpdatedDate(LocalDateTime.now());
@@ -322,11 +322,39 @@ public class UserService {
     		rAttr.addFlashAttribute("resultMsg", "회원 탈퇴 실패.");
     		return false;
 		}
-    	
     }
     
-    
-    
+//    @Transactional
+//    public boolean regHomeAddress(CustomUserDetails cud,
+//    		RedirectAttributes rAttr,
+//    		String address,
+//    		String detailAddress,
+//    		String latitude,
+//    		String longitude) {
+//    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
+//    	
+//    	try {
+//    		if (findUser.isEmpty()) {
+//        		rAttr.addFlashAttribute("result", 1);
+//    			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+//    			return false;
+//        	}
+//    		double latitudeDouble = Double.parseDouble(latitude);
+//    		double longitudeDouble = Double.parseDouble(longitude);
+//    		Address homeAddress = new Address(address, detailAddress, latitudeDouble, longitudeDouble);
+//    		
+//    		findUser.get().updateHomeAddress(homeAddress);
+//    		cud.getUser().setHomeAddress(homeAddress);
+//    		rAttr.addFlashAttribute("result", 0);
+//    		rAttr.addFlashAttribute("resultMsg", "주소 등록 완료!");
+//    		return true;
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			rAttr.addFlashAttribute("result", 1);
+//    		rAttr.addFlashAttribute("resultMsg", "주소 등록 실패");
+//    		return false;
+//		}
+//    }
     
     
     

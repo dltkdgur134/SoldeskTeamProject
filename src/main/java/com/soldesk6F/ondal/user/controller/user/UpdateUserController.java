@@ -83,11 +83,5 @@ public class UpdateUserController {
 		return "redirect:/logout";
 	}
 	
-	@PostMapping("/content/regAddress")
-	public String registerAddress() {
-		
-		return "redirect:/myPage";
-	}
-	
 }
 

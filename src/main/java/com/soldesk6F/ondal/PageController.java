@@ -22,4 +22,9 @@ public class PageController {
 		return "content/myAddress";
 	}
 	
+	@GetMapping (value = "/regAddress")
+	public String goRegAddress() {
+		return "content/regAddress";
+	}
+ 	
 }

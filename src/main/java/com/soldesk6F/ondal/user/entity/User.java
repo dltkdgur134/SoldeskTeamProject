@@ -85,25 +85,15 @@ public class User {
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
 	
-	// 나은석 - 단순히 데이터를 조회하는 ' ~details ' 같은 'entity'는 별도의 table 보다 이렇게
-	@Embedded
-	@AttributeOverrides({
-		@AttributeOverride(name = "address", column = @Column(name = "home_address")) , 
-		@AttributeOverride(name = "detailAddress", column = @Column(name = "home_detail_address")),
-		@AttributeOverride(name = "latitude", column = @Column(name = "home_address_latitude")),
-		@AttributeOverride(name = "longitude", column = @Column(name = "home_address_longitude"))
-	})
-	private HomeAddress HomeAddress;
+//	@Embedded
+//	@AttributeOverrides({
+//		@AttributeOverride(name = "address", column = @Column(name = "home_address")) , 
+//		@AttributeOverride(name = "detailAddress", column = @Column(name = "home_detail_address")),
+//		@AttributeOverride(name = "latitude", column = @Column(name = "home_address_latitude")),
+//		@AttributeOverride(name = "longitude", column = @Column(name = "home_address_longitude"))
+//	})
+//	private Address HomeAddress;
 	
-	@Embedded
-	@AttributeOverrides({
-		@AttributeOverride(name = "address", column = @Column(name = "other_address")) , 
-		@AttributeOverride(name = "detailAddress", column = @Column(name = "other_detail_address")),
-		@AttributeOverride(name = "latitude", column = @Column(name = "other_address_latitude")),
-		@AttributeOverride(name = "longitude", column = @Column(name = "other_address_longitude"))
-	})
-	private OtherAddress OtherAddress;
-
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
@@ -207,8 +197,19 @@ public class User {
 		return this;
 	}
 	
+//	public User updateHomeAddress(Address homeAddress) {
+//		this.HomeAddress = homeAddress; 
+//		return this;
+//	}
+	
+	public User updateUserSelectedAddress(RegAddress userSelectedAddress) {
+		this.userSelectedAddress = userSelectedAddress;
+		return this;
+	}
+	
 	public String getUserUuidAsString() {
 		return userUuid != null ? userUuid.toString() : null;
 	}
+	
 
 }
