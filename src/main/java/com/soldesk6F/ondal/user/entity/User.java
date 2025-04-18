@@ -90,11 +90,19 @@ public class User {
 	@AttributeOverrides({
 		@AttributeOverride(name = "address", column = @Column(name = "home_address")) , 
 		@AttributeOverride(name = "detailAddress", column = @Column(name = "home_detail_address")),
-		@AttributeOverride(name = "latitude", column = @Column(name = "home_latitude")),
-		@AttributeOverride(name = "longitude", column = @Column(name = "home_longitude"))
+		@AttributeOverride(name = "latitude", column = @Column(name = "home_address_latitude")),
+		@AttributeOverride(name = "longitude", column = @Column(name = "home_address_longitude"))
 	})
 	private HomeAddress HomeAddress;
 	
+	@Embedded
+	@AttributeOverrides({
+		@AttributeOverride(name = "address", column = @Column(name = "other_address")) , 
+		@AttributeOverride(name = "detailAddress", column = @Column(name = "other_detail_address")),
+		@AttributeOverride(name = "latitude", column = @Column(name = "other_address_latitude")),
+		@AttributeOverride(name = "longitude", column = @Column(name = "other_address_longitude"))
+	})
+	private OtherAddress OtherAddress;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
