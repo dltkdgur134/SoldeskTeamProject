@@ -64,11 +64,17 @@ public class Order {
     @Column(name = "order_time", nullable = false, updatable = false)
     private LocalDateTime orderTime;
 
+    @Column(name = "cooking_start_time", updatable = false)
+    private LocalDateTime cookingStartTime;
+    
     @Column(name = "expect_cooking_time")
     private LocalTime expectCookingTime;
     
     @Column(name = "real_cooking_time", updatable = false)
     private LocalTime realCookingTime;
+    
+    @Column(name = "delivery_start_time", updatable = false)
+    private LocalDateTime deliveryStartTime;
     
     @Column(name = "expect_delivery_time")
     private LocalTime expectDeliveryTime;
