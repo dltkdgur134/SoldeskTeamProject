@@ -325,6 +325,11 @@ function setupOrderButtons() {
         const orderId = getOrderId(this);
         handleOrderAction(orderId, 'startDelivery');
     });
+    
+    $(document).on('click', '.extendTimeBtn, #extendTimeBtn', function () {
+        const orderId = getOrderId(this);
+        extendTime(orderId, 5); // 기본 5분 추가
+    });
 }
 
 function updateTemporaryCookingTime(orderId, minutes) {
@@ -521,7 +526,9 @@ function renderOrderDetail(order) {
   $('#detailDeliveryRequest').text(order.deliveryRequest);
   $('#detailTotalPrice').text(order.totalPrice);
 
-  $('#confirmBtn, #cancelBtn, #completeBtn, #startDeliveryBtn').hide();
+  $('#confirmBtn, #cancelBtn, #completeBtn, #startDeliveryBtn')
+  .data('orderid', order.orderId)
+  .hide();
 
   if (order.orderStatus === 'PENDING') {
     $('#confirmBtn, #cancelBtn').show();
@@ -697,7 +704,6 @@ function extendTime(orderId, minutes) {
             if (timerElem) {
                 // 기존 타이머 제거
                 if (timerElem._intervalId) clearInterval(timerElem._intervalId);
-
                 timerElem.querySelector('.circle')?.classList.remove('overdue');
 
                 // ✅ ⬇️ 정확한 남은 시간 계산
@@ -706,7 +712,7 @@ function extendTime(orderId, minutes) {
                     updatedOrder.expectCookingTime
                 );
 
-                startCountdown(timerElem, remainingTime);
+                startCountdown(timerElem, updatedOrder.cookingStartTime, updatedOrder.expectCookingTime);
             }
         },
         error: function(err) {
