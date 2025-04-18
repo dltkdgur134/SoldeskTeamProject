@@ -4,12 +4,9 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-	<link th:href="@{/css/infopage.css}" rel="stylesheet" />
 	<link th:href="@{/css/custom.css}" rel="stylesheet" />
 	<link th:href="@{/css/update.css}" rel="stylesheet" />
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-	<script th:src="@{/js/zipcode.js}"></script>
-	<script th:src="@{/js/index.js}"></script>
 	<script th:src="@{/js/initialize.js}"></script>
 	<script th:src="@{/js/update.js}"></script>
 </head>
@@ -64,15 +61,7 @@
 				<strong  th:text="${#authentication.principal.user.nickName}"></strong>
 					<a type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateNicknameModal">수정</a>
 				</li>
-				<li class="list-group-item d-flex justify-content-between"><Label>전화번호</Label>
-				<!-- <strong th:text="${#authentication.principal.user.userPhone}"></strong> -->
-				<strong >
-					<span th:text="${#strings.substring(#authentication.principal.user.userPhone, 0, 3)}"></span>
-					-
-					<span th:text="${#strings.substring(#authentication.principal.user.userPhone, 3, 4)}"></span>***
-					-
-					<span th:text="${#strings.substring(#authentication.principal.user.userPhone, 7, 8)}"></span>***
-				</strong>
+				<li class="list-group-item d-flex justify-content-between"><Label>전화번호</Label><strong th:text="${#authentication.principal.user.userPhone}"></strong>
 				<a type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updatePhoneModal">수정</a>
 				</li>
 			</ul>
@@ -228,16 +217,20 @@
 		th:with="userRole=${#authentication.principal.user.userRole.name()}">
 		<div class="reg-buttonContainer">
 			<h6 class="card-title">업종</h6>
-			<div class="new-role-buttons">
-				
 			<div class="reg-buttons">
 				<!-- 라이더 등록 버튼: user 또는 owner인 경우 보여줌 -->
 				<a th:href="@{/rider/register}" class="riderBtn">라이더 등록하러 가기</a>
 
+				<!-- 라이더 홈 이동 버튼: rider 또는 all인 경우 
+				<a th:if="${userRole == 'RIDER' or userRole == 'ALL'}"
+					th:href="@{/rider/home}" class="riderBtn">라이더 페이지로 가기</a>-->
 
 				<!-- 점주 등록 버튼: user 또는 rider인 경우 보여줌 -->
 				<a th:href="@{/owner/register}" class="ownerBtn">점주 등록하러 가기</a>
 
+				<!-- 점주 홈 이동 버튼: owner 또는 all인 경우 
+				<a th:if="${userRole == 'OWNER' or userRole == 'ALL'}"
+					th:href="@{/owner/home}" class="ownerBtn">점주 페이지로 가기</a>-->
 			</div>
 		</div>
 	</div>
@@ -253,11 +246,10 @@
 
 				<!-- 점주이거나 ALL인 경우: 점주 정보 보기 -->
 				<a th:if="${userRole == 'OWNER' or userRole == 'ALL'}"
-					th:href="@{/owner/ownerInfopage}" class="ownerBtn">점주 정보 보기</a>
+					th:href="@{/owner/profile}" class="ownerBtn">점주 정보 보기</a>
 			</div>
 		</div>
 	</div>
-</div>
 	<br>
 	<div class="card info-card p-4">
 		<h5 class="card-title">
