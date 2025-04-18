@@ -59,7 +59,6 @@ public class RiderHomeController {
             Rider rider = optionalRider.get();
             model.addAttribute("rider", rider);
         } else {
-            System.out.println("❌ Rider 정보 없음. userId = " + userId);
             // 예외 처리나 에러 페이지로 이동 가능
         }
     	

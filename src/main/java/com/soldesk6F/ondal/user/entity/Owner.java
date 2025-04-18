@@ -31,7 +31,7 @@ public class Owner {
     @Column(name = "owner_nickname" , nullable = false , length = 30)
     private String ownerNickname;
     
-    @Column(name = "secondary_password",nullable = false , length = 10)
+    @Column(name = "secondary_password",nullable = false , length = 255)
     private String secondaryPassword;  // 비밀번호 해싱 필요
     
     @Column(name = "owner_wallet",nullable = true )
@@ -45,9 +45,11 @@ public class Owner {
     
     // Owner 생성자에 owner_id와 registrationDate가 없는 이유: 이 둘은 자동으로 생성하는 값이기에 없어도 된다.
     @Builder
-	public Owner(User user, String secondaryPassword, String ownerNickname) {
+
+	public Owner(User user,String ownerNickname, String secondaryPassword) {
 		super();
 		this.user = user;
+		this.ownerNickname = ownerNickname;
 		this.secondaryPassword = secondaryPassword;
 		this.ownerNickname = ownerNickname;
 	}

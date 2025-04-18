@@ -28,13 +28,13 @@ public class StoreImg {
 
 
     @Column(name = "store_img", nullable = false, length = 255)
-    private String StoreImg;
+    private String storeImg;
 
     @Builder
 	public StoreImg(Store store, String storeImg) {
 		super();
 		this.store = store;
-		StoreImg = storeImg;
+		storeImg = storeImg;
 	}
     
     public String getStoreImgUuidAsString() {

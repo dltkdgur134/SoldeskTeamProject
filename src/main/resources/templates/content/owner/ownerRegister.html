@@ -4,16 +4,12 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-<th:block layout:fragment="css">
 	<link rel="stylesheet" th:href="@{/css/riderRegister.css}">
 	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
-</th:block>
-<th:block layout:fragment="js">
 	<script
 		src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script th:src="@{/js/zipcode.js}"></script>
 	<script th:src="@{/js/hideLogo.js}"></script>
-</th:block>
 </head>
 <div layout:fragment="content">
 	<div class="rider-register-wrapper">
@@ -23,7 +19,7 @@
 				<div class="error-message" th:if="${error}" th:text="${error}"></div>
 			</div>
 
-			<form th:action="@{/owner/register}" method="post">
+			<form th:action="@{/owner/ownerRegGoToStoreReg}"	 method="post">
 				<div class="form-group">
 					<i class="fa-solid fa-id-card input-icon"></i> <input type="text"
 						name="ownerNickname" placeholder="점주 닉네임" maxlength="10" required>
@@ -35,19 +31,9 @@
 				</div>
 				<div class="form-group password-group">
 					<i class="fa-solid fa-lock input-icon"></i> <input type="password"
-						name="secondaryPasswordConfirm" placeholder="2차 비밀번호 확인" maxlength="10"
-						required>
+						name="secondaryPasswordConfirm" placeholder="2차 비밀번호 확인"
+						maxlength="10" required>
 				</div>
-				<div class="form-group">
-					<i class="fa-solid fa-store input-icon"></i> <input type="text"
-						name="storeName" placeholder="상호명" maxlength="20" required>
-				</div>
-				<div class="form-group">
-					<i class="fa-solid fa-store input-icon"></i> <input type="text"
-						name="businessNum" placeholder="사업자번호" maxlength="20" required>
-				</div>
-				
-
 				<div class="form-group">
 					<button class="reg-btn" type="submit">가게등록 하러하기</button>
 				</div>

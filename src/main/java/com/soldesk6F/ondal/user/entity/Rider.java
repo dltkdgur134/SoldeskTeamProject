@@ -64,8 +64,8 @@ public class Rider {
 	private double hubAddressLongitude;
 	
 	@Column(name = "rider_wallet",nullable = true )
-	private int riderWallet;
-	
+    private int riderWallet;
+
 	@CreationTimestamp
 	@Column(name = "registration_date", updatable = false)
 	private LocalDateTime registrationDate;

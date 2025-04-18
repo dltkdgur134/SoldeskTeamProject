@@ -10,6 +10,7 @@
 	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
 	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script>
 	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	
 </head>
 <body>
 
@@ -101,7 +102,7 @@
 		</div>
 	</div>
 	<div layout:fragment="js">
-		<script src="/js/register.js"></script>
+		<script th:src="@{/js/register.js}"></script>
 	</div>
 </body>
 </html>
