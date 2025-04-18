@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<script th:src="@{/js/update.js}"></script>
+</head>
+<body>
+	<div layout:fragment="content" class="container py-5">
+		<div class="my-3">
+			<h1>회원탈퇴 유의사항</h1>
+			<p>회원 탈퇴를 신청하시기 전에 안내 사항을 꼭 확인해주세요.</p>
+		</div>
+		<br>
+		<div class="my-3">
+			<h3>회원정보</h3>
+			<p>회원 탈퇴를 하시게 되면 모든 회원 정보는 임시로 보관됩니다.</p> 
+			<p>모든 회원정보 및 이용기록은 탈퇴 시점으로부터 <strong>365일</strong> 후에 완전히삭제됩니다.</p>
+			<p>라이더 및 사장님으로 기입한 데이터 또한 같이 삭제되오니 유의 바랍니다.</p>
+			<p>삭제되는 내용을 확인하시고 필요한 데이터는 미리 백업해주세요.</p>
+			<table class="table" id="delete-info-table">
+  				<thead>
+    				<tr>
+      					<th scope="col">분류</th>
+      					<th scope="col">삭제 정보</th>
+    				</tr>
+  				</thead>
+  				<tbody>
+    				<tr>
+      					<th scope="row">유저</th>
+      						<td>주문내역, 결제내역, 리뷰글, 문의글</td>
+    				</tr>
+    				<tr>
+     	 				<th scope="row">라이더</th>
+      					<td>배달 매출 정보, 배달 내역, 배달 차량 정보</td>
+    				</tr>
+    				<tr>
+      					<th scope="row">점주</th>
+      					<td>가게 기본정보, 사업자등록 심사 정보, 매출정보, 가게 사진, 메뉴 정보, 메뉴 사진</td>
+    				</tr>
+  				</tbody>
+			</table>
+		</div>
+		<br>
+		<div class="my-3">
+			<h3>소셜 연동</h3>
+			<p>회원 탈퇴시에는 연동된 소셜 정보 또한 같이 삭제됩니다.</p>
+			<p>소셜 가입 회원의 경우에는 일반회원과 동일한 모든 항목의 데이터가 삭제됩니다.</p>
+		</div>
+		<br>
+		<div class="my-3">
+			<p class="delete-agree-msg">탈퇴 후, <strong th:text="${#authentication.principal.user.userId}"></strong> 아이디는 중복확인을 거친 후에 사용이 가능합니다.</p>
+			<p class="delete-agree-msg">해당 아이디로 기록된 라이더, 사장님 데이터 또한 같이 삭제됩니다.</p>
+			<p class="delete-agree-msg">탈퇴 시점으로부터 <strong>365일</strong>이내에 같은 아이디 및 개인 정보로 가입할시에는 인증 과정을 거친 후에 기존 아이디의 데이터를 불러올 수 있습니다.</p>
+			<hr>
+			<form class="form" th:action="@{/deleteUser}" method="post" name="deleteAccountForm"
+					autocomplete="off" id="delete-account-form" onsubmit="return checkDeleteCheckbox();" novalidate >
+				<div class="form-check">
+  					<input class="form-check-input" type="checkbox" value="" id="checkDefault" name="agree" required>
+  					<label class="form-check-label" for="checkDefault">
+    					위의 모든 안내사항들을 확인하였으며, 회원 탈퇴에 동의합니다.
+ 				 	</label>
+ 				<div class="invalid-feedback">
+     				<i class="fa-solid fa-circle-exclamation"></i>  회원 탈퇴에 동의하지 않으면 회원 탈퇴 신청이 불가능합니다. 체크박스를 눌러 동의 여부를 알려주세요.
+				</div>
+				</div>
+ 				<br>
+			</form>
+			<div class="d-flex justify-content-evenly">
+		 		<button type="submit" class="btn btn-danger btn-lg"
+					form="delete-account-form" id="delete-accout-btn"><strong>회원탈퇴</strong></button>
+				<a th:href="@{/myPage}" type="button" class="btn btn-dark btn-lg" id="delete-account-back-btn" ><strong>뒤로가기</strong></a>	
+			</div>
+		</div>
+	</div>
+</body>
+</html>

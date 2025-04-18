@@ -318,3 +318,18 @@ function dragLeaveHandler(ev) {
 	console.log("File(s) left drop zone")
 	ev.target.style.backgroundColor = "white";
 }
+
+
+// 회원 탈퇴 
+function checkDeleteCheckbox() {
+	const agreeToTerms = document.deleteAccountForm.agree;
+	if (agreeToTerms.checked == true) {
+		agreeToTerms.classList.add("is-valid");
+		agreeToTerms.classList.remove("is-invalid")
+		return true;
+	} else {
+		agreeToTerms.classList.add("is-invalid");
+		agreeToTerms.classList.remove("is-valid");
+		return false
+	}
+}
