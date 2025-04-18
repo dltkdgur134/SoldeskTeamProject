@@ -117,7 +117,6 @@ public class Order {
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
     
-    
     @Builder
     public Order(User user, Store store, String deliveryAddress, String storeRequest,
                  String deliveryRequest, int totalPrice, String orderAdditional1, String orderAdditional2,
