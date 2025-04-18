@@ -244,18 +244,6 @@
 </div>
 
 <script th:inline="javascript">
-$(function() {
-    // 1) 페이지 로드 시, 서버에서 전체 주문 목록을 불러옴
-    loadOrderList();
-    setupOrderButtons();  // ✅ 버튼 바인딩
-});
-
-const actionNames = {
-		  accept: '접수',
-		  reject: '거부',
-		  complete: '조리 완료',
-		  startDelivery: '배달 시작'
-		};
 
 function handleOrderAction(orderId, action, extra = {}) {
     let url = '';
@@ -310,6 +298,12 @@ function getCompletionTime(elem) {
 }
 
 function setupOrderButtons() {
+    // ✅ 주문 리스트 아이템 클릭 시 주문 상세 정보 로딩
+    $(document).on('click', '.order-item', function () {
+        const orderId = $(this).data('orderid');
+        loadOrderDetail(orderId);
+    });
+    
     $(document).on('click', '.acceptBtn, #confirmBtn', function () {
         const orderId = getOrderId(this);
         const time = getCompletionTime(this);
@@ -647,7 +641,7 @@ function updateOrderStatus(orderId, url) {
            contentType: 'application/json',
            data: JSON.stringify({ orderId: orderId, completionTime: parsedTime }),
            success: function(updatedOrder) {
-        	   alert(`주문이 ${actionNames[action]} 처리되었습니다.`);
+        	   alert(`주문이 접수 처리되었습니다.`);
                closeNewOrderPopup();
                renderOrderDetail(updatedOrder);  // ✅ 추가
                removeOrderFromList(orderId);
@@ -677,7 +671,7 @@ function rejectOrder(orderId) {
         contentType: 'application/json', // ✅ 추가
         data: JSON.stringify({ orderId: orderId }), // ✅ JSON 문자열로
         success: function(response) {
-        	alert(`주문이 ${actionNames[action]} 처리되었습니다.`);
+        	alert(`주문이 거부 처리되었습니다.`);
             closeNewOrderPopup();
             removeOrderFromList(orderId);
         },
@@ -759,7 +753,7 @@ function completeOrder(orderId) {
         contentType: 'application/json',
         data: JSON.stringify({ orderId: orderId }),
         success: function(updatedOrder) {
-        	alert(`주문이 ${actionNames[action]} 처리되었습니다.`);
+        	alert(`주문이 조리완료 처리되었습니다.`);
             renderOrderDetail(updatedOrder);
             removeOrderFromList(orderId);
             addOrderToList(updatedOrder);
@@ -782,6 +776,10 @@ $(document).ready(function() {
     
     // WebSocket 연결, etc.
     connect();
+
+    // 1) 페이지 로드 시, 서버에서 전체 주문 목록을 불러옴
+    loadOrderList();
+    setupOrderButtons();  // ✅ 버튼 바인딩
 });
 </script>
 
