@@ -32,13 +32,13 @@
 	  						</label>
 						</div> -->
 						<strong th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
-	    						<br>
-	    						<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
+	    				<br>
+	    				<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
   					</div>
 				</div>
-				
 				<th:block th:each="address : ${addressList}">
-					<div class="card">
+					<th:block th:if="${address.isUserSelectedAddress == false}">
+						<div class="card">
 						<div class="card-body">
 							<div class="form-check">
 			  					<input class="form-check-input" type="radio" name="radioDefault" th:id="'radioDefault' + ${addressStat.count}">
@@ -50,6 +50,7 @@
 							</div>
 						</div>
 					</div>
+					</th:block>
 				</th:block>
 			</form>
 			

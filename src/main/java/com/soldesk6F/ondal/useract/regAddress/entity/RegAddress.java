@@ -58,17 +58,24 @@ public class RegAddress {
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
 	
-	@Column(name = "is_user_selected_address")
+	@Column(name = "is_user_selected_address", nullable = false)
 	private boolean isUserSelectedAddress;
 
 	@Builder
-	public RegAddress(User user, String address,String detailAddress, double userAddressLatitude, double userAddressLongitude) {
+	public RegAddress(User user, String address,String detailAddress, double userAddressLatitude, 
+			double userAddressLongitude, boolean isUserSelectedAddress) {
 		super();
 		this.user = user;
 		this.address = address;
 		this.detailAddress = detailAddress;
 		this.userAddressLatitude = userAddressLatitude;
 		this.userAddressLongitude = userAddressLongitude;
+		this.isUserSelectedAddress = isUserSelectedAddress;
+	}
+	
+	public RegAddress updateDefaultAddress(boolean isUserSelectedAddress) {
+		this.isUserSelectedAddress = isUserSelectedAddress;
+		return this;
 	}
 	
 	public String getUserUuidAsString() {

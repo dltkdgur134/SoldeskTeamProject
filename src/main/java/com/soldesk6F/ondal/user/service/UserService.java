@@ -287,8 +287,6 @@ public class UserService {
 			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
     		return false;
     	}
-    	System.out.println(password);
-    	System.out.println(findUser.get().getPassword());
     	if (passwordEncoder.matches(password, findUser.get().getPassword())) {
     		rAttr.addFlashAttribute("result", 0);
 			rAttr.addFlashAttribute("resultMsg", "비밀번호가 맞습니다!");
@@ -299,6 +297,7 @@ public class UserService {
     	return false;
     }
     
+    // 유저 탈퇴 상태로 변경
     @Transactional
     public boolean deleteUserTemp(CustomUserDetails cud, 
     		RedirectAttributes rAttr) {
@@ -323,40 +322,6 @@ public class UserService {
     		return false;
 		}
     }
-    
-//    @Transactional
-//    public boolean regHomeAddress(CustomUserDetails cud,
-//    		RedirectAttributes rAttr,
-//    		String address,
-//    		String detailAddress,
-//    		String latitude,
-//    		String longitude) {
-//    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
-//    	
-//    	try {
-//    		if (findUser.isEmpty()) {
-//        		rAttr.addFlashAttribute("result", 1);
-//    			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
-//    			return false;
-//        	}
-//    		double latitudeDouble = Double.parseDouble(latitude);
-//    		double longitudeDouble = Double.parseDouble(longitude);
-//    		Address homeAddress = new Address(address, detailAddress, latitudeDouble, longitudeDouble);
-//    		
-//    		findUser.get().updateHomeAddress(homeAddress);
-//    		cud.getUser().setHomeAddress(homeAddress);
-//    		rAttr.addFlashAttribute("result", 0);
-//    		rAttr.addFlashAttribute("resultMsg", "주소 등록 완료!");
-//    		return true;
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			rAttr.addFlashAttribute("result", 1);
-//    		rAttr.addFlashAttribute("resultMsg", "주소 등록 실패");
-//    		return false;
-//		}
-//    }
-    
-    
     
 }
 

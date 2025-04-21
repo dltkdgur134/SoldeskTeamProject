@@ -52,10 +52,13 @@ public class RegAddressService {
     				.detailAddress(detailAddress)
     				.userAddressLatitude(latitudeDouble)
     				.userAddressLongitude(longitudeDouble)
+    				.isUserSelectedAddress(false)
     				.build();
     		regAddressRepository.save(regAddress);
     		if (findUser.get().getUserSelectedAddress() == null) {
+    			regAddress.updateDefaultAddress(true);
     			findUser.get().updateUserSelectedAddress(regAddress);
+    			cud.getUser().setUserSelectedAddress(regAddress);
     		}
     		rAttr.addFlashAttribute("result", 0);
     		rAttr.addFlashAttribute("resultMsg", "주소 등록 완료!");
@@ -69,30 +72,37 @@ public class RegAddressService {
     }
 	
 	@Transactional
-	public List<RegAddress> getRegAddress(CustomUserDetails cud,
+	public void getRegAddress(CustomUserDetails cud,
 			RedirectAttributes rAttr,
 			Model model) {
-		Optional<User> findUser = userRepository.findByUserId(cud.getUsername()); 
+		Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
 		if (findUser.isEmpty()) {
 			rAttr.addFlashAttribute("result", 1);
-			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");	
 		}
-		List<RegAddress> addressList = regAddressRepository.findAll();
-		model.addAttribute("addressList", addressList);
-		return addressList;
+		Optional<List<RegAddress>> addressList = regAddressRepository.findAllByUser(findUser.get());
+		model.addAttribute("addressList", addressList.get());	
 	}
 	
 	@Transactional
 	public boolean selectDefaultAddress (
 			CustomUserDetails cud,
-			RedirectAttributes rAttr,
-			Model model) {
+			RegAddress regAddress,
+			boolean isUserSelectedAddress,
+			RedirectAttributes rAttr) {
 		Optional<User> findUser = userRepository.findByUserId(cud.getUsername()); 
 		if (findUser.isEmpty()) {
 			rAttr.addFlashAttribute("result", 1);
 			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
 		}
-		
+		try {
+			Optional<RegAddress> findAddress = regAddressRepository.findByUser(findUser.get());
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return true;
 	}

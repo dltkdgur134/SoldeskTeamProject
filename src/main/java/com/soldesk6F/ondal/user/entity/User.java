@@ -9,10 +9,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -84,15 +81,6 @@ public class User {
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
-	
-//	@Embedded
-//	@AttributeOverrides({
-//		@AttributeOverride(name = "address", column = @Column(name = "home_address")) , 
-//		@AttributeOverride(name = "detailAddress", column = @Column(name = "home_detail_address")),
-//		@AttributeOverride(name = "latitude", column = @Column(name = "home_address_latitude")),
-//		@AttributeOverride(name = "longitude", column = @Column(name = "home_address_longitude"))
-//	})
-//	private Address HomeAddress;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
@@ -196,11 +184,6 @@ public class User {
 		this.updatedDate = updatedDate;
 		return this;
 	}
-	
-//	public User updateHomeAddress(Address homeAddress) {
-//		this.HomeAddress = homeAddress; 
-//		return this;
-//	}
 	
 	public User updateUserSelectedAddress(RegAddress userSelectedAddress) {
 		this.userSelectedAddress = userSelectedAddress;
