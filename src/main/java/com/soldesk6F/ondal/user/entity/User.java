@@ -10,6 +10,7 @@ import org.hibernate.annotations.UuidGenerator;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.OverridesAttribute;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
