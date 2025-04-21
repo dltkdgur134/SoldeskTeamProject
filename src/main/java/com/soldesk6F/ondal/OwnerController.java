@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class OwnerController {
 
-	@GetMapping("/store")
+	@GetMapping("/owner/store-management")
 	public String store() {
-		return "content/store/storeMenu";
+		return "content/store/storeManagement";
 	}
 	
 	@GetMapping("/storesetting")

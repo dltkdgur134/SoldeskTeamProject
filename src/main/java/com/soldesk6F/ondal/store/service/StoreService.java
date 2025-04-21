@@ -12,6 +12,7 @@ import com.soldesk6F.ondal.user.repository.OwnerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -128,6 +129,17 @@ public class StoreService {
 		List<Store> stores = storeRepository.findByOwner(owner);
 		System.out.println("📦 StoreRepository에서 조회된 가게 수: " + stores.size());
 		return stores;
+	}
+	
+	public Store getStoreForOwner(UUID storeId, String authenticatedUserId) {
+	    Store store = storeRepository.findById(storeId)
+	        .orElseThrow(() -> new IllegalArgumentException("점포를 찾을 수 없습니다."));
+
+	    if (!store.getOwner().getUser().getUserId().equals(authenticatedUserId)) {
+	        throw new AccessDeniedException("접근 권한이 없습니다.");
+	    }
+
+	    return store;
 	}
 	
 }
