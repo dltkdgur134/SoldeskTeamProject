@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.user.entity.Address;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserStatus;
 import com.soldesk6F.ondal.user.repository.UserRepository;
