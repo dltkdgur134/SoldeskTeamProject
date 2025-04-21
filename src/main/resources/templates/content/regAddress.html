@@ -1,0 +1,67 @@
+	<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/myAddress.css}" rel="stylesheet">
+	<script th:src="@{/js/zipcode.js}" defer></script>
+	<script th:src="@{/js/myAddress.js}" defer></script>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+
+<div layout:fragment="content" class="container py-5">
+	<div class="card info-card p-4">
+		<h5 class="card-title">
+			주소 등록하기
+		</h5>
+		<div class="card-body">
+			<div class="form-floating mb-3">
+				<form th:action="@{/content/regHomeAddress}" method="post" name="regAddressForm"
+						autocomplete="off" id="reg-address-form">
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-map-location-dot"></i></span> 
+							<input type="text" class="form-control" aria-label="regAddress" name="address" id="userAddress" placeholder="주소" readonly>
+								<input type="button" onclick="regUserAddress()" value="주소 찾기" class="btn btn-warning btn">
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-house-user"></i></span> 
+							<input type="text" class="form-control" aria-label="detailAddress" name="detailAddress" id="detailAddress" placeholder="상세주소">
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-location-crosshairs"></i></span>
+							<input type="text" name="longitude" class="form-control" id="userAddresslongitude" placeholder="경도" readonly>
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2">
+							<i class="fa-solid fa-location-crosshairs"></i></span> 
+							<input type="text" name="latitude" class="form-control" id="userAddresslatitude" placeholder="위도" readonly>
+						</div>
+ 					 <br>
+ 					<div id="iframe-layer" >
+						<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
+					</div>			 
+					<br>
+ 					 <button type="submit" class="btn btn-primary"
+						form="reg-address-form" id="reg-address-btn">확인</button> 
+				</form>
+			</div> 
+		</div>
+		<!-- <div class="address-search-container">
+  				<input type="text" id="address-search-bar"	placeholder="주소검색"	/>
+				oninput="fetchSearchResults(this.value)"  				
+ 			 <ul id="dropdown-results" class="dropdown-menu"></ul>
+		</div> -->
+		<br>
+	</div> 
+
+<!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
+		
+
+</div>
+
+</html>
