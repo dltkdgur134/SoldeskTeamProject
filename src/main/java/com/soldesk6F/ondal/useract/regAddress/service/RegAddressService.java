@@ -1,10 +1,12 @@
 package com.soldesk6F.ondal.useract.regAddress.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
@@ -66,7 +68,33 @@ public class RegAddressService {
 		}
     }
 	
+	@Transactional
+	public List<RegAddress> getRegAddress(CustomUserDetails cud,
+			RedirectAttributes rAttr,
+			Model model) {
+		Optional<User> findUser = userRepository.findByUserId(cud.getUsername()); 
+		if (findUser.isEmpty()) {
+			rAttr.addFlashAttribute("result", 1);
+			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+		}
+		List<RegAddress> addressList = regAddressRepository.findAll();
+		model.addAttribute("addressList", addressList);
+		return addressList;
+	}
 	
-	
+	@Transactional
+	public boolean selectDefaultAddress (
+			CustomUserDetails cud,
+			RedirectAttributes rAttr,
+			Model model) {
+		Optional<User> findUser = userRepository.findByUserId(cud.getUsername()); 
+		if (findUser.isEmpty()) {
+			rAttr.addFlashAttribute("result", 1);
+			rAttr.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+		}
+		
+		
+		return true;
+	}
 	
 }

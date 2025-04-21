@@ -57,6 +57,9 @@ public class RegAddress {
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
+	
+	@Column(name = "is_user_selected_address")
+	private boolean isUserSelectedAddress;
 
 	@Builder
 	public RegAddress(User user, String address,String detailAddress, double userAddressLatitude, double userAddressLongitude) {

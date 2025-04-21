@@ -98,8 +98,12 @@
 								class="card-title d-flex justify-content-center align-items-center"
 								th:text="${#authentication.principal.user.nickName}"></h5>
 							<p class="card-text">
-								<i class="fas fa-map-marker-alt"></i> <strong
-									th:text="${#authentication.principal.user.userSelectedAddress}"></strong>
+								<i class="fas fa-map-marker-alt"></i>
+								<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
+								<strong	th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
+								<br>
+								<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
+								</th:block> 
 							</p>
 						</div>
 

@@ -2,6 +2,8 @@ package com.soldesk6F.ondal.useract.regAddress.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -30,7 +32,21 @@ public class RegAddressController {
 //			return "redirect:/myPage";
 //		}
 		regAddressService.regAddress(cud, rAttr, address, detailAddress, latitude, longitude);
-		return "redirect:/mypage";
+		return "redirect:/myPage";
 	}
+	
+	@GetMapping (value = "/myAddress")
+	public String goMyAddress(@AuthenticationPrincipal CustomUserDetails cud,
+			RedirectAttributes rAttr,
+			Model model) {
+		regAddressService.getRegAddress(cud, rAttr, model);
+		return "content/myAddress";
+	}
+	
+	@GetMapping (value = "/regAddress")
+	public String goRegAddress() {
+		return "content/regAddress";
+	}
+	
 	
 }

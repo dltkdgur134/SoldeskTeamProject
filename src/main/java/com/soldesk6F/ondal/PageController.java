@@ -17,14 +17,4 @@ public class PageController {
 		return "content/mySecurity";
 	}
 	
-	@GetMapping (value = "/myAddress")
-	public String goMyAddress() {
-		return "content/myAddress";
-	}
-	
-	@GetMapping (value = "/regAddress")
-	public String goRegAddress() {
-		return "content/regAddress";
-	}
- 	
 }
