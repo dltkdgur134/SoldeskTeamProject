@@ -53,7 +53,8 @@ public class OwnerStoreController {
 		System.out.println("📦 해당 점주의 가게 수: " + myStores.size());
 		
 		for (Store s : myStores) {
-	        System.out.println("   - 가게명: " + s.getStoreName());
+			System.out.println("   - 가게명: " + s.getStoreName());
+			System.out.println("✅ storeId: " + s.getStoreId());
 	    }
 
 		model.addAttribute("myStores", myStores);
