@@ -38,9 +38,9 @@ public class StoreService {
 		log.info("가게 이름: {}", dto.getStoreName());
 		log.info("전화번호: {}", dto.getStorePhone());
 		log.info("첨부파일: {}", dto.getStoreImgs() != null ? dto.getStoreImgs().getOriginalFilename() : "null");
-		String userId = user.getUserId();
-		Owner owner = ownerRepository.findByUser_UserId(userId)
-			.orElseThrow(() -> new IllegalStateException("해당 userId로 등록된 점주 정보가 없습니다."));
+		UUID userUuid = user.getUserUuid();
+		Owner owner = ownerRepository.findByUser_UserUuid(userUuid)
+			.orElseThrow(() -> new IllegalStateException("해당 아이디로 등록된 점주 정보가 없습니다."));
 
 		MultipartFile file = dto.getStoreImgs();
 		List<StoreImg> imgList = new ArrayList<>();
@@ -123,4 +123,11 @@ public class StoreService {
 			})
 			.collect(Collectors.toList());
 	}
+	
+	public List<Store> findStoresByOwner(Owner owner) {
+		List<Store> stores = storeRepository.findByOwner(owner);
+		System.out.println("📦 StoreRepository에서 조회된 가게 수: " + stores.size());
+		return stores;
+	}
+	
 }

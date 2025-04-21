@@ -23,22 +23,22 @@ public class OwnerController {
     public String operationSetting() {
         return "content/setting/operation";
     }
-
+    
     @GetMapping("/setting/printer")
     public String printerSetting() {
         return "content/setting/printer";
     }
-
+    
     @GetMapping("/setting/alarm")
     public String alarmSetting() {
         return "content/setting/alarm";
     }
-
+    
     @GetMapping("/setting/delivery")
     public String deliverySetting() {
         return "content/setting/deliveryAgency";
     }
-	
+
 }
 
 
