@@ -45,7 +45,7 @@ public class UpdateOwnerController {
 		return "content/owner/ownerUpdateInfo"; // 수정 폼 페이지
 	}
 	
-	@PostMapping("/updateRiderNickname")
+	@PostMapping("/updateOwnerNickname")
 	public String updateOwnerNickname(
 	        @RequestParam("ownerNickname") String ownerNickname,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
