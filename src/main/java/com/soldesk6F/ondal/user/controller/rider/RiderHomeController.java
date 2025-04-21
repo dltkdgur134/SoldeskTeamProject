@@ -44,9 +44,9 @@ public class RiderHomeController {
         return "content/rider/riderHome";
     }
     
-    @GetMapping("/infopage")
+    @GetMapping("/myPage")
     public String showMyPage() {
-    	return "redirect:/infopage"; // templates/user/infopage.html 이라는 뷰 파일을 반환
+    	return "redirect:/myPage"; // templates/user/infopage.html 이라는 뷰 파일을 반환
     }
     
     @GetMapping("/riderInfopage")
@@ -64,7 +64,7 @@ public class RiderHomeController {
     	
     	
     	
-    	return "content/rider/riderInfopage"; // templates/user/infopage.html 이라는 뷰 파일을 반환
+    	return "content/rider/riderInfopage"; 
     }
     
     

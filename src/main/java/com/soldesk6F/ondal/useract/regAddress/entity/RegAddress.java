@@ -61,6 +61,7 @@ public class RegAddress {
 	@Column(name = "is_user_selected_address", nullable = false)
 	private boolean isUserSelectedAddress;
 
+	
 	@Builder
 	public RegAddress(User user, String address,String detailAddress, double userAddressLatitude, 
 			double userAddressLongitude, boolean isUserSelectedAddress) {

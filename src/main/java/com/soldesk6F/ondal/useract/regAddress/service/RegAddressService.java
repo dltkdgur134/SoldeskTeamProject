@@ -23,7 +23,7 @@ public class RegAddressService {
 	
 	 private final UserRepository userRepository;
 	 private final RegAddressRepository regAddressRepository;
-	
+	 
     @Transactional
     public boolean regAddress(CustomUserDetails cud,
     		RedirectAttributes rAttr,
