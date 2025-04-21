@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.store.entity.Store;
 
@@ -36,7 +37,7 @@ public class OrderTestController {
 
         // 나머지 속성들 세팅
         testOrder.setOrderId(UUID.randomUUID());
-        testOrder.setOrderToOwner(OrderStatus.PENDING);
+        testOrder.setOrderToOwner(OrderToOwner.PENDING);
         testOrder.setDeliveryAddress("서울특별시 강남구 논현동 123-45");
         testOrder.setStoreRequest("매운맛으로 주세요");
         testOrder.setDeliveryRequest("벨 누르지 말고 문자 부탁합니다");

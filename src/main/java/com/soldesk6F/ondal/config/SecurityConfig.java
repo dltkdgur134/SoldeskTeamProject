@@ -18,19 +18,17 @@ import com.soldesk6F.ondal.user.*;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
 
     private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
-
     private final CustomAuthFailureHandler customAuthFailureHandler;
-
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomUserDetailsService costomUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
     		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
-        this.costomUserDetailsService = customUserDetailsService;
+        this.customUserDetailsService = customUserDetailsService;
         this.customAuthFailureHandler = customAuthFailureHandler;
         this.customOAuth2UserService = customOAuth2UserService;
         this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
@@ -46,7 +44,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(costomUserDetailsService)
+                .userDetailsService(customUserDetailsService)
                 .passwordEncoder(passwordEncoder())
                 .and()
                 .build();
@@ -79,7 +77,8 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     	http
     		.authorizeHttpRequests(auth -> auth
-    			.requestMatchers("/**","/register", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll() 
+    			.requestMatchers("/**","/register", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
+    			.requestMatchers("/owner/**").hasAnyRole("OWNER", "ALL")
     			.anyRequest().authenticated() 
 				)
 			.formLogin(form -> form
@@ -93,12 +92,18 @@ public class SecurityConfig {
 				.logoutUrl("/logout")
 				.logoutSuccessUrl("/login?logout")
 				.permitAll()
-			).oauth2Login(oauth2 -> oauth2
-                    .loginPage("/login/tryOAuthLogin")
-                    .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService)
-                    
-                    ).successHandler(OAuth2LoginSuccessHandler)
+			)
+			.oauth2Login(oauth2 -> oauth2
+				.loginPage("/login/tryOAuthLogin")
+				.userInfoEndpoint(userInfo -> userInfo
+					.userService(customOAuth2UserService)
+				)
+				.successHandler(OAuth2LoginSuccessHandler)
+			)
+			.exceptionHandling(exception -> exception
+				.accessDeniedHandler((request, response, accessDeniedException) ->
+					response.sendRedirect("/access-denied")
+				)
 			)
 			.csrf(csrf -> csrf.disable());
 
@@ -125,5 +130,6 @@ public class SecurityConfig {
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
     
 }

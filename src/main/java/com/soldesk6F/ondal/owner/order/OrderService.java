@@ -14,6 +14,7 @@ import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto.OrderDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.menu.entity.Menu;
@@ -45,7 +46,7 @@ public class OrderService {
                 .deliveryRequest(requestDto.getDeliveryRequest())
                 .orderAdditional1(requestDto.getOrderAdditional1())
                 .orderAdditional2(requestDto.getOrderAdditional2())
-                .orderStatus(OrderStatus.PENDING)
+                .orderToOwner(OrderToOwner.PENDING)
                 .build();
 
         if (requestDto.getOrderDetails() != null) {
@@ -65,7 +66,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문 없음"));
 
-        order.setOrderToOwner(OrderStatus.CONFIRMED);
+        order.setOrderToOwner(OrderToOwner.CONFIRMED);
         order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
         order.setCookingStartTime(LocalDateTime.now());
 
@@ -93,7 +94,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
-        order.setOrderToOwner(OrderStatus.IN_DELIVERY);
+        order.setOrderToOwner(OrderToOwner.IN_DELIVERY);
         return orderRepository.save(order);
     }
 
@@ -109,11 +110,11 @@ public class OrderService {
     }
     
     @Transactional
-    public Order updateOrderStatus(UUID orderId, OrderStatus newStatus) {
+    public Order updateOrderStatus(UUID orderId, OrderToOwner orderToOwner) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
-        order.setOrderToOwner(newStatus);
+        order.setOrderToOwner(orderToOwner);
         Order savedOrder = orderRepository.save(order);
 
         if (savedOrder.getUser() != null) {
@@ -158,7 +159,7 @@ public class OrderService {
             .deliveryAddress(order.getDeliveryAddress())
             .storeRequest(order.getStoreRequest())
             .deliveryRequest(order.getDeliveryRequest())
-            .orderStatus(order.getOrderToOwner()) // .name() 필요 없음 (enum 그대로 DTO에 선언되어 있으면)
+            .orderToOwner(order.getOrderToOwner()) // .name() 필요 없음 (enum 그대로 DTO에 선언되어 있으면)
             .totalPrice(order.getTotalPrice())
             .orderTime(order.getOrderTime())
             .expectCookingTime(order.getExpectCookingTime()) // 이거도 있으면 넣어줘

@@ -1,10 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
 <head>
+	<script th:src="@{/js/initialize.js}" ></script>
+	<script th:src="@{/js/zipcode.js}" ></script>
+	<script th:src="@{/js/update.js}" ></script>
+	<script th:src="@{/js/hideLogo.js}"></script>
+	<link th:fragment="css" th:href="@{/css/OwnerCustom.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>온달</title>
 </head>
 <body>
-ownerInfopage
+	<div layout:fragment="content" class="container py-5">
+	 <div th:if="${InfoUpdateError}" class="alert alert-danger text-center" role="alert"
+		style="margin-bottom: 20px;">
+		<span th:text="${InfoUpdateError}"></span>
+		</div>
+	<div th:if="${InfoUpdateSuccess}" class="alert alert-success" role="alert"
+			style="margin-bottom: 20px;">
+			<span th:text="${InfoUpdateSuccess}"></span>
+		</div>
+		<div class="container text-center">
+			<div class="row justify-content-md-center">
+				<div class="col col-lg-2">
+					<a type="button" class="btn btn-link position-relative"
+						id="profile-pic-btn" data-bs-toggle="modal"
+						data-bs-target="#updateProfilePicModal"> 
+						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
+	             ? #authentication.principal.user.userProfile 
+	             : '/img/userProfiles/' + #authentication.principal.user.userProfile}"
+								class="rounded-circle img-thumbnail img-fluid"
+								alt="Profile Picture" id="profile-pic"> 
+				<span class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle" id="profile-pic-update-btn">
+		    		<i class="fa-solid fa-pen-to-square"></i>
+		  		</span>
+					</a>
+				</div>
+				<div class="col col-lg-2">
+					<h5 id="profile-nickName" th:text="${owner.ownerNickname}"></h5>
+					<span
+						class="badge rounded-pill text-bg-primary justify-content-center"
+						th:text="${#authentication.principal.user.UserRole}"></span>
+				</div>
+	</div>
+	</div>
+	<br>
+		<div class="card info-card p-4">
+			<h6 class="card-title">
+				프로필 <a href="ownerMypage" data-bs-toggle="tooltip"
+					data-bs-placement="right" title="프로필 수정"><i
+					class="fa-solid fa-pen-to-square"></i></a>
+			</h6>
+			<div class="card-body">
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item d-flex justify-content-between"><Label>아이디</Label><strong
+						th:text="${#authentication.principal.user.userId}"></strong></li>
+					<li class="list-group-item d-flex justify-content-between"><Label>점주
+						닉네임</Label> <strong th:text="${owner.ownerNickname}"></strong> 
+						<a type="button" class="btn btn-secondary btn-sm"
+						data-bs-toggle="modal" data-bs-target="#updateOwnerNicknameModal">수정</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="modal fade" id="updateOwnerNicknameModal"
+			data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+			aria-labelledby="updateOwnerNicknameModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="updateOwnerNicknameModalLabel">점주
+							닉네임 변경</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form th:action="@{/updateOwnerNickname}" method="post"
+							name="updateOwnerNicknameForm" autocomplete="off"
+							class="needs-validation" id="update-owner-nickname-form"
+							novalidate>
+						<div class="input-group mb-3">
+								<span class="input-group-text" id="basic-addon2"> <i
+									class="fa-solid fa-id-card"></i>
+								</span> <input type="text" class="form-control" placeholder="점주 닉네임"
+									aria-label="ownerNickname" name="ownerNickname"
+									id="owner-nickname-input" aria-describedby="basic-addon2"
+									maxlength="10" th:value="${owner.ownerNickname}">
+	
+								<div class="invalid-feedback">
+									닉네임을 확인해주세요. <i data-bs-toggle="tooltip"
+										data-bs-placement="right"
+										title="닉네임은 최소 1글자이어야 하며 기존 닉네임과 다르게 입력해주세요."
+										class="fa-solid fa-circle-question"></i>
+								</div>
+								<div class="valid-feedback">닉네임 변경이 가능합니다.</div>
+							</div>	
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary"
+							form="update-owner-nickname-form" id="update-ownerer-nickname-btn">변경</button>
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">취소</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="updateProfilePicModal"
+			data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+			aria-labelledby="updateProfilePicModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="updateProfilePicModalLabel">프로필
+							사진 변경</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form th:action="@{/content/updateProfilePic}" method="post"
+							autocomplete="off" id="update-profilePic-form">
+							<div class="input-group mb-3">
+								<label class="input-group-text" for="profileImage"><i
+									class="fa-solid fa-folder-open input-icon"></i></label> <input
+									type="file" class="form-control" id="profileImage">
+							</div>
+							<div id="drop_zone" ondrop="dropHandler(event);"
+								ondragover="dragOverHandler(event);">
+								<p>
+									이미지 파일을 <i>여기에</i> 드래그하여 업로드.
+								</p>
+							</div>
+							<div id="file-name-display" class="file-name">이미지를 선택해주세요</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary"
+							form="update-profilePic-form">변경</button>
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">취소</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="card info-card p-4">
+			<h6 class="card-title">
+				점주 정보 <a href="updateOwnerInfo" data-bs-toggle="tooltip"
+					data-bs-placement="right" title="라이더 정보 수정"> <i
+					class="fa-solid fa-pen-to-square"></i>
+				</a>
+			</h6>
+			<div class="card-body">
+				<ul class="list-group list-group-flush">
+					
+					<li class="list-group-item d-flex justify-content-between">
+					<label>2차 비밀번호</label> 
+					<strong>********</strong></li>
+					<li class="list-group-item d-flex justify-content-between">
+					<label>온달 지갑</label>
+					<strong th:text="${owner.ownerWallet}+'원'"></strong></li>
+				</ul>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

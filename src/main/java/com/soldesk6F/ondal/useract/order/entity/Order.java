@@ -68,11 +68,11 @@ public class Order {
     @Column(name = "order_time", nullable = false, updatable = false)
     private LocalDateTime orderTime;
 
-    @Column(name = "cooking_start_time")
-    private LocalDateTime cookingStartTime;
-    
     @Column(name = "expect_cooking_time")
     private LocalTime expectCookingTime;
+    
+    @Column(name = "cooking_start_time")
+    private LocalDateTime cookingStartTime;
     
     @Column(name = "real_cooking_time", updatable = false)
     private LocalTime realCookingTime;
@@ -99,7 +99,15 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "order_to_owner", nullable = false)
-    private OrderStatus orderToOwner;
+    private OrderToOwner orderToOwner;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "cancled_why", nullable = true)
+    private CancledWhy cancledWhy;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_to_rider", nullable = false)
+    private OrderToRider orderToRider;
 
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
@@ -116,24 +124,82 @@ public class Order {
     @JsonIgnoreProperties("order")
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
-    
-    @Builder
-    public Order(User user, Store store, String deliveryAddress, String storeRequest,
-                 String deliveryRequest, int totalPrice, String orderAdditional1, String orderAdditional2,
-                 OrderStatus orderStatus, String guestId) {
-        this.user = user;
-        this.store = store;
-        this.deliveryAddress = deliveryAddress;
-        this.storeRequest = storeRequest;
-        this.deliveryRequest = deliveryRequest;
-        this.totalPrice = totalPrice;
-        this.orderAdditional1 = orderAdditional1;
-        this.orderAdditional2 = orderAdditional2;
-        this.orderToOwner = orderStatus != null ? orderStatus : OrderStatus.PENDING;
-        this.guestId = guestId;
-        
-    }
 
+    public enum OrderToOwner {
+        PENDING("주문 요청 중"), 
+        CONFIRMED("주문 확인 완료"),
+        IN_DELIVERY("배달 중"), 
+        COMPLETED("주문 및 결재 완료"), 
+        CANCELED("주문 취소");
+    	private final String description;
+    	OrderToOwner(String description) {
+			this.description = description;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+    }
+    public enum CancledWhy {
+    	REQUEST_REFUSED("고객 요청 수용 불가"), 
+    	MATERIALS_USED_UP("재료소진"),
+    	CIRCUMSTANCES("업소 사정"), 
+    	CANNOTDELIVERY("배달 불가");
+    	private final String description;
+    	CancledWhy(String description) {
+    		this.description = description;
+    	}
+    	
+    	public String getDescription() {
+    		return description;
+    	}
+    }
+    
+    public enum OrderToRider {
+        PENDING("주문 요청 중"), 
+        CONFIRMED("주문 확인 완료"),
+        DISPATCHED("라이더 배차 수락"), 
+        ON_DELIVERY("픽업 완료 후 배달 중"),
+        COMPLETED("배달 완료"),
+        INTERRUPTED("배달 중단");
+    	
+    	private final String description;
+    	OrderToRider(String description) {
+			this.description = description;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+    }
+    @Builder
+    public Order(User user, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
+    		LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
+    		LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress, String storeRequest,
+    		String deliveryRequest, OrderToOwner orderToOwner, CancledWhy cancledWhy, OrderToRider orderToRider,
+    		int totalPrice, String orderAdditional1, String orderAdditional2, List<OrderDetail> orderDetails) {
+    	this.user = user;
+    	this.guestId = guestId;
+    	this.store = store;
+    	this.rider = rider;
+    	this.expectCookingTime = expectCookingTime;
+    	this.cookingStartTime = cookingStartTime;
+    	this.realCookingTime = realCookingTime;
+    	this.deliveryStartTime = deliveryStartTime;
+    	this.expectDeliveryTime = expectDeliveryTime;
+    	this.realDeliveryTime = realDeliveryTime;
+    	this.deliveryAddress = deliveryAddress;
+    	this.storeRequest = storeRequest;
+    	this.deliveryRequest = deliveryRequest;
+    	this.orderToOwner = orderToOwner;
+    	this.cancledWhy = cancledWhy;
+    	this.orderToRider = orderToRider;
+    	this.totalPrice = totalPrice;
+    	this.orderAdditional1 = orderAdditional1;
+    	this.orderAdditional2 = orderAdditional2;
+    	this.orderDetails = orderDetails;
+    }
+    
     public void addOrderDetail(OrderDetail orderDetail) {
         orderDetails.add(orderDetail);
         orderDetail.setOrder(this);
@@ -153,6 +219,7 @@ public class Order {
     public String getOrderUuidAsString() {
 	    return orderId != null ? orderId .toString() : null;
 	}
+
     
     
 }

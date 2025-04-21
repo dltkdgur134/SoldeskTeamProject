@@ -114,10 +114,6 @@ body {
     padding-left: 20px; /* 이미지를 보일 공간을 확보 */
 }
 
-/* .highlight-title 텍스트가 밀리지 않도록 padding-left를 충분히 줌 */
-.highlight-title {
-    padding-left: 20px; /* 이미지를 보일 공간을 확보 */
-}
 
 
 .tooltip .tooltip-inner {
@@ -200,3 +196,19 @@ body {
   color: #c62828;
 }
 
+.message-container {
+    background-color: #f2f2f2; /* 약간 회색빛 배경 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 50px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+    max-width: 500px;
+    margin: 50px auto; /* 화면 중앙 정렬 */
+}
+
+.message {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333; /* 어두운 글자 색 */
+    line-height: 1.5;
+}

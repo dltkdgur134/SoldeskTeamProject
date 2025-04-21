@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.useract.order.dto;
 
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @Builder
 public class OrderResponseDto {
 	
-	private OrderStatus orderStatus;
+	private OrderToOwner orderToOwner;
     private UUID orderId;
     private String deliveryAddress;	
     private String storeRequest;
@@ -43,7 +44,7 @@ public class OrderResponseDto {
     public static OrderResponseDto from(Order order) {
         return OrderResponseDto.builder()
                 .orderId(order.getOrderId())
-                .orderStatus(order.getOrderToOwner()) // ⚠️ orderStatus가 null이면 NPE 주의
+                .orderToOwner(order.getOrderToOwner()) // ⚠️ orderStatus가 null이면 NPE 주의
                 .deliveryAddress(order.getDeliveryAddress())
                 .storeRequest(order.getStoreRequest())
                 .deliveryRequest(order.getDeliveryRequest())

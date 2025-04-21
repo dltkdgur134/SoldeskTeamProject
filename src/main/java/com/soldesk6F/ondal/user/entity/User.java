@@ -10,6 +10,7 @@ import org.hibernate.annotations.UuidGenerator;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.OverridesAttribute;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -81,25 +83,7 @@ public class User {
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
-
-	public User update(String nickName, String userProfilePath) {
-		this.nickName = nickName;
-		this.userProfile = userProfilePath;
-
-		return this;
-	}
-
-	public User updateProvider(String socialLoginProvider) {
-		this.socialLoginProvider = socialLoginProvider;
-		return this;
-
-	}
-
-	public User updateEmail(String email) {
-		this.email = email;
-		return this;
-	}
-
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
@@ -156,13 +140,61 @@ public class User {
 		this.userProfileLiveUpdate = userProfileLiveUpdate;
 	}
 
-	public User update(String name) {
-		this.userName = name;
+	
+	public User update(String name) { 
+		this.userName = name; 
+		return this; 
+	}
+	 
+	public User update(String nickName, String userProfilePath) {
+		this.nickName = nickName;
+		this.userProfile = userProfilePath;
+		return this;
+	}
+	
+	public User updateNickname(String nickName) {
+		this.nickName = nickName;
+		return this;
+	}
+	
+	public User updateProfile(String userProfile) {
+		this.userProfile = userProfile;
+		return this;
+	}
+	
+	public User updatePhone(String userPhone) {
+		this.userPhone = userPhone;
+		return this;
+	}
+	
+	public User updateProvider(String socialLoginProvider) {
+		this.socialLoginProvider = socialLoginProvider;
 		return this;
 	}
 
+	public User updateEmail(String email) {
+		this.email = email;
+		return this;
+	}
+	
+	public User updatePassword(String password) {
+		this.password = password;
+		return this;
+	}
+	
+	public User updateUpdatedDate(LocalDateTime updatedDate) {
+		this.updatedDate = updatedDate;
+		return this;
+	}
+	
+	public User updateUserSelectedAddress(RegAddress userSelectedAddress) {
+		this.userSelectedAddress = userSelectedAddress;
+		return this;
+	}
+	
 	public String getUserUuidAsString() {
 		return userUuid != null ? userUuid.toString() : null;
 	}
+	
 
 }

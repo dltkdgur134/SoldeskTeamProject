@@ -12,6 +12,7 @@ import com.soldesk6F.ondal.useract.order.dto.ExtendTimeRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 
 import jakarta.servlet.http.HttpSession;
@@ -83,13 +84,13 @@ public class OwnerOrderController {
 
     @PostMapping("/reject")
     public ResponseEntity<Order> rejectOrder(@RequestParam("orderId") UUID orderId) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderStatus.CANCELED);
+        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
         return ResponseEntity.ok(updatedOrder);
     }
 
     @PostMapping("/cancel")
     public ResponseEntity<Order> cancelOrder(@RequestParam("orderId") UUID orderId) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderStatus.CANCELED);
+        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
         return ResponseEntity.ok(updatedOrder);
     }
     
@@ -139,7 +140,7 @@ public class OwnerOrderController {
             .deliveryAddress(order.getDeliveryAddress())
             .storeRequest(order.getStoreRequest())
             .deliveryRequest(order.getDeliveryRequest())
-            .orderStatus(order.getOrderToOwner()) // enum 그대로
+            .orderToOwner(order.getOrderToOwner()) // enum 그대로
             .totalPrice(order.getTotalPrice())
             .orderTime(order.getOrderTime())
             .expectCookingTime(order.getExpectCookingTime()) // 누락 시 추가
