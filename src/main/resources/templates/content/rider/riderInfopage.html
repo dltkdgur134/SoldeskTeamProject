@@ -4,12 +4,10 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-<script th:src="@{/js/initialize.js}" ></script>
+	<script th:src="@{/js/initialize.js}" ></script>
 	<script th:src="@{/js/zipcode.js}" ></script>
 	<script th:src="@{/js/update.js}" ></script>
 	<script th:src="@{/js/hideLogo.js}"></script>
-	
-	
 	<link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
 	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
 	<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
@@ -177,6 +175,9 @@
 				<li class="list-group-item d-flex justify-content-between">
 				<label>전화번호</label>
 				<strong th:text="${rider.riderPhone}">전화번호</strong></li>
+				<li class="list-group-item d-flex justify-content-between">
+				<label>온달 지갑</label>
+				<strong th:text="${rider.riderWallet}+'원'"></strong></li>
 			</ul>
 		</div>
 	</div>
