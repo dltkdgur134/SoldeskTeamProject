@@ -32,7 +32,7 @@ public class OwnerHomeController {
         if (optionalOwner.isPresent()) {
             Owner owner = optionalOwner.get();
 
-            // 디버깅 로그
+            // 디버깅 로그	
             System.out.println("✅ Owner 불러오기 성공!");
             System.out.println("🆔 ownerId: " + owner.getOwnerId());
             System.out.println("📅 등록일: " + owner.getRegistrationDate());
