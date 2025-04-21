@@ -34,7 +34,7 @@ public class StoreImg {
 	public StoreImg(Store store, String storeImg) {
 		super();
 		this.store = store;
-		storeImg = storeImg;
+		this.storeImg = storeImg;
 	}
     
     public String getStoreImgUuidAsString() {
