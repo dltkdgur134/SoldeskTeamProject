@@ -4,18 +4,20 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
+<title>점포 입점</title>
+<meta charset="UTF-8">
+	<link rel="stylesheet" th:href="@{/css/storeRegSubmit.css}">
 	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
 	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
-	<link rel="stylesheet" th:href="@{/css/storeRegSubmit.css}">
 	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0888431cff1af50a88706bb2bd8773bc&libraries=services"></script>
 </head>
 <body>
 	<div layout:fragment="content">
-	<div th:if="${ownerSuccess}" class="alert alert-success" role="alert"
-		style="margin-bottom: 20px;">
-		<span th:text="${ownerSuccess}"></span>
-	</div>
+		<div th:if="${ownerSuccess}" class="alert alert-success" role="alert"
+			style="margin-bottom: 20px;">
+			<span th:text="${ownerSuccess}"></span>
+		</div>
 		<div class="form-container">
 			<div class="title-and-error">
 				<h1>점포 입점</h1>

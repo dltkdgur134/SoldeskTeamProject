@@ -18,6 +18,15 @@ body {
 	color: #fff;
 }
 
+.store-header {
+	display: flex;
+	margin: auto 20px;
+}
+
+.store-info {
+	margin: auto 20px;
+}
+
 .menu-btn {
 	font-size: 20px;
 	background-color: white;

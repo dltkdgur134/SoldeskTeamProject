@@ -9,11 +9,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.service.UserService;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class OwnerStoreController {
 	private final UserService userService;
 	private final StoreService storeService;
+	private final StoreRepository storeRepository;
 	
 	@GetMapping("/ownerStoreList")
 	public String getOwnerStores(@AuthenticationPrincipal CustomUserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
@@ -57,4 +60,34 @@ public class OwnerStoreController {
 
 		return "content/owner/ownerStoreList";
 	}
+	
+	private String formatPhoneNumber(String phone) {
+		if (phone == null) return "";
+		phone = phone.replaceAll("[^0-9]", "");
+
+		if (phone.length() == 11) {
+			return phone.replaceFirst("(\\d{3})(\\d{4})(\\d{4})", "$1-$2-$3");
+		} else if (phone.length() == 10) {
+			return phone.replaceFirst("(\\d{3})(\\d{3})(\\d{4})", "$1-$2-$3");
+		} else if (phone.length() == 9) {
+			return phone.replaceFirst("(\\d{2})(\\d{3})(\\d{4})", "$1-$2-$3");
+		} else {
+			return phone;
+		}
+	}
+	
+	@GetMapping("/storeManagement/{storeId}")
+	public String manageStore(@PathVariable("storeId") UUID storeId, 
+							@AuthenticationPrincipal CustomUserDetails userDetails,
+							Model model, RedirectAttributes redirectAttributes) {
+	    Store store = storeRepository.findById(storeId)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 점포를 찾을 수 없습니다."));
+	    
+	    String formattedPhone = formatPhoneNumber(store.getStorePhone());
+	    System.out.println("형식 포맷된 전화번호: " + formattedPhone);
+	    model.addAttribute("store", store);
+	    model.addAttribute("formattedPhone", formattedPhone);
+	    return "content/store/storeManagement";
+	}
+	
 }

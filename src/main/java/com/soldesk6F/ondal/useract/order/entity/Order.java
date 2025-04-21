@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.User;
@@ -19,6 +20,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -41,19 +43,21 @@ public class Order {
 
     @Id
     @GeneratedValue
-    @UuidGenerator
+    @UuidGenerator	
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uuid", nullable = true)
+    @JsonIgnoreProperties({"orders"})
     private User user;
 
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
+    @JsonIgnoreProperties({"orders", "owner"})
     private Store store;
 
     @ManyToOne
@@ -117,7 +121,9 @@ public class Order {
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
+    @JsonIgnoreProperties("order")
     private List<OrderDetail> orderDetails = new ArrayList<>();
+
 
     public enum OrderToOwner {
         PENDING("주문 요청 중"), 
