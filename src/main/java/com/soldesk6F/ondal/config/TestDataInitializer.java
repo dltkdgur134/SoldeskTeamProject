@@ -14,7 +14,7 @@
 //import com.soldesk6F.ondal.user.repository.UserRepository;
 //import com.soldesk6F.ondal.useract.order.entity.Order;
 //import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
-//import com.soldesk6F.ondal.useract.order.entity.Order.OrderStatus;
+//import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 //import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.boot.CommandLineRunner;
@@ -57,7 +57,7 @@
 //                .userRole(UserRole.OWNER)
 //                .userStatus(UserStatus.ACTIVE)
 //                .socialLoginProvider("NONE")
-//                .build());
+//                .build());	
 //
 //        Owner owner = ownerRepository.save(Owner.builder()
 //                .user(ownerUser)
@@ -99,7 +99,7 @@
 //                    .storeRequest("덜 맵게 해주세요")
 //                    .deliveryRequest("문 앞에 놔주세요")
 //                    .totalPrice(0)
-//                    .orderStatus(OrderStatus.PENDING)
+//                    .orderToOwner(OrderToOwner.PENDING)
 //                    .guestId(null)
 //                    .build();
 //
