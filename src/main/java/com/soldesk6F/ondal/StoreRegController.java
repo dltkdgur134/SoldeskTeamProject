@@ -9,13 +9,24 @@ public class StoreRegController {
 
 	@GetMapping("/storeReg")
 	public String storeReg() {
-		return "content/storeReg";
+		return "content/store/storeReg";
 	}
 
 	@GetMapping("/storeReg/submit")
 	public String storeSubmit() {
-		return "content/storereg/submit";
+		return "content/store/submit";
 	}
+	
+	@GetMapping("/content/store/storeRegSuccess")
+	public String showStoreRegSuccessPage() {
+	    return "content/store/storeRegSuccess";
+	}
+	
+	@GetMapping("/storelist")
+	public String StoreList() {
+		return "content/store/storelist";
+	}
+	
 	
 }
 

@@ -18,6 +18,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserStatus;
+import com.soldesk6F.ondal.user.entity.Owner;
+import com.soldesk6F.ondal.user.repository.OwnerRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final OwnerRepository ownerRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
@@ -46,7 +49,7 @@ public class UserService {
     public boolean isEmailDuplicate(String email) {
         return userRepository.existsByEmail(email);
     }
-    
+
     public boolean isPhoneDuplicate(String userPhone) {
         return userRepository.existsByUserPhone(userPhone);
     }
@@ -62,9 +65,10 @@ public class UserService {
 
 	        String fileName = "default.png";
 	        String extension = "png";
-	        String filePath = uploadDir + File.separator + fileName;
+//	        String filePath = uploadDir + File.separator + fileName;
 	        
-	        String webPath = "/img/userProfiles/" + fileName;
+//	        String webPath = "/img/userProfiles/" + fileName;
+	        String webPath = fileName;
 	
 	        if (profileImage != null && !profileImage.isEmpty()) {
 	        	String originalFilename = profileImage.getOriginalFilename();
@@ -80,7 +84,8 @@ public class UserService {
 	            File saveFile = new File(saveFolder, fileName);
 	            profileImage.transferTo(saveFile);
 //	            filePath = uploadDir + File.separator + fileName;
-	            webPath = "/img/userProfiles/" + fileName;
+//	            webPath = "/img/userProfiles/" + fileName;
+	            webPath = fileName;
 	        }
 	
 	        String encryptedPassword = passwordEncoder.encode(password);
@@ -94,7 +99,8 @@ public class UserService {
 	                .userPhone(userPhone)
 	                .userSelectedAddress(userSelectedAddress)	
 //	                .userProfile(filePath)
-	                .userProfile(fileName)
+//	                .userProfile(fileName)
+	                .userProfile(webPath)
 	                .socialLoginProvider(socialLoginProvider)
 	                .build();
 	
@@ -322,5 +328,16 @@ public class UserService {
 		}
     }
     
+	public Optional<Owner> findOwnerByUserUuid(String uuid) {
+		UUID uuidObj = UUID.fromString(uuid);
+		Optional<User> user = userRepository.findByUserUuid(uuidObj);
+		System.out.println("🧩 User 존재 여부: " + (user.isPresent() ? "있음" : "없음"));
+
+		return user.flatMap(u -> {
+			System.out.println("🔎 UserId로 Owner 찾기: " + u.getUserId());
+			return ownerRepository.findByUser_UserId(u.getUserId());
+		});
+	}
+
 }
 

@@ -124,10 +124,6 @@ body {
     position: inherit;
 }
 
-/* .highlight-title 텍스트가 밀리지 않도록 padding-left를 충분히 줌 */
-.highlight-title {
-    padding-left: 20px; /* 이미지를 보일 공간을 확보 */
-}
 
 
 .tooltip .tooltip-inner {
