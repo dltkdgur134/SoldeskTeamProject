@@ -30,7 +30,7 @@ public class UpdateOwnerController {
 		Owner owner = ownerService.getOwnerByUserId(userId);
 		model.addAttribute("owner", owner);
 		
-		return "content/owner/ownerMypage"; 
+		return "content/owner/ownerMypage"; //닉네임 수정 폼 페이지
     }
 	
 	@GetMapping("owner/updateOwnerInfo")

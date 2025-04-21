@@ -61,7 +61,7 @@
 				<li class="list-group-item d-flex justify-content-between"><Label>점주
 					닉네임</Label> <strong th:text="${owner.ownerNickname}"></strong> 
 					<a type="button" class="btn btn-secondary btn-sm"
-					data-bs-toggle="modal" data-bs-target="#updateRiderNicknameModal">수정</a>
+					data-bs-toggle="modal" data-bs-target="#updateOwnerNicknameModal">수정</a>
 				</li>
 			</ul>
 		</div>
@@ -72,7 +72,7 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="updateOwnerNicknameModalLabel">라이더
+					<h1 class="modal-title fs-5" id="updateOwnerNicknameModalLabel">점주
 						닉네임 변경</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close"></button>
@@ -102,7 +102,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-primary"
-						form="update-rider-nickname-form" id="update-rider-nickname-btn">변경</button>
+						form="update-owner-nickname-form" id="update-ownerer-nickname-btn">변경</button>
 					<button type="button" class="btn btn-secondary"
 						data-bs-dismiss="modal">취소</button>
 				</div>
@@ -149,7 +149,7 @@
 	<br>
 	<div class="card info-card p-4">
 		<h6 class="card-title">
-			라이더 정보 <a href="updateOwnerInfo" data-bs-toggle="tooltip"
+			점주 정보 <a href="updateOwnerInfo" data-bs-toggle="tooltip"
 				data-bs-placement="right" title="라이더 정보 수정"> <i
 				class="fa-solid fa-pen-to-square"></i>
 			</a>
