@@ -36,7 +36,7 @@ public class OrderTestController {
 
         // 나머지 속성들 세팅
         testOrder.setOrderId(UUID.randomUUID());
-        testOrder.setOrderStatus(OrderStatus.PENDING);
+        testOrder.setOrderToOwner(OrderStatus.PENDING);
         testOrder.setDeliveryAddress("서울특별시 강남구 논현동 123-45");
         testOrder.setStoreRequest("매운맛으로 주세요");
         testOrder.setDeliveryRequest("벨 누르지 말고 문자 부탁합니다");

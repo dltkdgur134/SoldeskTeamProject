@@ -65,7 +65,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문 없음"));
 
-        order.setOrderStatus(OrderStatus.CONFIRMED);
+        order.setOrderToOwner(OrderStatus.CONFIRMED);
         order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
         order.setCookingStartTime(LocalDateTime.now());
 
@@ -93,7 +93,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
-        order.setOrderStatus(OrderStatus.IN_DELIVERY);
+        order.setOrderToOwner(OrderStatus.IN_DELIVERY);
         return orderRepository.save(order);
     }
 
@@ -113,7 +113,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
-        order.setOrderStatus(newStatus);
+        order.setOrderToOwner(newStatus);
         Order savedOrder = orderRepository.save(order);
 
         if (savedOrder.getUser() != null) {
@@ -158,7 +158,7 @@ public class OrderService {
             .deliveryAddress(order.getDeliveryAddress())
             .storeRequest(order.getStoreRequest())
             .deliveryRequest(order.getDeliveryRequest())
-            .orderStatus(order.getOrderStatus()) // .name() 필요 없음 (enum 그대로 DTO에 선언되어 있으면)
+            .orderStatus(order.getOrderToOwner()) // .name() 필요 없음 (enum 그대로 DTO에 선언되어 있으면)
             .totalPrice(order.getTotalPrice())
             .orderTime(order.getOrderTime())
             .expectCookingTime(order.getExpectCookingTime()) // 이거도 있으면 넣어줘

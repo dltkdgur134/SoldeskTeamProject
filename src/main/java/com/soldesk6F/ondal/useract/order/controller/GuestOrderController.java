@@ -90,7 +90,7 @@ public class GuestOrderController {
             dto.setTotalPrice(order.getTotalPrice());
             dto.setStoreName(order.getStore().getStoreName());
             dto.setOrderDate(order.getOrderTime());
-            dto.setOrderStatus(order.getOrderStatus().name());
+            dto.setOrderStatus(order.getOrderToOwner().name());
 
             List<GuestOrderResponseDto.OrderDetailDto> detailDtos = order.getOrderDetails().stream().map(detail -> {
                 GuestOrderResponseDto.OrderDetailDto detailDto = new GuestOrderResponseDto.OrderDetailDto();
@@ -139,7 +139,7 @@ public class GuestOrderController {
         dto.setTotalPrice(order.getTotalPrice());
         dto.setStoreName(order.getStore().getStoreName());
         dto.setOrderDate(order.getOrderTime());
-        dto.setOrderStatus(order.getOrderStatus().name());
+        dto.setOrderStatus(order.getOrderToOwner().name());
 
         List<GuestOrderResponseDto.OrderDetailDto> detailDtos = order.getOrderDetails().stream().map(detail -> {
             GuestOrderResponseDto.OrderDetailDto detailDto = new GuestOrderResponseDto.OrderDetailDto();

@@ -43,7 +43,7 @@ public class OrderResponseDto {
     public static OrderResponseDto from(Order order) {
         return OrderResponseDto.builder()
                 .orderId(order.getOrderId())
-                .orderStatus(order.getOrderStatus()) // ⚠️ orderStatus가 null이면 NPE 주의
+                .orderStatus(order.getOrderToOwner()) // ⚠️ orderStatus가 null이면 NPE 주의
                 .deliveryAddress(order.getDeliveryAddress())
                 .storeRequest(order.getStoreRequest())
                 .deliveryRequest(order.getDeliveryRequest())

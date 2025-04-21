@@ -98,8 +98,8 @@ public class Order {
     private String deliveryRequest;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_status", nullable = false)
-    private OrderStatus orderStatus;
+    @Column(name = "order_to_owner", nullable = false)
+    private OrderStatus orderToOwner;
 
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
@@ -129,7 +129,7 @@ public class Order {
         this.totalPrice = totalPrice;
         this.orderAdditional1 = orderAdditional1;
         this.orderAdditional2 = orderAdditional2;
-        this.orderStatus = orderStatus != null ? orderStatus : OrderStatus.PENDING;
+        this.orderToOwner = orderStatus != null ? orderStatus : OrderStatus.PENDING;
         this.guestId = guestId;
         
     }

@@ -19,13 +19,13 @@ public class HomeController {
         this.ondalApplication = ondalApplication;
     }
 
-//	@GetMapping("/")
-//	public String home() {
-//		return "content/index";
-//	}
-	
 	@GetMapping("/")
 	public String home() {
+		return "content/index";
+	}
+	
+	@GetMapping("/owner")
+	public String dashboard() {
 		return "owner/content/ownerDashboard";
 	}
 	

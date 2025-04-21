@@ -249,41 +249,47 @@ function handleOrderAction(orderId, action, extra = {}) {
     let url = '';
     let payload = { orderId };
 
+    const finalize = (completionTime) => {
+        if (action === 'accept') {
+            payload.completionTime = completionTime || 15;
+        }
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function(updatedOrder) {
+                alert(`주문 상태 변경 완료: ${action}`);
+                renderOrderDetail(updatedOrder);
+                removeOrderFromList(updatedOrder.orderId);
+                addOrderToList(updatedOrder);
+            },
+            error: function(err) {
+                console.error(`${action} 실패:`, err);
+                alert(`${action} 실패: ` + err.responseText);
+            }
+        });
+    };
+
     switch (action) {
         case 'accept':
             url = '/owner/order/accept';
-            payload.completionTime = extra.completionTime || 15;
-            break;
+            $.get(`/owner/order/get-cooking-time?orderId=${orderId}`, function (time) {
+                finalize(time);
+            });
+            return; // ✅ 여기서 끝나야 함
         case 'reject':
-            url = '/owner/order/reject';
-            break;
+            url = '/owner/order/reject'; break;
         case 'complete':
-            url = '/owner/order/complete';
-            break;
+            url = '/owner/order/complete'; break;
         case 'startDelivery':
-            url = '/owner/order/startDelivery';
-            break;
+            url = '/owner/order/startDelivery'; break;
         default:
-            console.warn('Unsupported action:', action);
-            return;
+            console.warn('Unsupported action:', action); return;
     }
 
-    $.ajax({
-        url: url,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(payload),
-        success: function(updatedOrder) {
-            alert(`주문 상태 변경 완료: ${action}`);
-            renderOrderDetail(updatedOrder);
-            removeOrderFromList(updatedOrder.orderId);
-            addOrderToList(updatedOrder);
-        },
-        error: function(err) {
-            console.error(`${action} 실패:`, err);
-            alert(`${action} 실패: ` + err.responseText);
-        }
-    });
+    finalize();
 }
 
 function getOrderId(elem) {
@@ -292,9 +298,13 @@ function getOrderId(elem) {
 }
 
 function getCompletionTime(elem) {
-    // 리스트의 input 또는 상세 completionTime input
     const input = $(elem).closest('li').find('.time-adjust input');
-    return input.length ? input.val() : $('#completionTime').val();
+    if (input.length) return input.val();
+
+    const detailInput = $('#detailTimeInput');
+    if (detailInput.length) return detailInput.val();
+
+    return 15;
 }
 
 function setupOrderButtons() {

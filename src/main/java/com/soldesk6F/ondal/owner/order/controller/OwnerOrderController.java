@@ -59,6 +59,15 @@ public class OwnerOrderController {
         return ResponseEntity.ok().build();
     }
     
+    @GetMapping("/get-cooking-time")
+    public ResponseEntity<Integer> getCookingTime(@RequestParam("orderId") UUID orderId, HttpSession session) {
+        Map<UUID, Integer> cookingTimes = (Map<UUID, Integer>) session.getAttribute("cookingTimes");
+        int time = (cookingTimes != null && cookingTimes.containsKey(orderId))
+            ? cookingTimes.get(orderId)
+            : 15;
+        return ResponseEntity.ok(time);
+    }
+    
     @PostMapping("/complete")
     public ResponseEntity<OrderResponseDto> completeOrder(@RequestBody Map<String, String> payload) {
         UUID orderId = UUID.fromString(payload.get("orderId"));
@@ -130,7 +139,7 @@ public class OwnerOrderController {
             .deliveryAddress(order.getDeliveryAddress())
             .storeRequest(order.getStoreRequest())
             .deliveryRequest(order.getDeliveryRequest())
-            .orderStatus(order.getOrderStatus()) // enum 그대로
+            .orderStatus(order.getOrderToOwner()) // enum 그대로
             .totalPrice(order.getTotalPrice())
             .orderTime(order.getOrderTime())
             .expectCookingTime(order.getExpectCookingTime()) // 누락 시 추가
