@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>메뉴 관리</title>
+	<link rel="stylesheet" th:href="@{/css/storeMenuManage.css}">
+</head>
+<body>
+	<header class="menu-header">
+		<h2 th:text="${store.name} + ' 메뉴 관리'">가게 이름 메뉴 관리</h2>
+		<button class="save-btn">저장</button>
+	</header>
+	
+	<section class="menu-tabs">
+		<button class="tab active">전체</button>
+		<button class="tab">메인</button>
+		<button class="tab">사이드</button>
+		<button class="tab">음료</button>
+	</section>
+	
+	<section class="menu-list">
+		<div class="menu-card" th:each="menu : ${menuList}">
+			<img th:src="@{${menu.imageUrl}}" alt="menu image" />
+			<div class="info">
+				<h3 th:text="${menu.name}">메뉴명</h3>
+				<p th:text="${menu.price} + '원'">가격</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="add-btn-wrap">
+		<button class="add-btn">+ 새 메뉴 추가</button>
+	</section>
+
+	<script th:src="@{/js/ownerMenu.js}"></script>
+</body>
+</html>

@@ -14,7 +14,6 @@ import com.soldesk6F.ondal.login.CustomAuthFailureHandler;
 import com.soldesk6F.ondal.login.CustomOAuth2UserService;
 import com.soldesk6F.ondal.login.CustomUserDetailsService;
 import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
-import com.soldesk6F.ondal.user.*;
 
 @Configuration
 @EnableWebSecurity

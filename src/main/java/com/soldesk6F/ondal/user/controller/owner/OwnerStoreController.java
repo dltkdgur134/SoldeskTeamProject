@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.menu.dto.MenuDto;
 import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.entity.StoreDto;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.user.entity.Owner;
@@ -53,7 +55,8 @@ public class OwnerStoreController {
 		System.out.println("📦 해당 점주의 가게 수: " + myStores.size());
 		
 		for (Store s : myStores) {
-	        System.out.println("   - 가게명: " + s.getStoreName());
+	        System.out.println("##################   - 가게명: " + s.getStoreName());
+	        System.out.println("✅ storeId: " + s.getStoreId());
 	    }
 
 		model.addAttribute("myStores", myStores);
@@ -87,7 +90,19 @@ public class OwnerStoreController {
 	    System.out.println("형식 포맷된 전화번호: " + formattedPhone);
 	    model.addAttribute("store", store);
 	    model.addAttribute("formattedPhone", formattedPhone);
-	    return "content/store/storeManagement";
+	    return "content/store/storeManagement2";
 	}
+	
+//	@GetMapping("/storeManagement/{storeId}/menu-manage")
+//	public String menuManagePage(@PathVariable UUID storeId, Model model) {
+//	    StoreDto store = storeService.getStoreById(storeId);
+//	    List<MenuDto> menuList = MenuService.getMenusByStore(storeId);
+//	    
+//	    model.addAttribute("store", store);
+//	    model.addAttribute("menuList", menuList);
+//	    
+//	    return "content/store/storeMenuManage";
+//	}
+//	
 	
 }
