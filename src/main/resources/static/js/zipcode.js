@@ -23,37 +23,35 @@ function regUserAddress() {
 			element_layer.style.display = 'none';
 			
 			fetch(`https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`, {
-							headers: {
-								Authorization: 'KakaoAK c7dd39e36776f90fb259bbd8ac3fcdc6'
-							}
-						})
-							.then(response => response.json())
-							.then(result => {
-								console.log('Kakao 응답:', result);
-								const location = result.documents[0];
-								if (location) {
-									document.getElementById('userAddresslongitude').value = parseFloat(location.y).toFixed(6);
-									document.getElementById('userAddresslatitude').value = parseFloat(location.x).toFixed(6);
-								} else {
-									alert('주소의 위치 정보를 찾을 수 없습니다.');
-								}
-							})
-							.catch(error => {
-								console.error('좌표 변환 에러:', error);
-							});
-			
-		},
-		width: '100%',
-		height: '100%',
-		maxSuggestItems: 5
-	}).embed(element_layer);
+					headers: {
+						Authorization: 'KakaoAK c7dd39e36776f90fb259bbd8ac3fcdc6'
+					}
+			})
+					.then(response => response.json())
+					.then(result => {
+						console.log('Kakao 응답:', result);
+						const location = result.documents[0];
+						if (location) {
+							document.getElementById('userAddresslongitude').value = parseFloat(location.y).toFixed(6);
+							document.getElementById('userAddresslatitude').value = parseFloat(location.x).toFixed(6);
+						} else {
+							alert('주소의 위치 정보를 찾을 수 없습니다.');
+						}
+					})
+					.catch(error => {
+						console.error('좌표 변환 에러:', error);
+					});
+			},
+			width: '100%',
+			height: '100%',
+			maxSuggestItems: 5
+		}).embed(element_layer);
 	
-	// iframe을 넣은 element를 보이게 한다.
-	element_layer.style.display = 'block';
+		// iframe을 넣은 element를 보이게 한다.
+		element_layer.style.display = 'block';
 	
-	// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
-	initLayerPosition();
-
+		// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+		initLayerPosition();
 }
 
 // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는

@@ -1,6 +1,6 @@
 
 $(function() {
-	
+
 	/*document.getElementById('address-search-bar').addEventListener('change', event => {
 		var results = [];
 		let address = {
@@ -65,8 +65,8 @@ $(function() {
 		})
 		
 	});*/
-	
-	document.getElementById('좌표 받기').addEventListener('click', event => {
+
+	/*document.getElementById('좌표 받기').addEventListener('click', event => {
 			var results = [];
 			let address = {
 				place_name : "",
@@ -90,7 +90,7 @@ $(function() {
 				success: function(response) {
 					const places = response.documents;
 					//const resultList = $('#resultList');
-					/*console.log(response.meta.total_count);*/
+					console.log(response.meta.total_count);
 					
 					places.forEach(place => {
 						//resultList.append(`<li>${place.place_name} - ${place.address_name}</li>`);
@@ -104,37 +104,66 @@ $(function() {
 				}
 			})
 			
-		});
-	
+		});*/
+
+
+
 });
 
-
-
 function fetchSearchResults(query, sampleData) {
-	  const dropdown = document.getElementById('dropdown-results');
-	  
-	  if (!query) {
-	    dropdown.style.display = 'none';
-	    dropdown.innerHTML = '';
-	    return;
-	  }
-	  
-	  // Simulating a search API call with sample data
-	  //const sampleData = ['Apple', 'Banana', 'Cherry', 'Date', 'Grape', 'Kiwi', 'Mango', '서초구', '강남구', '관악구'];
-	  const filteredData = sampleData.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+	const dropdown = document.getElementById('dropdown-results');
 
-	  // Show results in the dropdown
-	  dropdown.innerHTML = filteredData.map(item => `<li onclick="handleSelection('${item}')">${item}</li>`).join('');
+	if (!query) {
+		dropdown.style.display = 'none';
+		dropdown.innerHTML = '';
+		return;
+	}
 
-	  dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
+	// Simulating a search API call with sample data
+	//const sampleData = ['Apple', 'Banana', 'Cherry', 'Date', 'Grape', 'Kiwi', 'Mango', '서초구', '강남구', '관악구'];
+	const filteredData = sampleData.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+
+	// Show results in the dropdown
+	dropdown.innerHTML = filteredData.map(item => `<li onclick="handleSelection('${item}')">${item}</li>`).join('');
+
+	dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
 }
 
-	function handleSelection(selectedValue) {
-	  const searchBar = document.getElementById('address-search-bar');
-	  const dropdown = document.getElementById('dropdown-results');
-	  searchBar.value = selectedValue;
-	  dropdown.style.display = 'none';
-	}
-	
+function handleSelection(selectedValue) {
+	const searchBar = document.getElementById('address-search-bar');
+	const dropdown = document.getElementById('dropdown-results');
+	searchBar.value = selectedValue;
+	dropdown.style.display = 'none';
+}
+
+function deleteAddress(count) {
+	const form = document.getElementById('address-form' + count);
+	const regAddressId = form.regAddressId;
+	fetch('/deleteAddress/' + regAddressId.value, {
+		method: 'delete',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(response => {
+			// Check if response is OK (status 200)
+			if (!response.ok) {
+				throw new Error('Address deletion failed with status: ' + response.status);
+			}
+			return response.json(); // Parse JSON if response is OK
+		})
+		.then(data => {
+			if (data.result === 0) {
+				alert(data.resultMsg);
+			} else {
+				alert(data.resultMsg); // Show error message if result is 1
+			}
+			location.reload(); // Reload the page to reflect the deletion
+		})
+		.catch(error => {
+			console.error('Error occurred:', error);
+			alert('삭제 중 에러가 발생했습니다.');
+		});
+}
 
 

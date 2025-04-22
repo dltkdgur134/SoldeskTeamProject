@@ -8,55 +8,55 @@
 	<link th:href="@{/css/myAddress.css}" rel="stylesheet">
 	<script th:src="@{/js/zipcode.js}" defer></script>
 	<script th:src="@{/js/myAddress.js}" defer></script>
+	<script th:src="@{/js/update.js}" defer></script>
 	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
 <div layout:fragment="content" class="container py-5">
+	<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+		<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
+	<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
 	<div class="card info-card p-4">
 		<h5 class="card-title">
 			내 주소
 		</h5>
 		<div class="card-body">
-			<form>
-				<div class="card">
-					<div class="title">
-						<strong>기본 주소</strong>
-					</div>		
+				<div class="card my-2">
   					<div class="card-body">
-    					<!-- <div class="form-check">
-	  						<input class="form-check-input" type="radio" name="radioDefault" id="radioDefault" checked>
-	  						<label class="form-check-label" for="radioDefault">
-	    						<strong th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
-	    						<br>
-	    						<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
-	  						</label>
-						</div> -->
-						<strong th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
-	    				<br>
+						<strong th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong> 
 	    				<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
+						<span class="badge rounded-pill text-bg-primary" id="default-address-badge">현재 설정된 주소</span>
+	    				<br>
   					</div>
 				</div>
 				<th:block th:each="address : ${addressList}">
 					<th:block th:if="${address.isUserSelectedAddress == false}">
-						<div class="card">
-						<div class="card-body">
-							<div class="form-check">
-			  					<input class="form-check-input" type="radio" name="radioDefault" th:id="'radioDefault' + ${addressStat.count}">
-			  					<label class="form-check-label" th:for="'radioDefault' + ${addressStat.count}">
-			    					<strong th:text="${address.address}"></strong>
-			    					<br>
-			    					<strong th:text=${address.detailAddress}></strong>
-			  					</label>
+						<form th:id="address-form + ${addressStat.count}" th:name="addressForm + ${addressStat.count}" action="/content/setDefaultAddress" method="POST">
+							<div class="card my-2">
+								<div class="card-body">
+			  							<input class="form-control" type="text" name="regAddressId" th:id="'reg-address' + ${addressStat.count}" 
+			  								hidden="true" th:value="${address.regAddressId}">
+			  							<label class="form-label" th:for="'reg-address' + ${addressStat.count}">
+			    							<strong th:text="${address.address}"></strong>
+			    							<strong th:text=${address.detailAddress}></strong>
+			    							<br>
+											<!-- <button type="button" class="btn btn-link my-2" 
+												th:id="set-default-address-btn + ${addressStat.count}"
+												th:onclick="setDefaultAddress([[${addressStat.count}]]);">배달 주소 설정</button> -->
+											<button type="submit" class="btn btn-link my-2" >배달 주소 설정</button>
+											<button type="button" class="btn btn-link my-2" 
+											th:id="delete-address-btn + ${addressStat.count}"
+											th:onclick="deleteAddress([[${addressStat.count}]])"
+											>주소 삭제</button>
+			  							</label> 
+								</div>
 							</div>
-						</div>
-					</div>
+						</form>
 					</th:block>
 				</th:block>
-			</form>
-			
-			
-			
-			<a href="#" type="button" class="btn btn-success my-3" id="deleteAddress-btn">주소 삭제</a>
 			<a href="regAddress" type="button" class="btn btn-success my-3" id="regAddress-btn">주소 등록</a>
 		</div>
 		<!-- <div class="address-search-container">
@@ -65,10 +65,6 @@
  			 <ul id="dropdown-results" class="dropdown-menu"></ul>
 		</div> -->
 	</div> 
-
-<!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
-		
-
 </div>
 
 </html>

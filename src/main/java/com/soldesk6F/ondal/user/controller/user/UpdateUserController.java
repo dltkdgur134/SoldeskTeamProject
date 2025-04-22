@@ -25,7 +25,7 @@ public class UpdateUserController {
 	@ResponseBody
 	public Map<Object, Object> checkNickname(
 			@RequestParam("nickname") String nickName,
-			RedirectAttributes rAttr) {
+			RedirectAttributes redirectAttributes) {
 		Map<Object, Object> response = new HashMap<>();
 		boolean nickNameExists = userService.isNicknameDuplicate(nickName);
 		response.put("count", nickNameExists ? 1 : 0); // 닉네임이 있으면 1 (중복확인 통과 X) 없으면 0 (통과)
@@ -34,20 +34,20 @@ public class UpdateUserController {
 	
 	@PostMapping("/content/updateNickname")
 	public String updateNickname(
-			@AuthenticationPrincipal CustomUserDetails cud,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
 			@RequestParam("nickname") String nickName,
-			RedirectAttributes rAttr) {
+			RedirectAttributes redirectAttributes) {
 //		String userId = cud.getUser().getUserId(); business logic 컨트롤러에 노출
-		userService.updateUserNickname(cud, nickName, rAttr);
+		userService.updateUserNickname(userDetails, nickName, redirectAttributes); 
 		return "redirect:/myPage";
 	}
 	
 	@PostMapping("/content/updateProfilePic")
 	public String updateProfilePic(
-			@AuthenticationPrincipal CustomUserDetails cud,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
 			@RequestParam("profileImage") MultipartFile profileImage,
-			RedirectAttributes rAttr) {
-		userService.updateUserPicture(cud, profileImage, rAttr);
+			RedirectAttributes redirectAttributes) {
+		userService.updateUserPicture(userDetails, profileImage, redirectAttributes);
 		return "redirect:/myPage";
 	}
 	
@@ -55,7 +55,7 @@ public class UpdateUserController {
 	@ResponseBody
 	public Map<Object, Object> checkPhoneNum(
 			@RequestParam("userPhone") String userPhone,
-			RedirectAttributes rattr) {
+			RedirectAttributes redirectAttributes) {
 		Map<Object, Object> response = new HashMap<>();
 		boolean userPhoneExists = userService.isPhoneDuplicate(userPhone);
 		response.put("count", userPhoneExists ? 1 : 0); // 전화번호가 있으면 1 (중복확인 통과 X) 없으면 0 (통과)
@@ -64,20 +64,20 @@ public class UpdateUserController {
 	
 	@PostMapping("/content/updatePhoneNum")
 	public String updatePhoneNum(
-			@AuthenticationPrincipal CustomUserDetails cud,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
 			@RequestParam("userPhone") String userPhone,
-			RedirectAttributes rAttr) {
-		userService.updateUserPhone(cud, userPhone, rAttr); 
+			RedirectAttributes redirectAttributes) {
+		userService.updateUserPhone(userDetails, userPhone, redirectAttributes); 
 		return "redirect:/myPage";
 	}
 	
 	@PostMapping("/content/updatePassword")
 	public String updatePassword(
-			@AuthenticationPrincipal CustomUserDetails cud,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
 			@RequestParam("oldPassword") String oldPassword,
 			@RequestParam("password") String password,
-			RedirectAttributes rAttr) {
-		if (!userService.updatePassword(cud, oldPassword, password, rAttr)) {
+			RedirectAttributes redirectAttributes) {
+		if (!userService.updatePassword(userDetails, oldPassword, password, redirectAttributes)) {
 			return "redirect:/mySecurity";
 		}
 		return "redirect:/logout";
