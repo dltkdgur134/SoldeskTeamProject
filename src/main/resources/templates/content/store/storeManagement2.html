@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>주문 관리</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+	<link rel="stylesheet" th:href="@{/css/storeManagement.css}">
+	<script defer th:src="@{/js/storeManagement.js}"></script>
+	
+</head>
+<body>
+	<div class="store-header">
+		<h1 th:text="${store.storeName}">점포명</h1>
+		<div class="store-info">
+			<p th:text="${store.storeAddress}" style="margin: 1px 0">주소</p>
+			<p th:text="${formattedPhone}" style="margin: 1px 0">전화번호</p>
+			<p th:text="${store.storeStatus.description}" style="margin: 1px 0">영업 상태</p>
+		</div>
+	</div>
+	<div class="topbar">
+		<button class="menu-btn" onclick="toggleSidebar()">☰</button>
+		<h1>영업중</h1>
+		<div class="date-container">
+			<span id="today-date"></span>
+		</div>
+	</div>
+	<div class="sidebar-wrapper" id="sidebarWrapper">
+		<div class="sidebar" id="sidebar">
+			<div class="sidebar-title">
+				<h3 th:text="${store.storeName + ' 사장님'}"></h3>
+				<button class="close-btn" onclick="toggleSidebar()">X</button>
+			</div>
+			<div class="sidebar-menu">
+				<button class="sidebar-btn"><i class="fas fa-comment"></i> 공지 · 한마디</button>
+				<button class="sidebar-btn"><i class="fas fa-home"></i> 운영정보 관리</button>
+				<button class="sidebar-btn"><i class="fas fa-clipboard-list"></i> 메뉴 · 품절 관리</button>
+<!--				<a th:href="@{'/storeManagement/' + ${store.id} + '/menu-manage'}">
+				    <button class="sidebar-btn"><i class="fas fa-clipboard-list"></i> 메뉴 · 품절 관리</button>
+				</a>-->
+				<button class="sidebar-btn"><i class="fas fa-file-pen"></i> 리뷰 관리</button>
+				<a class="sidebar-btn2" href="/storesetting?tab=operation"> 운영 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+				<a class="sidebar-btn2" href="/storesetting?tab=printer"> 프린터 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+				<a class="sidebar-btn2" href="/storesetting?tab=alarm"> 알림 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+				<a class="sidebar-btn2" href="/storesetting?tab=delivery"> 배달대행사 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="left-panel">
+			<h3></h3>
+		</div>
+
+		<div class="center-panel">
+			<h3>신규/진행 배달</h3>
+		</div>
+
+		<div class="right-panel">
+			<h3>배달</h3>
+		</div>
+	</div>
+</body>
+</html>
+
