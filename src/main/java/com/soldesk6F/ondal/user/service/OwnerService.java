@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.user.dto.OwnerForm;
+import com.soldesk6F.ondal.user.dto.owner.OwnerForm;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.User;

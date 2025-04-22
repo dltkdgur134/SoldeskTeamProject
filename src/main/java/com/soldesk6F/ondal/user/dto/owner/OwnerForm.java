@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user.dto;
+package com.soldesk6F.ondal.user.dto.owner;
 
 import lombok.Data;
 

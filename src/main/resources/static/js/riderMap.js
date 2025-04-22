@@ -1,10 +1,6 @@
 let map;
-let intervalId = null;
 
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("lat from global var:", riderLat);
-    console.log("lng from global var:", riderLng);
-
+document.addEventListener("DOMContentLoaded", async function () {
     if (isNaN(riderLat) || isNaN(riderLng)) {
         console.error("위도 또는 경도가 유효하지 않습니다.");
         return;
@@ -18,25 +14,60 @@ document.addEventListener("DOMContentLoaded", function () {
 
     map = new kakao.maps.Map(mapContainer, mapOption);
 
-    startGenerating(); // 시작 시 자동 생성
-
-    document.getElementById('stopBtn').addEventListener('click', stopGenerating);
-    document.getElementById('startBtn').addEventListener('click', startGenerating);
+    // 주문 데이터 불러오기
+    const orders = await fetchOrders(riderLat, riderLng);
+    displayOrdersOnMap(orders);
 });
 
-function startGenerating() {
-    if (intervalId === null) {
-        intervalId = setInterval(() => {
-            addRandomMarker(riderLat, riderLng);
-        }, 5000); // 주기적으로 마커 생성
+async function fetchOrders(lat, lng) {
+    try {
+        const response = await fetch(`/api/orders/nearby?lat=${lat}&lng=${lng}`);
+        return await response.json(); // [{ id, storeName, deliveryFee, storeLatitude, storeLongitude }]
+    } catch (e) {
+        console.error("주문 데이터를 불러오는 데 실패했습니다", e);
+        return [];
     }
 }
 
-function stopGenerating() {
-    if (intervalId !== null) {
-        clearInterval(intervalId);
-        intervalId = null;
-    }
+function displayOrdersOnMap(orders) {
+    orders.forEach(order => {
+        const position = new kakao.maps.LatLng(order.storeLatitude, order.storeLongitude);
+
+        let imageSrc = 'https://ifh.cc/g/HMrtaC.png',
+            imageSize = new kakao.maps.Size(30, 30),
+            imageOption = { offset: new kakao.maps.Point(27, 69) };
+
+        let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+        let marker = new kakao.maps.Marker({
+            position: position,
+            image: markerImage
+        });
+        marker.setMap(map);
+
+        const content = `
+            <div class="delivery-request" id="order-${order.id}" style="cursor:pointer;">
+                <strong>${order.storeName}</strong><br>${order.deliveryFee}원
+            </div>
+        `;
+
+        let customOverlay = new kakao.maps.CustomOverlay({
+            map: map,
+            content: content,
+            position: position,
+            yAnchor: 1
+        });
+
+        setTimeout(() => {
+            const element = document.getElementById(`order-${order.id}`);
+            if (element) {
+                element.addEventListener('click', function () {
+                    displayOrderInfo(order.storeName, order.deliveryFee);
+                    // 여기서 상세 정보 더 넣을 수 있음
+                });
+            }
+        }, 50);
+    });
 }
 
 function displayOrderInfo(storeName, price) {
@@ -45,50 +76,4 @@ function displayOrderInfo(storeName, price) {
 
     orderNameElement.textContent = storeName;
     orderPriceElement.textContent = price + "원";
-}
-
-function addRandomMarker(baseLat, baseLng) {
-    let randomLat = baseLat + (Math.random() - 0.5) * 0.01;
-    let randomLng = baseLng + (Math.random() - 0.5) * 0.01;
-
-    let imageSrc = 'https://ifh.cc/g/HMrtaC.png',
-        imageSize = new kakao.maps.Size(30, 30),
-        imageOption = { offset: new kakao.maps.Point(27, 69) };
-
-    let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
-        markerPosition = new kakao.maps.LatLng(randomLat, randomLng);
-
-    let marker = new kakao.maps.Marker({
-        position: markerPosition,
-        image: markerImage
-    });
-    marker.setMap(map);
-
-    const storeName = "랜덤식당";
-    const price = Math.floor(Math.random() * 5000) + 1000;
-
-    const orderId = 'order-' + crypto.randomUUID();
-
-    let content = `
-        <div class="delivery-request" id="${orderId}" 
-        style="cursor:pointer;">
-            <strong>${storeName}</strong><br>${price}원
-        </div>
-    `;
-
-    let customOverlay = new kakao.maps.CustomOverlay({
-        map: map,
-        content: content,
-        position: markerPosition,
-        yAnchor: 1
-    });
-
-    setTimeout(() => {
-        const element = document.getElementById(orderId);
-        if (element) {
-            element.addEventListener('click', function () {
-                displayOrderInfo(storeName, price);
-            });
-        }
-    }, 50);
 }

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.user.dto.OwnerForm;
-import com.soldesk6F.ondal.user.dto.RiderForm;
+import com.soldesk6F.ondal.user.dto.owner.OwnerForm;
+import com.soldesk6F.ondal.user.dto.rider.RiderForm;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.repository.UserRepository;
