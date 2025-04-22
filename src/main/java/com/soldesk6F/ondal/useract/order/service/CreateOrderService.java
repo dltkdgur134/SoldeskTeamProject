@@ -9,7 +9,7 @@ import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class OrderService {
+public class CreateOrderService {
 
     @Autowired
     private OrderRepository orderRepository;

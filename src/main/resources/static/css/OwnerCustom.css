@@ -197,18 +197,52 @@ body {
 }
 
 .message-container {
-    background-color: #f2f2f2; /* 약간 회색빛 배경 */
+    background-color: #F0F0F0; /* 약간 회색빛 배경 */
     border-radius: 10px; /* 둥근 모서리 */
     padding: 50px;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
-    max-width: 500px;
+    width: 80%;
     margin: 50px auto; /* 화면 중앙 정렬 */
 }
 
-.message {
-    font-size: 20px;
-    font-weight: bold;
-    color: #333; /* 어두운 글자 색 */
-    line-height: 1.5;
+.message img {
+    max-width: 80%;
+    max-height: 60vh; /* 뷰포트 높이의 60%까지만 */
+    height: auto;
+    width: auto;
+    display: block;
+    margin: 0 auto; /* 가운데 정렬 */
+}
+
+.cute-button {
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 2rem;
+    background-color: #f0f0f0;
+    color: #5A3E36;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 15px;
+    text-decoration: none;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.2s ease;
+}
+
+.message-container2 {
+    background-color: #E8E4DF; /* 약간 회색빛 배경 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 50px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+    width: 80%;
+    margin: 50px auto; /* 화면 중앙 정렬 */
+}
+
+.message2 img {
+    max-width: 80%;
+    max-height: 60vh; /* 뷰포트 높이의 60%까지만 */
+    height: auto;
+    width: auto;
+    display: block;
+    margin: 0 auto; /* 가운데 정렬 */
 }

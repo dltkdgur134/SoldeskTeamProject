@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.soldesk6F.ondal.useract.order.entity.Order;
-import com.soldesk6F.ondal.useract.order.service.OrderService;
+import com.soldesk6F.ondal.useract.order.service.CreateOrderService;
 
 @RestController
 @RequestMapping("/api/orders")
 public class RiderGetOrderController {
 
     @Autowired
-    private OrderService orderService;
+    private CreateOrderService orderService;
 
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {

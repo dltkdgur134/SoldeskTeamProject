@@ -90,22 +90,14 @@ public class RegOwnerController {
         User user = userRepository.findByUserId(userId).orElseThrow();
         userRoleService.changeRoleToOwner(user, ownerForm);
 	    // 가게 등록 페이지로 이동
-//	    return "redirect:/owner/content/storereg/submit";
-	    return "redirect:/storeReg/submit";
+	    return "redirect:/owner/store/submit";
 	    
 	}
 	
-	@GetMapping("/content/storereg/submit")
+	@GetMapping("/store/submit")
 	public String showSubmitPage() {
-	    return "content/storereg/submit";  // submit.html 파일을 Thymeleaf 템플릿으로 처리
+		
+	    return "content/store/submit";  // submit.html 파일을 Thymeleaf 템플릿으로 처리
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-
 }
