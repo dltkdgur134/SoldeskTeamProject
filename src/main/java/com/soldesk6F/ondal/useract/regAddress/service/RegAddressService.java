@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.useract.regAddress.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,6 +60,7 @@ public class RegAddressService {
     		regAddressRepository.save(regAddress);
     		if (findUser.get().getUserSelectedAddress() == null) {
     			regAddress.updateDefaultAddress(true);
+    			regAddress.setCreatedDate(LocalDateTime.now());
     			findUser.get().updateUserSelectedAddress(regAddress);
 //    			cud.getUser().setUserSelectedAddress(regAddress);
     			userService.refreshUserAuthentication(findUser.get().getUserId());
@@ -130,6 +132,7 @@ public class RegAddressService {
 				Optional<RegAddress> findAddress = regAddressRepository.findById(addressUuid);
 				defaultAddress.setUserSelectedAddress(false);
 				findAddress.get().updateDefaultAddress(true);
+				findAddress.get().setUpdatedDate(LocalDateTime.now());
 				findUser.get().updateUserSelectedAddress(findAddress.get());
 				userService.refreshUserAuthentication(findUser.get().getUserId());
 				redirectAttributes.addFlashAttribute("result", 0);
@@ -170,4 +173,14 @@ public class RegAddressService {
 		}
 	}
 	
+	@Transactional
+	public boolean updateAddress(CustomUserDetails userDetails,
+			UUID regAddressId
+			) {
+		
+		
+		
+		return false;
+		
+	}
 }

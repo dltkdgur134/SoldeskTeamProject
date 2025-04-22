@@ -81,11 +81,5 @@ public class RegAddress {
 	public String getUserUuidAsString() {
 	    return regAddressId != null ? regAddressId .toString() : null;
 	}
-
-
-
-
-	
-	
 	
 }

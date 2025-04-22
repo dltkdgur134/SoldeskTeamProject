@@ -1,6 +1,13 @@
 
 $(function() {
+	var flashDurationInSeconds = 5;
+	 var flashContainerId = 'flash-messages';
 
+	 function removeFlashMessages() {
+	    $('#' + flashContainerId).remove();
+	 }
+	 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
+	
 	/*document.getElementById('address-search-bar').addEventListener('change', event => {
 		var results = [];
 		let address = {
@@ -146,19 +153,37 @@ function deleteAddress(count) {
 		}
 	})
 		.then(response => {
-			// Check if response is OK (status 200)
+			// 응답 상태 확인 (200)
 			if (!response.ok) {
 				throw new Error('Address deletion failed with status: ' + response.status);
 			}
-			return response.json(); // Parse JSON if response is OK
+			return response.json(); // 응답 상태 OK 시 JSON 파싱 진행
 		})
 		.then(data => {
 			if (data.result === 0) {
-				alert(data.resultMsg);
+				//alert(data.resultMsg);
+				const container = document.getElementById('result-msg-container');
+				const statusContainer = document.getElementById('result-status');
+				container.innerHTML = 
+				"<div class='alert alert-success' id='flash-messages' role='alert'>" +
+				"<i class='fa-solid fa-circle-check'></i>" +
+				"<strong>" + data.resultMsg + "</strong>" +
+				"</div>";
+				statusContainer.innerHTML = 
+				"<div class='spinner-border text-dark'' role='status'><span class='visually-hidden'>Loading...</span></div>";
+				var flashDurationInSeconds = 2;
+				var flashContainerId = 'result-msg-container';
+
+					 function removeFlashMessages() {
+					    $('#' + flashContainerId).remove();
+					 }
+					 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
 			} else {
-				alert(data.resultMsg); // Show error message if result is 1
+				alert(data.resultMsg); // 에러 메시지
 			}
-			location.reload(); // Reload the page to reflect the deletion
+			setTimeout(function () { location.reload(); }, 1000);			
+			//location.reload(); // 삭제 후 페이지 새로고침
+			//window.location.href = "/myAddress?deleted=true";
 		})
 		.catch(error => {
 			console.error('Error occurred:', error);
