@@ -30,7 +30,7 @@ body {
 	--bs-link-hover-color: #FFDF33;
 }
 
-
+/* 기본 버튼 */
 .btn-primary {
     background-color: #404040 !important;
     border: none !important;
@@ -41,6 +41,7 @@ body {
     background-color: black !important;
   }
 
+/* myPage 버튼 */
 .btn-secondary {
 	background-color: grey;
 	border: none !important;
@@ -49,6 +50,7 @@ body {
 	font-weight: 800;
 }
 
+/* 노란 버튼 */
 .btn-success {
 	background-color: #FFE766;
 	border: none !important;
@@ -239,6 +241,8 @@ body {
 	color: red;
 	font-weight: 800;
 }
+
+/* 주소 관리 */
 
 #default-address-badge {
 	font-size: 8pt;

@@ -14,6 +14,7 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.user.service.UserService;
+import com.soldesk6F.ondal.useract.regAddress.DTO.RegAddressDTO;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
 
@@ -35,11 +36,9 @@ public class RegAddressService {
     		String detailAddress,
     		String latitude,
     		String longitude) {
-//    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
     	String userUUIDString = userDetails.getUser().getUserUuidAsString();
     	UUID userUuid = UUID.fromString(userUUIDString);
     	Optional<User> findUser = userRepository.findById(userUuid);
-    	
     	try {
     		if (findUser.isEmpty()) {
     			redirectAttributes.addFlashAttribute("result", 1);
@@ -76,15 +75,39 @@ public class RegAddressService {
 		}
     }
 	
+    // 유저가 선택한 수정할 주소 반환
+    @Transactional(readOnly = true)
+    public RegAddress getRegAddress(CustomUserDetails userDetails,
+    		UUID regAddressId,
+    		RedirectAttributes redirectAttributes,
+    		Model model) {
+    	String userUUIDString = userDetails.getUser().getUserUuidAsString();
+    	UUID userUuid = UUID.fromString(userUUIDString);
+    	Optional<User> findUser = userRepository.findById(userUuid);
+    	if (findUser.isEmpty()) {
+    		redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");	
+    	} 
+    	String regAddressUUIDString = regAddressId.toString();
+    	UUID regAddressUuid = UUID.fromString(regAddressUUIDString);
+    	Optional<RegAddress> findAddress = regAddressRepository.findByRegAddressIdAndUser(regAddressUuid, findUser.get());
+    	if (findAddress.isEmpty()) {
+    		redirectAttributes.addFlashAttribute("result", 1);
+    		redirectAttributes.addFlashAttribute("resultMsg", "등록되지 않은 주소입니다.");	
+    	}
+    	model.addAttribute("address", findAddress.get());
+    	return findAddress.get();
+    }
+    
+    
     // 유저가 등록한 모든 주소 반환
 	@Transactional (readOnly = true)
-	public Optional<List<RegAddress>> getRegAddress(CustomUserDetails userDetails,
+	public Optional<List<RegAddress>> getAllRegAddress(CustomUserDetails userDetails,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		String userUUIDString = userDetails.getUser().getUserUuidAsString();
 		UUID userUuid = UUID.fromString(userUUIDString);
 		Optional<User> findUser = userRepository.findById(userUuid);
-		
 		if (findUser.isEmpty()) {
 			redirectAttributes.addFlashAttribute("result", 1);
 			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");	
@@ -117,7 +140,7 @@ public class RegAddressService {
 					defaultAddress = address;
 				}
 			}
-			String defaultAddressUUIDString = defaultAddress.getUserUuidAsString();
+			String defaultAddressUUIDString = defaultAddress.getRegAddressUuidAsString();
 			UUID defaultAddressUuid = UUID.fromString(defaultAddressUUIDString);
 			
 //			String addressUUIDString = regAddress.getUserUuidAsString();
@@ -173,14 +196,47 @@ public class RegAddressService {
 		}
 	}
 	
+	// 주소 정보 수정
 	@Transactional
 	public boolean updateAddress(CustomUserDetails userDetails,
-			UUID regAddressId
-			) {
+			RegAddressDTO regAddressDTO,
+			RedirectAttributes redirectAttributes) {
+		String regAddressIdString = regAddressDTO.getRegAddressUuidAsString();
+		UUID regAddressUuid = UUID.fromString(regAddressIdString);
+		Optional<RegAddress> findAddress = regAddressRepository.findById(regAddressUuid);
 		
-		
-		
-		return false;
-		
+		if (findAddress.isEmpty()) {
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "등록되지 않은 주소입니다.");
+			return false;
+		}
+		try {
+			String userUUIDString = userDetails.getUser().getUserUuidAsString();
+			UUID userUuid = UUID.fromString(userUUIDString);
+			Optional<User> findUser = userRepository.findById(userUuid);
+			if (findUser.isEmpty()) {
+				redirectAttributes.addFlashAttribute("result", 1);
+				redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 유저입니다.");
+				return false;
+			}
+			// DTO에 String으로 받아왔기 때문에 파싱 필요
+			double latitudeDouble = Double.parseDouble(regAddressDTO.getUserAddressLatitude());
+    		double longitudeDouble = Double.parseDouble(regAddressDTO.getUserAddressLongitude());
+			findAddress.get().updateRegAddress( 
+					regAddressDTO.getAddress(), 
+					regAddressDTO.getDetailAddress(), 
+					latitudeDouble,
+					longitudeDouble);
+			findAddress.get().setUpdatedDate(LocalDateTime.now());
+			userService.refreshUserAuthentication(findUser.get().getUserId());
+			redirectAttributes.addFlashAttribute("result", 0);
+			redirectAttributes.addFlashAttribute("resultMsg", "주소 정보가 변경되었습니다.");
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "주소 변경에 실패했습니다.");
+			return false;
+		}
 	}
 }

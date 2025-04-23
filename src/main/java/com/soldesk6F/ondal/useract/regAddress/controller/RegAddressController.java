@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.useract.regAddress.DTO.RegAddressDTO;
 import com.soldesk6F.ondal.useract.regAddress.service.RegAddressService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class RegAddressController {
 
 	private final RegAddressService regAddressService;
 
-	@PostMapping("/content/regHomeAddress")
+	@PostMapping("/content/regAddress")
 	public String registerHomeAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
 			@RequestParam("address") String address, @RequestParam("detailAddress") String detailAddress,
 			@RequestParam("longitude") String longitude, @RequestParam("latitude") String latitude,
@@ -37,7 +38,44 @@ public class RegAddressController {
 		return "redirect:/myAddress";
 	}
 
-	@DeleteMapping("/deleteAddress/{regAddressId}")
+
+	@GetMapping(value = "/myAddress")
+	public String goMyAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes redirectAttributes, Model model) {
+		regAddressService.getAllRegAddress(userDetails, redirectAttributes, model);
+		return "content/myAddress";
+	}
+
+	@GetMapping(value = "/regAddress")
+	public String goRegAddress() {
+		return "content/regAddress";
+	}
+	
+	@GetMapping("/updateAddress/{regAddressId}")
+	public String goUpdateAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
+			@PathVariable("regAddressId") UUID regAddressId,
+			RedirectAttributes redirectAttributes, Model model) {
+		regAddressService.getRegAddress(userDetails, regAddressId, redirectAttributes, model);
+		return "content/updateAddress";
+	}
+	
+	@PostMapping("/content/setDefaultAddress")
+	public String changeUserSelectedAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
+			@RequestParam("regAddressId") UUID regAddressId, 
+			RedirectAttributes redirectAttributes) {
+		regAddressService.selectDefaultAddress(userDetails, regAddressId, redirectAttributes);
+		return "redirect:/myAddress";
+	}
+	
+	@PutMapping("/content/updateAddress")
+	public String updateAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
+			RegAddressDTO regAddressDTO,
+			RedirectAttributes redirectAttributes) {
+		regAddressService.updateAddress(userDetails, regAddressDTO, redirectAttributes);
+		return "redirect:/myAddress";
+	}
+	
+	@DeleteMapping("/content/deleteAddress/{regAddressId}")
 	public ResponseEntity<Map<String, Object>> deleteAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
 			@PathVariable("regAddressId") UUID regAddressId) {
 		boolean result = regAddressService.deleteAddress(userDetails, regAddressId);
@@ -51,25 +89,6 @@ public class RegAddressController {
 			response.put("resultMsg", "주소가 삭제에 실패했습니다.");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
-	}
-
-	@GetMapping(value = "/myAddress")
-	public String goMyAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
-			RedirectAttributes redirectAttributes, Model model) {
-		regAddressService.getRegAddress(userDetails, redirectAttributes, model);
-		return "content/myAddress";
-	}
-
-	@GetMapping(value = "/regAddress")
-	public String goRegAddress() {
-		return "content/regAddress";
-	}
-
-	@PostMapping("/content/setDefaultAddress")
-	public String changeUserSelectedAddress(@AuthenticationPrincipal CustomUserDetails userDetails,
-			@RequestParam("regAddressId") UUID regAddressId, RedirectAttributes redirectAttributes) {
-		regAddressService.selectDefaultAddress(userDetails, regAddressId, redirectAttributes);
-		return "redirect:/myAddress";
 	}
 
 }

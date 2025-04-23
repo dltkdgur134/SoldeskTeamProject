@@ -73,12 +73,20 @@ public class RegAddress {
 		this.isUserSelectedAddress = isUserSelectedAddress;
 	}
 	
+	public void updateRegAddress(String address, String detailAddress, double userAddressLatitude, 
+			double userAddressLongitude) {
+		this.address = address;
+		this.detailAddress = detailAddress;
+		this.userAddressLatitude = userAddressLatitude;
+		this.userAddressLongitude = userAddressLongitude;
+	}
+	
 	public RegAddress updateDefaultAddress(boolean isUserSelectedAddress) {
 		this.isUserSelectedAddress = isUserSelectedAddress;
 		return this;
 	}
 	
-	public String getUserUuidAsString() {
+	public String getRegAddressUuidAsString() {
 	    return regAddressId != null ? regAddressId .toString() : null;
 	}
 	

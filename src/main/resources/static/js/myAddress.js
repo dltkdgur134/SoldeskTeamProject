@@ -146,7 +146,7 @@ function handleSelection(selectedValue) {
 function deleteAddress(count) {
 	const form = document.getElementById('address-form' + count);
 	const regAddressId = form.regAddressId;
-	fetch('/deleteAddress/' + regAddressId.value, {
+	fetch('/content/deleteAddress/' + regAddressId.value, {
 		method: 'delete',
 		headers: {
 			'Content-Type': 'application/json'
@@ -190,5 +190,7 @@ function deleteAddress(count) {
 			alert('삭제 중 에러가 발생했습니다.');
 		});
 }
+
+
 
 

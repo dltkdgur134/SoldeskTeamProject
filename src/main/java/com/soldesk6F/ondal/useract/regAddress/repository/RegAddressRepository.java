@@ -12,5 +12,5 @@ import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 public interface RegAddressRepository extends JpaRepository<RegAddress, UUID> {
 	Optional<List<RegAddress>> findAllByUser(User user);
 	Optional<RegAddress> findByUser(User user);
-	
+	Optional<RegAddress> findByRegAddressIdAndUser(UUID regAddressId, User user);
 }

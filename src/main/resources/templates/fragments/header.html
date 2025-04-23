@@ -78,14 +78,14 @@
 		<div sec:authorize="isAnonymous()">
 		</div>
 		<div class="container" sec:authorize="isAuthenticated()">
-			<div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
+			<div class="card shadow-sm" style="">
 				<div class="row g-0">
 					<div class="col-md-4 p-3 text-center">
 						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
              				? #authentication.principal.user.userProfile 
              				: '/img/userProfiles/' + #authentication.principal.user.userProfile}"
 							class="rounded-circle img-thumbnail img-fluid"
-							alt="Profile Picture">
+							alt="Profile Picture" id="header-profile-pic">
 
 						<div class="mt-2">
 							<span class="badge bg-success"

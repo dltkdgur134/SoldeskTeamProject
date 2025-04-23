@@ -14,32 +14,36 @@
 <div layout:fragment="content" class="container py-5">
 	<div class="card info-card p-4">
 		<h5 class="card-title">
-			주소 등록하기
+			주소 수정
 		</h5>
 		<div class="card-body">
 			<div class="form-floating mb-3">
-				<form th:action="@{/content/regAddress}" method="POST" name="regAddressForm"
-						autocomplete="off" id="reg-address-form">
+				<form th:action="@{/content/updateAddress}" method="POST" name="updateAddressForm"
+						autocomplete="off" id="update-address-form">
+						<input type="hidden" name="_method" value="PUT" />
+						<input class="form-control" type="text" name="RegAddressId" id="update-address-id" 
+			  								hidden="true" th:value="${address.regAddressId}"> 
+			  			<input class="form-control" type="text" name="user" id="update-address-User" hidden="true" th:value="${#authentication.principal.user}"/>
 						<div class="input-group mb-3">
 							<span class="input-group-text" id="basic-addon2">
 							<i class="fa-solid fa-map-location-dot"></i></span> 
-							<input type="text" class="form-control" aria-label="regAddress" name="address" id="userAddress" placeholder="주소" readonly>
+							<input type="text" class="form-control" aria-label="regAddress" name="address" id="userAddress" placeholder="주소" th:value="${address.address}" readonly>
 								<input type="button" onclick="regUserAddress()" value="주소 찾기" class="btn btn-warning btn">
 						</div>
 						<div class="input-group mb-3">
 							<span class="input-group-text" id="basic-addon2">
 							<i class="fa-solid fa-house-user"></i></span> 
-							<input type="text" class="form-control" aria-label="detailAddress" name="detailAddress" id="detailAddress" placeholder="상세주소" required>
+							<input type="text" class="form-control" aria-label="detailAddress" name="detailAddress" id="detailAddress" placeholder="상세주소" th:value="${address.detailAddress}" required>
 						</div>
 						<div class="input-group mb-3">
 							<span class="input-group-text" id="basic-addon2">
 							<i class="fa-solid fa-location-crosshairs"></i></span> 
-							<input type="text" name="latitude" class="form-control" id="userAddresslatitude" placeholder="위도" readonly>
+							<input type="text" name="userAddressLatitude" class="form-control" id="userAddresslatitude" placeholder="위도" th:value="${address.userAddressLatitude}" readonly>
 						</div>
 						<div class="input-group mb-3">
 							<span class="input-group-text" id="basic-addon2">
 							<i class="fa-solid fa-location-crosshairs"></i></span>
-							<input type="text" name="longitude" class="form-control" id="userAddresslongitude" placeholder="경도" readonly>
+							<input type="text" name="userAddressLongitude" class="form-control" id="userAddresslongitude" placeholder="경도" th:value="${address.userAddressLongitude}" readonly>
 						</div>
  					 <br>
  					<div id="iframe-layer" >
@@ -47,15 +51,10 @@
 					</div>			 
 					<br>
  					 <button type="submit" class="btn btn-primary"
-						form="reg-address-form" id="reg-address-btn">확인</button> 
+						form="update-address-form" id="update-address-btn">확인</button> 
 				</form>
 			</div> 
 		</div>
-		<!-- <div class="address-search-container">
-  				<input type="text" id="address-search-bar"	placeholder="주소검색"	/>
-				oninput="fetchSearchResults(this.value)"  				
- 			 <ul id="dropdown-results" class="dropdown-menu"></ul>
-		</div> -->
 		<br>
 	</div> 
 </div>
