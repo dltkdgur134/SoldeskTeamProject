@@ -78,15 +78,14 @@
 		<div sec:authorize="isAnonymous()">
 		</div>
 		<div class="container" sec:authorize="isAuthenticated()">
-			<div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
+			<div class="card shadow-sm" style="">
 				<div class="row g-0">
 					<div class="col-md-4 p-3 text-center">
 						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
              				? #authentication.principal.user.userProfile 
              				: '/img/userProfiles/' + #authentication.principal.user.userProfile}"
 							class="rounded-circle img-thumbnail img-fluid"
-							alt="Profile Picture">
-
+							alt="Profile Picture" id="header-profile-pic">
 						<div class="mt-2">
 							<span class="badge bg-success"
 								th:text="${#authentication.principal.user.userRole}"></span>
@@ -113,9 +112,18 @@
 							<!--<a class="btn btn-link text-decoration-none" th:href="@{/infopage}">-->
 							<a class="btn btn-link text-decoration-none" th:href="@{/myPage}">
 								<small><i class="fas fa-edit"></i>마이페이지</small>
-							</a> <a class="btn btn-link text-decoration-none" href="#"> <small><i
-									class="fas fa-map-marker-alt"></i> 주소관리</small>
-							</a> <a class="btn btn-link text-decoration-none" href="/logout">
+							</a> 
+							<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
+								<a class="btn btn-link text-decoration-none" href="myAddress"> 
+									<small><i class="fas fa-map-marker-alt"></i> 주소관리</small>
+								</a> 
+							</th:block>
+							<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
+								<a class="btn btn-link text-decoration-none" href="regAddress"> 
+									<small><i class="fa-solid fa-map-location-dot"></i> 주소등록</small>
+								</a> 
+							</th:block>
+							<a class="btn btn-link text-decoration-none" href="/logout">
 								<small><i class="fas fa-share"></i> 로그아웃</small>
 							</a>
 						</div>
