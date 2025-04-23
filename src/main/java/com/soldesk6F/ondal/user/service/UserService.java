@@ -148,7 +148,6 @@ public class UserService {
     	} else {
     		findUser.get().updateNickname(nickName);
     		findUser.get().updateUpdatedDate(LocalDateTime.now());
-//    		userDetails.getUser().setNick	Name(nickName);
     		refreshUserAuthentication(findUser.get().getUserId());
     		redirectAttributes.addFlashAttribute("result", 0);
     		redirectAttributes.addFlashAttribute("resultMsg", "닉네임 변경 성공!");
@@ -213,7 +212,6 @@ public class UserService {
 	            final String finalFileName = new String(fileName);
 	            findUser.get().updateProfile(finalFileName);
 	            findUser.get().updateUpdatedDate(LocalDateTime.now());
-//	            cud.getUser().setUserProfile(finalFileName);
 	            refreshUserAuthentication(findUser.get().getUserId());
 	            redirectAttributes.addFlashAttribute("result", 0);
 	            redirectAttributes.addFlashAttribute("resultMsg", "프로필 이미지 변경 성공!");
@@ -223,7 +221,6 @@ public class UserService {
 	        final String finalFileName = new String(fileName);
 	        findUser.get().updateProfile(finalFileName);
 	        findUser.get().updateUpdatedDate(LocalDateTime.now());
-//	        cud.getUser().setUserProfile(finalFileName);
 	        refreshUserAuthentication(findUser.get().getUserId());
 	        redirectAttributes.addFlashAttribute("result", 0);
 	        redirectAttributes.addFlashAttribute("resultMsg", "기본 이미지로 변경 성공!");
@@ -257,7 +254,6 @@ public class UserService {
     	} else {
     		findUser.get().updatePhone(userPhone);
     		findUser.get().updateUpdatedDate(LocalDateTime.now());
-//    		cud.getUser().setUserPhone(userPhone);
     		refreshUserAuthentication(findUser.get().getUserId());
     		redirectAttributes.addFlashAttribute("result", 0);
     		redirectAttributes.addFlashAttribute("resultMsg", "전화번호 변경 성공!");
@@ -292,7 +288,6 @@ public class UserService {
     			String encryptedPassword = passwordEncoder.encode(password);
     			findUser.get().updatePassword(encryptedPassword);
     			findUser.get().updateUpdatedDate(LocalDateTime.now());
-//    			cud.getUser().setPassword(password);
     			redirectAttributes.addFlashAttribute("result", 0);
     			redirectAttributes.addFlashAttribute("resultMsg", "비밀번호 변경 성공!");
     			return true;

@@ -89,6 +89,16 @@ public class Order {
     @Column(name = "delivery_address", nullable = false, length = 255)
     private String deliveryAddress;
 
+    @Column(name = "delivery_address_latitude", nullable = false)
+    private double deliveryAddressLatitude;  // 배달 주소 위도 추가
+
+    @Column(name = "delivery_address_longitude", nullable = false)
+    private double deliveryAddressLongitude;  // 배달 주소 경도 추가
+
+
+    @Column(name = "delivery_fee", nullable = false)
+    private int deliveryFee;
+    
     @Lob
     @Column(name = "store_request")
     private String storeRequest;
@@ -174,30 +184,36 @@ public class Order {
     }
     @Builder
     public Order(User user, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
-    		LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
-    		LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress, String storeRequest,
-    		String deliveryRequest, OrderToOwner orderToOwner, CancledWhy cancledWhy, OrderToRider orderToRider,
-    		int totalPrice, String orderAdditional1, String orderAdditional2, List<OrderDetail> orderDetails) {
-    	this.user = user;
-    	this.guestId = guestId;
-    	this.store = store;
-    	this.rider = rider;
-    	this.expectCookingTime = expectCookingTime;
-    	this.cookingStartTime = cookingStartTime;
-    	this.realCookingTime = realCookingTime;
-    	this.deliveryStartTime = deliveryStartTime;
-    	this.expectDeliveryTime = expectDeliveryTime;
-    	this.realDeliveryTime = realDeliveryTime;
-    	this.deliveryAddress = deliveryAddress;
-    	this.storeRequest = storeRequest;
-    	this.deliveryRequest = deliveryRequest;
-    	this.orderToOwner = orderToOwner;
-    	this.cancledWhy = cancledWhy;
-    	this.orderToRider = orderToRider;
-    	this.totalPrice = totalPrice;
-    	this.orderAdditional1 = orderAdditional1;
-    	this.orderAdditional2 = orderAdditional2;
-    	this.orderDetails = orderDetails;
+                 LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
+                 LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress,
+                 Double deliveryAddressLatitude, Double deliveryAddressLongitude, int deliveryFee,
+                 String storeRequest, String deliveryRequest, OrderToOwner orderToOwner, CancledWhy cancledWhy,
+                 OrderToRider orderToRider, int totalPrice, String orderAdditional1, String orderAdditional2,
+                 List<OrderDetail> orderDetails) {
+
+        this.user = user;
+        this.guestId = guestId;
+        this.store = store;
+        this.rider = rider;
+        this.expectCookingTime = expectCookingTime;
+        this.cookingStartTime = cookingStartTime;
+        this.realCookingTime = realCookingTime;
+        this.deliveryStartTime = deliveryStartTime;
+        this.expectDeliveryTime = expectDeliveryTime;
+        this.realDeliveryTime = realDeliveryTime;
+        this.deliveryAddress = deliveryAddress;
+        this.deliveryAddressLatitude = deliveryAddressLatitude;
+        this.deliveryAddressLongitude = deliveryAddressLongitude;
+        this.deliveryFee = deliveryFee;
+        this.storeRequest = storeRequest;
+        this.deliveryRequest = deliveryRequest;
+        this.orderToOwner = orderToOwner;
+        this.cancledWhy = cancledWhy;
+        this.orderToRider = orderToRider;
+        this.totalPrice = totalPrice;
+        this.orderAdditional1 = orderAdditional1;
+        this.orderAdditional2 = orderAdditional2;
+        this.orderDetails = orderDetails;
     }
     
     public void addOrderDetail(OrderDetail orderDetail) {
@@ -212,15 +228,47 @@ public class Order {
     
     public int calculateOrderTotal() {
         return orderDetails.stream()
-        		.mapToInt(od -> od.getQuantity() * od.getPrice())
-        		.sum();
+                .mapToInt(OrderDetail::calculateTotalPrice)
+                .sum();
+    }
+    
+    public int getTotalPrice() {
+        return calculateOrderTotal() + deliveryFee;
     }
     
     public String getOrderUuidAsString() {
 	    return orderId != null ? orderId .toString() : null;
 	}
 
-    
+
+    //출발지(가게주소)와 도착지(배달주소)의 위도 경도로 거리 계산
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int EARTH_RADIUS = 6371;
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS * c;
+    }
+    // 그 거리 기반으로 배달료 측정
+    public void calculateDeliveryFee() {
+    	double storeLat = store.getStoreLatitude();
+    	double storeLon = store.getStoreLongitude();
+    	double distance = calculateDistance(storeLat, storeLon, deliveryAddressLatitude, deliveryAddressLongitude);
+    	
+    	if (distance < 1.0) {
+    		this.deliveryFee = 3000;
+    	} else if (distance < 2.0) {
+    		this.deliveryFee = 4000;
+    	} else if (distance < 3.0) {
+    		this.deliveryFee = 5000;
+    	} else {
+    		this.deliveryFee = 6000;
+    	}
+    }
     
 }
+
 

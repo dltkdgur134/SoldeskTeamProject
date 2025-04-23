@@ -12,51 +12,49 @@
 </head>
 
 <div layout:fragment="content" class="container py-5">
-	<div class="container text-center">
+	 <div class="container text-center">
 	<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
 		<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
 	</div>
 	<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
 		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
 	</div>
-		<div class="row justify-content-md-center">
-			<div class="col col-lg-2">
-				<a type="button" class="btn btn-link position-relative" id="profile-pic-btn" data-bs-toggle="modal" data-bs-target="#updateProfilePicModal">
-					
-		<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
-             ? #authentication.principal.user.userProfile 
-             : '/img/userProfiles/' + #authentication.principal.user.userProfile}"
-							class="rounded-circle img-thumbnail img-fluid"
-							alt="Profile Picture" id="profile-pic">
-					
+	</div> 
+	<div class="container d-flex justify-content-md-center my-3 text-center">
+    	<div class="row justify-content-md-cetner align-items-center">
+        	<div class="col-auto">
+            	<a type="button" class="btn btn-link position-relative" id="profile-pic-btn" data-bs-toggle="modal" data-bs-target="#updateProfilePicModal">
+					<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
+             			? #authentication.principal.user.userProfile 
+             			: '/img/userProfiles/' + #authentication.principal.user.userProfile}"
+						class="rounded-circle img-thumbnail img-fluid"
+						alt="Profile Picture" id="profile-pic">
 					<span class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle" id="profile-pic-update-btn">
 	    				<i class="fa-solid fa-pen-to-square"></i>
 	  				</span>
 				</a>
-			</div>
-			<div class="col col-lg-2">
+				<br>
+				<br>
 				<h5 id="profile-nickName"
 					th:text="${#authentication.principal.user.nickName}"></h5>
-				<span
-					class="badge rounded-pill text-bg-primary justify-content-center"
+				<h5 id="profile-id" th:text="${#authentication.principal.user.userId}"></h5>
+				<span class="badge rounded-pill text-bg-primary justify-content-center"
 					th:text="${#authentication.principal.user.UserRole}"></span>
-			</div>
-			<div class="col col-lg-2"></div>
-		</div>
+        	</div>
+    	</div>
 	</div>
-	<br>
 	<div class="card info-card p-4">
 		<h5 class="card-title">
 			기본 정보 <span class="mypage-title-icon"><i class="fa-solid fa-circle-info"></i></span>
 		</h5>
 		<div class="card-body">
 			<ul class="list-group list-group-flush">
-				<li class="list-group-item d-flex justify-content-between align-items-center">
+				<!-- <li class="list-group-item d-flex justify-content-between align-items-center">
 					<Label>아이디</Label>
 					<strong th:text="${#authentication.principal.user.userId}"></strong>
 					<i data-bs-toggle="tooltip"
 						data-bs-placement="right" title="아이디는 변경하실 수 없습니다." class="fa-solid fa-circle-question"></i>
-  				</li> 
+  				</li>  -->
 				<li class="list-group-item d-flex justify-content-between"><Label>닉네임</Label>
 				<strong  th:text="${#authentication.principal.user.nickName}"></strong>
 					<a type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateNicknameModal">수정</a>

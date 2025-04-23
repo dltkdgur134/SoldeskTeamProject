@@ -166,6 +166,20 @@ body {
     z-index: 1050;
 }
 
+/* 마이페이지 */
+
+#profile-nickName {
+	color: black;
+	font-weight: 900;
+}
+
+
+#profile-id {
+	color: gray;
+	font-weight: 900;
+	font-size: 12pt;
+}
+
 #profile-pic {
 	width: 100px;
 	top: -3em;

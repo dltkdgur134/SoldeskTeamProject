@@ -170,7 +170,7 @@ function deleteAddress(count) {
 				"<strong>" + data.resultMsg + "</strong>" +
 				"</div>";
 				statusContainer.innerHTML = 
-				"<div class='spinner-border text-dark'' role='status'><span class='visually-hidden'>Loading...</span></div>";
+				"<div class='spinner-border text-dark'' role='status'><span class='visually-hidden'>로딩중...</span></div>";
 				var flashDurationInSeconds = 2;
 				var flashContainerId = 'result-msg-container';
 
