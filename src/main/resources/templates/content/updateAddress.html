@@ -50,8 +50,12 @@
 						<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
 					</div>			 
 					<br>
- 					 <button type="submit" class="btn btn-primary"
-						form="update-address-form" id="update-address-btn">확인</button> 
+					<div class="container d-flex justify-content-between">
+ 						<button type="submit" class="btn btn-primary"
+							form="update-address-form" id="update-address-btn">확인</button> 
+						<button type="button" class="btn btn-secondary btn-lg" id="check-password-back-btn" 
+							onclick="return window.location.href='/myAddress'"><strong>뒤로가기</strong></button>
+					</div>	
 				</form>
 			</div> 
 		</div>
