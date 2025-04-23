@@ -1,6 +1,5 @@
 package com.soldesk6F.ondal.user.controller.owner;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,14 +8,21 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.menu.dto.MenuCategoryDto;
 import com.soldesk6F.ondal.menu.dto.MenuDto;
+import com.soldesk6F.ondal.menu.dto.MenuRegisterDto;
+import com.soldesk6F.ondal.menu.entity.MenuCategory;
+import com.soldesk6F.ondal.menu.service.MenuCategoryService;
+import com.soldesk6F.ondal.menu.service.MenuService;
 import com.soldesk6F.ondal.store.entity.Store;
-import com.soldesk6F.ondal.store.entity.StoreDto;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.user.entity.Owner;
@@ -31,6 +37,8 @@ public class OwnerStoreController {
 	private final UserService userService;
 	private final StoreService storeService;
 	private final StoreRepository storeRepository;
+	private final MenuService menuService;
+	private final MenuCategoryService menuCategoryService;
 	
 	@GetMapping("/ownerStoreList")
 	public String getOwnerStores(@AuthenticationPrincipal CustomUserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
@@ -93,16 +101,74 @@ public class OwnerStoreController {
 	    return "content/store/storeManagement2";
 	}
 	
-//	@GetMapping("/storeManagement/{storeId}/menu-manage")
-//	public String menuManagePage(@PathVariable UUID storeId, Model model) {
-//	    StoreDto store = storeService.getStoreById(storeId);
-//	    List<MenuDto> menuList = MenuService.getMenusByStore(storeId);
-//	    
-//	    model.addAttribute("store", store);
-//	    model.addAttribute("menuList", menuList);
-//	    
-//	    return "content/store/storeMenuManage";
-//	}
-//	
+	@GetMapping("/storeManagement/{storeId}/menu-manage")
+	public String menuManagePage(
+			@PathVariable("storeId") UUID storeId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model) {
+	
+		String loginUserId = userDetails.getUser().getUserId();
+		Store store = storeService.getStoreForOwner(storeId, loginUserId);
+		List<MenuDto> menuList = menuService.getMenusByStore(store);
+		List<MenuCategoryDto> categoryList = menuCategoryService.findByStore(store);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String categoryListJson = "";
+		try {
+			categoryListJson = mapper.writeValueAsString(categoryList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		model.addAttribute("store", store);
+		model.addAttribute("menuList", menuList);
+		model.addAttribute("categoryListJson", categoryListJson);
+		
+		if (!model.containsAttribute("result")) {
+	        model.addAttribute("result", -1);
+	    }
+	    if (!model.containsAttribute("resultMsg")) {
+	        model.addAttribute("resultMsg", "");
+	    }
+		
+		return "content/store/storeMenuManage";
+	}
+	
+	@PostMapping("/storeManagement/{storeId}/menu-register")
+	public String registerMenu(@PathVariable("storeId") UUID storeId,
+	                           @ModelAttribute MenuRegisterDto menuDto,
+	                           @AuthenticationPrincipal CustomUserDetails userDetails,
+	                           RedirectAttributes redirectAttributes) {
+		
+	    try {
+	        menuService.registerMenu(storeId, menuDto, userDetails.getUser().getUserId());
+	        redirectAttributes.addFlashAttribute("result", 0);
+	        redirectAttributes.addFlashAttribute("resultMsg", "메뉴가 등록되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("result", 1);
+	        redirectAttributes.addFlashAttribute("resultMsg", "메뉴 등록에 실패했습니다.");
+	    }
+	    return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
+	}
+	
+	@PostMapping("/storeManagement/{storeId}/menu-edit")
+	public String editMenu(@PathVariable("storeId") UUID storeId,
+	                       @ModelAttribute MenuRegisterDto menuDto,
+	                       @AuthenticationPrincipal CustomUserDetails userDetails,
+	                       RedirectAttributes redirectAttributes) {
+
+		try {
+			menuService.editMenu(storeId, menuDto, userDetails.getUser().getUserId());
+			redirectAttributes.addFlashAttribute("result", 0);
+			redirectAttributes.addFlashAttribute("resultMsg", "수정되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "수정에 실패했습니다.");
+		}
+		return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
+	}
+	
 	
 }

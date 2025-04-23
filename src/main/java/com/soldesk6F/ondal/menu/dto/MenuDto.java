@@ -17,12 +17,11 @@ import lombok.NoArgsConstructor;
 public class MenuDto {
 	private UUID menuId;
 	private UUID storeId;
-	
 	private String menuName;
 	private String description;
 	private int price;
-	
 	private String menuImg;
+	private String menuCategory;
 	
 	private List<String> menuOptions1;
 	private List<Integer> menuOptions1Price;
