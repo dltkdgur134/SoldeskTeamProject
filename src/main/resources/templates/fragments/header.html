@@ -91,17 +91,18 @@
 								th:text="${#authentication.principal.user.userRole}"></span>
 						</div>
 					</div>
-					<div class="col-md-8">
-						<div class="card-body">
-							<h5
-								class="card-title d-flex justify-content-center align-items-center"
+					<div class="col-md-8 d-flex text-start">
+						<div class="card-body my-2">
+							<h5	class="card-title"
 								th:text="${#authentication.principal.user.nickName}"></h5>
 							<p class="card-text">
 								<i class="fas fa-map-marker-alt"></i>
 								<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
-								<strong	th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
-								<br>
-								<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
+								<small th:text="${#authentication.principal.user.userSelectedAddress.address} + ' ' + 
+									${#authentication.principal.user.userSelectedAddress.detailAddress}"></small>
+								</th:block>
+								<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
+									<strong>주소를 등록해주세요.</strong>
 								</th:block> 
 							</p>
 						</div>

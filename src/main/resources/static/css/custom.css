@@ -64,6 +64,13 @@ body {
 	background-color: #FFEF99;
 }
 
+/* 모바일 화면 (넓이 480px 이하) 에서 적용할 css */
+@media only screen and (max-width: 480px) {
+	#header-profile-pic {
+		width: 30%;
+	}
+}
+
 .info-card {
       max-width: 600px;
       margin: auto;

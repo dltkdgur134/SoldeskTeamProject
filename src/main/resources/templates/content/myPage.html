@@ -20,8 +20,8 @@
 		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
 	</div>
 	</div> 
-	<div class="container d-flex justify-content-md-center my-3 text-center">
-    	<div class="row justify-content-md-cetner align-items-center">
+	<div class="container d-flex justify-content-center my-3 text-center">
+    	<div class="row justify-content-center align-items-center">
         	<div class="col-auto">
             	<a type="button" class="btn btn-link position-relative" id="profile-pic-btn" data-bs-toggle="modal" data-bs-target="#updateProfilePicModal">
 					<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
