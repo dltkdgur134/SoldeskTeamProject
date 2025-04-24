@@ -8,7 +8,9 @@ export function openCategoryModal() {
 	list.innerHTML = "";
 
 	for (const [categoryName, categoryId] of dynamicCategories.entries()) {
-		const li = document.createElement("li");
+		const li = document.createElement("li");		
+		li.setAttribute('data-category-id', categoryId);
+		
 		li.style.display = "flex";
 		li.style.alignItems = "center";
 		li.style.gap = "10px";
@@ -65,14 +67,28 @@ export function openCategoryModal() {
 			};
 	
 			deleteBtn.onclick = () => {
-				fetch(`/api/category/${categoryId}`, { method: 'DELETE' })
-					.then(() => {
-						dynamicCategories.delete(categoryName);
-						initCategoryButtons();
-						openCategoryModal();
+				fetch(`/api/category/${categoryId}/has-menu`)
+					.then(res => res.json())
+					.then(hasMenu => {
+						if (hasMenu) {
+							alert("❌ 해당 카테고리에 등록된 메뉴가 있어 삭제할 수 없습니다.");
+							return;
+						}
+
+						if (!confirm(`정말로 카테고리 "${categoryName}"을 삭제하시겠습니까?`)) return;
+
+						fetch(`/api/category/${categoryId}`, { method: 'DELETE' })
+							.then(() => {
+								dynamicCategories.delete(categoryName);
+								initCategoryButtons();
+								openCategoryModal();
+							})
+							.catch(() => {
+								alert("카테고리 삭제에 실패했습니다.");
+							});
 					})
 					.catch(() => {
-						alert("카테고리 삭제에 실패했습니다.");
+						alert("카테고리 메뉴 조회에 실패했습니다.");
 					});
 			};
 		}
@@ -84,6 +100,7 @@ export function openCategoryModal() {
 	}
 
 	modal.style.display = "flex";
+	enableCategoryDrag();
 }
 
 export function closeCategoryModal() {
@@ -132,7 +149,7 @@ export function removeCategory(category) {
 	openCategoryModal();
 }
 
-export function initCategoryButtons() {
+/*export function initCategoryButtons() {
 	const uniqueCategories = new Set(["전체"]);
 	window.menuList.forEach(menu => {
 		if (menu.menuCategory && menu.menuCategory.trim() !== "") {
@@ -153,6 +170,39 @@ export function initCategoryButtons() {
 			document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
 			btn.classList.add("active");
 			filterMenusByCategory(category);
+		});
+		categoryContainer.appendChild(btn);
+	});
+
+	const manageBtn = document.createElement("button");
+	manageBtn.className = "tab manage-category-btn";
+	manageBtn.innerText = "카테고리 관리";
+	manageBtn.addEventListener("click", openCategoryModal);
+	categoryContainer.appendChild(manageBtn);
+}*/
+
+export function initCategoryButtons() {
+	const categoryContainer = document.getElementById("category-buttons");
+	categoryContainer.innerHTML = "";
+
+	const 전체버튼 = document.createElement("button");
+	전체버튼.className = "tab active";
+	전체버튼.innerText = "전체";
+	전체버튼.addEventListener("click", () => {
+		document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+		전체버튼.classList.add("active");
+		filterMenusByCategory("전체");
+	});
+	categoryContainer.appendChild(전체버튼);
+
+	window.categoryList.forEach(cat => {
+		const btn = document.createElement("button");
+		btn.className = "tab";
+		btn.innerText = cat.categoryName;
+		btn.addEventListener("click", () => {
+			document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+			btn.classList.add("active");
+			filterMenusByCategory(cat.categoryName);
 		});
 		categoryContainer.appendChild(btn);
 	});
@@ -201,5 +251,54 @@ export function renderEditCategorySelect(selectedId = "") {
 		}
 	select.value = String(selectedId);
 }
+
+export function enableCategoryDrag() {
+	const list = document.getElementById("categoryList");
+
+	Sortable.create(list, {
+		animation: 150,
+		onEnd: () => {
+			const newOrder = [...list.children].map((li, index) => {
+				const categoryId = li.getAttribute('data-category-id');
+				
+				if (!categoryId) {
+					console.warn(`❗ 카테고리 ID가 비어 있습니다.`);
+					return;
+				}
+				
+				return { id: categoryId, order: index };
+			}).filter(item => item !== null);
+
+			console.log("🔁 새로운 카테고리 순서:", newOrder);
+
+			fetch('/api/category/reorder', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(newOrder)
+			});
+		}
+	});
+}
+
+export function initCategoryData() {
+	const storeId = document.body.dataset.storeId;
+
+	fetch(`/api/category/list?storeId=${storeId}`)
+		.then(res => res.json())
+		.then(data => {
+			window.categoryList = data;
+			dynamicCategories.clear();
+			data.forEach(cat => {
+				dynamicCategories.set(cat.categoryName.trim(), cat.id);
+			});
+			initCategoryButtons(); // ✅ 버튼도 여기서 생성
+		})
+		.catch(() => {
+			alert("카테고리 목록을 불러오는 데 실패했습니다.");
+		});
+}
+
 
 
