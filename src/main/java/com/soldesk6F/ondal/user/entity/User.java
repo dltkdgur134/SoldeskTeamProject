@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
 import jakarta.persistence.Column;
@@ -76,10 +77,12 @@ public class User {
 	@Column(name = "login_fail_count", nullable = false)
 	private int loginFailCount = 0;
 
+	@JsonIgnore
 	@CreationTimestamp
 	@Column(name = "created_date", nullable = false, updatable = false)
 	private LocalDateTime createdDate;
 
+	@JsonIgnore
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;

@@ -1,7 +1,7 @@
 package com.soldesk6F.ondal.user.service;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.user.dto.RiderForm;
+import com.soldesk6F.ondal.user.dto.rider.RiderForm;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 import com.soldesk6F.ondal.user.entity.User.UserRole;

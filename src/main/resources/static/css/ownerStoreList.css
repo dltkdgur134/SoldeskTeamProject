@@ -51,7 +51,7 @@
 }
 
 .storeReg-btn {
-	background-color: #FFDF33;
+	background-color: #2D7121;
 	border: none !important;
 	border-radius: 7px;
 	text-align: center;
@@ -63,3 +63,10 @@
 	transition: background-color 0.3s;
 	padding: 10px;
 }
+
+.storeReg-btn:hover{
+	background-color: #0a7121;
+	cursor: pointer;
+	
+}
+

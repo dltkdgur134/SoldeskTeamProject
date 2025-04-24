@@ -38,7 +38,7 @@ public class UpdateOwnerController {
     }
 	
 	@GetMapping("owner/updateOwnerInfo")
-	public String showUpdateRiderInfoForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+	public String showUpdateOwnerInfoForm(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 		String userId = userDetails.getUser().getUserId();
 		Owner owner = ownerService.getOwnerByUserId(userId);
 		model.addAttribute("owner",owner);
@@ -70,7 +70,7 @@ public class UpdateOwnerController {
 	                "정보 변경이 실패했습니다.");
 	    }
 
-	    return "redirect:/rider/riderInfopage";
+	    return "redirect:/owner/ownerInfopage";
 	}
 
 	@PostMapping("/updateOwnerInfo")

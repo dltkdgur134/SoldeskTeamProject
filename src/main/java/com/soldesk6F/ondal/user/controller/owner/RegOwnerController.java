@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.user.dto.OwnerForm;
-import com.soldesk6F.ondal.user.dto.RiderForm;
+import com.soldesk6F.ondal.user.dto.owner.OwnerForm;
+import com.soldesk6F.ondal.user.dto.rider.RiderForm;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.repository.UserRepository;
@@ -90,22 +90,14 @@ public class RegOwnerController {
         User user = userRepository.findByUserId(userId).orElseThrow();
         userRoleService.changeRoleToOwner(user, ownerForm);
 	    // 가게 등록 페이지로 이동
-//	    return "redirect:/owner/content/storereg/submit";
-	    return "redirect:/storeReg/submit";
+	    return "redirect:/owner/store/submit";
 	    
 	}
 	
-	@GetMapping("/content/storereg/submit")
+	@GetMapping("/store/submit")
 	public String showSubmitPage() {
-	    return "content/storereg/submit";  // submit.html 파일을 Thymeleaf 템플릿으로 처리
+		
+	    return "content/store/submit";  // submit.html 파일을 Thymeleaf 템플릿으로 처리
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-
 }
