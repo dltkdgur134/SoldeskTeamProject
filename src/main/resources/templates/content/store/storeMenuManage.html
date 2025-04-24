@@ -3,7 +3,12 @@
 <head>
 	<meta charset="UTF-8">
 	<title>메뉴 관리</title>
-	<link rel="stylesheet" th:href="@{/css/storeMenuManage.css}">
+	<link rel="stylesheet" th:href="@{/css/storeMenuManage/base.css}">
+	<link rel="stylesheet" th:href="@{/css/storeMenuManage/form.css}">
+	<link rel="stylesheet" th:href="@{/css/storeMenuManage/layout.css}">
+	<link rel="stylesheet" th:href="@{/css/storeMenuManage/menu.css}">
+	<link rel="stylesheet" th:href="@{/css/storeMenuManage/modal.css}">
+	<link rel="stylesheet" th:href="@{/css/storeMenuManage/other.css}">
 </head>
 <body th:attr="data-store-id=${store.storeId}" data-store-id="">
 	<header class="menu-header">
@@ -15,8 +20,10 @@
 	</section>
 	
 	<section class="menu-list" id="menu-list-container">
-		<div class="menu-card" th:each="menu : ${menuList}" th:attr="data-menu-id=${menu.menuId}, data-category=${menu.menuCategory}" style="cursor:pointer;">
-			<img th:src="${menu.menuImg}" alt="menu image" />
+		<div class="menu-card" th:each="menu : ${menuList}" th:attr="data-menu-id=${menu.menuId}, data-category=${menu.menuCategory}, data-status=${menu.menuStatus}" style="cursor:pointer;">
+			<div class="image-wrapper">
+				<img th:src="${menu.menuImg}" alt="menu image" />
+			</div>
 			<div class="info">
 				<h3 th:text="${menu.menuName}">메뉴명</h3>
 				<p th:text="${menu.price} + '원'">가격</p>
@@ -65,7 +72,7 @@
 					<option value="SOLD_OUT">품절</option>
 				</select>
 
-				<button type="submit">등록하기</button>
+				<button type="submit">등록</button>
 			</form>
 		</div>
 	</div>
@@ -92,46 +99,25 @@
 				</select>
 				<div id="edit-option-container" style="grid-column: span 2;"></div>
 				<button type="button" id="edit-add-option-btn" style="grid-column: span 2;">+ 옵션 추가</button>
-				<button type="submit">수정하기</button>
+				<button type="submit">수정</button>
 			</form>
 			<form id="deleteMenuForm" method="post"
 				  th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/menu-delete'}"
 				  style="margin-top: 10px;">
 				<input type="hidden" name="menuId" id="deleteMenuId">
-				<button type="submit" class="delete-btn" style="background-color: red; color: white;">삭제하기</button>
+				<button type="submit" class="delete-btn" style="background-color: red; color: white;">삭제</button>
 			</form>
 		</div>
 	</div>
 
-	<script th:src="@{/js/storeMenuManage.js}"></script>
+	<script type="module" th:src="@{/js/storeMenuManage/main.js}"></script>
+	<!--<script th:src="@{/js/storeMenuManage/storeMenuManageBackup.js}"></script>-->
 	<script th:inline="javascript">
 		/*<![CDATA[*/
-		window.categoryList = JSON.parse([[${categoryListJson}]]);
+		window.categoryList = JSON.parse([[${categoryListJson}]]); // 동작엔 문제 없음
 		window.menuList = [[${menuList}]];
 		/*]]>*/
 	</script>
 	<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-	<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		const el = document.getElementById('menu-list-container'); // 메뉴 카드 부모
-		Sortable.create(el, {
-			animation: 150,
-			onEnd: function (evt) {
-				const newOrder = [...el.children].map((card, idx) => ({
-					menuId: card.dataset.menuId,
-					order: idx
-				}));
-				console.log("🔃 변경된 순서", newOrder);
-				fetch('/owner/menu-reorder', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(newOrder)
-				});
-			}
-		});
-	});
-	</script>
 </body>
 </html>

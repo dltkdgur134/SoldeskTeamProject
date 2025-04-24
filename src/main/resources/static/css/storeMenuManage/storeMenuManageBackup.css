@@ -68,6 +68,38 @@ body {
     color: #666;
 }
 
+.menu-card .image-wrapper {
+	position: relative;
+	width: 100%;
+	height: 140px;
+	overflow: hidden;
+}
+
+.menu-card .image-wrapper img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.menu-card.sold-out .image-wrapper img {
+	filter: grayscale(100%);
+	opacity: 0.6;
+}
+
+.menu-card.sold-out .image-wrapper::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url('/img/menu/soldout_overlay.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	pointer-events: none;
+}
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
 	-webkit-appearance: none;
