@@ -28,6 +28,10 @@ public class OwnerController {
 	    return "content/store/storeManagement";
 	}
 
+//	@GetMapping("/owner/store-management")
+//	public String store() {
+//		return "content/store/storeManagement";
+//	}
 	
 	@GetMapping(value = "/storesetting")
 	public String storeSetting() {

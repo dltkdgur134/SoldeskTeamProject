@@ -133,12 +133,12 @@ public class Menu {
 	}
 
 	@Builder
-	public Menu(Store store, String menuName,String menuCategory, /*이거추가됨*/ String description, int price, String menuImg,
+	public Menu(Store store, String menuName,String menuCategory, String description, int price, String menuImg,
 			String menuOptions1, String menuOptions1Price, String menuOptions2, String menuOptions2Price,
 			String menuOptions3, String menuOptions3Price, MenuStatus menuStatus) {
 		this.store = store;
 		this.menuName = menuName;
-		this.menuCategory = menuCategory;/*이거추가됨*/
+		this.menuCategory = menuCategory;
 		this.description = description;
 		this.price = price;
 		this.menuImg = menuImg;

@@ -119,7 +119,7 @@ body {
 	background-color: #6C0C0C;
 }
 
-.reg-btn {
+.rider-reg-btn ,.owner-reg-btn{
 	width: 100%;
 	padding: 10px;
 	background-color: #ffc107;
@@ -130,8 +130,11 @@ body {
 	cursor: pointer;
 }
 
-.reg-btn:hover {
+.rider-reg-btn:hover {
 	background-color: #6C0C0C;
+}
+.owner-reg-btn:hover {
+	background-color: #2D7121;
 }
 
 /* 기본 스타일 */

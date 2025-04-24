@@ -5,20 +5,20 @@
 	layout:decorate="~{layouts/Layouts}">
 <head>
 	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
-	<link rel="stylesheet" th:href="@{/css/ownerStoreList.css}">
+	<link th:fragment="css" th:href="@{/css/ownerCustom.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/ownerStoreList.css}" rel="stylesheet" />
+	<script th:src="@{/js/hideLogo.js}"></script>
 <meta charset="UTF-8">
 <title>오우너 점포 리스트</title>
 </head>
-<body>
 	<div layout:fragment="content">
 		<h2 class="text-center">내 점포</h2>
 		<div id="gallery-area">
 			<div th:each="store : ${myStores}" class="store-row">
 				<a th:href="@{/owner/storeManagement/{storeId}(storeId=${store.storeId})}" class="store-row2">
 				    <img class="store-image"
-				        th:src="${store.storeImgs[0]?.storeImg != null ? store.storeImgs[0].storeImg : '/img/store/default.png'}"
-				        th:alt="${store.storeName}" />
+     				th:src="${store.brandImg != null ? store.brandImg : '/img/store/default.png'}"
+     				th:alt="${store.storeName}" />
 				    <div class="store-info">
 				        <p class="store-name" th:text="${store.storeName}">점포명</p>
 				        <p class="store-category" th:text="${store.category}">카테고리</p>
@@ -29,7 +29,7 @@
 			</div>
 		</div>
 		<div id="btn-area">
-			<a class="storeReg-btn">점포 추가 입점</a>
+			<a href="/owner/store/submit" class="storeReg-btn">점포 추가 입점</a>
 		</div>
 	</div>
 	<div layout:fragment="js" th:if="${errorMessage != null}">
@@ -37,7 +37,6 @@
 			alert("[[${errorMessage}]]");
 		</script>
 	</div>
-</body>
 </html>
 
 

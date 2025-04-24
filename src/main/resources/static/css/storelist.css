@@ -6,22 +6,17 @@
 }
 
 .store-row {
-  width: 90%;
-  max-width: 700px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  padding: 15px;
+	display: flex;
+	align-items: center;
+	width: 90%;
+	max-width: 700px;
+	background-color: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	padding: 15px;
 }
 
-.store-row2 {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 700px;
-  background-color: #fff;
-  padding: 15px;
-}
+
 
 .store-image {
   width: 120px;
@@ -51,7 +46,7 @@
 }
 
 .storeReg-btn {
-	background-color: #2D7121;
+	background-color: #FFDF33;
 	border: none !important;
 	border-radius: 7px;
 	text-align: center;
@@ -63,10 +58,3 @@
 	transition: background-color 0.3s;
 	padding: 10px;
 }
-
-.storeReg-btn:hover{
-	background-color: #0a7121;
-	cursor: pointer;
-	
-}
-

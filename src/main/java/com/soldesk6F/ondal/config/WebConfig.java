@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer{
 			.addResourceHandler("/img/**")
 //			.addResourceLocations("file:C:\\TeamProject\\SoldeskTeamProject\\src\\main\\resources\\static\\img");
 //			.addResourceLocations("file:C:\\Users\\sdedu\\Desktop\\Project_Ondal\\git_SoldeskTeamProject\\src\\main\\resources\\static\\img");
-			.addResourceLocations("file:C:\\Users\\sdedu\\Desktop\\Project\\src\\main\\resources\\static\\img");
+			.addResourceLocations("file:C:\\ondal\\SoldeskTeamProject\\src\\main\\resources\\static\\img");
 			
 			
 	}

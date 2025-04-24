@@ -17,6 +17,7 @@ public class PageController {
 	
 	@GetMapping (value = "/myPage")
 	public String goMyPage(Model model) {
+		System.out.println("myPage 컨트롤러 진입");
 		return "content/myPage";
 	}
 	

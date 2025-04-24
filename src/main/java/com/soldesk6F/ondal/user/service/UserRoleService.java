@@ -3,8 +3,8 @@ package com.soldesk6F.ondal.user.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.soldesk6F.ondal.user.dto.OwnerForm;
-import com.soldesk6F.ondal.user.dto.RiderForm;
+import com.soldesk6F.ondal.user.dto.owner.OwnerForm;
+import com.soldesk6F.ondal.user.dto.rider.RiderForm;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.repository.UserRepository;
