@@ -27,8 +27,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostUpdate;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,7 +47,7 @@ public class Order {
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_uuid", nullable = true)
     @JsonIgnoreProperties({"orders"})
     private User user;
@@ -57,7 +55,7 @@ public class Order {
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     @JsonIgnoreProperties({"orders", "owner"})
     private Store store;

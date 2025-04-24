@@ -11,6 +11,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
@@ -101,9 +102,11 @@ public class Store {
     @Column(name = "food_origin",nullable = false)
     private String foodOrigin;
 
+    @JsonIgnore
     @Column(name = "opening_time")
     private LocalTime openingTime;
 
+    @JsonIgnore
     @Column(name = "closing_time")
     private LocalTime closingTime;
 
@@ -114,6 +117,7 @@ public class Store {
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus;
 
+    @JsonIgnore
     @CreationTimestamp
     @Column(name = "registration_date", updatable = false,nullable = false)
     private LocalDateTime registrationDate;

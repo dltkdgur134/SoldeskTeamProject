@@ -5,46 +5,43 @@
 	layout:decorate="~{layouts/Layouts}">
 
 <head>
-    <link th:fragment="css" th:href="@{/css/deliveryMap.css}"rel="stylesheet" />
-    <link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
-    <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-    <link th:fragment="css" th:href="@{/css/RiderIndex.css}" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<link th:fragment="css" th:href="@{/css/deliveryMap.css}"
+	rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/RiderCustom.css}"
+	rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/RiderIndex.css}" rel="stylesheet" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<script
+	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 </head>
 <body>
-<div layout:fragment="content">
-    <!-- 지도 영역 -->
-      <div id="map" style="width: 100%; height: 400px;"></div> 
-    <!-- 주문 목록 출력 -->
-    <div id="order-list">
-        <h4>주문 목록</h4>
-        <div th:each="order : ${orders}">
-            <div class="order-item">
-                <h5 th:text="${order.store.storeName}">업장명</h5>
-                <p>배달 번호: <span th:text="${order.orderId}">배달 번호</span></p>
-                <p>주문일자: <span th:text="${order.orderTime}">주문일자</span></p>
-                <p>배달 요청 사항: <span th:text="${order.deliveryRequest}">배달 요청 사항</span></p>
-                <p>조리 완료 예상 시간: <span th:text="${order.expectCookingTime}">시간</span></p>
-                <button class="assign-btn" th:data-order-id="${order.orderId}">배차</button>
-                <button class="cancel-btn" th:data-order-id="${order.orderId}">취소</button>
-            </div>
-        </div>
-    </div>
+	<div layout:fragment="content">
+		<!-- 지도 영역 -->
+		<div id="map" style="width: 100%; height: 400px;"></div>
+		<!-- 주문 목록 출력 -->
+		<div id="order-list">
+			<h4>주문 목록</h4>
+			<div id="order-items">
+				<!-- 여기 안에 각 주문 항목이 동적으로 들어갑니다. -->
+			</div>
+		</div>
 
-    <!-- Kakao Maps API -->
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
-    <script src="/js/riderMap.js"></script>
-    
-    <script>
-        const riderLat = parseFloat('[[${rider.hubAddressLatitude}]]');
-        const riderLng = parseFloat('[[${rider.hubAddressLongitude}]]');
-    </script>
-     <div class="action-buttons">
-        <button id="assignBtn">배차</button>
-        <button class="cancel">취소</button>
-    </div>
-</div>
-</div>
+		<!-- Kakao Maps API -->
+		<script
+			src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
+		<script src="/js/riderMap.js"></script>
+
+		<script th:inline="javascript">
+			const riderLat = /*[[${rider.hubAddressLatitude}]]*/0;
+			const riderLng = /*[[${rider.hubAddressLongitude}]]*/0;
+		</script>
+
+		<script th:inline="javascript">
+			const orders = /*[[${ordersJson}]]*/[];
+			console.log("📦 Orders loaded: ", orders);
+		</script>
+	</div>
 </body>
 </html>

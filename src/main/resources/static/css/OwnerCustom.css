@@ -195,7 +195,7 @@ body {
   background-color: #fdecea;
   color: #c62828;
 }
-
+/* 가게 없을 때 */
 .message-container {
     background-color: #F0F0F0; /* 약간 회색빛 배경 */
     border-radius: 10px; /* 둥근 모서리 */
@@ -227,7 +227,7 @@ body {
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     transition: background-color 0.2s ease;
 }
-
+/* 가게 등록 성공 시 */
 .message-container2 {
     background-color: #E8E4DF; /* 약간 회색빛 배경 */
     border-radius: 10px; /* 둥근 모서리 */

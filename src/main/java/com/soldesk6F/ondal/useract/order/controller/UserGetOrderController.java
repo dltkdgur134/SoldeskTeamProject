@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal.user.controller.rider;
+package com.soldesk6F.ondal.useract.order.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import com.soldesk6F.ondal.useract.order.service.CreateOrderService;
 
 @RestController
 @RequestMapping("/api/orders")
-public class RiderGetOrderController {
+public class UserGetOrderController {
 
     @Autowired
     private CreateOrderService orderService;
