@@ -75,8 +75,12 @@ public class SecurityConfig{
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     	http
+    		.csrf(csrf -> csrf
+    			.ignoringRequestMatchers("/api/**") // REST API는 CSRF 무시
+    		)
     		.authorizeHttpRequests(auth -> auth
     			.requestMatchers("/**","/register", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
+    			.requestMatchers("/api/category/**").hasAuthority("OWNER")
     			.requestMatchers("/owner/**").hasAnyRole("OWNER", "ALL")
     			.anyRequest().authenticated() 
 				)
