@@ -15,6 +15,7 @@ public class MenuRegisterDto {
 	private UUID menuId;
 	private String menuName;
 	private String description;
+	private UUID menuCategoryId;
 	private int price;
 	private MultipartFile menuImg;
 	

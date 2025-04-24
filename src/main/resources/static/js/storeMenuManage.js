@@ -218,7 +218,16 @@ function removeOption(button) {
 	}
 }
 
-function handleSubmit() {
+function handleSubmit(event) {
+	const fileInput = document.querySelector("#menuForm input[type='file']");
+	const isValid = validateImageFile(fileInput);
+
+	if (!isValid) {
+		event.preventDefault();
+		console.log("❌ 이미지 유효성 검사 실패");
+		return false;
+	}
+
 	closeMenuModal();
 	return true;
 }
@@ -227,6 +236,10 @@ function openEditMenuModal(menuId) {
 	const menu = window.menuList.find(m => m.menuId === menuId);
 	if (!menu) return;
 
+	console.log("👉 선택할 카테고리 ID:", menu.menuCategoryId);
+	console.log("🧭 전체 카테고리 목록:", [...dynamicCategories.entries()]);
+	console.log("editMenuModal: 선택된 메뉴", menu);
+
 	document.getElementById('editMenuId').value = menu.menuId;
 	document.getElementById('editMenuName').value = menu.menuName;
 	document.getElementById('editPrice').value = menu.price;
@@ -234,7 +247,7 @@ function openEditMenuModal(menuId) {
 	document.getElementById('editMenuStatus').value = menu.menuStatus;
 	document.getElementById('editMenuCategory').value = menu.menuCategory || "";
 	
-	renderEditCategorySelect(menu.menuCategory?.trim() || "메인");
+	renderEditCategorySelect(menu.menuCategoryId);
 
 	const container = document.getElementById("edit-option-container");
 	container.innerHTML = "";
@@ -270,13 +283,15 @@ function openEditMenuModal(menuId) {
 	document.getElementById('editMenuModal').style.display = 'flex';
 	const addBtn = document.getElementById("edit-add-option-btn");
 	addBtn.disabled = editOptionCount.value >= maxOption;
+	
+	document.getElementById('deleteMenuId').value = menu.menuId;
 }
 
 function closeEditMenuModal() {
 	document.getElementById('editMenuModal').style.display = 'none';
 }
 
-function validateImageFile(fileInput, event) {
+function validateImageFile(fileInput) {
 	const file = fileInput.files[0];
 	if (!file) return true;
 
@@ -285,13 +300,11 @@ function validateImageFile(fileInput, event) {
 
 	if (!validTypes.includes(file.type)) {
 		alert("이미지 파일만 업로드할 수 있습니다. (jpg, png, gif, webp)");
-		event.preventDefault();
 		return false;
 	}
 
 	if (file.size > maxSize) {
 		alert("이미지 크기는 1MB 이하만 가능합니다.");
-		event.preventDefault();
 		return false;
 	}
 
@@ -310,32 +323,62 @@ function renderCategorySelect() {
 	const select = document.getElementById("menuCategory");
 	select.innerHTML = ""; // 초기화
 
-	for (const [name] of dynamicCategories.entries()) {
+	for (const [name, id] of dynamicCategories.entries()) {
 		const option = document.createElement("option");
-		option.value = name;
+		option.value = id;
 		option.innerText = name;
 		if (name === "메인") option.selected = true;
 		select.appendChild(option);
 	}
 }
 
-function renderEditCategorySelect(selectedName = "메인") {
+function renderEditCategorySelect(selectedId = "") {
+	console.log("🟡 selectedId:", selectedId);
+	console.log("🟢 dynamicCategories:", dynamicCategories);
 	const select = document.getElementById("editMenuCategory");
 	select.innerHTML = "";
 
-	for (const [name] of dynamicCategories.entries()) {
-		const option = document.createElement("option");
-		option.value = name;
-		option.innerText = name;
-		if (name === selectedName) option.selected = true;
-		select.appendChild(option);
-	}
+	for (const [name, id] of dynamicCategories.entries()) {
+			const option = document.createElement("option");
+			option.value = id;
+			option.innerText = name;
+
+			if (String(id) === String(selectedId)) {
+				option.selected = true;
+				console.log("✅ 선택됨:", id, name);
+			}
+
+			select.appendChild(option);
+		}
+	select.value = String(selectedId);
 }
 
-["menuForm", "editMenuForm"].forEach(formId => {
+function deleteMenu(menuId) {
+	if (!confirm("정말로 삭제하시겠습니까?")) return;
+
+	const storeId = document.body.dataset.storeId;
+	fetch(`/owner/storeManagement/${storeId}/menu-delete`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		},
+		body: new URLSearchParams({ menuId })
+	})
+	.then(() => {
+		alert("메뉴가 삭제되었습니다.");
+		location.reload();
+	})
+	.catch(() => {
+		alert("메뉴 삭제에 실패했습니다.");
+	});
+}
+
+["editMenuForm"].forEach(formId => {
 	document.getElementById(formId).addEventListener("submit", function(e) {
 		const fileInput = this.querySelector("input[name='menuImg']");
-		validateImageFile(fileInput, e);
+		if (!validateImageFile(fileInput)) {
+			e.preventDefault();
+		}
 	});
 });
 
@@ -404,4 +447,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 			openEditMenuModal(card.getAttribute("data-menu-id"));
 		});
 	});
+	const menuForm = document.querySelector("#menuForm");
+	if (menuForm) {
+		menuForm.addEventListener("submit", handleSubmit);
+	}
 });

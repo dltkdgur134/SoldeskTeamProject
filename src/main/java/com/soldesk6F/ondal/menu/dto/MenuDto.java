@@ -22,6 +22,7 @@ public class MenuDto {
 	private int price;
 	private String menuImg;
 	private String menuCategory;
+	private UUID menuCategoryId;
 	
 	private List<String> menuOptions1;
 	private List<Integer> menuOptions1Price;

@@ -81,6 +81,11 @@ public class Menu {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "menu_status", length = 20)
 	private MenuStatus menuStatus;
+	
+	@Column(name = "menu_order")
+	private Integer menuOrder;
+	
+	private UUID menuCategoryId;
 
 	public enum MenuStatus {
 		ACTIVE, INACTIVE, SOLD_OUT

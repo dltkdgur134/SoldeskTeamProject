@@ -8,14 +8,13 @@
 <body th:attr="data-store-id=${store.storeId}" data-store-id="">
 	<header class="menu-header">
 		<h2 th:text="${store.storeName} + ' 메뉴 관리'">가게 이름 메뉴 관리</h2>
-		<button class="save-btn">저장</button>
 	</header>
 	
 	<section class="menu-tabs" id="category-buttons">
 		
 	</section>
 	
-	<section class="menu-list">
+	<section class="menu-list" id="menu-list-container">
 		<div class="menu-card" th:each="menu : ${menuList}" th:attr="data-menu-id=${menu.menuId}, data-category=${menu.menuCategory}" style="cursor:pointer;">
 			<img th:src="${menu.menuImg}" alt="menu image" />
 			<div class="info">
@@ -47,9 +46,9 @@
 			<span class="close-btn" onclick="closeMenuModal()">&times;</span>
 			<h2>메뉴 등록</h2>
 			<form id="menuForm" class="modal-form" method="post" enctype="multipart/form-data"
-					th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/menu-register'}" onsubmit="return handleSubmit();">
+					th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/menu-register'}">
 				<label for="menuCategory">카테고리</label>
-				<select id="menuCategory" name="menuCategory" required></select>
+				<select id="menuCategory" name="menuCategoryId" required></select>
 				<label for="menuName">메뉴명</label>
 				<input id="menuName" name="menuName" type="text" placeholder="ex) 불고기 버거" required />
 				<label for="price">가격</label>
@@ -79,7 +78,7 @@
 				  th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/menu-edit'}">
 				<input type="hidden" name="menuId" id="editMenuId" />
 				<label for="editMenuCategory">카테고리</label>
-				<select id="editMenuCategory" name="menuCategory" required></select>
+				<select id="editMenuCategory" name="menuCategoryId" required></select>
 				<label for="editMenuName">메뉴명</label>
 				<input id="editMenuName" name="menuName" type="text" required />
 				<label for="editPrice">가격</label>
@@ -95,6 +94,12 @@
 				<button type="button" id="edit-add-option-btn" style="grid-column: span 2;">+ 옵션 추가</button>
 				<button type="submit">수정하기</button>
 			</form>
+			<form id="deleteMenuForm" method="post"
+				  th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/menu-delete'}"
+				  style="margin-top: 10px;">
+				<input type="hidden" name="menuId" id="deleteMenuId">
+				<button type="submit" class="delete-btn" style="background-color: red; color: white;">삭제하기</button>
+			</form>
 		</div>
 	</div>
 
@@ -104,6 +109,29 @@
 		window.categoryList = JSON.parse([[${categoryListJson}]]);
 		window.menuList = [[${menuList}]];
 		/*]]>*/
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const el = document.getElementById('menu-list-container'); // 메뉴 카드 부모
+		Sortable.create(el, {
+			animation: 150,
+			onEnd: function (evt) {
+				const newOrder = [...el.children].map((card, idx) => ({
+					menuId: card.dataset.menuId,
+					order: idx
+				}));
+				console.log("🔃 변경된 순서", newOrder);
+				fetch('/owner/menu-reorder', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(newOrder)
+				});
+			}
+		});
+	});
 	</script>
 </body>
 </html>
