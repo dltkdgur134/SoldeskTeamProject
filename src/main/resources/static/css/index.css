@@ -23,8 +23,11 @@ body {
 	margin: auto;
 	background-color: white;
 }
+
 /* #f2c131 */
 .gallery-container div {
+	top: 80px;
+	/*탑200px로 고정시켰음 반응형때 확인 필요*/
 	position: relative;
 }
 
@@ -35,16 +38,16 @@ body {
 	height: 100%;
 	width: 100%;
 	background: rgba(0, 0, 0, 0.4);
-	
+
 	color: white;
 	font-size: 2.5vw;
 	font-weight: bold;
 	text-decoration: none;
-	
+
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	
+
 	opacity: 0;
 	transition: opacity 0.5s;
 }
@@ -63,68 +66,135 @@ body {
 	outline: grey solid 10px;
 }
 
-.search {
-    /* width: 100%; */
-    min-width: 320px;
-    margin-bottom: 20px;
-    margin-top: 20px;
-    height: 50px;
-    background-color: #fff;
-    padding: 10px;
-    border: solid #ffc107 3px;
-    border-radius: 5px;
+.search-box {
+	position: relative;
+	display: flex;
+	/* input + icon 나란히 */
+	align-items: center;
+	height: 50px;
+	/* 기본 높이 */
+	min-width: 320px;
+	background: #fff;
+	border: 3px solid #ffc107;
+	border-radius: 5px;
+	padding: 10px;
+	transition: height .25s ease;
+	/* ↓로 ‘펼쳐지는’ 애니메이션 */
+	transform-origin: top;
+	z-index: 4;
+	flex-direction: row;
+	overflow: hidden
 }
 
+.search-box:focus-within {
+	/* input 혹은 아이콘에 포커스가 있으면 */
+	height: 270px;
+	z-index: 4;
+	/* 50 → 270 (=50+리스트 220) */
+}
+
+/* ───── input / icon ───── */
 .search-input {
-    color: white;
-    border: 0;
-    outline: 0;
-    background: none;
-    width: 0;
-    margin-top: 5px;
-    caret-color: transparent;
-    line-height: 20px;
-    transition: width 0.4s linear
+	height: 50px;
+	border: none;
+	outline: none;
+	font-size: 16px;
+	padding: 10px;
+	background-color: transparent;
+	position: relative;
 }
 
-.search .search-input {
-    padding: 0 10px;
-    width: 100%;
-    caret-color: #536bf6;
-    font-size: 16px;
-    /* font-size: 2vw; */
-    font-weight: 300;
-    color: black;
-    transition: width 0.4s linear;
+.search-input::placeholder {
+	color: #6c757d;
 }
 
 .search-icon {
-        height: 34px;
-    width: 34px;
-    float: right;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    background-color: #ffc107;
-    font-size: 10px;
-        bottom: 30px;
-        position: relative;
-        border-radius: 5px;
+	position: relative;
+	top: -4px;
+	flex:1 1 0; min-width:0;
+	right: -25px;
+	background: #ffc107;
+	color: white;
+	width: 34px;
+	height: 34px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 5px;
 }
 
-.search-icon:hover {
-  color: #fff !important;
+/* ───── 자동완성 / 기록 리스트 ───── */
+#autocomplete-list {
+	position: absolute;
+	top: 50px;
+	left: 0;
+	right: 0;
+	/* box 안 아래로 정확히 붙음  */
+	max-height: 220px;
+	/* search-box 높이 270-50 =220 */
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	overflow-y: auto;
+	background: #fff;
+	z-index: 1;
+	/* 밑 컨텐츠를 밀지 않고 위에 뜸 */
 }
 
-.search-icon:active {
-	background-color: #D39E00;
+.autocomplete-item {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	user-select: none;
+	padding: .45rem .75rem;
+	z-index: -2;
 }
 
-a:link {
-    text-decoration: none
+.autocomplete-item:hover,
+.autocomplete-item.active {
+	background: #f1f1f1;
 }
-#reenter-address-btn {
-  height: 50px;
-  white-space: nowrap;
+
+.autocomplete-item.active {
+	border-left: 4px solid #000;
 }
+
+.icon-span {
+	width: 24px;
+	display: inline-block;
+	margin-right: 8px;
+}
+
+.icon-span.history::before {
+	content: "\f017";
+	font-family: FontAwesome;
+}
+
+.icon-span.suggest::before {
+	content: "\f002";
+	font-family: FontAwesome;
+}
+
+
+#search-wrapper {
+	height: 0; 
+	align-items: center;
+	background-color: transparent;	
+	
+}
+
+.search-inner {
+	top: 0px;
+	position: absolute;
+	display: flex;
+	flex-direction: row;
+	background-color: transparent;
+	align-items: center;
+
+}
+#reenter-address-btn{
+	top:6px;
+	position: relative;
+}
+
+
