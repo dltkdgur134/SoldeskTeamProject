@@ -15,5 +15,5 @@ public class StoreRegisterDto {
     private String category;
     private double latitude;
     private double longitude;
-    private MultipartFile storeImgs;
+    private MultipartFile brandImg;
 }

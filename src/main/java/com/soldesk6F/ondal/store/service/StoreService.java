@@ -38,46 +38,39 @@ public class StoreService {
 		log.info("사용자 정보: {}", user.getUserId());
 		log.info("가게 이름: {}", dto.getStoreName());
 		log.info("전화번호: {}", dto.getStorePhone());
-		log.info("첨부파일: {}", dto.getStoreImgs() != null ? dto.getStoreImgs().getOriginalFilename() : "null");
+		log.info("첨부파일: {}", dto.getBrandImg() != null ? dto.getBrandImg().getOriginalFilename() : "null");
+
 		UUID userUuid = user.getUserUuid();
 		Owner owner = ownerRepository.findByUser_UserUuid(userUuid)
 			.orElseThrow(() -> new IllegalStateException("해당 아이디로 등록된 점주 정보가 없습니다."));
 
-		MultipartFile file = dto.getStoreImgs();
-		List<StoreImg> imgList = new ArrayList<>();
+		String brandImgPath = null;
 
-        if (file != null && !file.isEmpty()) {
-        	try {
-        		String originalName = file.getOriginalFilename();
-        		if (originalName == null || originalName.isBlank()) {
-        			throw new RuntimeException("파일 이름이 유효하지 않습니다.");
-        		}
-        		
-        		String uploadDir = "src/main/resources/static/img/store/";
+		MultipartFile file = dto.getBrandImg();
+		if (file != null && !file.isEmpty()) {
+			try {
+				String originalName = file.getOriginalFilename();
+				if (originalName == null || originalName.isBlank()) {
+					throw new RuntimeException("파일 이름이 유효하지 않습니다.");
+				}
+
+				String uploadDir = "src/main/resources/static/img/store/";
 				Path uploadPath = Paths.get(uploadDir);
-				
 				if (!Files.exists(uploadPath)) {
 					Files.createDirectories(uploadPath);
 				}
-				
-    			String uuidName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-    			Path filePath = Paths.get(uploadDir + uuidName);
 
-    			Files.copy(file.getInputStream(), filePath);
+				String uuidName = UUID.randomUUID() + "_" + originalName;
+				Path filePath = Paths.get(uploadDir + uuidName);
+				Files.copy(file.getInputStream(), filePath);
 
-    			StoreImg storeImg = StoreImg.builder()
-    					.storeImg("/img/store/" + uuidName)
-//    					.store(null)
-    					.build();
+				brandImgPath = "/img/store/" + uuidName;
+			} catch (IOException e) {
+				throw new RuntimeException("이미지 저장 실패", e);
+			}
+		}
 
-    			imgList.add(storeImg);
-
-        	} catch (IOException e) {
-        		throw new RuntimeException("이미지 저장 실패", e);
-        	}
-        }
-
-        Store store = Store.builder()
+		Store store = Store.builder()
 			.owner(owner)
 			.businessNum(dto.getBusinessNum())
 			.storeName(dto.getStoreName())
@@ -87,13 +80,11 @@ public class StoreService {
 			.storeLatitude(dto.getLatitude())
 			.storeLongitude(dto.getLongitude())
 			.storeStatus(Store.StoreStatus.CLOSED)
-			.storeImgs(imgList)
+			.brandImg(brandImgPath) // ✅ 이 부분만 이미지 저장
 			.foodOrigin("")
 			.build();
-        for (StoreImg img : imgList) {
-        	img.setStore(store);
-        }
-        storeRepository.save(store);
+
+		storeRepository.save(store);
 	}
     
 	public List<StoreDto> getStoresByCategory(String category) {
@@ -106,11 +97,8 @@ public class StoreService {
 		
 		return storeRepository.findByCategory(category).stream()
 			.map(store -> {
-				String imageUrl = "/img/store/default.png";
-				
-		        if (store.getStoreImgs() != null && !store.getStoreImgs().isEmpty()) {
-		            imageUrl = store.getStoreImgs().get(0).getStoreImg();
-		        }
+				String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank())
+						? store.getBrandImg() : "/img/store/default.png";
 				StoreDto dto = StoreDto.builder()
 					.storeName(store.getStoreName())
 					.category(store.getCategory())
@@ -143,7 +131,12 @@ public class StoreService {
 	}
 	
 	public Store findStoreByStoreId(UUID storeId) {
-        return storeRepository.findByStoreId(storeId);
+        return storeRepository.findByStoreId(storeId)
     }
+	
+	public Store findById(UUID storeId) {
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 매장을 찾을 수 없습니다."));
+	}
 	
 }

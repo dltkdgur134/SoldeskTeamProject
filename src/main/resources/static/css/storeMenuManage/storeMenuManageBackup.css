@@ -1,0 +1,261 @@
+body {
+	font-family: "yisunshinM";
+	margin: 0;
+	padding: 0;
+	background: #f9f9f9;
+}
+
+.menu-header {
+	background: #ffc107;
+	color: white;
+	padding: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.menu-tabs {
+	display: flex;
+	gap: 8px;
+	padding: 10px;
+	background: #fff;
+	border-bottom: 1px solid #ddd;
+}
+
+.menu-tabs .tab {
+	padding: 8px 16px;
+	border: none;
+	background: #eee;
+	border-radius: 16px;
+	cursor: pointer;
+}
+
+.menu-tabs .tab.active {
+    background: #ffc107;
+    color: white;
+}
+
+.menu-list {
+	padding: 16px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.menu-card {
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	width: 220px;
+	overflow: hidden;
+}
+
+.menu-card img {
+	width: 100%;
+	height: 140px;
+	object-fit: cover;
+}
+
+.menu-card .info {
+    padding: 12px;
+}
+
+.menu-card h3 {
+    margin: 0;
+}
+
+.menu-card p {
+    color: #666;
+}
+
+.menu-card .image-wrapper {
+	position: relative;
+	width: 100%;
+	height: 140px;
+	overflow: hidden;
+}
+
+.menu-card .image-wrapper img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.menu-card.sold-out .image-wrapper img {
+	filter: grayscale(100%);
+	opacity: 0.6;
+}
+
+.menu-card.sold-out .image-wrapper::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url('/img/menu/soldout_overlay.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	pointer-events: none;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+.edit-btn, .save-btn, .add-btn {
+	background: #ffc107;
+	color: white;
+	border: none;
+	padding: 8px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+	margin-top: 8px;
+}
+
+.add-btn-wrap {
+	text-align: center;
+	margin: 20px 0;
+}
+
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.6);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+}
+
+.modal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	background: white;
+	padding: 30px;
+	border-radius: 10px;
+	width: 400px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	position: relative;
+}
+
+.modal-content .close-btn {
+	cursor: pointer;
+	float: right;
+	font-size: 24px;
+}
+
+.modal-form {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+
+.modal-form button[type="submit"] {
+	background: #ffc107;
+	color: white;
+	border: none;
+	padding: 10px;
+	font-weight: bold;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select,
+.modal-content button {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	box-sizing: border-box;
+	font-size: 14px;
+	margin-top: 5px;
+}
+
+.modal-form textarea,
+.modal-form input[type="file"],
+.modal-form #option1-container,
+.modal-form button[type="button"], 
+.modal-form button[type="submit"] { 
+	grid-column: span 2;
+}
+
+.modal-content label {
+	font-weight: bold;
+	margin-top: 10px;
+	display: block;
+}
+
+.close-btn {
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	font-size: 22px;
+	cursor: pointer;
+}
+
+.option-group {
+	display: grid;
+	grid-template-columns: 1fr 1fr auto;
+	gap: 8px;
+	align-items: center;
+	margin-top: 10px;
+}
+
+.category-manage-btn {
+	background-color: #eee;
+	border: 1px solid #ccc;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+#category-buttons {
+	display: flex;
+	gap: 8px;
+}
+
+.manage-category-btn {
+	margin-left: auto;
+	background-color: #eee;
+}
+
+.menu-tabs {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+#categoryList ul {
+	padding: 0;
+}
+
+#categoryList li input.category-input {
+	flex: 1;
+	padding: 5px;
+	min-width: 100px;
+}
+#categoryList li button {
+	padding: 5px 10px;
+}
+
+.category-input + button {
+	margin-left: 5px;
+}
+
+.modal-content button {
+	cursor: pointer;
+}
