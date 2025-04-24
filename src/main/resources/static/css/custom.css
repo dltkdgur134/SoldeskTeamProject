@@ -45,6 +45,21 @@ body {
 	background-color: grey;
 	border: none !important;
 	color: #fff !important;
+	font-size:12pt;
+	font-weight: 800;
+}
+
+.btn-success {
+	background-color: #FFE766;
+	border: none !important;
+	color: black !important;
+	font-size: 16pt;
+	font-weight: 800;
+	width: 100%;
+}
+
+.btn-success:hover {
+	background-color: #FFEF99;
 }
 
 .info-card {
@@ -206,4 +221,21 @@ body {
 
 .modal-header {
 	background-color: #FFEF99;
+}
+
+/* 회원 탈퇴 */
+
+.delete-agree-msg {
+	color: #FF7833;
+	font-size: 10pt;
+	margin-bottom: 0;
+}
+
+.delete-agree-msg strong {
+	color: black;
+}
+
+.form-check > .invalid-feedback {
+	color: red;
+	font-weight: 800;
 }

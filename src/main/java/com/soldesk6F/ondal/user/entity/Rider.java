@@ -65,7 +65,7 @@ public class Rider {
 	
 	@Column(name = "rider_wallet",nullable = true )
     private int riderWallet;
-	
+
 	@CreationTimestamp
 	@Column(name = "registration_date", updatable = false)
 	private LocalDateTime registrationDate;

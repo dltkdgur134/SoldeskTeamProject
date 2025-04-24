@@ -3,18 +3,14 @@ package com.soldesk6F.ondal.user.controller.user;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,118 +19,69 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UpdateUserController {
 
-    private final UserRepository userRepository;
-	
 	private final UserService userService;
-	
-	@PostMapping("/content/passwordCheck")
-	public String checkPassword(
-			@RequestParam("oldPassword") String oldPassword,
-			@RequestParam("password") String password,
-			RedirectAttributes rAttr) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-		User user = customUserDetails.getUser();
-		
-		if (!userService.updatePassword(oldPassword, password, user, rAttr)) {
-			return "redirect:/mySecurity";
-		}
-		customUserDetails.getUser().setPassword(password);
-		rAttr.addFlashAttribute("resultMsg", "비밀번호 변경 성공!");
-		return "redirect:/infopage";
-	}
-	
-	
 	
 	@PostMapping("/checkNickname") 
 	@ResponseBody
-	public Map<Object, Object> checkNickname(@RequestParam("nickname") String nickName,
-			Model model,
+	public Map<Object, Object> checkNickname(
+			@RequestParam("nickname") String nickName,
 			RedirectAttributes rAttr) {
-		
-		Map<Object, Object> map = new HashMap<>();
-		
-		if (userRepository.existsByNickName(nickName) == true) {
-			map.put("count", 1);
-		} else {
-			map.put("count", 0);
-		}
-		return map;
+		Map<Object, Object> response = new HashMap<>();
+		boolean nickNameExists = userService.isNicknameDuplicate(nickName);
+		response.put("count", nickNameExists ? 1 : 0); // 닉네임이 있으면 1 (중복확인 통과 X) 없으면 0 (통과)
+		return response;
 	}
 	
 	@PostMapping("/content/updateNickname")
 	public String updateNickname(
-			@RequestParam("nickname") String nickName, 
-			Model model,
+			@AuthenticationPrincipal CustomUserDetails cud,
+			@RequestParam("nickname") String nickName,
 			RedirectAttributes rAttr) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-		User user = customUserDetails.getUser();
-		
-		if (!userService.updateUserNickname(nickName, user, model)) {
-			rAttr.addFlashAttribute("result", 1);
-			rAttr.addFlashAttribute("resultMsg", "닉네임을 변경할 수 없습니다.");
-			return "redirect:/infopage";
-		}
-		customUserDetails.getUser().setNickName(nickName);
-	    rAttr.addFlashAttribute("result", 0);
-	    rAttr.addFlashAttribute("resultMsg", "닉네임 변경 성공!");
-		return "redirect:/infopage";
+//		String userId = cud.getUser().getUserId(); business logic 컨트롤러에 노출
+		userService.updateUserNickname(cud, nickName, rAttr);
+		return "redirect:/myPage";
 	}
 	
 	@PostMapping("/content/updateProfilePic")
 	public String updateProfilePic(
-			@RequestParam("profileImage") MultipartFile profileImage, Model model,
+			@AuthenticationPrincipal CustomUserDetails cud,
+			@RequestParam("profileImage") MultipartFile profileImage,
 			RedirectAttributes rAttr) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-		User user = customUserDetails.getUser();
-		
-		if (!userService.updateUserPicture(user, profileImage, model)) {
-			rAttr.addFlashAttribute("result", 1);
-			rAttr.addFlashAttribute("resultMsg", "프로필 이미지 변경 실패!");
-			return "redirect:/infopage";
-		}
-		customUserDetails.getUser().setUserProfile(userRepository.findByUserId(user.getUserId()).get().getUserProfile());
-		rAttr.addFlashAttribute("result", 0);
-		rAttr.addFlashAttribute("resultMsg", "프로필 이미지 변경 성공!");
-		return "redirect:/infopage";
+		userService.updateUserPicture(cud, profileImage, rAttr);
+		return "redirect:/myPage";
 	}
 	
 	@PostMapping("/checkPhoneNum")
 	@ResponseBody
-	public Map<Object, Object> checkPhoneNum(@RequestParam("userPhone") String userPhone,
+	public Map<Object, Object> checkPhoneNum(
+			@RequestParam("userPhone") String userPhone,
 			RedirectAttributes rattr) {
-		Map<Object, Object> map = new HashMap<>();
-		
-		if (userRepository.existsByUserPhone(userPhone) == true) {
-			map.put("count", 1);
-		} else {
-			map.put("count", 0);
-		}
-		return map;
+		Map<Object, Object> response = new HashMap<>();
+		boolean userPhoneExists = userService.isPhoneDuplicate(userPhone);
+		response.put("count", userPhoneExists ? 1 : 0); // 전화번호가 있으면 1 (중복확인 통과 X) 없으면 0 (통과)
+		return response;
 	}
 	
 	@PostMapping("/content/updatePhoneNum")
 	public String updatePhoneNum(
+			@AuthenticationPrincipal CustomUserDetails cud,
 			@RequestParam("userPhone") String userPhone,
-			RedirectAttributes rAttr,
-			Model model) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-		User user = customUserDetails.getUser();
-		
-		if (!userService.updateUserPhone(userPhone, user, model)) {
-			rAttr.addFlashAttribute("result", 1);
-			rAttr.addFlashAttribute("resultMsg", "전화번호 변경 실패!");
-			return "redirect:/infopage";
-		}
-		customUserDetails.getUser().setUserPhone(userRepository.findByUserId(user.getUserId()).get().getUserPhone());
-		rAttr.addFlashAttribute("result", 0);
-		rAttr.addFlashAttribute("resultMsg", "전화번호 변경 성공!");
-		return "redirect:/infopage";
+			RedirectAttributes rAttr) {
+		userService.updateUserPhone(cud, userPhone, rAttr); 
+		return "redirect:/myPage";
 	}
 	
+	@PostMapping("/content/updatePassword")
+	public String updatePassword(
+			@AuthenticationPrincipal CustomUserDetails cud,
+			@RequestParam("oldPassword") String oldPassword,
+			@RequestParam("password") String password,
+			RedirectAttributes rAttr) {
+		if (!userService.updatePassword(cud, oldPassword, password, rAttr)) {
+			return "redirect:/mySecurity";
+		}
+		return "redirect:/logout";
+	}
 	
 }
 

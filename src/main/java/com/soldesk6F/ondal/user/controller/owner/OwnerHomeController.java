@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.user.controller.owner;
 
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,45 +20,47 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/owner")
 @RequiredArgsConstructor
 public class OwnerHomeController {
+	
 	private final OwnerRepository ownerRepository;
 
     @GetMapping("/home")
     public String ownerHomeGet(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-        String userId = userDetails.getUser().getUserId();
+         UUID userUuid = userDetails.getUser().getUserUuid();
 
-        Optional<Owner> optionalOwner = ownerRepository.findByUser_UserId(userId);
+        Optional<Owner> optionalOwner = ownerRepository.findByUser_UserUuid(userUuid);
 
         if (optionalOwner.isPresent()) {
             Owner owner = optionalOwner.get();
 
-            // 디버깅 로그
+            // 디버깅 로그	
             System.out.println("✅ Owner 불러오기 성공!");
             System.out.println("🆔 ownerId: " + owner.getOwnerId());
             System.out.println("📅 등록일: " + owner.getRegistrationDate());
 
             model.addAttribute("owner", owner);
         } else {
-            System.out.println("❌ Owner 정보 없음. userId = " + userId);
+            System.out.println("❌ Owner 정보 없음. userId = " + userUuid);
         }
 
         return "content/owner/ownerHome"; // templates/content/owner/ownerHome.html
     }
 
-    @GetMapping("/infopage")
+    @GetMapping("/myPage")
     public String showMyPage() {
-        return "redirect:/infopage"; // templates/user/infopage.html
+        return "redirect:/myPage"; // templates/user/infopage.html
     }
 
     @GetMapping("/ownerInfopage")
     public String showOwnerMyPage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-        String userId = userDetails.getUser().getUserId();
+    	UUID userUuid = userDetails.getUser().getUserUuid();
 
-        Optional<Owner> optionalOwner = ownerRepository.findByUser_UserId(userId);
+        Optional<Owner> optionalOwner = ownerRepository.findByUser_UserUuid(userUuid);
 
         if (optionalOwner.isPresent()) {
             Owner owner = optionalOwner.get();
             model.addAttribute("owner", owner);
         } else {
+        	System.out.println("Owner 정보 없음. userUuid = " + userUuid);
             // 예외 처리 또는 에러 페이지 이동
         }
 

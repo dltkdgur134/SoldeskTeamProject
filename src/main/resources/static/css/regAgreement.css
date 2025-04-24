@@ -1,9 +1,15 @@
 body {
 	background-color: #f5f6f7;
+<<<<<<< HEAD
 	justify-content: center;
+=======
+	/* display: flex;
+	justify-content: center; 
+	padding: 50px;*/
+>>>>>>> ad96f6f3d46ce8f959a6bb1440f5c153d9d66b3b
 }
 
-.agreement-container {
+#agreement-container {
 	background-color: white;
 	padding: 30px;
 	border-radius: 10px;

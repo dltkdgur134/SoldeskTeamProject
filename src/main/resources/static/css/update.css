@@ -20,6 +20,10 @@ body {
   margin-top: 10px;
 }
 
+.mypage-title-icon {
+	color: #404040;
+}
+
 /* @font-face {
     font-family: 'yssdotum';
     src: url('ysssdotum.eot');

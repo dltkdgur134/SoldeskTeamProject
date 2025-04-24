@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}">
+<head>
+    <title>User Order History</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js"></script>
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
+	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
+</head>
+<body>
+<h1>유저 주문 내역</h1>
+
+<div id="orderList">
+    <!-- 유저의 주문 목록 표시 (AJAX 또는 Thymeleaf 렌더링) -->
+</div>
+
+<script>
+let stompClient = null;
+const userId = "user123"; // 실제 로그인 유저ID, 혹은 UUID
+
+function connect() {
+    const socket = new SockJS('/stomp');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function(frame) {
+        console.log("Connected: " + frame);
+        // /topic/user/{userId} 채널 구독
+        stompClient.subscribe('/topic/user/' + userId, function(message) {
+            const updatedOrder = JSON.parse(message.body);
+            handleOrderUpdate(updatedOrder);
+        });
+    });
+}
+
+function handleOrderUpdate(order) {
+    // 받은 주문 데이터(orderStatus 등)를 확인하여
+    // 페이지 내 주문 목록/상세 UI를 업데이트
+    alert("주문 상태 변경됨: " + order.orderStatus);
+
+    // 예를 들어, 특정 주문 DOM을 찾아 상태 표시
+    // or 전체 리스트 다시 로드
+}
+
+window.onload = connect;
+</script>
+
+</body>
+</html>

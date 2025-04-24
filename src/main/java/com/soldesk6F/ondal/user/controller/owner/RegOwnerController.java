@@ -90,7 +90,9 @@ public class RegOwnerController {
         User user = userRepository.findByUserId(userId).orElseThrow();
         userRoleService.changeRoleToOwner(user, ownerForm);
 	    // 가게 등록 페이지로 이동
-	    return "redirect:/owner/content/storereg/submit";
+//	    return "redirect:/owner/content/storereg/submit";
+	    return "redirect:/storeReg/submit";
+	    
 	}
 	
 	@GetMapping("/content/storereg/submit")
