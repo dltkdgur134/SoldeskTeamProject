@@ -20,9 +20,10 @@
 		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
 	</div>
 	</div> 
-	<div class="container d-flex justify-content-center my-3 text-center">
-    	<div class="row justify-content-center align-items-center">
-        	<div class="col-auto">
+	<div class="card info-card border-light d-flex justify-content-between my-3 text-center">
+    	<div class="card-body">
+    	<div class="row justify-content-start align-items-center">
+        	<div class="col-auto me-5">
             	<a type="button" class="btn btn-link position-relative" id="profile-pic-btn" data-bs-toggle="modal" data-bs-target="#updateProfilePicModal">
 					<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
              			? #authentication.principal.user.userProfile 
@@ -35,12 +36,15 @@
 				</a>
 				<br>
 				<br>
+        	</div>
+        	<div class="col-auto ms-5">
 				<h5 id="profile-nickName"
 					th:text="${#authentication.principal.user.nickName}"></h5>
 				<h5 id="profile-id" th:text="${#authentication.principal.user.userId}"></h5>
 				<span class="badge rounded-pill text-bg-primary justify-content-center"
 					th:text="${#authentication.principal.user.UserRole}"></span>
         	</div>
+    	</div>
     	</div>
 	</div>
 	<div class="card info-card p-4">
@@ -197,10 +201,10 @@
 	<div class="card info-card p-4">
 		<h5 class="card-title">주소 관리 <span class="mypage-title-icon"><i class="fa-solid fa-house"></i></span></h5>
 		<div class="card-body">
-			<div th:if="${#authentication.principal.user.userSelectedAddress == null}">
+			<th:block th:if="${#authentication.principal.user.userSelectedAddress == null}">
 				<a href="regAddress" type="button" class="btn btn-success" id="regAddress-btn">주소 등록하러 가기</a>
-			</div>
-			<div th:if="${#authentication.principal.user.userSelectedAddress != null}">
+			</th:block>
+			<th:block th:if="${#authentication.principal.user.userSelectedAddress != null}">
 				<span>
 					<strong th:text="${#authentication.principal.user.userSelectedAddress.address} 
 					+ ' ' + ${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
@@ -208,7 +212,7 @@
 				<br>
 				<br>
 				<a href="myAddress" type="button" class="btn btn-success" id="manageAddress-btn">내 주소 관리</a>
-			</div>
+			</th:block>
 		</div>
 	</div>
 	<br>

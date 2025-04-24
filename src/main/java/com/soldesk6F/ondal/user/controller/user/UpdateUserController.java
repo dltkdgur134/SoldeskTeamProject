@@ -21,6 +21,7 @@ public class UpdateUserController {
 
 	private final UserService userService;
 	
+	// 닉네임 중복확인
 	@PostMapping("/checkNickname") 
 	@ResponseBody
 	public Map<Object, Object> checkNickname(
@@ -32,16 +33,17 @@ public class UpdateUserController {
 		return response;
 	}
 	
+	// 닉네임 수정
 	@PostMapping("/content/updateNickname")
 	public String updateNickname(
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			@RequestParam("nickname") String nickName,
 			RedirectAttributes redirectAttributes) {
-//		String userId = cud.getUser().getUserId(); business logic 컨트롤러에 노출
 		userService.updateUserNickname(userDetails, nickName, redirectAttributes); 
 		return "redirect:/myPage";
 	}
 	
+	// 유저 프로필 사진 수정
 	@PostMapping("/content/updateProfilePic")
 	public String updateProfilePic(
 			@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -51,6 +53,7 @@ public class UpdateUserController {
 		return "redirect:/myPage";
 	}
 	
+	// 전화번호 중복 확인
 	@PostMapping("/checkPhoneNum")
 	@ResponseBody
 	public Map<Object, Object> checkPhoneNum(
@@ -62,6 +65,7 @@ public class UpdateUserController {
 		return response;
 	}
 	
+	// 전화번호 수정
 	@PostMapping("/content/updatePhoneNum")
 	public String updatePhoneNum(
 			@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -71,6 +75,7 @@ public class UpdateUserController {
 		return "redirect:/myPage";
 	}
 	
+	// 비밀번호 수정
 	@PostMapping("/content/updatePassword")
 	public String updatePassword(
 			@AuthenticationPrincipal CustomUserDetails userDetails,

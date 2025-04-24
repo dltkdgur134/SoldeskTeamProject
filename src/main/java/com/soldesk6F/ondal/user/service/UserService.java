@@ -122,8 +122,7 @@ public class UserService {
     	 UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
     			 updatedUserDetails,
     			 updatedUserDetails.getPassword(),
-    			 updatedUserDetails.getAuthorities()
-    			 );
+    			 updatedUserDetails.getAuthorities());
     	 SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
     
@@ -169,7 +168,6 @@ public class UserService {
     		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
     		return false;
     	}
-    	
     	// 기존 이미지 존재 시 해당 파일 삭제
    		try {
    			String old_profImgName = findUser.get().getUserProfile();

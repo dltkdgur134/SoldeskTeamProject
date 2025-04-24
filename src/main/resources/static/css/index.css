@@ -5,8 +5,13 @@
 	src: url(acloud.ttf);
 }
 
+@font-face {
+	font-family: "siwol";
+	src: url('siwol.ttf');
+}
+
 body {
-	font-family: "yisunshinM";
+	font-family: "siwol";
 	text-align: center;
 }
 

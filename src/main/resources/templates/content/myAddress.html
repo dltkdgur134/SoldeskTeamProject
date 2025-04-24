@@ -28,7 +28,7 @@
 			내 주소
 		</h4>
 		<div class="card-body">
-				<div class="card my-2">
+				<div class="card info-card my-2">
 					<div class="card-header">
 						<i class="fa-solid fa-house"></i>
 						<strong>우리집</strong>
@@ -44,7 +44,7 @@
 				<th:block th:each="address : ${addressList}">
 					<th:block th:if="${address.isUserSelectedAddress == false}">
 						<form th:id="address-form + ${addressStat.count}" th:name="addressForm + ${addressStat.count}" action="/content/setDefaultAddress" method="POST">
-							<div class="card my-2">
+							<div class="card info-card my-2">
 								<div class="card-header">
 									<i class="fa-solid fa-location-dot"></i>
 									<strong th:text="주소 + ${addressStat.count}"></strong>
@@ -73,7 +73,7 @@
 						</form>
 					</th:block>
 				</th:block>
-				<div class="container d-flex justify-content-between">
+				<div class="container d-flex justify-content-between mt-5">
 					<a href="regAddress" type="button" class="btn btn-warning" id="regAddress-btn"><strong>주소 등록</strong></a>
 					<button type="button" class="btn btn-secondary btn-lg" id="check-password-back-btn" 
 								onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	

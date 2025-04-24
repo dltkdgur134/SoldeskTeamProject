@@ -113,8 +113,6 @@ $(function() {
 			
 		});*/
 
-
-
 });
 
 function fetchSearchResults(query, sampleData) {
@@ -143,6 +141,7 @@ function handleSelection(selectedValue) {
 	dropdown.style.display = 'none';
 }
 
+// 주소 삭제
 function deleteAddress(count) {
 	const form = document.getElementById('address-form' + count);
 	const regAddressId = form.regAddressId;
@@ -177,11 +176,11 @@ function deleteAddress(count) {
 					 function removeFlashMessages() {
 					    $('#' + flashContainerId).remove();
 					 }
-					 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
+					 setTimeout(removeFlashMessages, flashDurationInSeconds * 500); // 요청 응답 메시지 표시
 			} else {
 				alert(data.resultMsg); // 에러 메시지
 			}
-			setTimeout(function () { location.reload(); }, 1000);			
+			setTimeout(function () { location.reload(); }, 1000); // 페이지 새로고침			
 			//location.reload(); // 삭제 후 페이지 새로고침
 			//window.location.href = "/myAddress?deleted=true";
 		})

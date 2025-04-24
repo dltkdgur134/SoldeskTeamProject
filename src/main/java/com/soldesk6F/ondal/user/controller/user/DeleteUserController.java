@@ -20,36 +20,34 @@ public class DeleteUserController {
 
 	private final UserService userService;
 	
-	@GetMapping(value = "/checkMyPass")
-	public String goToPassCheck(Model model) {
-		model.addAttribute("checkPassPurpose", "회원탈퇴");
-		return "content/myPassCheck";
-	}
-	
+	// 회원 탈퇴 전 비밀번호 확인
 	@PostMapping("/checkPassword")
 	public String checkMyPassword(
-			@AuthenticationPrincipal CustomUserDetails cud,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
 			@RequestParam("password") String password,
-			RedirectAttributes rAttr) {
-		if (!userService.checkPassword(cud, password, rAttr)) {
+			RedirectAttributes redirectAttribute) {
+		if (!userService.checkPassword(userDetails, password, redirectAttribute)) {
 			return "redirect:/checkMyPass";
 		}
 		return "redirect:/deleteUserPage";
 	}
 	
-	@GetMapping("/deleteUserPage")
-	public String goDeleteUserPage() {
-		return "content/deleteUserPage";
-	}
-	
+	// 회원 탈퇴
 	@PostMapping("/deleteUser")
 	public String deleteUser(
-			@AuthenticationPrincipal CustomUserDetails cud,
-			RedirectAttributes rAttr) {
-		if (!userService.deleteUserTemp(cud, rAttr)) {
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes redirectAttribute) {
+		if (!userService.deleteUserTemp(userDetails, redirectAttribute)) {
 			return "redirect:/myPage";
 		}
 		return "redirect:/logout";
+	}
+	
+	// 비밀번호 확인
+	@GetMapping(value = "/checkMyPass")
+	public String goToPassCheck(Model model) {
+		model.addAttribute("checkPassPurpose", "회원탈퇴");
+		return "content/myPassCheck";
 	}
 	
 }
