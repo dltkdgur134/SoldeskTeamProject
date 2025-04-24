@@ -15,9 +15,7 @@ import java.util.UUID;
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findByGuestId(String guestId);
     List<Order> findByStore_StoreId(UUID storeId);
-<<<<<<< HEAD
 	List<Order> findByUser(User user);
-=======
     List<Order> findAllByOrderToRider(OrderToRider pending);
     
  // 반경 내 주문 조회 쿼리 추가
@@ -37,5 +35,4 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     	List<Order> findOrdersWithinRadius(@Param("lat") double lat,
     	                                   @Param("lng") double lng,
     	                                   @Param("radius") double radiusKm);
->>>>>>> origin/develop
 }

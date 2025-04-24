@@ -9,7 +9,7 @@
 
 <div th:fragment="header">
 	<nav class="navbar navbar-light">
-		<div class="container-md justify-content-between">
+		<div class="container-fluid justify-content-evenly">
 			<!-- 로그인 안한 사람들을 위한 로고 -->
 			<div sec:authorize="isAnonymous()" style="position: relative;">
 				<a href="javascript:void(0);" class = logo onclick="toggleRoleLogos()">
@@ -69,40 +69,38 @@
 			<button type="button" class="btn-close text-reset"
 				data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
-		<div class="container" sec:authorize="isAnonymous()">
+		<div class="container text-center" sec:authorize="isAnonymous()">
 			<div class="list-group" id="login-reg-card">
   				<a href="/login" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">로그인 <i class="fa-solid fa-right-to-bracket"></i></strong></a>
   				<a href="/regAgreement" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">회원가입 <i class="fa-solid fa-user-plus"></i></strong></a>
 			</div>
 		</div>
-		<div sec:authorize="isAnonymous()">
-		</div>
 		<div class="container" sec:authorize="isAuthenticated()">
-			<div class="card shadow-sm" style="max-width: 540px; margin: 0 auto;">
+			<div class="card shadow-sm" style="">
 				<div class="row g-0">
 					<div class="col-md-4 p-3 text-center">
 						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
              				? #authentication.principal.user.userProfile 
              				: '/img/userProfiles/' + #authentication.principal.user.userProfile}"
 							class="rounded-circle img-thumbnail img-fluid"
-							alt="Profile Picture">
-
+							alt="Profile Picture" id="header-profile-pic">
 						<div class="mt-2">
 							<span class="badge bg-success"
 								th:text="${#authentication.principal.user.userRole}"></span>
 						</div>
 					</div>
-					<div class="col-md-8">
-						<div class="card-body">
-							<h5
-								class="card-title d-flex justify-content-center align-items-center"
+					<div class="col-md-8 d-flex text-start">
+						<div class="card-body my-2">
+							<h5	class="card-title"
 								th:text="${#authentication.principal.user.nickName}"></h5>
 							<p class="card-text">
 								<i class="fas fa-map-marker-alt"></i>
 								<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
-								<strong	th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
-								<br>
-								<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
+								<small th:text="${#authentication.principal.user.userSelectedAddress.address} + ' ' + 
+									${#authentication.principal.user.userSelectedAddress.detailAddress}"></small>
+								</th:block>
+								<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
+									<strong>주소를 등록해주세요.</strong>
 								</th:block> 
 							</p>
 						</div>
@@ -113,9 +111,18 @@
 							<!--<a class="btn btn-link text-decoration-none" th:href="@{/infopage}">-->
 							<a class="btn btn-link text-decoration-none" th:href="@{/myPage}">
 								<small><i class="fas fa-edit"></i>마이페이지</small>
-							</a> <a class="btn btn-link text-decoration-none" href="#"> <small><i
-									class="fas fa-map-marker-alt"></i> 주소관리</small>
-							</a> <a class="btn btn-link text-decoration-none" href="/logout">
+							</a> 
+							<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
+								<a class="btn btn-link text-decoration-none" href="myAddress"> 
+									<small><i class="fas fa-map-marker-alt"></i> 주소관리</small>
+								</a> 
+							</th:block>
+							<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
+								<a class="btn btn-link text-decoration-none" href="regAddress"> 
+									<small><i class="fa-solid fa-map-location-dot"></i> 주소등록</small>
+								</a> 
+							</th:block>
+							<a class="btn btn-link text-decoration-none" href="/logout">
 								<small><i class="fas fa-share"></i> 로그아웃</small>
 							</a>
 						</div>
@@ -148,14 +155,14 @@
 					role="tabpanel" aria-labelledby="pills-home-tab">
 					<ul class="nav flex-column">
 						<li class="nav-item"><a class="nav-link" aria-current="page"
-							href="#">주소 선택</a></li>
-						<li class="nav-item"><a class="nav-link" href="#">찜 목록</a></li>
-						<li class="nav-item"><a class="nav-link" href="orderHistory">주문 내역</a></li>
+							href="myAddress" sec:authorize="isAuthenticated()">주소 선택</a></li>
+						<li class="nav-item"><a class="nav-link" href="#" sec:authorize="isAuthenticated()">찜 목록</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">주문 내역</a></li>
 						<li class="nav-item"><a class="nav-link" href="myPage"
 							sec:authorize="isAuthenticated()">마이페이지</a></li>
 					</ul>
 				</div>
-				<div class="tab-pane fade" id="pills-profile" role="tabpanel"
+				<div class="tab-pane fade" id="pills-owner" role="tabpanel"
 					aria-labelledby="pills-profile-tab">
 					<ul class="nav flex-column">
 						<li class="nav-item"><a class="nav-link" aria-current="page"
@@ -169,7 +176,7 @@
 							sec:authorize="isAuthenticated()">마이페이지</a></li>
 					</ul>
 				</div>
-				<div class="tab-pane fade" id="pills-contact" role="tabpanel"
+				<div class="tab-pane fade" id="pills-rider" role="tabpanel"
 					aria-labelledby="pills-contact-tab">
 					<ul class="nav flex-column">
 						<li class="nav-item"><a class="nav-link" aria-current="page"

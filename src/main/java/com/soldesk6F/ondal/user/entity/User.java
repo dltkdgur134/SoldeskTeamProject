@@ -190,7 +190,7 @@ public class User {
 		return this;
 	}
 	
-	public User updateUserAddresses(RegAddress userSelectedAddress) {
+	public User updateUserSelectedAddress(RegAddress userSelectedAddress) {
 		this.userSelectedAddress = userSelectedAddress;
 		return this;
 	}

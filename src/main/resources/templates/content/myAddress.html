@@ -8,67 +8,79 @@
 	<link th:href="@{/css/myAddress.css}" rel="stylesheet">
 	<script th:src="@{/js/zipcode.js}" defer></script>
 	<script th:src="@{/js/myAddress.js}" defer></script>
+	<script th:src="@{/js/initialize.js}"></script>
 	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
 <div layout:fragment="content" class="container py-5">
+	<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+		<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
+	<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
+	<div id="result-msg-container">
+		
+	</div>
+	<div class="container d-flex justify-content-center my-3" id="result-status"></div>
 	<div class="card info-card p-4">
-		<h5 class="card-title">
+		<h4 class="card-title">
 			내 주소
-		</h5>
+		</h4>
 		<div class="card-body">
-			<form>
-				<div class="card">
-					<div class="title">
-						<strong>기본 주소</strong>
-					</div>		
+				<div class="card info-card my-2">
+					<div class="card-header">
+						<i class="fa-solid fa-house"></i>
+						<strong>우리집</strong>
+						<span class="badge rounded-pill text-bg-primary" id="default-address-badge">현재 설정된 주소</span>
+					</div>
   					<div class="card-body">
-    					<!-- <div class="form-check">
-	  						<input class="form-check-input" type="radio" name="radioDefault" id="radioDefault" checked>
-	  						<label class="form-check-label" for="radioDefault">
-	    						<strong th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
-	    						<br>
-	    						<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
-	  						</label>
-						</div> -->
-						<strong th:text="${#authentication.principal.user.userSelectedAddress.address}"></strong>
-	    				<br>
+						<strong th:text="${#authentication.principal.user.userSelectedAddress.address} "></strong>
 	    				<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
+	    				<br>
+	    				<a th:href="@{updateAddress/{regAddressId}(regAddressId=${#authentication.principal.user.userSelectedAddress.regAddressId})}" type="button" class="btn btn-light" id="updateAddress-btn"><strong>수정</strong></a>
   					</div>
 				</div>
 				<th:block th:each="address : ${addressList}">
 					<th:block th:if="${address.isUserSelectedAddress == false}">
-						<div class="card">
-						<div class="card-body">
-							<div class="form-check">
-			  					<input class="form-check-input" type="radio" name="radioDefault" th:id="'radioDefault' + ${addressStat.count}">
-			  					<label class="form-check-label" th:for="'radioDefault' + ${addressStat.count}">
-			    					<strong th:text="${address.address}"></strong>
-			    					<br>
-			    					<strong th:text=${address.detailAddress}></strong>
-			  					</label>
+						<form th:id="address-form + ${addressStat.count}" th:name="addressForm + ${addressStat.count}" action="/content/setDefaultAddress" method="POST">
+							<div class="card info-card my-2">
+								<div class="card-header">
+									<i class="fa-solid fa-location-dot"></i>
+									<strong th:text="주소 + ${addressStat.count}"></strong>
+								</div>
+								<div class="card-body">
+			  							<input class="form-control" type="text" name="regAddressId" th:id="'reg-address' + ${addressStat.count}" 
+			  								hidden="true" th:value="${address.regAddressId}">
+			  							<p class="card-text">
+			    							<button type="submit" class="btn btn-link" data-bs-toggle="tooltip" 
+			    								data-bs-placement="right"
+        										data-bs-custom-class="custom-tooltip"
+        										data-bs-title="이 주소를 기본 주소로 설정하기">
+				    							<strong th:text="${address.address} "></strong>
+				    							<strong th:text=${address.detailAddress}></strong>
+			    							</button>
+											<!-- <button type="submit" class="btn btn-info" ><strong>배달 주소 설정</strong></button> -->
+			    							<br>
+											<a th:href="@{updateAddress/{regAddressId}(regAddressId=${address.regAddressId})}" type="button" class="btn btn-light" id="updateAddress-btn"><strong>수정</strong></a>
+											<button type="button" class="btn btn-light" 
+												th:id="delete-address-btn + ${addressStat.count}"
+												th:onclick="deleteAddress([[${addressStat.count}]])"
+												><strong id="delete-address-btn-text">삭제</strong>
+											</button>
+			  							</p>
+								</div>
 							</div>
-						</div>
-					</div>
+						</form>
 					</th:block>
 				</th:block>
-			</form>
-			
-			
-			
-			<a href="#" type="button" class="btn btn-success my-3" id="deleteAddress-btn">주소 삭제</a>
-			<a href="regAddress" type="button" class="btn btn-success my-3" id="regAddress-btn">주소 등록</a>
+				<div class="container d-flex justify-content-between mt-5">
+					<a href="regAddress" type="button" class="btn btn-warning" id="regAddress-btn"><strong>주소 등록</strong></a>
+					<button type="button" class="btn btn-secondary btn-lg" id="check-password-back-btn" 
+								onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	
+				</div>
 		</div>
-		<!-- <div class="address-search-container">
-  				<input type="text" id="address-search-bar"	placeholder="주소검색"	/>
-				oninput="fetchSearchResults(this.value)"  				
- 			 <ul id="dropdown-results" class="dropdown-menu"></ul>
-		</div> -->
 	</div> 
-
-<!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
-		
-
 </div>
 
 </html>

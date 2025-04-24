@@ -34,6 +34,10 @@ public class RegAddress {
 	@Column(name = "reg_address_id", nullable = false , unique = true)
 	private UUID regAddressId;
 	
+	@ManyToOne
+	@JoinColumn(name = "user_uuid", nullable = false)
+	private User user;
+	
 	@Column(name ="address" , nullable =  false)
 	private String address;
 	
@@ -61,7 +65,8 @@ public class RegAddress {
 	
 	@Builder
 	public RegAddress(String address,String detailAddress, double userAddressLatitude, 
-			double userAddressLongitude, boolean isUserSelectedAddress) {
+			double userAddressLongitude, boolean isUserSelectedAddress, User user) {
+		this.user = user;
 		this.address = address;
 		this.detailAddress = detailAddress;
 		this.userAddressLatitude = userAddressLatitude;
@@ -69,19 +74,21 @@ public class RegAddress {
 		this.isUserSelectedAddress = isUserSelectedAddress;
 	}
 	
+	public void updateRegAddress(String address, String detailAddress, double userAddressLatitude, 
+			double userAddressLongitude) {
+		this.address = address;
+		this.detailAddress = detailAddress;
+		this.userAddressLatitude = userAddressLatitude;
+		this.userAddressLongitude = userAddressLongitude;
+	}
+	
 	public RegAddress updateDefaultAddress(boolean isUserSelectedAddress) {
 		this.isUserSelectedAddress = isUserSelectedAddress;
 		return this;
 	}
 	
-	public String getUserUuidAsString() {
+	public String getRegAddressUuidAsString() {
 	    return regAddressId != null ? regAddressId .toString() : null;
 	}
-
-
-
-
-	
-	
 	
 }
