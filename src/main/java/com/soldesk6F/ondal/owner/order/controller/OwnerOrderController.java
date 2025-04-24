@@ -120,7 +120,7 @@ public class OwnerOrderController {
     @GetMapping("/test-login")
     public String fakeLogin(HttpSession session) {
         // 테스트용 Store UUID (실제 DB에 있는 값으로 바꿔야 함)
-        UUID dummyStoreId = UUID.fromString("60d392ca-adcb-4f2d-84b2-9efae338159e");
+        UUID dummyStoreId = UUID.fromString("7e603d19-5893-497d-ac93-8ea8f537c3d9");
         session.setAttribute("storeId", dummyStoreId);
         return "세션에 storeId 저장 완료: " + dummyStoreId;
     }

@@ -4,11 +4,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.stereotype.Repository;
 
 import com.soldesk6F.ondal.user.entity.User;
 
-
+@Repository
 public interface UserRepository extends JpaRepository<User,UUID> {
 	boolean existsByUserId(String userId);
     boolean existsByEmail(String email);

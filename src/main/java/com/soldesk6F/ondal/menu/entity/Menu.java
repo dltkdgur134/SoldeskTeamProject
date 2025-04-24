@@ -45,6 +45,9 @@ public class Menu {
 	@Column(name = "menu_name", nullable = false, length = 15)
 	private String menuName;
 
+	@Column(name = "menu_category",length = 20)
+	private String menuCategory;
+	
 	@Lob
 	@Column(name = "description")
 	private String description;
@@ -130,11 +133,12 @@ public class Menu {
 	}
 
 	@Builder
-	public Menu(Store store, String menuName, String description, int price, String menuImg,
+	public Menu(Store store, String menuName,String menuCategory, /*이거추가됨*/ String description, int price, String menuImg,
 			String menuOptions1, String menuOptions1Price, String menuOptions2, String menuOptions2Price,
 			String menuOptions3, String menuOptions3Price, MenuStatus menuStatus) {
 		this.store = store;
 		this.menuName = menuName;
+		this.menuCategory = menuCategory;/*이거추가됨*/
 		this.description = description;
 		this.price = price;
 		this.menuImg = menuImg;

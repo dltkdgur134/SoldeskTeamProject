@@ -19,109 +19,115 @@
 
     <!-- JavaScript Fragment -->
         <!-- Kakao Maps API -->
-         <script
-            src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
+             <!-- ✅ 1. Kakao SDK 먼저 불러오기 (defer 절대 금지) -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740&autoload=false&libraries=services"></script>
 
-        <!-- Thymeleaf에서 위도 경도 값을 넘겨받기 -->
-        
-         <script>
-            /*<![CDATA[*/
-            var lat = parseFloat('[[${rider.hubAddressLatitude}]]');
-            var lng = parseFloat('[[${rider.hubAddressLongitude}]]');
-            console.log("Latitude: ", lat);
-            console.log("Longitude: ", lng);
-            /*]]>*/
-        </script>
-         <script>
-            // map 변수를 처음에 한 번만 선언
-            let map;
-            let intervalId = null;
+    <!-- ✅ 2. 좌표 및 riderId Thymeleaf로 전달 -->
+    <script>
+        const lat = parseFloat('[[${rider.hubAddressLatitude}]]');
+        const lng = parseFloat('[[${rider.hubAddressLongitude}]]');
+        const riderId = '[[${rider.riderId}]]';
+        let map, intervalId = null, stompClient = null;
+    </script>
 
-            document.addEventListener("DOMContentLoaded", function () {
-                const mapContainer = document.getElementById('map');
-                const mapOption = {
-                    center: new kakao.maps.LatLng(lat, lng),
-                    level: 3
-                };
-                // map 변수에 지도 객체 할당
-                map = new kakao.maps.Map(mapContainer, mapOption);
+    <!-- ✅ 3. WebSocket + Kakao Map + Marker 통합 -->
+    <script>
+        window.onload = function () {
+        	console.log("🔥 window.onload 실행됨");
 
-                startGenerating(); // 시작 시 자동 생성
+            // Kakao 지도 로드
+            if (typeof kakao !== 'undefined') {
+		        kakao.maps.load(function () {
+		            const mapContainer = document.getElementById('map');
+		            const mapOption = {
+		                center: new kakao.maps.LatLng(lat, lng),
+		                level: 3
+		            };
+	            map = new kakao.maps.Map(mapContainer, mapOption);
+	
+	            startGenerating();
+	            document.getElementById('stopBtn').addEventListener('click', stopGenerating);
+	            document.getElementById('startBtn').addEventListener('click', startGenerating);
+		        });
+		    } else {
+		        console.warn("⚠️ Kakao SDK 로드 실패 → 지도만 비활성화됨");
+		    }
 
-                document.getElementById('stopBtn').addEventListener('click', stopGenerating);
-                document.getElementById('startBtn').addEventListener('click', startGenerating);
+            // WebSocket 연결
+            console.log("🔥 connect() 함수 진입");
+            const socket = new SockJS('/stomp');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log("✅ WebSocket 연결 성공");
+                stompClient.subscribe('/topic/rider/' + riderId, function (message) {
+                    const updatedOrder = JSON.parse(message.body);
+                    console.log("📦 메시지 수신:", updatedOrder);
+                    alert("배달 주문 상태 변경: " + updatedOrder.orderStatus);
+                });
+            }, function (error) {
+                console.error("❌ WebSocket 연결 실패:", error);
+            });
+            
+            connect(); // ✅ 여기가 실제 연결 시작
+        };
+
+        function startGenerating() {
+            if (intervalId === null) {
+                intervalId = setInterval(() => addRandomMarker(lat, lng), 5000);
+            }
+        }
+
+        function stopGenerating() {
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function addRandomMarker(baseLat, baseLng) {
+            let randomLat = baseLat + (Math.random() - 0.5) * 0.01;
+            let randomLng = baseLng + (Math.random() - 0.5) * 0.01;
+
+            let imageSrc = 'https://ifh.cc/g/HMrtaC.png',
+                imageSize = new kakao.maps.Size(30, 30),
+                imageOption = { offset: new kakao.maps.Point(27, 69) };
+
+            let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+                markerPosition = new kakao.maps.LatLng(randomLat, randomLng);
+
+            let marker = new kakao.maps.Marker({
+                position: markerPosition,
+                image: markerImage
+            });
+            marker.setMap(map);
+
+            const storeName = "랜덤식당";
+            const price = Math.floor(Math.random() * 5000) + 1000;
+            const orderId = 'order-' + crypto.randomUUID();
+
+            let content = `
+                <div class="delivery-request" id="${orderId}" style="cursor:pointer;">
+                    <strong>${storeName}</strong><br>${price}원
+                </div>
+            `;
+
+            let customOverlay = new kakao.maps.CustomOverlay({
+                map: map,
+                content: content,
+                position: markerPosition,
+                yAnchor: 1
             });
 
-            function startGenerating() {
-                if (intervalId === null) {
-                    intervalId = setInterval(() => {
-                        addRandomMarker(lat, lng);
-                    }, 5000);
+            // 오버레이가 붙고 나서 클릭 이벤트 바인딩
+            setTimeout(() => {
+                const element = document.getElementById(orderId);
+                if (element) {
+                    element.addEventListener('click', function () {
+                        displayOrderInfo(storeName, price);
+                    });
                 }
-            }
-
-            function stopGenerating() {
-                if (intervalId !== null) {
-                    clearInterval(intervalId);
-                    intervalId = null;
-                }
-            }
-
-            function displayOrderInfo(storeName, price) {
-                const orderNameElement = document.getElementById("storeName").getElementsByTagName("span")[0];
-                const orderPriceElement = document.getElementById("deliveryFee").getElementsByTagName("span")[0];
-
-                orderNameElement.textContent = storeName;  // 식당 이름 표시
-                orderPriceElement.textContent = price + "원";  // 가격 표시
-            }
-            
-            function addRandomMarker(baseLat, baseLng) {
-                let randomLat = baseLat + (Math.random() - 0.5) * 0.01;
-                let randomLng = baseLng + (Math.random() - 0.5) * 0.01;
-
-                let imageSrc = 'https://ifh.cc/g/HMrtaC.png',
-                    imageSize = new kakao.maps.Size(30, 30),
-                    imageOption = { offset: new kakao.maps.Point(27, 69) };
-
-                let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
-                    markerPosition = new kakao.maps.LatLng(randomLat, randomLng);
-
-                let marker = new kakao.maps.Marker({
-                    position: markerPosition,
-                    image: markerImage
-                });
-                marker.setMap(map);
-
-                const storeName = "랜덤식당";
-                const price = Math.floor(Math.random() * 5000) + 1000;
-
-                // 유니크한 order ID 생성
-                const orderId = 'order-' + crypto.randomUUID();
-
-                let content = `
-                    <div class="delivery-request" id="${orderId}" 
-                    style="cursor:pointer;">
-                        <strong>${storeName}</strong><br>${price}원
-                    </div>
-                `;
-
-                let customOverlay = new kakao.maps.CustomOverlay({
-                    map: map,
-                    content: content,
-                    position: markerPosition,
-                    yAnchor: 1
-                });
-
-                // 오버레이가 DOM에 붙은 직후, 해당 ID로 요소 가져와 이벤트 바인딩
-                setTimeout(() => {
-                    const element = document.getElementById(orderId);
-                    if (element) {
-                        element.addEventListener('click', function () {
-                            displayOrderInfo(storeName, price);
-                        });
-                    }
-                }, 50); // DOM이 붙는 걸 기다림
-            }
+            }, 50);
+        }
         </script> 
 </head>
 
@@ -187,5 +193,4 @@
     </div>
 </div>
 </div>
-
 </html>

@@ -8,8 +8,6 @@
 //import com.soldesk6F.ondal.store.repository.StoreRepository;
 //import com.soldesk6F.ondal.user.entity.Owner;
 //import com.soldesk6F.ondal.user.entity.User;
-//import com.soldesk6F.ondal.user.entity.User.UserRole;
-//import com.soldesk6F.ondal.user.entity.User.UserStatus;
 //import com.soldesk6F.ondal.user.repository.OwnerRepository;
 //import com.soldesk6F.ondal.user.repository.UserRepository;
 //import com.soldesk6F.ondal.useract.order.entity.Order;
@@ -19,8 +17,11 @@
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.boot.CommandLineRunner;
 //import org.springframework.stereotype.Component;
+//
 //import java.time.LocalTime;
+//import java.util.ArrayList;
 //import java.util.Arrays;
+//import java.util.Optional;
 //
 //@Component
 //@RequiredArgsConstructor
@@ -33,38 +34,19 @@
 //    private final OwnerRepository ownerRepository;
 //
 //    @Override
-//    public void run(String... args) throws Exception {
+//    public void run(String... args) {
+//        // 기존 user1과 owner1 불러오기
+//        User user = userRepository.findByUserId("user1").orElseThrow(() -> new RuntimeException("user1 없음"));
+//        User ownerUser = userRepository.findByUserId("owner1").orElseThrow(() -> new RuntimeException("owner1 없음"));
 //
-//        User user = userRepository.save(User.builder()
-//                .userId("user1")
-//                .password("1234")
-//                .userName("홍길동")
-//                .nickName("길동이")
-//                .email("user1@example.com")
-//                .userPhone("010-1111-2222")
-//                .userRole(UserRole.USER)
-//                .userStatus(UserStatus.ACTIVE)
-//                .socialLoginProvider("NONE")
-//                .build());
-//
-//        User ownerUser = userRepository.save(User.builder()
-//                .userId("owner1")
-//                .password("zzzz")
-//                .userName("사장1")
-//                .nickName("사장님1")
-//                .email("owner1@example.com")
-//                .userPhone("010-9999-8888")
-//                .userRole(UserRole.OWNER)
-//                .userStatus(UserStatus.ACTIVE)
-//                .socialLoginProvider("NONE")
-//                .build());	
-//
+//        // Owner 엔티티 생성
 //        Owner owner = ownerRepository.save(Owner.builder()
 //                .user(ownerUser)
 //                .secondaryPassword("1234")
 //                .ownerNickname("사장님1")
 //                .build());
 //
+//        // Store 생성
 //        Store store = storeRepository.save(Store.builder()
 //                .owner(owner)
 //                .businessNum("1112233344")
@@ -83,6 +65,7 @@
 //                .storeStatus(StoreStatus.OPEN)
 //                .build());
 //
+//        // Menu 생성
 //        Menu menu = menuRepository.save(Menu.builder()
 //                .store(store)
 //                .menuName("김치찌개")
@@ -91,6 +74,7 @@
 //                .menuStatus(MenuStatus.ACTIVE)
 //                .build());
 //
+//        // 주문 5개 생성
 //        for (int i = 1; i <= 5; i++) {
 //            Order order = Order.builder()
 //                    .user(user)
@@ -101,6 +85,7 @@
 //                    .totalPrice(0)
 //                    .orderToOwner(OrderToOwner.PENDING)
 //                    .guestId(null)
+//                    .orderDetails(new ArrayList<>())  // ✅ 필수
 //                    .build();
 //
 //            OrderDetail detail = OrderDetail.builder()
@@ -111,7 +96,7 @@
 //                    .optionPrices(Arrays.asList(1000))
 //                    .build();
 //
-//            order.addOrderDetail(detail);
+//            order.addOrderDetail(detail);  // 가격 계산 포함됨
 //            orderRepository.save(order);
 //        }
 //    }

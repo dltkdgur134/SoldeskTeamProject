@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.owner.order;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -12,14 +13,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.menu.repository.MenuRepository;
+import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
+import com.soldesk6F.ondal.owner.order.dto.StatusTimeline;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
-
+import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto.OrderDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
@@ -34,6 +40,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserRepository userRepository;
+    
 
     public Order saveOrder(OrderRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
@@ -144,6 +152,29 @@ public class OrderService {
         return orderRepository.findByStore_StoreId(storeId);
     }
     
+    @Transactional(readOnly = true)
+    public List<OrderHistoryDto> getOrderHistoryByUser(String userId) {
+        var user = userRepository.findByUserId(userId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자: " + userId));
+        var orders = orderRepository.findByUser(user);
+        return orders.stream()
+                     .map(this::toHistoryDto)
+                     .collect(Collectors.toList());
+    }
+
+    private OrderHistoryDto toHistoryDto(Order order) {
+        var dto = new OrderHistoryDto();
+        dto.setOrderId(order.getOrderId());
+        dto.setStoreName(order.getStore().getStoreName());
+        dto.setStoreImageUrl(order.getStore().getBrandImg());
+        dto.setOrderStatus(order.getOrderToOwner().name());
+        dto.setOrderDate(order.getOrderTime().toString());
+        var menuNames = order.getOrderDetails().stream()
+                             .map(d -> d.getMenu().getMenuName())
+                             .collect(Collectors.toList());
+        dto.setMenuItems(menuNames);
+        return dto;
+    }
     private OrderResponseDto convertToDto(Order order) {
         List<OrderResponseDto.OrderDetailDto> detailDtos = order.getOrderDetails().stream()
             .map(detail -> OrderResponseDto.OrderDetailDto.builder()
@@ -165,5 +196,49 @@ public class OrderService {
             .expectCookingTime(order.getExpectCookingTime()) // 이거도 있으면 넣어줘
             .orderDetails(detailDtos)
             .build();
+    }
+
+    @Transactional(readOnly = true)
+    public OrderToRider getOrderToRider(String orderId) {
+        UUID uuid = UUID.fromString(orderId);
+        var order = orderRepository.findById(uuid)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId: " + orderId));
+        return order.getOrderToRider();
+    }
+
+    @Transactional(readOnly = true)
+    public OrderHistoryDto getOrderHistoryDto(String orderId) {
+    	UUID uuid = UUID.fromString(orderId);
+        Order order = orderRepository.findById(uuid)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
+        // 간단히 toDto 매퍼 호출
+        return OrderHistoryDto.from(order);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderLiveDto getOrderLiveDto(String orderId) {
+        UUID uuid = UUID.fromString(orderId);
+        var order = orderRepository.findById(uuid)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId: " + orderId));
+
+        var dto = new OrderLiveDto();
+        dto.setOrderId(order.getOrderId().toString());
+        dto.setOrderStatus(order.getOrderToRider());
+
+        var timeline = new ArrayList<StatusTimeline>();
+        // 시간 필드들이 있다고 가정
+        timeline.add(new StatusTimeline("PENDING",             order.getOrderTime()));
+        timeline.add(new StatusTimeline("CONFIRMED",           order.getCookingStartTime()));
+        timeline.add(new StatusTimeline("COOKING_COMPLETED",   order.getCookingEndTime()));
+        timeline.add(new StatusTimeline("IN_DELIVERY",         order.getDeliveryStartTime()));
+        timeline.add(new StatusTimeline("COMPLETED",           order.getDeliveryCompleteTime()));
+        dto.setTimeline(timeline);
+
+        // 2) 가게 위치 (라이더 대신)
+        Store store = order.getStore();
+        dto.setLat(store.getStoreLatitude());   // 또는 store.getHubAddressLatitude()
+        dto.setLng(store.getStoreLongitude());  // 또는 store.getHubAddressLongitude()
+
+        return dto;
     }
 }

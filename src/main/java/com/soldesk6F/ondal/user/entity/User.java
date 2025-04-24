@@ -62,7 +62,7 @@ public class User {
 	@ManyToOne
 	@JoinColumn(name = "user_selected_address", nullable = true)
 	private RegAddress userSelectedAddress;
-
+	
 	@Column(name = "social_login_provider", nullable = false, length = 30)
 	private String socialLoginProvider;
 
@@ -187,7 +187,7 @@ public class User {
 		return this;
 	}
 	
-	public User updateUserSelectedAddress(RegAddress userSelectedAddress) {
+	public User updateUserAddresses(RegAddress userSelectedAddress) {
 		this.userSelectedAddress = userSelectedAddress;
 		return this;
 	}

@@ -11,6 +11,7 @@ import com.soldesk6F.ondal.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -32,10 +33,6 @@ public class RegAddress {
 	@UuidGenerator
 	@Column(name = "reg_address_id", nullable = false , unique = true)
 	private UUID regAddressId;
-	
-	@ManyToOne
-	@JoinColumn(name = "user_uuid", nullable = false)
-	private User user;
 	
 	@Column(name ="address" , nullable =  false)
 	private String address;
@@ -63,10 +60,8 @@ public class RegAddress {
 
 	
 	@Builder
-	public RegAddress(User user, String address,String detailAddress, double userAddressLatitude, 
+	public RegAddress(String address,String detailAddress, double userAddressLatitude, 
 			double userAddressLongitude, boolean isUserSelectedAddress) {
-		super();
-		this.user = user;
 		this.address = address;
 		this.detailAddress = detailAddress;
 		this.userAddressLatitude = userAddressLatitude;

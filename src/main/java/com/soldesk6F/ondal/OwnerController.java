@@ -2,39 +2,54 @@ package com.soldesk6F.ondal;
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.entity.Store.StoreStatus;
+
 
 @Controller
+@RequestMapping("/owner")
 public class OwnerController {
 
-	@GetMapping("/owner/store-management")
-	public String store() {
-		return "content/store/storeManagement";
+	@GetMapping("/store-management")
+	public String storeManagement(Model model) {
+	    Store mockStore = Store.builder()
+	        .storeName("온달닭갈비")
+	        .storeAddress("서울시 강남구 역삼동 123")
+	        .storePhone("02-1234-5678")
+	        .storeStatus(StoreStatus.OPEN) // enum 등 설정 필수
+	        .build();
+
+	    model.addAttribute("store", mockStore);
+	    model.addAttribute("formattedPhone", "02-1234-5678");
+	    return "content/store/storeManagement";
 	}
+
 	
-	@GetMapping("/storesetting")
+	@GetMapping(value = "/storesetting")
 	public String storeSetting() {
 		return "content/store/storeSetting";
 	}
 
-    @GetMapping("/setting/operation")
+    @GetMapping(value = "/setting/operation")
     public String operationSetting() {
         return "content/setting/operation";
     }
     
-    @GetMapping("/setting/printer")
+    @GetMapping(value = "/setting/printer")
     public String printerSetting() {
         return "content/setting/printer";
     }
     
-    @GetMapping("/setting/alarm")
+    @GetMapping(value = "/setting/alarm")
     public String alarmSetting() {
         return "content/setting/alarm";
     }
     
-    @GetMapping("/setting/delivery")
+    @GetMapping(value = "/setting/delivery")
     public String deliverySetting() {
         return "content/setting/deliveryAgency";
     }

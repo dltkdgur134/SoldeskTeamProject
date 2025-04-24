@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+  <title>배송 진행 화면</title>
+
+  <!-- CSS -->
+  <link th:href="@{/css/orderLive.css}" rel="stylesheet"/>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Kakao Map (autoload=false 로 나중에 로딩) -->
+  <script
+    th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}">
+  </script>
+
+  <!-- 페이지 전용 JS -->
+  <script th:src="@{/js/orderLive.js}" defer></script>
+</head>
+<body>
+<section layout:fragment="content">
+  <h1>실시간 배송 진행</h1>
+  <div class="live-container">
+    <!-- 왼쪽 메인 영역 -->
+    <div class="main-panel">
+      <!-- 1) 진행 상태 차트 -->
+      <div class="status-chart">
+        <canvas id="statusChart"></canvas>
+      </div>
+      <!-- 2) 지도 -->
+      <div id="map" class="map-area"></div>
+    </div>
+
+    <!-- 오른쪽 채팅 패널 -->
+    <div id="chatPanel" class="chat-panel">
+      <h3>실시간 채팅</h3>
+      <div id="chatMessages" class="chat-messages"></div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="메시지를 입력하세요…" />
+        <button id="sendChatBtn">전송</button>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
