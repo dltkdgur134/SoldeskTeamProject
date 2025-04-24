@@ -9,7 +9,7 @@
 
 <div th:fragment="header">
 	<nav class="navbar navbar-light">
-		<div class="container justify-content-between">
+		<div class="container-fluid justify-content-evenly">
 			<!-- 로그인 안한 사람들을 위한 로고 -->
 			<div sec:authorize="isAnonymous()" style="position: relative;">
 				<a href="javascript:void(0);" class = logo onclick="toggleRoleLogos()">
@@ -69,13 +69,11 @@
 			<button type="button" class="btn-close text-reset"
 				data-bs-dismiss="offcanvas" aria-label="Close"></button>
 		</div>
-		<div class="container" sec:authorize="isAnonymous()">
+		<div class="container text-center" sec:authorize="isAnonymous()">
 			<div class="list-group" id="login-reg-card">
   				<a href="/login" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">로그인 <i class="fa-solid fa-right-to-bracket"></i></strong></a>
   				<a href="/regAgreement" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">회원가입 <i class="fa-solid fa-user-plus"></i></strong></a>
 			</div>
-		</div>
-		<div sec:authorize="isAnonymous()">
 		</div>
 		<div class="container" sec:authorize="isAuthenticated()">
 			<div class="card shadow-sm" style="">
@@ -157,14 +155,14 @@
 					role="tabpanel" aria-labelledby="pills-home-tab">
 					<ul class="nav flex-column">
 						<li class="nav-item"><a class="nav-link" aria-current="page"
-							href="#">주소 선택</a></li>
-						<li class="nav-item"><a class="nav-link" href="#">찜 목록</a></li>
+							href="myAddress" sec:authorize="isAuthenticated()">주소 선택</a></li>
+						<li class="nav-item"><a class="nav-link" href="#" sec:authorize="isAuthenticated()">찜 목록</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">주문 내역</a></li>
 						<li class="nav-item"><a class="nav-link" href="myPage"
 							sec:authorize="isAuthenticated()">마이페이지</a></li>
 					</ul>
 				</div>
-				<div class="tab-pane fade" id="pills-profile" role="tabpanel"
+				<div class="tab-pane fade" id="pills-owner" role="tabpanel"
 					aria-labelledby="pills-profile-tab">
 					<ul class="nav flex-column">
 						<li class="nav-item"><a class="nav-link" aria-current="page"
@@ -178,7 +176,7 @@
 							sec:authorize="isAuthenticated()">마이페이지</a></li>
 					</ul>
 				</div>
-				<div class="tab-pane fade" id="pills-contact" role="tabpanel"
+				<div class="tab-pane fade" id="pills-rider" role="tabpanel"
 					aria-labelledby="pills-contact-tab">
 					<ul class="nav flex-column">
 						<li class="nav-item"><a class="nav-link" aria-current="page"

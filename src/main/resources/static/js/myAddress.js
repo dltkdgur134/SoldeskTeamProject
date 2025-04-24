@@ -145,6 +145,10 @@ function handleSelection(selectedValue) {
 function deleteAddress(count) {
 	const form = document.getElementById('address-form' + count);
 	const regAddressId = form.regAddressId;
+	// 버튼 innerHTML을 로딩 스피너로 변경
+	const btn = document.getElementById('delete-address-btn' + count);
+	btn.innerHTML =
+	"<span class='spinner-border spinner-border-sm' aria-hidden='true'></span>";
 	fetch('/content/deleteAddress/' + regAddressId.value, {
 		method: 'delete',
 		headers: {
