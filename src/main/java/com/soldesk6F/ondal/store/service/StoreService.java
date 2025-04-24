@@ -142,4 +142,8 @@ public class StoreService {
 	    return store;
 	}
 	
+	public Store findStoreByStoreId(UUID storeId) {
+        return storeRepository.findByStoreId(storeId);
+    }
+	
 }
