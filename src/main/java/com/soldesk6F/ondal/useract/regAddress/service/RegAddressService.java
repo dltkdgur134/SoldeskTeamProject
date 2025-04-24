@@ -36,20 +36,24 @@ public class RegAddressService {
     		String detailAddress,
     		String latitude,
     		String longitude) {
-    	String userUUIDString = userDetails.getUser().getUserUuidAsString();
-    	UUID userUuid = UUID.fromString(userUUIDString);
-    	Optional<User> findUser = userRepository.findById(userUuid);
     	try {
+    		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+        	UUID userUuid = UUID.fromString(userUUIDString);
+        	Optional<User> findUser = userRepository.findById(userUuid);
+    		
     		if (findUser.isEmpty()) {
     			redirectAttributes.addFlashAttribute("result", 1);
     			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
     			return false;
         	}
+    		
+    		User user = findUser.get();
+    		
     		double latitudeDouble = Double.parseDouble(latitude);
     		double longitudeDouble = Double.parseDouble(longitude);
     		
     		RegAddress regAddress = RegAddress.builder()
-    				.user(findUser.get())
+    				.user(user)
     				.address(address)
     				.detailAddress(detailAddress)
     				.userAddressLatitude(latitudeDouble)
@@ -57,13 +61,14 @@ public class RegAddressService {
     				.isUserSelectedAddress(false)
     				.build();
     		regAddressRepository.save(regAddress);
-    		if (findUser.get().getUserSelectedAddress() == null) {
+    		
+    		if (user.getUserSelectedAddress() == null) {
     			regAddress.updateDefaultAddress(true);
     			regAddress.setCreatedDate(LocalDateTime.now());
-    			findUser.get().updateUserSelectedAddress(regAddress);
-//    			cud.getUser().setUserSelectedAddress(regAddress);
-    			userService.refreshUserAuthentication(findUser.get().getUserId());
+    			user.updateUserSelectedAddress(regAddress);
+    			userService.refreshUserAuthentication(user.getUserId());
     		}
+    		
     		redirectAttributes.addFlashAttribute("result", 0);
     		redirectAttributes.addFlashAttribute("resultMsg", "주소 등록 완료!");
     		return true;
@@ -84,17 +89,23 @@ public class RegAddressService {
     	String userUUIDString = userDetails.getUser().getUserUuidAsString();
     	UUID userUuid = UUID.fromString(userUUIDString);
     	Optional<User> findUser = userRepository.findById(userUuid);
+    	
     	if (findUser.isEmpty()) {
     		redirectAttributes.addFlashAttribute("result", 1);
 			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");	
     	} 
+    	
+    	User user = findUser.get();
+    	
     	String regAddressUUIDString = regAddressId.toString();
     	UUID regAddressUuid = UUID.fromString(regAddressUUIDString);
-    	Optional<RegAddress> findAddress = regAddressRepository.findByRegAddressIdAndUser(regAddressUuid, findUser.get());
+    	Optional<RegAddress> findAddress = regAddressRepository.findByRegAddressIdAndUser(regAddressUuid, user);
+    	
     	if (findAddress.isEmpty()) {
     		redirectAttributes.addFlashAttribute("result", 1);
     		redirectAttributes.addFlashAttribute("resultMsg", "등록되지 않은 주소입니다.");	
     	}
+    	
     	model.addAttribute("address", findAddress.get());
     	return findAddress.get();
     }
@@ -108,11 +119,16 @@ public class RegAddressService {
 		String userUUIDString = userDetails.getUser().getUserUuidAsString();
 		UUID userUuid = UUID.fromString(userUUIDString);
 		Optional<User> findUser = userRepository.findById(userUuid);
+		
 		if (findUser.isEmpty()) {
 			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");	
+			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+			return null;
 		}
-		Optional<List<RegAddress>> addressList = regAddressRepository.findAllByUser(findUser.get());
+		
+		User user = findUser.get();
+		
+		Optional<List<RegAddress>> addressList = regAddressRepository.findAllByUser(user);
 		model.addAttribute("addressList", addressList.get());	
 		return addressList;
 	}
@@ -123,16 +139,19 @@ public class RegAddressService {
 			CustomUserDetails userDetails,
 			UUID regAddressId,
 			RedirectAttributes redirectAttributes) {
-		String userUUIDString = userDetails.getUser().getUserUuidAsString();
-		UUID userUuid = UUID.fromString(userUUIDString); 
-		Optional<User> findUser = userRepository.findById(userUuid);
-		
-		if (findUser.isEmpty()) {
-			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
-			return true;
-		}
 		try {
+			String userUUIDString = userDetails.getUser().getUserUuidAsString();
+			UUID userUuid = UUID.fromString(userUUIDString); 
+			Optional<User> findUser = userRepository.findById(userUuid);
+			
+			if (findUser.isEmpty()) {
+				redirectAttributes.addFlashAttribute("result", 1);
+				redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+				return true;
+			}
+			
+			User user = findUser.get();
+			
 			Optional<List<RegAddress>> addressList = regAddressRepository.findAllByUser(findUser.get());
 			RegAddress defaultAddress = null;
 			for (RegAddress address : addressList.get()) {
@@ -143,7 +162,6 @@ public class RegAddressService {
 			String defaultAddressUUIDString = defaultAddress.getRegAddressUuidAsString();
 			UUID defaultAddressUuid = UUID.fromString(defaultAddressUUIDString);
 			
-//			String addressUUIDString = regAddress.getUserUuidAsString();
 			String addressUUIDString = regAddressId.toString();
 			UUID addressUuid = UUID.fromString(addressUUIDString);
 			
@@ -153,11 +171,20 @@ public class RegAddressService {
 				return false;
 			} else {
 				Optional<RegAddress> findAddress = regAddressRepository.findById(addressUuid);
+				
+				if (findAddress.isEmpty()) {
+					redirectAttributes.addFlashAttribute("result", 1);
+					redirectAttributes.addFlashAttribute("resultMsg", "등록되지 않은 주소입니다.");
+					return false;
+				}
+				
+				RegAddress regAddress = findAddress.get();
+				
 				defaultAddress.setUserSelectedAddress(false);
-				findAddress.get().updateDefaultAddress(true);
-				findAddress.get().setUpdatedDate(LocalDateTime.now());
-				findUser.get().updateUserSelectedAddress(findAddress.get());
-				userService.refreshUserAuthentication(findUser.get().getUserId());
+				regAddress.updateDefaultAddress(true);
+				regAddress.setUpdatedDate(LocalDateTime.now());
+				user.updateUserSelectedAddress(regAddress);
+				userService.refreshUserAuthentication(user.getUserId());
 				redirectAttributes.addFlashAttribute("result", 0);
 				redirectAttributes.addFlashAttribute("resultMsg", "기본 주소로 설정되었습니다!");
 				return true;
@@ -174,21 +201,28 @@ public class RegAddressService {
 	@Transactional
 	public boolean deleteAddress(CustomUserDetails userDetails,
 			UUID regAddressId) {
-		String regAddressIdString = regAddressId.toString();
-		UUID regAddressUuid = UUID.fromString(regAddressIdString);
-		Optional<RegAddress> findAddress = regAddressRepository.findById(regAddressUuid);
-		if (findAddress.isEmpty()) {
-			return false;
-		}
 		try {
+			String regAddressIdString = regAddressId.toString();
+			UUID regAddressUuid = UUID.fromString(regAddressIdString);
+			Optional<RegAddress> findAddress = regAddressRepository.findById(regAddressUuid);
+			
+			if (findAddress.isEmpty()) {
+				return false;
+			}
+			
+			RegAddress regAddress = findAddress.get();
+			
 			String userUUIDString = userDetails.getUser().getUserUuidAsString();
 			UUID userUuid = UUID.fromString(userUUIDString);
 			Optional<User> findUser = userRepository.findById(userUuid);
+			
 			if (findUser.isEmpty()) {
 				return false;
 			}
-			regAddressRepository.delete(findAddress.get());
-			userService.refreshUserAuthentication(findUser.get().getUserId());
+			
+			User user = findUser.get();
+			regAddressRepository.delete(regAddress);
+			userService.refreshUserAuthentication(user.getUserId());
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -201,16 +235,19 @@ public class RegAddressService {
 	public boolean updateAddress(CustomUserDetails userDetails,
 			RegAddressDTO regAddressDTO,
 			RedirectAttributes redirectAttributes) {
-		String regAddressIdString = regAddressDTO.getRegAddressUuidAsString();
-		UUID regAddressUuid = UUID.fromString(regAddressIdString);
-		Optional<RegAddress> findAddress = regAddressRepository.findById(regAddressUuid);
-		
-		if (findAddress.isEmpty()) {
-			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "등록되지 않은 주소입니다.");
-			return false;
-		}
 		try {
+			String regAddressIdString = regAddressDTO.getRegAddressUuidAsString();
+			UUID regAddressUuid = UUID.fromString(regAddressIdString);
+			Optional<RegAddress> findAddress = regAddressRepository.findById(regAddressUuid);
+			
+			if (findAddress.isEmpty()) {
+				redirectAttributes.addFlashAttribute("result", 1);
+				redirectAttributes.addFlashAttribute("resultMsg", "등록되지 않은 주소입니다.");
+				return false;
+			}
+			
+			RegAddress regAddress = findAddress.get();
+			
 			String userUUIDString = userDetails.getUser().getUserUuidAsString();
 			UUID userUuid = UUID.fromString(userUUIDString);
 			Optional<User> findUser = userRepository.findById(userUuid);
@@ -219,16 +256,20 @@ public class RegAddressService {
 				redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 유저입니다.");
 				return false;
 			}
+			
+			User user = findUser.get();
+			
 			// DTO에 String으로 받아왔기 때문에 파싱 필요
 			double latitudeDouble = Double.parseDouble(regAddressDTO.getUserAddressLatitude());
     		double longitudeDouble = Double.parseDouble(regAddressDTO.getUserAddressLongitude());
+    		
 			findAddress.get().updateRegAddress( 
 					regAddressDTO.getAddress(), 
 					regAddressDTO.getDetailAddress(), 
 					latitudeDouble,
 					longitudeDouble);
-			findAddress.get().setUpdatedDate(LocalDateTime.now());
-			userService.refreshUserAuthentication(findUser.get().getUserId());
+			regAddress.setUpdatedDate(LocalDateTime.now());
+			userService.refreshUserAuthentication(user.getUserId());
 			redirectAttributes.addFlashAttribute("result", 0);
 			redirectAttributes.addFlashAttribute("resultMsg", "주소 정보가 변경되었습니다.");
 			return true;

@@ -131,27 +131,37 @@ public class UserService {
     public boolean updateUserNickname(CustomUserDetails userDetails, 
     		String nickName, 
     		RedirectAttributes redirectAttributes) {
-    	String userUUIDString = userDetails.getUser().getUserUuidAsString();
-    	UUID userUuid = UUID.fromString(userUUIDString);
-    	Optional<User> findUser = userRepository.findById(userUuid);
-    	
-    	if (findUser.isEmpty()) {
-    		redirectAttributes.addFlashAttribute("result", 1);
-    		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+    	try {
+    		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+        	UUID userUuid = UUID.fromString(userUUIDString);
+        	Optional<User> findUser = userRepository.findById(userUuid);
+        	
+        	if (findUser.isEmpty()) {
+        		redirectAttributes.addFlashAttribute("result", 1);
+        		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+        		return false;
+        	}
+        	
+        	User user = findUser.get();
+        	
+        	if (user.getNickName().equals(nickName)) {
+       			redirectAttributes.addFlashAttribute("result", 1);
+       			redirectAttributes.addFlashAttribute("resultMsg", "닉네임을 변경사항이 없습니다.");
+        		return false;
+        	} else {
+        		user.updateNickname(nickName);
+        		user.updateUpdatedDate(LocalDateTime.now());
+        		refreshUserAuthentication(findUser.get().getUserId());
+        		redirectAttributes.addFlashAttribute("result", 0);
+        		redirectAttributes.addFlashAttribute("resultMsg", "닉네임 변경 성공!");
+        		return true;
+        	}
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", 1);
+    		redirectAttributes.addFlashAttribute("resultMsg", "닉네임 변경 실패.");
     		return false;
-    	}
-   		if (findUser.get().getNickName().equals(nickName)) {
-   			redirectAttributes.addFlashAttribute("result", 1);
-   			redirectAttributes.addFlashAttribute("resultMsg", "닉네임을 변경할 수 없습니다.");
-    		return false;
-    	} else {
-    		findUser.get().updateNickname(nickName);
-    		findUser.get().updateUpdatedDate(LocalDateTime.now());
-    		refreshUserAuthentication(findUser.get().getUserId());
-    		redirectAttributes.addFlashAttribute("result", 0);
-    		redirectAttributes.addFlashAttribute("resultMsg", "닉네임 변경 성공!");
-    		return true;
-    	}
+		}
     }
     
     // 유저 프로필 이미지 업데이트
@@ -168,6 +178,9 @@ public class UserService {
     		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
     		return false;
     	}
+    	
+    	User user = findUser.get();
+    	
     	// 기존 이미지 존재 시 해당 파일 삭제
    		try {
    			String old_profImgName = findUser.get().getUserProfile();
@@ -208,8 +221,8 @@ public class UserService {
 	            filePath.replace("/", File.separator);
 	            
 	            final String finalFileName = new String(fileName);
-	            findUser.get().updateProfile(finalFileName);
-	            findUser.get().updateUpdatedDate(LocalDateTime.now());
+	            user.updateProfile(finalFileName);
+	            user.updateUpdatedDate(LocalDateTime.now());
 	            refreshUserAuthentication(findUser.get().getUserId());
 	            redirectAttributes.addFlashAttribute("result", 0);
 	            redirectAttributes.addFlashAttribute("resultMsg", "프로필 이미지 변경 성공!");
@@ -217,8 +230,8 @@ public class UserService {
 	        }
 	        // 업로드한 파일 없을 시에는 기본 이미지로 설정
 	        final String finalFileName = new String(fileName);
-	        findUser.get().updateProfile(finalFileName);
-	        findUser.get().updateUpdatedDate(LocalDateTime.now());
+	        user.updateProfile(finalFileName);
+	        user.updateUpdatedDate(LocalDateTime.now());
 	        refreshUserAuthentication(findUser.get().getUserId());
 	        redirectAttributes.addFlashAttribute("result", 0);
 	        redirectAttributes.addFlashAttribute("resultMsg", "기본 이미지로 변경 성공!");
@@ -236,27 +249,37 @@ public class UserService {
     public boolean updateUserPhone(CustomUserDetails userDetails, 
     		String userPhone, 
     		RedirectAttributes redirectAttributes) {
-    	String userUUIDString = userDetails.getUser().getUserUuidAsString();
-    	UUID userUuid = UUID.fromString(userUUIDString);
-    	Optional<User> findUser = userRepository.findById(userUuid);
-    	
-    	if (findUser.isEmpty()) {
-    		redirectAttributes.addFlashAttribute("result", 1);
-    		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
-			return false;
-    	}
-   		if (findUser.get().getUserPhone().equals(userPhone)) {
-   			redirectAttributes.addFlashAttribute("result", 1);
-   			redirectAttributes.addFlashAttribute("resultMsg", "전화번호 변경 사항이 없습니다.");
-    		return false;
-    	} else {
-    		findUser.get().updatePhone(userPhone);
-    		findUser.get().updateUpdatedDate(LocalDateTime.now());
-    		refreshUserAuthentication(findUser.get().getUserId());
-    		redirectAttributes.addFlashAttribute("result", 0);
-    		redirectAttributes.addFlashAttribute("resultMsg", "전화번호 변경 성공!");
-    		return true;
-    	}
+    	try {
+    		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+        	UUID userUuid = UUID.fromString(userUUIDString);
+        	Optional<User> findUser = userRepository.findById(userUuid);
+        	
+        	if (findUser.isEmpty()) {
+        		redirectAttributes.addFlashAttribute("result", 1);
+        		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+    			return false;
+        	}
+        	
+        	User user = findUser.get();
+        	
+        	if (user.getUserPhone().equals(userPhone)) {
+       			redirectAttributes.addFlashAttribute("result", 1);
+       			redirectAttributes.addFlashAttribute("resultMsg", "전화번호 변경 사항이 없습니다.");
+        		return false;
+        	} else {
+        		user.updatePhone(userPhone);
+        		user.updateUpdatedDate(LocalDateTime.now());
+        		refreshUserAuthentication(findUser.get().getUserId());
+        		redirectAttributes.addFlashAttribute("result", 0);
+        		redirectAttributes.addFlashAttribute("resultMsg", "전화번호 변경 성공!");
+        		return true;
+        	}
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", 1);
+   			redirectAttributes.addFlashAttribute("resultMsg", "전화번호 변경 실패.");
+   			return false;
+		}
     }
     
     // 유저 비밀번호 업데이트
@@ -265,36 +288,40 @@ public class UserService {
     		String oldPassword, 
     		String password, 
     		RedirectAttributes redirectAttributes) {
-//    	Optional<User> findUser = userRepository.findByUserId(cud.getUsername());
-    	String userUUIDString = userDetails.getUser().getUserUuidAsString();
-    	UUID userUuid = UUID.fromString(userUUIDString);
-    	Optional<User> findUser = userRepository.findById(userUuid);
-    	
-    	if (findUser.isEmpty()) {
-    		redirectAttributes.addFlashAttribute("result", 1);
-    		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
-    		return false;
-    	}
-    	
     	try {
-   			if (passwordEncoder.matches(oldPassword, findUser.get().getPassword())) {
+    		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+        	UUID userUuid = UUID.fromString(userUUIDString);
+        	Optional<User> findUser = userRepository.findById(userUuid);
+        	
+        	if (findUser.isEmpty()) {
+        		redirectAttributes.addFlashAttribute("result", 1);
+        		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+        		return false;
+        	}
+        	
+        	User user = findUser.get();
+    		
+    		if(passwordEncoder.matches(oldPassword, user.getPassword())) {
     			if (password.equals(oldPassword)) {
     				redirectAttributes.addFlashAttribute("result", 1);
     				redirectAttributes.addFlashAttribute("resultMsg", "비밀번호 변경사항이 없습니다." );
     				return false;
     			}
     			String encryptedPassword = passwordEncoder.encode(password);
-    			findUser.get().updatePassword(encryptedPassword);
-    			findUser.get().updateUpdatedDate(LocalDateTime.now());
+    			user.updatePassword(encryptedPassword);
+    			user.updateUpdatedDate(LocalDateTime.now());
     			redirectAttributes.addFlashAttribute("result", 0);
     			redirectAttributes.addFlashAttribute("resultMsg", "비밀번호 변경 성공!");
     			return true;
     		}
+    		
    			redirectAttributes.addFlashAttribute("result", 1);
    			redirectAttributes.addFlashAttribute("resultMsg", "기존 비밀번호가 일치하지 않습니다.");
     		return false;
 		} catch (Exception e) {
 			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", 1);
+   			redirectAttributes.addFlashAttribute("resultMsg", "비밀번호 변경 실패.");
 			return false;
 		}
     }
@@ -314,7 +341,10 @@ public class UserService {
     		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
     		return false;
     	}
-    	if (passwordEncoder.matches(password, findUser.get().getPassword())) {
+    	
+    	User user = findUser.get();
+    	
+    	if (passwordEncoder.matches(password, user.getPassword())) {
     		redirectAttributes.addFlashAttribute("result", 0);
     		redirectAttributes.addFlashAttribute("resultMsg", "비밀번호가 맞습니다!");
 			return true;
@@ -328,18 +358,21 @@ public class UserService {
     @Transactional
     public boolean deleteUserTemp(CustomUserDetails userDetails, 
     		RedirectAttributes redirectAttributes) {
-    	String userUUIDString = userDetails.getUser().getUserUuidAsString();
-    	UUID userUuid = UUID.fromString(userUUIDString);
-    	Optional<User> findUser = userRepository.findById(userUuid);
-    	
-    	if (findUser.isEmpty()) {
-    		redirectAttributes.addFlashAttribute("result", 1);
-    		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
-			return false;
-    	}
     	try {
-    		findUser.get().setUserStatus(UserStatus.LEAVED);
-    		findUser.get().updateUpdatedDate(LocalDateTime.now());
+    		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+        	UUID userUuid = UUID.fromString(userUUIDString);
+        	Optional<User> findUser = userRepository.findById(userUuid);
+        	
+        	if (findUser.isEmpty()) {
+        		redirectAttributes.addFlashAttribute("result", 1);
+        		redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+    			return false;
+        	}
+        	
+        	User user = findUser.get();
+    		
+    		user.setUserStatus(UserStatus.LEAVED);
+    		user.updateUpdatedDate(LocalDateTime.now());
     		refreshUserAuthentication(findUser.get().getUserId());
     		redirectAttributes.addFlashAttribute("result", 0);
     		redirectAttributes.addFlashAttribute("resultMsg", "회원 탈퇴 성공");
