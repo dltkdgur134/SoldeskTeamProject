@@ -14,6 +14,7 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 	List<Store> findByOwner(Owner owner);
 	 boolean existsByOwner_OwnerId(UUID ownerId);
 	 Store findByStoreId(UUID StoreId);
+	 List<Store> findAll();
 }
 
 

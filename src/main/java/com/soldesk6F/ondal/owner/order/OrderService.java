@@ -23,11 +23,15 @@ import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto.OrderDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
+import com.soldesk6F.ondal.useract.order.dto.TestOrderRequestDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
+import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
+import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
+import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +45,7 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final UserRepository userRepository;
+    private final RegAddressRepository regAddressRepository;
     
 
     public Order saveOrder(OrderRequestDto requestDto) {
@@ -241,4 +246,41 @@ public class OrderService {
 
         return dto;
     }
+    
+    @Transactional
+    public void createTestOrder(TestOrderRequestDto dto, UUID userId) {
+        Store store = storeRepository.findById(dto.getStoreId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid store ID"));
+        Menu menu = menuRepository.findById(dto.getMenuId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        RegAddress address = regAddressRepository.findByUserAndIsUserSelectedAddressTrue(user)
+        		.orElseThrow(() -> new IllegalStateException("사용자가 선택한 주소가 없습니다."));
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setStore(store);
+        order.setOrderTime(LocalDateTime.now());
+        order.setOrderToOwner(OrderToOwner.PENDING);
+        order.setOrderToRider(OrderToRider.PENDING);
+        order.setDeliveryAddress(address.getAddress() + " " + address.getDetailAddress()); // ✅ 전체 주소
+        order.setDeliveryAddressLatitude(address.getUserAddressLatitude());  // ✅ 위도
+        order.setDeliveryAddressLongitude(address.getUserAddressLongitude());  // ✅ 경도
+        order.calculateDeliveryFee();                        // 거리기반 배달료 설정
+
+        OrderDetail detail = new OrderDetail();
+        detail.setMenu(menu);
+        detail.setQuantity(dto.getQuantity());
+        detail.setOptionNames(List.of());  // 테스트용
+        detail.setOptionPrices(List.of());
+        detail.setOrder(order); // 이거는 addOrderDetail 안에서 하면 생략 가능
+        detail.setPrice(menu.getPrice());
+
+        order.addOrderDetail(detail); // 핵심! totalPrice 자동 계산됨
+
+        orderRepository.save(order);
+    }
+
+    
 }
