@@ -100,6 +100,30 @@ function sendChat() {
 }
 
 /**---------------------------------------------------
+ * 3.5) 채팅 읽었는지 확인하는 함수 "1"
+ *--------------------------------------------------*/
+function receiveMessage(message) {
+  const isFocused = $('#chatPanel').is(':visible'); // 또는 채팅방 상태 확인
+  if (!isFocused) {
+    $('#unreadBadge').text('1').show(); // 누적도 가능
+  }
+
+  $('#chatMessages').append(`<div>${message}</div>`);
+}
+
+function markMessagesAsRead() {
+  $('#unreadBadge').hide(); // 뱃지 숨기기
+  // 필요하다면 서버에 "읽음" 처리 요청도 추가
+  // $.post('/chat/read', { userId: ... });
+}
+
+$('.chat-button').click(function () {
+  $('#chatPanel').show();
+  markMessagesAsRead();
+});
+
+
+/**---------------------------------------------------
  * 4) 페이지 로드 시 초기화
  *--------------------------------------------------*/
 window.addEventListener('load', () => {

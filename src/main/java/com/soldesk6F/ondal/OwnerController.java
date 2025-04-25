@@ -1,19 +1,30 @@
 package com.soldesk6F.ondal;
 
 
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.entity.Store.StoreStatus;
+import com.soldesk6F.ondal.store.service.StoreService;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/owner")
 public class OwnerController {
-
+	
+	private final StoreService storeService;
+	
 	@GetMapping("/store-management")
 	public String storeManagement(Model model) {
 	    Store mockStore = Store.builder()
@@ -28,10 +39,14 @@ public class OwnerController {
 	    return "content/store/storeManagement";
 	}
 
-//	@GetMapping("/owner/store-management")
-//	public String store() {
-//		return "content/store/storeManagement";
-//	}
+	@GetMapping("/store-management/{storeId}")
+	public String store(@PathVariable("storeId") UUID storeId, Model model, HttpSession session) {
+	    session.setAttribute("storeId", storeId); // ✅ 세션에 저장
+	    Store store = storeService.findStoreByStoreId(storeId);
+	    model.addAttribute("store", store);
+
+	    return "content/store/storeManagement";
+	}
 	
 	@GetMapping(value = "/storesetting")
 	public String storeSetting() {
