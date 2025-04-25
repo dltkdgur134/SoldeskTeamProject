@@ -3,12 +3,14 @@ package com.soldesk6F.ondal.user.controller.rider;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -163,21 +165,42 @@ public class RiderHomeController {
     @ResponseBody
     public ResponseEntity<?> assignOrderToRider(@RequestBody Map<String, String> payload) {
         String orderId = payload.get("orderId");
-        Optional<Order> optionalOrder = orderRepository.findById(UUID.fromString(orderId));
-        if (optionalOrder.isEmpty()) {
-            return ResponseEntity.badRequest().body("해당 주문이 없습니다.");
+
+        // UUID 형식 검증
+        if (!isValidUUID(orderId)) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "잘못된 주문 ID 형식입니다."));
         }
 
-        Order order = optionalOrder.get();
-        order.setOrderToRider(Order.OrderToRider.DISPATCHED);  // 상태 변경
-        orderRepository.save(order);
-        
-        return ResponseEntity.ok().build();
+        try {
+            UUID orderUUID = UUID.fromString(orderId); // String -> UUID 변환
+            Optional<Order> optionalOrder = orderRepository.findById(orderUUID);
+
+            if (optionalOrder.isEmpty()) {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("message", "해당 주문이 없습니다."));
+            }
+
+            Order order = optionalOrder.get();
+            order.setOrderToRider(Order.OrderToRider.DISPATCHED);  // 상태 변경
+            orderRepository.save(order);
+
+            return ResponseEntity.ok(Collections.singletonMap("message", "배차 요청 성공"));
+        } catch (Exception e) {
+            // 예외 처리 (기타 예외 처리)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "배차 요청 중 오류 발생"));
+        }
     }
 
 
+    // UUID 형식 검증 메소드
+    private boolean isValidUUID(String uuid) {
+        try {
+            UUID.fromString(uuid); // UUID 변환 시 오류가 나면 false 리턴
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false; // 잘못된 형식이면 false 리턴
+        }
+    }
 
-    
 }
 
 

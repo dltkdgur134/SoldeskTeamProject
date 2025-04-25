@@ -126,13 +126,21 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         if (savedOrder.getUser() != null) {
-            messagingTemplate.convertAndSend("/topic/user/" + savedOrder.getUser().getUserUuidAsString(),
-                    convertToDto(savedOrder));
+        	String destination = "/topic/user/" + savedOrder.getUser().getUserUuidAsString();
+            OrderResponseDto orderDto = convertToDto(savedOrder);
+        	
+            System.out.println("발행 경로: " + destination);
+            System.out.println("발행 메시지: " + orderDto);
+            
+            messagingTemplate.convertAndSend(destination, orderDto);
         }
 
         if (savedOrder.getRider() != null) {
-            messagingTemplate.convertAndSend("/topic/rider/" + savedOrder.getRider().getRiderUuidAsString(),
-                    convertToDto(savedOrder));
+            String destination = "/topic/rider/" + savedOrder.getRider().getRiderUuidAsString();
+            OrderResponseDto orderDto = convertToDto(savedOrder);
+            System.out.println("발행 경로: " + destination);
+            System.out.println("발행 메시지: " + orderDto);
+            messagingTemplate.convertAndSend(destination, orderDto);
         }
 
         return savedOrder;

@@ -4,18 +4,21 @@ let stompClient;
 
 function initGlobalWebsocket() {
   if (!userId) return;  // 치환 실패 시 구독 안 함
-  const socket = new SockJS('/stomp');
-  stompClient = Stomp.over(socket);
+  const socket = new SockJS('/stomp'); // SockJS를 통해 /stomp 엔드포인트로 연결
+  stompClient = Stomp.over(socket); // STOMP 프로토콜을 통해 메시지 처리
   stompClient.connect({}, frame => {
-    console.log('Global WS connected:', frame);
+    console.log('Global WS connected:', frame); // 연결 성공 시 로그
 
     // /topic/user/{userId} 구독 → 모든 페이지에서 주문 변경 알림 받음
     stompClient.subscribe('/topic/user/' + userId, message => {
-      const data = JSON.parse(message.body);
+      const data = JSON.parse(message.body); // 서버에서 보낸 메시지를 JSON으로 파싱
+	  console.log("수신된 메시지:", data); // 수신된 데이터 로그
+	 
+	   // 수신된 데이터로 알림 표시
       showOrderNotification(data);
     });
   }, err => {
-    console.error('Global WS error', err);
+    console.error('Global WS error', err);  // 연결 실패 시 오류 로그
   });
 }
 

@@ -37,7 +37,7 @@
 
 		<!-- Kakao Maps API -->
 		<script
-			src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
+			src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
 		<script src="/js/riderMap.js"></script>
 
 		<script th:inline="javascript">
@@ -45,7 +45,7 @@
 			const riderLng = /*[[${rider.hubAddressLongitude}]]*/0;
 		</script>
 
-		<script th:inline="javascript">
+		<script th:inline="javascript">	
 			const orders = /*[[${ordersJson}]]*/[];
 			console.log("📦 Orders loaded: ", orders);
 		</script>
