@@ -25,9 +25,18 @@ body {
 	height: 150px;
 }
 
-.img-fluid:hover {
+/* .img-fluid:hover {
 	transform: translate(2px, 2px);
-} 
+}  */
+
+a .img-fluid:hover {
+	animation: pop 0.2s linear 1;
+}
+
+@keyframes pop{
+  50%  {transform: scale(1.2);}
+}
+
 
 .col a {
 	text-decoration: none;

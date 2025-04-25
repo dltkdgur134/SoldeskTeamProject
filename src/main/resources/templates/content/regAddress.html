@@ -46,14 +46,17 @@
 						<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
 					</div>			 
 					<br>
+					<div class="container d-flex justify-content-between">
  					 <button type="submit" class="btn btn-primary"
 						form="reg-address-form" id="reg-address-btn">확인</button> 
+					<button type="button" class="btn btn-secondary btn-lg" id="back-btn" 
+								onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	
+					</div>
 				</form>
 			</div> 
 		</div>
 		<!-- <div class="address-search-container">
-  				<input type="text" id="address-search-bar"	placeholder="주소검색"	/>
-				oninput="fetchSearchResults(this.value)"  				
+  				<input type="text" id="address-search-bar"	placeholder="주소검색"	 oninput="fetchSearchResults(this.value)" />
  			 <ul id="dropdown-results" class="dropdown-menu"></ul>
 		</div> -->
 		<br>
