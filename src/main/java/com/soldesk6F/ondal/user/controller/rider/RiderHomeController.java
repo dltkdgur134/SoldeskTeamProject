@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.user.dto.rider.RiderNaviDTO;
 import com.soldesk6F.ondal.user.dto.rider.RiderOrderDetailDTO;
 import com.soldesk6F.ondal.user.dto.rider.RiderOrderMarkerDTO;
 import com.soldesk6F.ondal.user.entity.Rider;
@@ -145,8 +147,6 @@ public class RiderHomeController {
                         .storeLatitude(order.getStore().getStoreLatitude())
                         .storeLongitude(order.getStore().getStoreLongitude())
                         .deliveryAddress(order.getDeliveryAddress())
-                        .deliveryAddressLatitude(order.getDeliveryAddressLatitude())
-                        .deliveryAddressLongitude(order.getDeliveryAddressLongitude())
                         .orderTimeFormatted(formattedOrderTime)
                         .deliveryRequest(order.getDeliveryRequest())
                         .deliveryFee(order.getDeliveryFee())
@@ -200,7 +200,37 @@ public class RiderHomeController {
             return false; // 잘못된 형식이면 false 리턴
         }
     }
+    @GetMapping("/api/orders/{orderId}/navi")
+    @ResponseBody
+    public RiderNaviDTO getRiderNaviInfo(@PathVariable("orderId") UUID orderId) {
+        try {
+            // 주문 정보 조회
+            Optional<Order> optionalOrder = orderRepository.findById(orderId);
+            if (optionalOrder.isEmpty()) {
+                throw new IllegalArgumentException("주문을 찾을 수 없습니다.");
+            }
+            Order order = optionalOrder.get();
 
+            // 주문의 출발지 및 도착지 정보
+            double storeLatitude = order.getStore().getStoreLatitude();
+            double storeLongitude = order.getStore().getStoreLongitude();
+            double deliveryAddressLatitude = order.getDeliveryAddressLatitude();
+            double deliveryAddressLongitude = order.getDeliveryAddressLongitude();
+
+            // RiderNaviDTO 생성하여 반환
+            return RiderNaviDTO.builder()
+                    .orderId(order.getOrderId().toString())
+                    .storeLatitude(storeLatitude)
+                    .storeLongitude(storeLongitude)
+                    .deliveryAddressLatitude(deliveryAddressLatitude)
+                    .deliveryAddressLongitude(deliveryAddressLongitude)
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("서버 처리 중 오류 발생", e);
+        }
+    }
 }
 
 

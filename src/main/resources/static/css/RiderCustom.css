@@ -6,23 +6,27 @@
 }
 
 @font-face {
-	font-family: "yisunshin";
-	src : url('yisunshinB.ttf') format("truetype");
+	font-family: "taebaek";
+	src: url('taebaek.ttf');
 }
 
 @font-face {
-	font-family: "yisunshinM";
-	src : url('../css/yssM.ttf') format("truetype");
+	font-family: "yisunshin";
+	src : url('yisunshinB.ttf'), format('truetype');
+}
+
+@font-face {
+	font-family: "siwol";
+	src : url('siwol.ttf');
 }
 
 body {
-	font-family: "acloud"; 
-	font-family: "yisunshinM";
+	font-family: "siwol"; 
 }
 
 .display-5 {
 	color: white;
-	font-family: "yisunshin" !important;
+	font-family: "taebaek" !important;
 }
 
 :root {
@@ -86,6 +90,12 @@ body {
     color: #000 !important;
     font-weight: bold;
   }
+  
+  .highlight-title{
+	color: black;	
+}
+  
+  
 /* role-logo의 기본 설정: opacity와 visibility로 보이기/숨기기 */
 .logo{
 	text-decoration: none;
