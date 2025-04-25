@@ -81,25 +81,54 @@
 
 
   
-  <div class="d-flex flex-column align-items-center px-5 w-100" sec:authorize="isAnonymous()">
-    
-    <!-- 검색창 전체 래퍼 -->
-  <div id="search-wrapper" class="d-flex justify-content-center align-items-start mt-3">
-    <!-- 주소 다시 입력 버튼: 위치 고정 -->
-    <button id="reenter-address-btn"
-            class="btn btn-outline-secondary me-2"
-            style="display:none;">주소 다시 입력</button>
+<!-- 익명 사용자 전용 -->
+<div class="d-flex flex-column align-items-center px-5 w-100" sec:authorize="isAnonymous()">
 
-    <!-- ⚠️ 노란 박스 전체를 search-box 로 분리 -->
-    <div id="search-box" class="search-box">
-    <div class = "search-inner">
-      <input id="main-input"  type="text" class="search-input" placeholder="배달받을 주소를 입력하세요">
-      <a href="#" id="main-btn" class="search-icon"><i class="fa fa-search"></i></a>
+  <div id="search-area"
+       class="d-flex justify-content-center mt-4"
+       style="max-width: 500px; width: 100%;">
+
+    <!-- 주소 다시 입력 버튼 -->
+    <button id="btn-address-reset"
+            class="btn btn-outline-secondary flex-shrink-0 me-2"
+            style="display:none; width: 140px; height: 48px;">
+      주소 다시 입력
+    </button>
+	
+    <!-- 검색 박스 (자동 확장) -->
+	<div id="search-box-container" class="d-flex justify-content-center w-100">
+    <div id="search-box"
+         class="bg-white border border-3 border-warning rounded-2 shadow-sm"
+         style="width: 100%; max-width: 400px; height: 48px; display: flex; align-items: center;">
+
+      <!-- input-group -->
+	  <div class="input-group h-100">
+
+	    <input type="text"
+	           class="form-control border-0 rounded-0 shadow-none"
+	           placeholder="배달받을 주소를 입력하세요"
+	           id="inp-search"
+	           autocomplete="off"/>
+
+	    <button id="btn-search"
+	            class="btn btn-warning d-flex align-items-center justify-content-center p-0 rounded-0"
+	            style="width: 48px; height: 100%;">
+	      <i class="fa fa-search"></i>
+	    </button>	
+		
+	  </div>
+	  <div id="list-wrapper" class="list-wrapper overflow-auto">
+      <!-- 자동완성 리스트 -->
+      <ul id="list-autocomplete"
+          class="list-group mb-0 px-0"
+          style="top: 48px;"></ul>
     </div>
-      <ul id="autocomplete-list" class="list-group position-absolute start-0 end-0 bg-white text-start rounded-bottom-2 shadow-sm"></ul>
-    </div>
+	</div>
+	</div>
+
+
   </div>
-  </div>
+</div>
   
 	<!-- <div class="gallery-container">
 		<div>

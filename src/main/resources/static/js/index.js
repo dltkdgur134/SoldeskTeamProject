@@ -8,12 +8,12 @@ $(function () {
 
 /* ───────────────────────────────  검색 로직  ─────────────────────────────── */
 $(document).ready(function() {
-  const $input      = $("#main-input");              // 메인 검색 input
-  const $searchBtn  = $("#main-btn");                // 검색 버튼 (돋보기 아이콘)
-  const $reAddrBtn  = $("#reenter-address-btn");     // '주소 다시 입력' 버튼
-  const $wrapper    = $("#search-wrapper");          // 검색창+리스트 래퍼 (포커스 스타일용)
-  const $list       = $("#autocomplete-list");       // 자동완성/기록 리스트 UL
-
+  const $input      = $("#inp-search");              // 메인 검색 input
+  const $searchBtn  = $("#btn-search");                // 검색 버튼 (돋보기 아이콘)
+  const $reAddrBtn  = $("#btn-address-reset");     // '주소 다시 입력' 버튼
+  const $wrapper    = $("#search-box");          // 검색창+리스트 래퍼 (포커스 스타일용)
+  const $list       = $("#list-autocomplete");       // 자동완성/기록 리스트 UL
+	
   // --- 상태 관리: 주소 입력 여부 확인 (주소가 있으면 true) ---
   function hasAddress() {
     return !!sessionStorage.getItem("address");
@@ -55,13 +55,15 @@ $(document).ready(function() {
   $reAddrBtn.on("click", function() {
     sessionStorage.removeItem("address");                         // 저장된 주소 삭제
     $input.val("").attr("placeholder", "배달받을 주소를 입력하세요");  // 입력 필드 초기화
-    $reAddrBtn.hide();                                            // 다시 입력 버튼 숨기기
+    $reAddrBtn.hide();
+	$("#search-box-container").removeClass("flex-grow-1").addClass("w-100 justify-content-center");
     hideList();
   });
 
   // --- 입력창 포커스 이벤트 ---
   $input.on("focus", function() {
-    if (!hasAddress()) return;  // 주소 입력 전이라면 아무 작업도 안 함
+		if (!hasAddress()){ return;  // 주소 입력 전이라면 아무 작업도 안 함
+	}
     // 음식 검색 모드에서는 포커스 시 최근 검색기록 표시 (입력값이 없을 때)
     if ($input.val().trim() === "") {
       showHistory();
@@ -119,23 +121,13 @@ $(document).ready(function() {
   // --- 문서 전체 클릭 이벤트 (외부 클릭 감지) ---
   $(document).on("click", function(e) {
     // 검색 영역 밖을 클릭하면 리스트 닫기
-    if ($(e.target).closest("#search-wrapper").length === 0) {
+    if ($(e.target).closest("#search-box").length === 0) {
       hideList();
     }
   });
 
   // ====== 자동완성/검색기록 표시를 위한 헬퍼 함수들 ======
 
-  // 리스트 보이기 (래퍼에 show-list 클래스 추가)
-  function showList() {
-    $wrapper.addClass("show-list");
-  }
-  // 리스트 모두 비우고 숨기기 (래퍼 클래스 제거)
-  function hideList() {
-    $list.empty();
-    $wrapper.removeClass("show-list");
-    activeIndex = -1;
-  }
 
   // 검색 결과 항목을 클릭 또는 선택했을 때 처리
   function selectItem(text) {
@@ -210,15 +202,17 @@ $(document).ready(function() {
         hideList();
         return;
       }
+	  
       results.forEach(word => {
-        $list.append(createItem(word, false));  // isHistory = false
+		$list.append(createItem(word, false));  // isHistory = false
       });
       showList();
       refreshActiveItem();  // activeIndex 초기값 -1 유지 (첫 항목 선택 없음)
     });
   }
   function showList() {
-    $wrapper.addClass("show-list");   // 밑 공간 열기
+    $wrapper.addClass("show-list");
+	$list.removeClass("d-none");
   }
   function hideList() {
     $list.empty();
