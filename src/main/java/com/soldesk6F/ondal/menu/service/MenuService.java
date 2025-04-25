@@ -264,5 +264,22 @@ public class MenuService {
     		menu.setMenuOrder(dto.getOrder());
     	}
     }
+    
+    public List<Menu> findByStoreId(UUID storeId) {
+        return menuRepository.findByStore_StoreId(storeId);
+    }
+    
+    public void createTestMenu(UUID storeId, String name, int price) {
+        Store store = storeRepository.findByStoreId(storeId);
+        if (store == null) throw new IllegalArgumentException("Invalid store ID");
 
+        Menu menu = Menu.builder()
+                .store(store)
+                .menuName(name)
+                .price(price)
+                .menuStatus(null)
+                .build();
+
+        menuRepository.save(menu);
+    }
 }

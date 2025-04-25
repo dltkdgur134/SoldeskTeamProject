@@ -17,7 +17,7 @@ public interface MenuRepository extends JpaRepository<Menu, UUID> {
 	List<Menu> findByStoreOrderByMenuOrderAsc(Store store);
 	@Query("SELECT m FROM Menu m WHERE m.store = :store ORDER BY CASE WHEN m.menuOrder IS NULL THEN 1 ELSE 0 END, m.menuOrder ASC")
 	List<Menu> findByStoreOrderByMenuOrderNullLast(@Param("store") Store store);
-
+	List<Menu> findByStore_StoreId(UUID storeId);
 	
 	
 }

@@ -14,6 +14,7 @@ import com.soldesk6F.ondal.user.entity.User.UserRole;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails , OAuth2User {
     private final User user;
@@ -37,6 +38,9 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
         return user;
     }
 
+    public UUID getUserId() {
+    	return user.getUserUuid();
+    }
     
     
     @Override
