@@ -12,6 +12,7 @@
 </head>
 <body th:attr="data-store-id=${store.storeId}" data-store-id="">
 	<header class="menu-header">
+		<img th:src="${store.brandImg != null} ? @{${store.brandImg}} : @{/img/default-store.png}" class="store-image" alt="가게 이미지" />
 		<h2 th:text="${store.storeName} + ' 메뉴 관리'">가게 이름 메뉴 관리</h2>
 	</header>
 	

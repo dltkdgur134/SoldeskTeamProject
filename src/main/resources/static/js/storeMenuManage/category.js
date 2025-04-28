@@ -149,38 +149,6 @@ export function removeCategory(category) {
 	openCategoryModal();
 }
 
-/*export function initCategoryButtons() {
-	const uniqueCategories = new Set(["전체"]);
-	window.menuList.forEach(menu => {
-		if (menu.menuCategory && menu.menuCategory.trim() !== "") {
-			uniqueCategories.add(menu.menuCategory.trim());
-		}
-	});
-	dynamicCategories.forEach((id, name) => uniqueCategories.add(name));
-
-	const categoryContainer = document.getElementById("category-buttons");
-	categoryContainer.innerHTML = "";
-
-	uniqueCategories.forEach(category => {
-		const btn = document.createElement("button");
-		btn.className = "tab";
-		if (category === "전체") btn.classList.add("active");
-		btn.innerText = category;
-		btn.addEventListener("click", () => {
-			document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-			btn.classList.add("active");
-			filterMenusByCategory(category);
-		});
-		categoryContainer.appendChild(btn);
-	});
-
-	const manageBtn = document.createElement("button");
-	manageBtn.className = "tab manage-category-btn";
-	manageBtn.innerText = "카테고리 관리";
-	manageBtn.addEventListener("click", openCategoryModal);
-	categoryContainer.appendChild(manageBtn);
-}*/
-
 export function initCategoryButtons() {
 	const categoryContainer = document.getElementById("category-buttons");
 	categoryContainer.innerHTML = "";

@@ -62,17 +62,20 @@
 				fetch(`/api/stores/${category}`)
 					.then(res => res.json())
 					.then(data => {
+						console.log("받아온 데이터", data);
 						const gallery = document.querySelector("#gallery-area");
 						gallery.innerHTML = `
 							${
 								data.map(store => `
-									<div class="store-row">
-										<img class="store-image" src="${store.imageUrl}" alt="${store.storeName}">
-										<div class="store-info">
-											<p class="store-name">${store.storeName}</p>
-											<p class="store-category">[${categoryMap[store.category] || store.category}]</p>
+									<a class="store-list" href="/store/${store.storeId}">
+										<div class="store-row">
+											<img class="store-image" src="${store.imageUrl}" alt="${store.storeName}">
+											<div class="store-info">
+												<p class="store-name">${store.storeName}</p>
+												<p class="store-category">[${categoryMap[store.category] || store.category}]</p>
+											</div>
 										</div>
-									</div>
+									</a>
 								`).join("")
 							}
 						`;

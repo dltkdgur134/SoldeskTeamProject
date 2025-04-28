@@ -30,6 +30,8 @@ public class StoreImg {
     @Column(name = "store_img", nullable = false, length = 255)
     private String storeImg;
 
+    private String imgPath;
+    
     @Builder
 	public StoreImg(Store store, String storeImg) {
 		super();

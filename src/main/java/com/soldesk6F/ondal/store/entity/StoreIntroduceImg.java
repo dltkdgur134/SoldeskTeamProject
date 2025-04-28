@@ -26,6 +26,7 @@ public class StoreIntroduceImg {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    private String imgPath;
 
     @Column(name = "store_introduce_img", nullable = false, length = 255)
     private String storeIntroduceImg;

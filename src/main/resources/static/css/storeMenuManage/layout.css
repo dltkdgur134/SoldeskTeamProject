@@ -3,7 +3,6 @@
 	color: white;
 	padding: 16px;
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 }
 
@@ -20,6 +19,12 @@
 .add-btn-wrap {
 	text-align: center;
 	margin: 20px 0;
+}
+
+.store-image {
+	width: 100px;
+	margin-right: 20px;
+	border-radius: 8px;
 }
 
 

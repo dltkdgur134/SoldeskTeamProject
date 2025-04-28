@@ -1,0 +1,133 @@
+
+.store-info {
+	background: #ffcc00;
+	padding-bottom: 20px;
+	text-align: center;
+}
+
+.store-info img {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-bottom: 10px;
+}
+
+.delivery-options {
+	display: flex;
+	justify-content: center;
+	margin: 10px 0;
+}
+
+.delivery-options button {
+	padding: 10px 20px;
+	margin: 0 5px;
+	border: none;
+	background: #eee;
+	border-radius: 20px;
+	cursor: pointer;
+}
+
+.delivery-options .active {
+	background: #ffcc00;
+	color: white;
+}
+
+.menu-tabs {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+	margin: 10px 0;
+}
+
+.tab {
+	border: none;
+	background: #eee;
+	padding: 8px 16px;
+	border-radius: 20px;
+	cursor: pointer;
+}
+
+.tab.active {
+	background: #ffcc00;
+	color: white;
+}
+
+.menu-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 15px;
+	padding: 20px;
+}
+
+.menu-card {
+	background: white;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	cursor: pointer;
+}
+
+.menu-card img {
+	width: 100%;
+	height: 120px;
+	object-fit: cover;
+}
+
+.menu-info {
+	padding: 10px;
+}
+
+.soldout {
+	display: inline-block;
+	margin-top: 5px;
+	color: red;
+	font-weight: bold;
+}
+
+.store-image-slider {
+	position: relative;
+	width: 100%;
+	height: 300px; /* 또는 400px 정도로 가게 소개란 전체 */
+	overflow: hidden;
+	background-color: #f9f9f9;
+}
+
+.slides {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+	min-width: 100%;
+	height: 100%;
+}
+
+.slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.dots {
+	position: absolute;
+	bottom: 10px;
+	width: 100%;
+	text-align: center;
+}
+
+.dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin: 0 5px;
+	background-color: #bbb;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.dot.active {
+	background-color: #717171;
+}
