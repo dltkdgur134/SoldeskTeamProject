@@ -82,8 +82,8 @@
 
   
 <!-- 익명 사용자 전용 -->
-<div class="d-flex flex-column align-items-center px-5 w-100"
-style="height: 0px;"
+<div class="d-flex flex-column align-items-center px-5 w-100 mb-2"
+style="height: 10px;"
  sec:authorize="isAnonymous()">
 
   <div id="search-area"
@@ -92,7 +92,7 @@ style="height: 0px;"
 
     <!-- 주소 다시 입력 버튼 -->
     <button id="btn-address-reset"
-            class="	btn btn-outline-secondary flex-shrink-0 d-flex me-2
+            class="	btn btn-outline-secondary flex-shrink-0 d-none me-2
 	               align-items-center justify-content-center px-3"
             style="width: 140px; height: 48px; z-index: 4;">주소 다시 입력</button>
 	

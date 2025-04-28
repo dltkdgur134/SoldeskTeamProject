@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	const history = loadHistory();
 		clearList();
      	  history.forEach(word => {
-	    list.appendChild(createItem(word, true)); // li 생성 후 추가
+		if(!word)list.appendChild(createItem(word, true)); 
 	  });
 
 	}
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		activeIndex=-1;
 		showReenterBtn();
 		searchInput.setAttribute("placeholder" , "뭐 먹을까?");
-		searchInput.setAttribute("value" , sessionStorage.getItem("food")+"");
+		searchInput.value = sessionStorage.getItem("food") || "";
 		showHistory();
 		
 	}else{
@@ -59,19 +59,20 @@ document.addEventListener('DOMContentLoaded', function() {
 		if(!hadAddress()){
 		
 		sessionStorage.setItem("address" , query);
-		searchInput.setAttribute("value", sessionStorage.getItem("food") || "");	
+		searchInput.value = sessionStorage.getItem("food") || "";
 		searchInput.setAttribute("placeholder" , "뭐 먹을까?");
 		showHistory();
 		showReenterBtn();
 		
 	}else{
 		
+		
 		sessionStorage.setItem("food" , query);
 		const firstItem = document.querySelector('#list-autocomplete li');
 		saveHistory(query);
 		
-		location.href("/searchStoreInRadius?orignal=" + query + "&bestMatcher="+firstItem );
-		
+/*		location.href("/searchStoreInRadius?orignal=" + query + "&bestMatcher="+firstItem );
+*/		
 	}
 		
 		clearList();		
@@ -85,7 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	function showAddrHistory() {
 	  clearList();
 	  const hist = loadAddrHistory();
-	  hist.forEach(a => list.appendChild(createItem(a, /* isHistory */ true)));
+	  
+	  hist.forEach(a => {if(!a)list.appendChild(createItem(a, /* isHistory */ true))});
 	  listWrapper.classList.remove('d-none');
 	  listWrapper.classList.add('d-flex');
 	}
@@ -204,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function hadAddress(){
-		return !!sessionStorage.getItem("address");
+		return !!sessionStorage.getItem('address');
 	}
 	
 	function showReenterBtn (){
