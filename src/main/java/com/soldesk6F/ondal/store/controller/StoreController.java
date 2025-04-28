@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal;
+package com.soldesk6F.ondal.store.controller;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.store.entity.Store;

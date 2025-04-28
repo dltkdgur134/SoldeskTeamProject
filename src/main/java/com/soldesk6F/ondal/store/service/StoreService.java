@@ -130,9 +130,18 @@ public class StoreService {
 	    return store;
 	}
 	
+	public Store findStoreByStoreId(UUID storeId) {
+        return storeRepository.findByStoreId(storeId);
+    }
+	
+	
 	public Store findById(UUID storeId) {
 		return storeRepository.findById(storeId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 매장을 찾을 수 없습니다."));
+	}
+
+	public List<Store> findAll() {
+		return storeRepository.findAll();
 	}
 	
 }
