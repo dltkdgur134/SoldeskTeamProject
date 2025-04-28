@@ -128,82 +128,13 @@ a:link {
 }
 
 
-.search-box {
-	position: relative;
-	display: flex;
-	/* input + icon 나란히 */
-	align-items: center;
-	height: 50px;
-	/* 기본 높이 */
-	min-width: 320px;
-	background: #fff;
-	border: 3px solid #ffc107;
-	border-radius: 5px;
-	padding: 10px;
-	transition: height .25s ease;
-	transform-origin: top;
-	z-index: 4;
-	flex-direction: row;
-	overflow: hidden
+#search-box{
+	
+	transition: all 0.5s ease;	
 }
 
-
-#inp-search:focus{
+#search-box.expand{
 	
-	border: none;
-	outline: none;
-	box-shadow: none;
-	
+	height: 300px !important;
 	
 }
-
-
-
-#btn-search{
-	z-index: 5;
-	width: 48px;
-	height: 100%;
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
-}
-
-
-
-#search-box-container {
-  position: relative;
-}
-
-#list-autocomplete {
-  border-top: none;
-  transition: border-color 0.3s ease, opacity 0.3s ease;
-  border-radius: 0 0 8px 8px;
-  margin-top: -5px; /* input과 딱 붙게 */
-  position: relative;
-  background-color: transparent;
-  overflow-y: auto;
-
-}
-
-
-
-#list-wrapper {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  background-color: #fff;
-  border: 3px solid #ffc107;
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  max-height: 0%;
-  overflow-y: auto;
-  overflow: hidden;
-  transition: max-height 0.8s ease;
-}
-#search-box:focus-within #list-wrapper {
-  	display: flex;
-	max-height: 220px !important; /* ul 예상 높이 만큼 */
-}
-
-

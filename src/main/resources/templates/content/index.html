@@ -82,27 +82,29 @@
 
   
 <!-- 익명 사용자 전용 -->
-<div class="d-flex flex-column align-items-center px-5 w-100" sec:authorize="isAnonymous()">
+<div class="d-flex flex-column align-items-center px-5 w-100"
+style="height: 0px;"
+ sec:authorize="isAnonymous()">
 
   <div id="search-area"
-       class="d-flex justify-content-center mt-4"
+       class="d-flex justify-content-center p-0 mt-4"
        style="max-width: 500px; width: 100%;">
 
     <!-- 주소 다시 입력 버튼 -->
     <button id="btn-address-reset"
-            class="btn btn-outline-secondary flex-shrink-0 me-2"
+            class="btn btn-outline-secondary d-none flex-shrink-0 me-2"
             style="display:none; width: 140px; height: 48px;">
       주소 다시 입력
     </button>
 	
     <!-- 검색 박스 (자동 확장) -->
-	<div id="search-box-container" class="d-flex justify-content-center w-100">
     <div id="search-box"
-         class="bg-white border border-3 border-warning rounded-2 shadow-sm"
-         style="width: 100%; max-width: 400px; height: 48px; display: flex; align-items: center;">
+         class="d-flex flex-column bg-white border border-3 border-warning rounded-2 shadow-sm p-0 overflow-hidden"
+         style="width: 100%; max-width: 400px; height:48px; display: flex; align-items: center; z-index: 4;">
 
       <!-- input-group -->
-	  <div class="input-group h-100">
+	  <div class="input-group m-0"
+	  style="height: 48px;">
 
 	    <input type="text"
 	           class="form-control border-0 rounded-0 shadow-none"
@@ -112,23 +114,26 @@
 
 	    <button id="btn-search"
 	            class="btn btn-warning d-flex align-items-center justify-content-center p-0 rounded-0"
-	            style="width: 48px; height: 100%;">
+	            style="width:48px; height: 100%;">
 	      <i class="fa fa-search"></i>
 	    </button>	
 		
 	  </div>
-	  <div id="list-wrapper" class="list-wrapper overflow-auto">
+	  <div id="list-wrapper" class="d-none list-wrapper overflow-auto w-100 m-0">
       <!-- 자동완성 리스트 -->
       <ul id="list-autocomplete"
           class="list-group mb-0 px-0"
-          style="top: 48px;"></ul>
+          style="top: 48px;">
+		  <li>1</li>
+		  <li>2</li>
+		  <li>3</li>
+		  </ul>
     </div>
 	</div>
 	</div>
 
 
   </div>
-</div>
   
 	<!-- <div class="gallery-container">
 		<div>
@@ -194,7 +199,7 @@
 	</div> -->
 	<br>
 	<br>
-	<div class="container-md text-center px-3">
+	<div class="container-md text-center px-3 mt-3">
   			<div class="row d-flex justify-content-start">
     			<div class="col">
     				<a th:href="@{/list(category='fastfood')}">

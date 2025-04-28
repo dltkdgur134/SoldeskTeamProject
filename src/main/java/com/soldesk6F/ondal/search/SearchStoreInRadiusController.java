@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class SearchStoreInRadiusController {
 	
-	
+	private 
 	
 	
 	@GetMapping("/searchStoreInRadius")
 	public String searchStoreInRadius(@RequestParam("x")String x , @RequestParam("y") String y , @RequestParam("keyword") String keyword ){
+		
 		
 		
 		
