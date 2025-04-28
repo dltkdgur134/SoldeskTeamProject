@@ -138,3 +138,65 @@ a:link {
 	height: 300px !important;
 	
 }
+.autocomplete-item i {
+  flex-shrink: 0;
+  font-size: 22px;
+  color: #666;
+}
+
+/* 시계 아이콘 */
+.history-icon::before {
+  content: "\f017"; /* Font Awesome 유니코드: clock */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: #666;
+}
+
+/* 돋보기 아이콘 */
+.suggest-icon::before {
+  content: "\f002"; /* Font Awesome 유니코드: search */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  color: #666;
+}
+.autocomplete-item {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;        /* 수직 중앙정렬 */
+  height: 48px;               /* 높이 통일 */
+  padding: 0 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  gap: 8px;                   /* 아이콘과 텍스트 간격 */
+}
+
+
+/* span 텍스트 스타일 */
+.item-text {
+  flex: 1;
+  margin: 5px;
+  margin-left: 5px;
+  text-align: left;
+  font-size: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.autocomplete-item.active,
+.autocomplete-item:hover{
+  background:#ffe08a;        /* 연한 노랑 배경  (#ffc107 보다 밝게) */
+}
+
+/* 텍스트·아이콘 색상 반전 */
+.autocomplete-item.active .item-text,
+.autocomplete-item:hover  .item-text{
+  color:#212529;             /* 짙은 글자색 */
+  font-weight:500;           /* 약간 굵게 */
+}
+
+.autocomplete-item.active i,
+.autocomplete-item:hover  i{
+  color:#212529;
+}
