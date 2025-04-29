@@ -265,6 +265,7 @@
 		<div class="card-body d-flex justify-content-between">
 			<a href="checkMyPass" type="button" class="btn btn-danger" id="delete-account-btn">회원탈퇴</a>
 			<a href="#" type="button" class="btn btn-danger" id="sns-account-unlink" th:if="${#authentication.principal.user.socialLoginProvider} != 'NONE'">소셜연동 해제</a>
+			<a href="#" type="button" class="btn btn-info" id="sns-account-link" th:if="${#authentication.principal.user.socialLoginProvider} == 'NONE'">소셜연동</a>
 		</div>
 	</div>
 </div>
