@@ -130,7 +130,14 @@
 				</div>
 			</div>
 		</div>
-		<div class="offcanvas-body">
+		<div class="offcanvas-body" sec:authorize="isAnonymous()">
+			<nav class="nav flex-column">
+  				<a class="nav-link active" aria-current="page" href="#">주문내역</a>
+  				<a class="nav-link" href="#">공지사항</a>
+  				<a class="nav-link" href="#">FAQ</a>
+				</nav>
+		</div>
+		<div class="offcanvas-body" sec:authorize="isAuthenticated()" th:with="role=${#authentication.principal.user.userRole.name()}">
 			<ul class="nav justify-content-between nav-pills mb-3" id="pills-tab"
 				role="tablist">
 				<li class="nav-item" role="presentation">
@@ -139,12 +146,12 @@
 						tabindex="1" role="tab" aria-controls="pills-home"
 						aria-selected="true">유저</button>
 				</li>
-				<li class="nav-item" role="presentation">
+				<li class="nav-item" role="presentation" th:if="${role == 'OWNER' or role == 'ALL'}">
 					<button class="nav-link" id="pills-owner-tab" data-bs-toggle="pill"
 						data-bs-target="#pills-owner" type="button" role="tab"
 						aria-controls="pills-owner" tabindex="2" aria-selected="false">사장님</button>
 				</li>
-				<li class="nav-item" role="presentation">
+				<li class="nav-item" role="presentation" th:if="${role == 'RIDER' or role == 'ALL'}">
 					<button class="nav-link" id="pills-rider-tab" data-bs-toggle="pill"
 						data-bs-target="#pills-rider" type="button" role="tab"
 						aria-controls="pills-rider" tabindex="3" aria-selected="false">라이더</button>
@@ -173,8 +180,7 @@
 						<li class="nav-item"><a class="nav-link" href="#">메뉴 품질
 								관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">리뷰 관리</a></li>
-						<li class="nav-item"><a class="nav-link" href="infopage"
-							sec:authorize="isAuthenticated()">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" href="infopage">마이페이지</a></li>
 					</ul>
 				</div>
 				<div class="tab-pane fade" id="pills-rider" role="tabpanel"
@@ -184,8 +190,7 @@
 							href="#">공지</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">운영정보 관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">배달 관리</a></li>
-						<li class="nav-item"><a class="nav-link" href="infopage"
-							sec:authorize="isAuthenticated()">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" href="infopage">마이페이지</a></li>
 					</ul>
 				</div>
 			</div>
