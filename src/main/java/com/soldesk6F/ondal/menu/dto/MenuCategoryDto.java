@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.menu.dto;
 
 import com.soldesk6F.ondal.menu.entity.MenuCategory;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,6 +30,7 @@ public class MenuCategoryDto {
 	public String getCategoryName() {
 		return categoryName;
 	}
+	
 }
 
 

@@ -31,4 +31,8 @@ public class MenuCategory {
 	public String toString() {
 		return categoryName;
 	}
+	
+	@Column(name = "category_order")
+	private Integer order;
+	
 }

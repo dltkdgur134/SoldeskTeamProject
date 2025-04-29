@@ -1,0 +1,186 @@
+.menu-header {
+	background: #ffc107;
+	color: white;
+	padding: 16px;
+	display: flex;
+	align-items: center;
+}
+
+.store-image {
+	width: 100px;
+	margin-right: 20px;
+	border-radius: 8px;
+}
+
+.store-manage-container {
+	max-width: 600px;
+	margin: 30px auto;
+	padding: 40px 30px;
+	background-color: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.store-info-section {
+	margin-bottom: 50px;
+}
+
+.store-info-section h3 {
+	font-size: 26px;
+	font-weight: bold;
+	margin-bottom: 30px;
+	text-align: center;
+	color: #333;
+}
+
+#store-info-form {
+	width: 100%;
+	max-width: 700px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+#store-info-form label {
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 5px;
+	text-align: left;
+}
+
+#store-info-form input,
+#store-info-form select,
+#store-info-form textarea {
+	width: 100%;
+	max-width: 500px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+#store-info-form textarea {
+	resize: vertical;
+	min-height: 100px;
+}
+
+.address-search-wrapper {
+	display: flex;
+	width: 300px; /* ✅ 다른 input들과 똑같이 맞춤 */
+	gap: 8px;
+	align-items: center;
+}
+
+.address-search-wrapper input {
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.address-btn {
+	padding: 0 15px;
+	height: 40px;
+	background-color: #ffcc00;
+	border: none;
+	border-radius: 5px;
+	font-weight: bold;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background-color 0.3s ease;
+}
+
+.address-btn:hover {
+	background-color: #ffb300;
+}
+
+.holiday-wrapper {
+	display: flex;
+	align-items: flex-start; 
+	gap: 20px;
+}
+
+.holiday-wrapper > label {
+	width: 80px;
+	font-weight: bold;
+}
+
+.holiday-checkboxes {
+	display: flex;
+	flex-direction: column; /* 요일을 세로로 배치 */
+	flex-wrap: wrap;
+	height: 160px; /* 높이를 주면 2열로 넘길 수 있음, 안주면 세로로 쭉 */
+	padding: 15px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	background-color: #f9f9f9;
+}
+
+.holiday-checkboxes label {
+	display: flex;
+	align-items: center;
+	margin-bottom: 8px;
+	gap: 6px;
+}
+
+.save-btn {
+	margin-top: 40px;
+	width: 100%;
+	background-color: #ffcc00;
+	color: #333;
+	font-weight: bold;
+	border: none;
+	padding: 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+	background-color: #ffb300;
+}
+
+.upload-btn {
+	margin-top: 10px;
+	padding: 10px 20px;
+	background-color: #ffcc00;
+	color: #333;
+	font-weight: bold;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.upload-btn:hover {
+	background-color: #ffb300;
+}
+
+.form-group {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	width: 100%;
+}
+
+.form-group label {
+	width: 150px; /* 제목 너비 고정 */
+	font-weight: bold;
+	color: #333;
+	text-align: right;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+
+

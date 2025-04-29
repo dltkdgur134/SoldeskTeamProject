@@ -13,6 +13,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.soldesk6F.ondal.menu.entity.MenuCategory;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 
@@ -28,6 +29,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -121,6 +123,10 @@ public class Store {
     @CreationTimestamp
     @Column(name = "registration_date", updatable = false,nullable = false)
     private LocalDateTime registrationDate;
+    
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)	 // 카테고리 정렬 순서 저장 컬럼
+    @OrderBy("order ASC")
+    private List<MenuCategory> menuCategories;
 
     public enum StoreStatus {
         OPEN("영업중"),

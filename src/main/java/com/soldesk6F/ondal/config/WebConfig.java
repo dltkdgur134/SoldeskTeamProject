@@ -14,10 +14,10 @@ public class WebConfig implements WebMvcConfigurer{
 //			.addResourceLocations("file:C:\\ondal\\SoldeskTeamProject\\src\\main\\resources\\static\\img");	//이상혁
 //			.addResourceLocations("file:C:\\TeamProject\\SoldeskTeamProject\\src\\main\\resources\\static\\img");
 //			.addResourceLocations("file:C:\\Users\\sdedu\\Desktop\\Project_Ondal\\git_SoldeskTeamProject\\src\\main\\resources\\static\\img");
-			.addResourceLocations("file:C:\\Users\\sdedu\\Desktop\\Project\\src\\main\\resources\\static\\img"); //나은석
+//			.addResourceLocations("file:C:\\Users\\sdedu\\Desktop\\Project\\src\\main\\resources\\static\\img"); //나은석
+//			.addResourceLocations("file:C:\\Users\\sdedu\\git\\SoldeskTeamProject\\src\\main\\resources\\static\\img"); //안영한
+			.addResourceLocations("file:" + System.getProperty("user.dir") + "/src/main/resources/static/img/"); //안영한
 //			.addResourceLocations("file:C:\\Users\\jwall\\Desktop\\repository\\SoldeskTeamProject\\src\\main\\resources\\static\\img");	//김태훈
-
-			
 			
 	}
 }
