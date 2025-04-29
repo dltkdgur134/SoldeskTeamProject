@@ -48,6 +48,8 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 	List<Store> findAll();
 	@Query("SELECT s FROM Store s LEFT JOIN FETCH s.storeImgs WHERE s.storeId = :storeId")
 	Optional<Store> findWithStoreImgsByStoreId(@Param("storeId") UUID storeId);
+
+
 }
 
 

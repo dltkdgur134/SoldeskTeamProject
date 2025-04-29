@@ -41,6 +41,7 @@ public class SearchStoreInRadiusController {
             @RequestParam String address,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1.0") double radius,
+            @RequestParam StoreSortType sortType,
             Model model
     ) {
         // 1. 주소 → 위경도 변환
@@ -52,6 +53,7 @@ public class SearchStoreInRadiusController {
                 latLng.getLongitude(),
                 radius,
                 (keyword == null || keyword.isBlank()) ? null : keyword.trim()
+                ,sortType
         );
 
         // 3. 결과를 모델에 담기
