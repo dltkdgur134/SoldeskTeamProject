@@ -21,7 +21,7 @@ public class KakaoService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${kakao.rest-key}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoRestKey;
 
     public LatLng toLatLng(String address) {
