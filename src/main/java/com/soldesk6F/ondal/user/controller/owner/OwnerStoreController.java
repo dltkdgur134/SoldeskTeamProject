@@ -152,9 +152,7 @@ public class OwnerStoreController {
 		String storeRoadAddress = "";
 		String storeDetailAddress = "";
 		
-		model.addAttribute("store", store);
-		
-		model.addAttribute("storeDetailAddress", ""); 
+		/* model.addAttribute("storeDetailAddress", ""); */
 		
 		if (storeAddress != null && !storeAddress.isBlank()) {
 			String[] parts = storeAddress.split(" ", 2);
@@ -167,6 +165,7 @@ public class OwnerStoreController {
 		}
 		
 		model.addAttribute("store", store);
+		/* model.addAttribute("storeImgs", store.getStoreImgs()); */
 		model.addAttribute("times", generateTimes());
 		model.addAttribute("storeRoadAddress", storeRoadAddress);
 		model.addAttribute("storeDetailAddress", storeDetailAddress);
@@ -276,11 +275,11 @@ public class OwnerStoreController {
 			Store store = storeService.findStoreByStoreId(storeId);
 
 			String finalAddress;
-	        if (roadAddress == null || roadAddress.isBlank()) {
-	            finalAddress = storeAddressHidden;
-	        } else {
-	            finalAddress = roadAddress + " " + detailAddress;
-	        }
+			if (roadAddress == null || roadAddress.isBlank()) {
+				finalAddress = storeAddressHidden;
+			} else {
+				finalAddress = (roadAddress + " " + detailAddress).trim();
+			}
 			double latitude = (latitudeStr == null || latitudeStr.isBlank()) ? store.getStoreLatitude() : Double.parseDouble(latitudeStr);
 			double longitude = (longitudeStr == null || longitudeStr.isBlank()) ? store.getStoreLongitude() : Double.parseDouble(longitudeStr);
 			
@@ -326,11 +325,11 @@ public class OwnerStoreController {
 		try {
 			storeService.uploadBrandImg(storeId, loginUserId, brandImgFile);
 			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "브랜드 이미지 업로드 완료");
+			redirectAttributes.addFlashAttribute("resultMsg", "이미지 업로드 성공");
 		} catch (Exception e) {
 			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("result", 0);
-			redirectAttributes.addFlashAttribute("resultMsg", "브랜드 이미지 업로드 실패");
+			redirectAttributes.addFlashAttribute("resultMsg", e.getMessage());
 		}
 
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";

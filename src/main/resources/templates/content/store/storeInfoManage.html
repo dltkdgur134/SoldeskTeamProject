@@ -57,6 +57,7 @@
 						<input type="hidden" id="storeAddress" name="storeAddress">
 						<input type="hidden" id="latitude" name="latitude" th:value="${store.storeLatitude}">
 						<input type="hidden" id="longitude" name="longitude" th:value="${store.storeLongitude}">
+						<input type="hidden" id="current-address" th:value="${store.storeAddress}">
 					</div>
 					<div class="form-group">
 						<label>점포 카테고리</label>
@@ -139,8 +140,11 @@
 			</section>
 	
 			<section class="store-img-section">
-				<h3>가게 대표 이미지</h3>
-				<form id="brand-img-form" th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage/upload-brandImg'}" method="post">
+				<h3>가게 브랜드 이미지</h3>
+				<div th:if="${resultMsg != ''}" class="alert-message" style="color: red; margin-bottom: 15px;">
+					<p th:text="${resultMsg}"></p>
+				</div>
+				<form id="brand-img-form" th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage/upload-brandImg'}" method="post" enctype="multipart/form-data">
 					<input type="file" name="brandImg" accept="image/*" />
 					<button type="submit" class="upload-btn">사진 업로드</button>
 				</form>

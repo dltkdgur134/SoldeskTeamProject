@@ -8,39 +8,30 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(
-    name = "store_img",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"store_id", "store_img"})
-    }
+	name = "store_img",
+	uniqueConstraints = @UniqueConstraint(columnNames = {"store_id", "store_img"})
 )
 public class StoreImg {
 
-    @Id
-    @GeneratedValue
-    @org.hibernate.annotations.UuidGenerator
-    @Column(name = "store_img_id", nullable = false, unique = true)
-    private UUID storeImgId;
+	@Id
+	@GeneratedValue
+	@org.hibernate.annotations.UuidGenerator
+	@Column(name = "store_img_id", nullable = false, unique = true)
+	private UUID storeImgId;
 
-    @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "store_id", nullable = false)
+	private Store store;
 
+	@Column(name = "store_img", nullable = false, length = 255)
+	private String storeImg;
 
-    @Column(name = "store_img", nullable = false, length = 255)
-    private String storeImg;
-
-    private String imgPath;
-    
-    @Builder
-	public StoreImg(Store store, String storeImg) {
-		super();
-		this.store = store;
-		this.storeImg = storeImg;
+	public String getStoreImgIdAsString() {
+		return storeImgId != null ? storeImgId.toString() : null;
 	}
-    
-    public String getStoreImgUuidAsString() {
-	    return storeImgId != null ? storeImgId .toString() : null;
-	}
-    
 }
+
+

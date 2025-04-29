@@ -5,6 +5,7 @@ import com.soldesk6F.ondal.store.entity.StoreImg;
 import com.soldesk6F.ondal.store.entity.StoreIntroduceImg;
 import com.soldesk6F.ondal.store.entity.StoreRegisterDto;
 import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.repository.StoreImgRepository;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.User;
@@ -35,7 +36,8 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final OwnerRepository ownerRepository;
-    
+	private final StoreImgRepository storeImgRepository;
+
 	public void registerStore(StoreRegisterDto dto, User user) {
 		log.info("DTO 값: {}", dto);
 		log.info("사용자 정보: {}", user.getUserId());
@@ -45,7 +47,7 @@ public class StoreService {
 
 		UUID userUuid = user.getUserUuid();
 		Owner owner = ownerRepository.findByUser_UserUuid(userUuid)
-			.orElseThrow(() -> new IllegalStateException("해당 아이디로 등록된 점주 정보가 없습니다."));
+				.orElseThrow(() -> new IllegalStateException("해당 아이디로 등록된 점주 정보가 없습니다."));
 
 		String brandImgPath = null;
 
@@ -73,90 +75,71 @@ public class StoreService {
 			}
 		}
 
-		Store store = Store.builder()
-			.owner(owner)
-			.businessNum(dto.getBusinessNum())
-			.storeName(dto.getStoreName())
-			.category(dto.getCategory())
-			.storePhone(dto.getStorePhone())
-			.storeAddress(dto.getStoreAddress())
-			.storeLatitude(dto.getLatitude())
-			.storeLongitude(dto.getLongitude())
-			.storeStatus(Store.StoreStatus.CLOSED)
-			.brandImg(brandImgPath) // ✅ 이 부분만 이미지 저장
-			.foodOrigin("")
-			.build();
+		Store store = Store.builder().owner(owner).businessNum(dto.getBusinessNum()).storeName(dto.getStoreName())
+				.category(dto.getCategory()).storePhone(dto.getStorePhone()).storeAddress(dto.getStoreAddress())
+				.storeLatitude(dto.getLatitude()).storeLongitude(dto.getLongitude())
+				.storeStatus(Store.StoreStatus.CLOSED).brandImg(brandImgPath) // ✅ 이 부분만 이미지 저장
+				.foodOrigin("").build();
 
 		storeRepository.save(store);
 	}
-    
+
 	public List<StoreDto> getStoresByCategory(String category) {
-    	
+
 		log.info("카테고리로 가게 검색 요청: {}", category);
-		
+
 		List<Store> stores = storeRepository.findByCategory(category);
-		
+
 		log.info("조회된 가게 수: {}", stores.size());
-		
-		return storeRepository.findByCategory(category).stream()
-			.map(store -> {
-				String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank())
-						? store.getBrandImg() : "/img/store/default.png";
-				StoreDto dto = StoreDto.builder()
-					.storeId(store.getStoreId())
-					.storeName(store.getStoreName())
-					.category(store.getCategory())
-					.storePhone(store.getStorePhone())
-					.storeAddress(store.getStoreAddress())
-					.storeIntroduce(store.getStoreIntroduce())
-					.storeStatus(store.getStoreStatus().getDescription())
-    	            .imageUrl(imageUrl)
-					.build();
-				return dto;
-			})
-			.collect(Collectors.toList());
+
+		return storeRepository.findByCategory(category).stream().map(store -> {
+			String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank()) ? store.getBrandImg()
+					: "/img/store/default.png";
+			StoreDto dto = StoreDto.builder().storeId(store.getStoreId()).storeName(store.getStoreName())
+					.category(store.getCategory()).storePhone(store.getStorePhone())
+					.storeAddress(store.getStoreAddress()).storeIntroduce(store.getStoreIntroduce())
+					.storeStatus(store.getStoreStatus().getDescription()).imageUrl(imageUrl).build();
+			return dto;
+		}).collect(Collectors.toList());
 	}
-	
+
 	public List<Store> findStoresByOwner(Owner owner) {
 		List<Store> stores = storeRepository.findByOwner(owner);
 		System.out.println("📦 StoreRepository에서 조회된 가게 수: " + stores.size());
 		return stores;
 	}
-	
+
 	public Store getStoreForOwner(UUID storeId, String authenticatedUserId) {
-	    Store store = storeRepository.findById(storeId)
-	        .orElseThrow(() -> new IllegalArgumentException("점포를 찾을 수 없습니다."));
+		Store store = storeRepository.findWithStoreImgsByStoreId(storeId)
+				.orElseThrow(() -> new IllegalArgumentException("점포를 찾을 수 없습니다."));
 
-	    if (!store.getOwner().getUser().getUserId().equals(authenticatedUserId)) {
-	        throw new AccessDeniedException("접근 권한이 없습니다.");
-	    }
+		if (!store.getOwner().getUser().getUserId().equals(authenticatedUserId)) {
+			throw new AccessDeniedException("접근 권한이 없습니다.");
+		}
 
-	    return store;
+		return store;
 	}
-	
+
 	public Store findStoreByStoreId(UUID storeId) {
-        return storeRepository.findByStoreId(storeId);
-    }
-	
-	
+		return storeRepository.findByStoreId(storeId);
+	}
+
 	public Store findById(UUID storeId) {
-		return storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 매장을 찾을 수 없습니다."));
+		return storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("해당 매장을 찾을 수 없습니다."));
 	}
 
 	public List<Store> findAll() {
 		return storeRepository.findAll();
 	}
-	
+
 	@Transactional
-	public void updateStoreInfo(UUID storeId, String loginUserId, String storeName, String storePhone, 
-			String storeAddress, String category, String storeStatus, String storeIntroduce, 
-			LocalTime openingTime, LocalTime closingTime, String holiday,
-			Store.DeliveryRange deliveryRange, String storeEvent, String foodOrigin,
-			Double latitude, Double longitude) {
+	public void updateStoreInfo(UUID storeId, String loginUserId, String storeName, String storePhone,
+			String storeAddress, String category, String storeStatus, String storeIntroduce, LocalTime openingTime,
+			LocalTime closingTime, String holiday, Store.DeliveryRange deliveryRange, String storeEvent,
+			String foodOrigin, Double latitude, Double longitude) {
 
 		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+				.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
 
 		if (!store.getOwner().getUser().getUserId().equals(loginUserId)) {
 			throw new AccessDeniedException("본인의 점포만 수정할 수 있습니다.");
@@ -179,27 +162,55 @@ public class StoreService {
 
 		storeRepository.save(store);
 	}
-	
+
 	public void uploadBrandImg(UUID storeId, String loginUserId, MultipartFile brandImgFile) throws IOException {
 		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+				.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
 
 		if (!store.getOwner().getUser().getUserId().equals(loginUserId)) {
 			throw new AccessDeniedException("본인의 점포만 수정할 수 있습니다.");
 		}
 
 		if (brandImgFile != null && !brandImgFile.isEmpty()) {
-			String uploadDir = "uploads/brandImg/";
-			String filename = UUID.randomUUID() + "_" + brandImgFile.getOriginalFilename();
-			Path filePath = Paths.get(uploadDir, filename);
-			Files.createDirectories(filePath.getParent());
+
+			final long MAX_FILE_SIZE = 3 * 1024 * 1024;
+			if (brandImgFile.getSize() > MAX_FILE_SIZE) {
+				throw new IllegalArgumentException("파일 크기는 3MB 이하로 해주세요.");
+			}
+
+			String originalFilename = Paths.get(brandImgFile.getOriginalFilename()).getFileName().toString();
+			String lowerCaseFilename = originalFilename.toLowerCase();
+			if (!(lowerCaseFilename.endsWith(".jpg") || lowerCaseFilename.endsWith(".jpeg")
+					|| lowerCaseFilename.endsWith(".png") || lowerCaseFilename.endsWith(".bmp"))) {
+				throw new IllegalArgumentException("jpg, jpeg, png, bmp 확장자만 업로드할 수 있습니다.");
+			}
+
+			String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/img/store/";
+			Files.createDirectories(Paths.get(uploadDir));
+
+			if (store.getBrandImg() != null && !store.getBrandImg().isBlank()) {
+				String relativePath = store.getBrandImg();
+				if (relativePath.startsWith("/")) {
+					relativePath = relativePath.substring(1);
+				}
+				Path existingFilePath = Paths.get(System.getProperty("user.dir"), "src/main/resources/static",
+						relativePath);
+				try {
+					Files.deleteIfExists(existingFilePath);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			String newFilename = UUID.randomUUID() + "_" + originalFilename;
+			Path filePath = Paths.get(uploadDir, newFilename);
 			Files.write(filePath, brandImgFile.getBytes());
 
-			store.setBrandImg("/uploads/brandImg/" + filename);
+			store.setBrandImg("/img/store/" + newFilename);
 			storeRepository.save(store);
 		}
 	}
-	
+
 	public void uploadStoreImgs(UUID storeId, String loginUserId, MultipartFile[] storeImgFiles) throws Exception {
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 점포를 찾을 수 없습니다."));
@@ -208,51 +219,47 @@ public class StoreService {
 			throw new AccessDeniedException("본인의 점포만 수정할 수 있습니다.");
 		}
 
+		String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/img/store/storeimg/";
+		Files.createDirectories(Paths.get(uploadDir));
+
 		for (MultipartFile file : storeImgFiles) {
 			if (!file.isEmpty()) {
-				String uploadDir = "uploads/storeImg/";
 				String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 				Path filePath = Paths.get(uploadDir, filename);
-
-				Files.createDirectories(filePath.getParent());
 				Files.write(filePath, file.getBytes());
 
 				StoreImg storeImg = new StoreImg();
 				storeImg.setStore(store);
-				storeImg.setImgPath("/" + uploadDir + filename);
-
-				store.getStoreImgs().add(storeImg);
+				storeImg.setStoreImg("/img/store/storeimg/" + filename);
+				
+				storeImgRepository.save(storeImg);
 			}
 		}
 
 		storeRepository.save(store);
 	}
-	
-	public void uploadStoreIntroduceImgs(UUID storeId, String loginUserId, MultipartFile[] storeIntroduceImgs) throws IOException {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
 
-		if (!store.getOwner().getUser().getUserId().equals(loginUserId)) {
-			throw new AccessDeniedException("본인의 점포만 수정할 수 있습니다.");
-		}
+	public void uploadStoreIntroduceImgs(UUID storeId, String loginUserId, MultipartFile[] storeIntroduceImgs)
+			throws IOException {
+		Store store = storeRepository.findById(storeId)
+				.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+
+		String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/img/store/storeintroduce/";
+		Files.createDirectories(Paths.get(uploadDir));
 
 		for (MultipartFile file : storeIntroduceImgs) {
 			if (!file.isEmpty()) {
-				String uploadDir = "uploads/storeIntroduce/";
 				String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 				Path filePath = Paths.get(uploadDir, filename);
-				Files.createDirectories(filePath.getParent());
 				Files.write(filePath, file.getBytes());
 
 				StoreIntroduceImg img = new StoreIntroduceImg();
 				img.setStore(store);
-				img.setImgPath("/uploads/storeIntroduce/" + filename);
-
+				img.setStoreIntroduceImg("/img/store/storeintroduce/" + filename);
 				store.addStoreIntroduceImg(img);
 			}
 		}
 
 		storeRepository.save(store);
 	}
-	
 }
