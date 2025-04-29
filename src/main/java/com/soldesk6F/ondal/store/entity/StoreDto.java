@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal.store.entity;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StoreDto {
+	private UUID storeId;
     private String storeName;
     private String category;
     private String storePhone;

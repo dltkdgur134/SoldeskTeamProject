@@ -1,4 +1,4 @@
-import { renderEditCategorySelect } from './category.js';
+import { dynamicCategories, renderEditCategorySelect } from './category.js';
 import { maxOption, editOptionCount } from './options.js';
 
 export function openMenuModal() {

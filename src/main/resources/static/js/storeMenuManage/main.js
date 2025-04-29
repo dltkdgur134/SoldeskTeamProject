@@ -1,7 +1,7 @@
 import { openMenuModal, closeMenuModal, openEditMenuModal, closeEditMenuModal, setupGlobalModalEvents } from './modal.js';
 import { dynamicCategories, openCategoryModal, closeCategoryModal, 
 	addCategory, removeCategory, initCategoryButtons, 
-	saveDynamicCategories, renderCategorySelect, renderEditCategorySelect } from './category.js';
+	saveDynamicCategories, renderCategorySelect, renderEditCategorySelect, initCategoryData } from './category.js';
 import { addOptionField, addOptionCount, editOptionCount, removeOption } from './options.js';
 import { handleSubmit, deleteMenu, setupEditFormValidation, filterMenusByCategory } from './menuForm.js';
 
@@ -9,6 +9,7 @@ import { handleSubmit, deleteMenu, setupEditFormValidation, filterMenusByCategor
 console.log("✅ main.js loaded");
 document.addEventListener("DOMContentLoaded", async () => {
 	setupGlobalModalEvents();
+	initCategoryData();
 	
 	const storeId = document.body.dataset.storeId;
 	dynamicCategories.clear();

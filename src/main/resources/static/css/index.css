@@ -29,7 +29,7 @@ body {
 	transform: translate(2px, 2px);
 }  */
 
-a .img-fluid:hover {
+.col .img-fluid:hover {
 	animation: pop 0.2s linear 1;
 }
 

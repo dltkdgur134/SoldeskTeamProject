@@ -1,16 +1,22 @@
 package com.soldesk6F.ondal.menu.controller;
 
 import com.soldesk6F.ondal.menu.dto.MenuCategoryDto;
+import com.soldesk6F.ondal.menu.dto.MenuCategoryOrderRequest;
 import com.soldesk6F.ondal.menu.entity.MenuCategory;
+import com.soldesk6F.ondal.menu.repository.MenuCategoryRepository;
+import com.soldesk6F.ondal.menu.repository.MenuRepository;
 import com.soldesk6F.ondal.menu.service.MenuCategoryService;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import com.soldesk6F.ondal.login.CustomUserDetails;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +25,8 @@ import java.util.UUID;
 public class MenuCategoryController {
 
 	private final MenuCategoryService menuCategoryService;
+	private final MenuCategoryRepository menuCategoryRepository;
+	private final MenuRepository menuRepository;
 	private final StoreService storeService; // 로그인된 사용자에게 Store 연결이 필요하다면 사용
 
 	@PostMapping("/add")
@@ -35,9 +43,9 @@ public class MenuCategoryController {
 	}
 
 	@GetMapping("/list")
-	public List<MenuCategoryDto> list(@RequestParam UUID storeId) {
+	public List<MenuCategoryDto> list(@RequestParam("storeId") UUID storeId) {
 		Store store = storeService.findById(storeId);
-		return menuCategoryService.findByStore(store);
+		return menuCategoryService.findByStoreOrdered(store);
 	}
 
 	@DeleteMapping("/{id}")
@@ -50,4 +58,22 @@ public class MenuCategoryController {
 	public MenuCategory update(@PathVariable UUID id, @RequestParam String name) {
 		return menuCategoryService.update(id, name);
 	}
+	
+	@GetMapping("/{id}/has-menu")
+	public ResponseEntity<Boolean> checkCategoryHasMenu(@PathVariable("id") UUID id) {
+		Optional<MenuCategory> categoryOpt = menuCategoryRepository.findById(id);
+		if (categoryOpt.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		boolean exists = menuRepository.existsByMenuCategory(categoryOpt.get());
+		return ResponseEntity.ok(exists);
+	}
+	
+	@PostMapping("/reorder")
+	public ResponseEntity<?> reorder(@RequestBody List<MenuCategoryOrderRequest> orderList) {
+		menuCategoryService.updateOrder(orderList);
+		return ResponseEntity.ok().build();
+	}
 }
+
+

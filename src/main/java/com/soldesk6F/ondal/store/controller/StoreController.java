@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal;
+package com.soldesk6F.ondal.store.controller;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.store.entity.Store;
@@ -47,7 +47,7 @@ public class StoreController {
         }
     }
     
-	@GetMapping("/store/list")
+	@GetMapping("/list")
 	public String showStoreList(@RequestParam(name = "category", required = false) String category,
     							Model model) {
     	model.addAttribute("selectedCategory", category);
