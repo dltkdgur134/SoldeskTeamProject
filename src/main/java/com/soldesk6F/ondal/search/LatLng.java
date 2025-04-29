@@ -9,4 +9,6 @@ import lombok.Getter;
 public class LatLng {
     private double latitude;  // 위도
     private double longitude; // 경도
+
+
 }

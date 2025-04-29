@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
+import org.locationtech.jts.geom.Point;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -85,6 +86,9 @@ public class Store {
 
     @Column(name = "store_longitude", nullable = false)
     private double storeLongitude;
+    
+    @Column(name = "store_location",  columnDefinition = "POINT SRID 4326" , nullable = true)
+    private Point storeLocation;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_range")
