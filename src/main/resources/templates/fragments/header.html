@@ -134,7 +134,7 @@
 			<nav class="nav flex-column">
   				<a class="nav-link active" aria-current="page" href="#">주문내역</a>
   				<a class="nav-link" href="#">공지사항</a>
-  				<a class="nav-link" href="#">FAQ</a>
+  				<a class="nav-link" href="faqs">FAQ</a>
 				</nav>
 		</div>
 		<div class="offcanvas-body" sec:authorize="isAuthenticated()" th:with="role=${#authentication.principal.user.userRole.name()}">
@@ -168,6 +168,9 @@
 						<li class="nav-item"><a class="nav-link" href="testOrder" sec:authorize="isAuthenticated()">테스트 주문</a></li>
 						<li class="nav-item"><a class="nav-link" href="myPage"
 							sec:authorize="isAuthenticated()">마이페이지</a></li>
+						<li class="nav-item">
+							<a class="nav-link" href="faqs">FAQ</a>
+						</li>
 					</ul>
 				</div>
 				<div class="tab-pane fade" id="pills-owner" role="tabpanel"

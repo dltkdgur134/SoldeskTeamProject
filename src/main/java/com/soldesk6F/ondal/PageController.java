@@ -28,6 +28,12 @@ public class PageController {
 		return "content/mySecurity";
 	}
 	
+	// 자주 묻는 질문 이동
+	@GetMapping("/faqs")
+	public String goFAQs() {
+		return "content/faq";
+	}
+	
 	private final OrderService orderService;
 
     @GetMapping("/orderHistory")
