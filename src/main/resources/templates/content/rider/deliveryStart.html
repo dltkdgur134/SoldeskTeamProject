@@ -22,69 +22,117 @@
 	src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a82eb7e13124954eb1c020ac4cece497"></script>
 
 <script>
-    window.onload = function() {
-        const routeData = JSON.parse(sessionStorage.getItem("routeData"));
-        if (routeData) {
-            console.log("Loaded Route Data:", routeData);
+window.onload = async function() {
+    const routeData = JSON.parse(sessionStorage.getItem("routeData"));
+    if (routeData) {
+        console.log("Loaded Route Data:", routeData);
 
+        // 카카오맵 API 초기화
+        kakao.maps.load(async function() {
+            var container = document.getElementById('map');
+            var options = {
+                center: new kakao.maps.LatLng(routeData.waypoint.lat, routeData.waypoint.lng), // 출발지 좌표
+                level: 3 // 지도 확대 수준
+            };
+            var map = new kakao.maps.Map(container, options);
+
+            var markers = [];
+            var polylines = [];
             
+            // 출발지와 경유지 좌표 설정
+            var startPosition = new kakao.maps.LatLng(routeData.waypoint.lat, routeData.waypoint.lng); // 출발지
+            var waypointPosition = new kakao.maps.LatLng(routeData.end.lat, routeData.end.lng); // 경유지
 
-            // 카카오맵 API 초기화
-            kakao.maps.load(function() {
-                var container = document.getElementById('map');
-                
-                var options = {
-                    center: new kakao.maps.LatLng(routeData.waypoint.lat, routeData.waypoint.lng), // 출발지 좌표
-                    level: 4 // 지도 확대 수준
-                };
-                var map = new kakao.maps.Map(container, options);
-                
-                var markers = [];
-                var polylines = [];
-                
-                // 마커 1개 (출발지)
-                var startPosition = new kakao.maps.LatLng(routeData.waypoint.lat,routeData.waypoint.lng); // 출발지
-                console.log(startPosition);
-                var waypointPosition = new kakao.maps.LatLng(routeData.end.lat,routeData.end.lng); // 경유지
-				console.log(waypointPosition);
-                
-                var startMarker = new kakao.maps.Marker({
-                    position: startPosition,
-                    map: map
+            // 마커 설정
+            var startMarker = new kakao.maps.Marker({
+                position: startPosition,
+                map: map
+            });
+
+            var waypointMarker = new kakao.maps.Marker({
+                position: waypointPosition,
+                map: map
+            });
+
+            // API 요청을 위한 URL과 파라미터 설정
+            const REST_API_KEY = '6a82e6474b08332bbf4be73f53d5c0bb';
+            const url = 'https://apis-navi.kakaomobility.com/v1/directions';
+            const origin = `${routeData.waypoint.lng},${routeData.waypoint.lat}`;
+            const destination = `${routeData.end.lng},${routeData.end.lat}`;
+            
+            const headers = {
+                'Authorization': `KakaoAK ${REST_API_KEY}`,
+                'Content-Type': 'application/json'
+            };
+
+            const queryParams = new URLSearchParams({
+                origin,
+                destination,
+                timestamp: Date.now().toString()
+            });
+            const requestUrl = `${url}?${queryParams}`;
+
+            try {
+                const routeresponse = await fetch(requestUrl, {
+                    method: 'GET',
+                    headers: headers
                 });
 
-                var waypointMarker = new kakao.maps.Marker({
-                    position: waypointPosition,
-                    map: map
+                if (!routeresponse.ok) throw new Error('경로 정보 요청 실패');
+                const routeDataFromAPI = await routeresponse.json();
+                console.log(routeDataFromAPI);  // API 응답 확인
+
+                const path2 = [];
+
+                routeDataFromAPI.routes[0].sections[0].roads.forEach(road => {
+                    const vertexes = road.vertexes;
+                    for (let i = 0; i < vertexes.length; i += 2) {
+                        path2.push({ lat: vertexes[i + 1], lng: vertexes[i] });
+                    }
                 });
-             // 경로 데이터에서 path1를 가져옵니다.
-                var path2 = routeData.path2; // path1 배열
-                console.log(path2);  // path1 값 확인
-                
-                
-                // 폴리라인 1개 (출발지 -> 경유지)
-                var polyline = new kakao.maps.Polyline({
-                    path: path2.map(coord => {
-                        // 좌표 값이 유효한지 체크
-                        if (typeof coord.lat === 'number' && typeof coord.lng === 'number') {
-                            return new kakao.maps.LatLng(coord.lat, coord.lng);
-                        } else {
-                            console.error('Invalid coordinate:', coord);  // 잘못된 좌표 로그
-                            return null;  // 잘못된 좌표는 무시
-                        }
-                    }).filter(coord => coord !== null),  // null 값을 제외하고 경로에 추가
+
+                const polyline2 = new kakao.maps.Polyline({
+                    path: path2.map(coord => new kakao.maps.LatLng(coord.lat, coord.lng)),
                     strokeWeight: 5,
-                    strokeColor: '#0000FF',
+                    strokeColor: '#00FF00',
                     strokeOpacity: 1,
                     strokeStyle: 'solid'
                 });
 
-                polyline.setMap(map);
-            });
-        } else {
-            console.error("routeData가 없습니다.");
-        }
-    };
+                polyline2.setMap(map);
+
+                // 각 구간의 거리와 소요 시간 표시
+                const section2 = routeDataFromAPI.routes[0].sections[0]; // 경유지 -> 목적지 구간
+
+                // 거리 (미터 -> 킬로미터로 변환)와 시간 (초 -> 분으로 변환)
+                const distance2 = (section2.distance / 1000).toFixed(2); // 킬로미터 단위
+                const duration2 = (section2.duration / 60).toFixed(0); // 분 단위
+
+                console.log(`구간 2 (경유지 -> 목적지): ${distance2} km, ${duration2}분`);
+
+                // UI에 표시할 요소
+                const infoContainer = document.createElement('div');
+                infoContainer.style.marginTop = '20px';  // 정보가 지도 아래에 충분히 띄워지도록 마진 추가
+                infoContainer.style.fontSize = '16px';   // 글자 크기 조정
+                infoContainer.style.border = "1px solid #ddd";  // 경계선 추가
+                infoContainer.style.padding = "10px";  // 패딩 추가
+                infoContainer.style.backgroundColor = "#f9f9f9";  // 배경색 추가
+
+                infoContainer.innerHTML = `
+                    <p><strong>경유지 → 목적지</strong>: ${distance2} km, ${duration2}분</p>
+                `;
+
+                const mapContainer = document.getElementById('map'); // 지도 컨테이너
+                mapContainer.parentNode.appendChild(infoContainer); // 지도 바로 아래에 정보 추가
+
+            } catch (error) {
+                console.error("길찾기 API 요청 오류:", error);
+            }
+        });
+    } else {
+        console.error("routeData가 없습니다.");
+    }
+};
     </script>
 </head>
 
@@ -94,16 +142,12 @@
 			<div id="map" style="width: 100%; height: 400px;"></div>
 		</div>
 
-		<p>
 		<form th:action="@{/rider/deliveryFin}" method="post"
 			style="display: inline;">
 			<input type="hidden" name="orderId" th:value="${orderId}">
 			<button type="submit" class="btn btn-success btn-lg"
 				id="finDeliveryBtn">배달 완료!</button>
 		</form>
-		</p>
 	</div>
 </body>
 </html>
-
-
