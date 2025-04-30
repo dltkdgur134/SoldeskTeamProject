@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/update.css}" rel="stylesheet" />
+	<link th:href="@{/css/review.css}" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<script th:src="@{/js/initialize.js}"></script>
+	<script th:src="@{/js/review.js}" defer></script>
+</head>
+
+<div layout:fragment="content" class="container py-5">
+	<div class="container text-center">
+		<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+			<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+		<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+			<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+	</div>
+	<div class="card info-card p-4">
+		<div class="card-title d-flex justify-content-center"><strong>가게명</strong></div>
+		<form class="p-3" name="regReviewForm" action="" enctype="multipart/form-data">
+		<div class="container-fluid d-flex justify-content-center">
+    		<div class="rating mb-3">
+  				<span id="5" class="fa-solid fa-moon mx-1"></span>
+  				<span id="4" class="fa-solid fa-moon mx-1"></span>
+  				<span id="3" class="fa-solid fa-moon mx-1"></span>
+  				<span id="2" class="fa-solid fa-moon mx-1"></span>
+  				<span id="1" class="fa-solid fa-moon mx-1"></span>
+			</div>
+			<input name="rating" id="rating-stars" type="text" hidden="true"/>
+		</div>
+		<div class="d-flex justify-content-center mb-3">
+  			<label for="review-img" class="custom-file-upload"><i class="fa-solid fa-camera"></i>  사진 첨부하기</label>
+  			<input type="file" class="form-control" id="review-img" name="reviewImg" multiple>
+		</div>
+		<div class="preview-container mt-3" id="image-preview-container">
+    		
+  		</div>
+		<div class="form-floating my-3">
+			<input type="text" class="form-control" name="reviewTitle" placeholder="리뷰 제목" id="review-title"/>
+			<label for="review-title">리뷰 제목</label>
+		</div>
+		
+		<div class="form-floating">
+  			<textarea class="form-control" placeholder="리뷰를 작성해주세요." id="review-content"></textarea>
+  			<label for="review-content">리뷰 내용</label>
+		</div>
+		<br>
+		<div class="d-flex justify-content-center">
+			<button class="btn btn-warning" form="regReviewForm">작성</button>
+		</div>
+	</form>
+		<button class="btn btn-secondary" onclick="return window.location.href='/orderHistory';">뒤로가기</button>
+	</div>
+</div>
+</html>

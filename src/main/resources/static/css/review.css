@@ -1,0 +1,46 @@
+.rating {
+    float: left;
+}
+.rating span {
+    font-size: 30px;
+    cursor: pointer;
+    float: right;
+    color: gray;
+}
+
+.rating span:hover, .rating span:hover ~ span{
+    color: #ffe766;
+}
+
+.rating .selected {
+	color: #ffe766;
+}
+
+#review-content {
+	resize: none;
+	height: 300px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+#image-preview{
+	display: none; 
+	max-width: 100%; 
+	height: auto; 
+	border: 1px solid #ccc; 
+	padding: 5px;
+}
+
+
+.custom-file-upload {
+  border: 3px solid #667EFF;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  width: 70%;
+  text-align: center;
+  color: #667EFF;
+}

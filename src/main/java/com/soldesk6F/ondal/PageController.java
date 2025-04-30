@@ -1,11 +1,15 @@
 package com.soldesk6F.ondal;
  
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
@@ -32,6 +36,12 @@ public class PageController {
 	@GetMapping("/faqs")
 	public String goFAQs() {
 		return "content/faq";
+	}
+	
+	@GetMapping("/writeReview")
+	public String writeReview() {
+		
+		return "content/writeReview";
 	}
 	
 	private final OrderService orderService;

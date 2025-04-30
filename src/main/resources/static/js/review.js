@@ -1,0 +1,42 @@
+$('.rating span').click(function() {
+	const rating = parseInt($(this).attr('id')); // 누른 별의 id 구하기
+	$('#rating-stars').val(rating); // 숨겨진 input 값 설정
+
+	// 나머지 별 selected 클래스 삭제
+	$('.rating span').removeClass('selected');
+
+	// 누른 별 및 그 전 별들 모두 selected 클래스 추가
+	$('.rating span').each(function() {
+		if (parseInt($(this).attr('id')) <= rating) {
+			$(this).addClass('selected');
+		}
+	});
+});
+
+// 리뷰 작성 업로드 이미지 프리뷰
+document.getElementById('review-img').addEventListener('change', function(event) {
+	const files = event.target.files; // 선택된 파일들
+	const previewContainer = document.getElementById('image-preview-container');
+	previewContainer.innerHTML = ''; // 이전 프리뷰 삭제
+
+	if (files.length > 0) {
+		Array.from(files).forEach(file => {
+			const reader = new FileReader();
+
+			reader.onload = function(e) {
+				// 이미지 엘레먼트 생성
+				const img = document.createElement('img');
+				img.src = e.target.result; // 이미지 소스 설정
+				img.alt = file.name;
+				img.style = 'max-width: 100px; height: auto; margin: 5px; border: 3px solid #ffef99; padding: 5px; border-radius: 5px;';
+
+				// 프리뷰 컨테이너 안에 이미지 넣기
+				previewContainer.appendChild(img);
+			};
+
+			reader.readAsDataURL(file); //파일을 data url로 읽어오기
+		});
+	} else {
+		previewContainer.innerHTML = '<p>No images selected.</p>';
+	}
+});
