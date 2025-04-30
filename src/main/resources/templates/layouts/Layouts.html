@@ -31,6 +31,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   </script>
   <script th:src="@{/js/websocket.js}"></script>
     <th:block layout:fragment="css"></th:block>
+    <script th:src="@{/js/hideLogo.js}"></script>
 </head>
 
 <body>
@@ -41,7 +42,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<div th:replace="~{fragments/footer::footer}"></div>
 
     <th:block layout:fragment="js">
-    	<script th:src="@{/js/hideLogo.js}"></script>
+    	
     </th:block>
 </body>
 

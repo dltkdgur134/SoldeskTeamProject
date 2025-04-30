@@ -113,12 +113,12 @@
 								<small><i class="fas fa-edit"></i>마이페이지</small>
 							</a> 
 							<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
-								<a class="btn btn-link text-decoration-none" href="myAddress"> 
+								<a class="btn btn-link text-decoration-none" th:href="@{/myAddress}"> 
 									<small><i class="fas fa-map-marker-alt"></i> 주소관리</small>
 								</a> 
 							</th:block>
 							<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
-								<a class="btn btn-link text-decoration-none" href="regAddress"> 
+								<a class="btn btn-link text-decoration-none" href="@{/regAddress}"> 
 									<small><i class="fa-solid fa-map-location-dot"></i> 주소등록</small>
 								</a> 
 							</th:block>
@@ -134,7 +134,7 @@
 			<nav class="nav flex-column">
   				<a class="nav-link active" aria-current="page" href="#">주문내역</a>
   				<a class="nav-link" href="#">공지사항</a>
-  				<a class="nav-link" href="#">FAQ</a>
+  				<a class="nav-link" th:href="@{/faqs}">FAQ</a>
 				</nav>
 		</div>
 		<div class="offcanvas-body" sec:authorize="isAuthenticated()" th:with="role=${#authentication.principal.user.userRole.name()}">
@@ -164,10 +164,10 @@
 						<li class="nav-item"><a class="nav-link" aria-current="page"
 							href="myAddress" sec:authorize="isAuthenticated()">주소 선택</a></li>
 						<li class="nav-item"><a class="nav-link" href="#" sec:authorize="isAuthenticated()">찜 목록</a></li>
-						<li class="nav-item"><a class="nav-link" href="orderHistory" sec:authorize="isAuthenticated()">주문 내역</a></li>
+						<li class="nav-item"><a class="nav-link" th:href="@{/orderHistory}" sec:authorize="isAuthenticated()">주문 내역</a></li>
 						<li class="nav-item"><a class="nav-link" href="testOrder" sec:authorize="isAuthenticated()">테스트 주문</a></li>
-						<li class="nav-item"><a class="nav-link" href="myPage"
-							sec:authorize="isAuthenticated()">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" th:href="@{/myPage}" sec:authorize="isAuthenticated()">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" th:href="@{/faqs}">FAQ</a></li>
 					</ul>
 				</div>
 				<div class="tab-pane fade" id="pills-owner" role="tabpanel"
@@ -180,7 +180,7 @@
 						<li class="nav-item"><a class="nav-link" href="#">메뉴 품질
 								관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">리뷰 관리</a></li>
-						<li class="nav-item"><a class="nav-link" href="infopage">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">마이페이지</a></li>
 					</ul>
 				</div>
 				<div class="tab-pane fade" id="pills-rider" role="tabpanel"
@@ -190,7 +190,7 @@
 							href="#">공지</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">운영정보 관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">배달 관리</a></li>
-						<li class="nav-item"><a class="nav-link" href="infopage">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">마이페이지</a></li>
 					</ul>
 				</div>
 			</div>
