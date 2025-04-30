@@ -33,6 +33,10 @@ input[type="file"] {
 	padding: 5px;
 }
 
+#image-preview-container p {
+	color: red;
+}
+
 
 .custom-file-upload {
   border: 3px solid #667EFF;

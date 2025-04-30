@@ -18,8 +18,11 @@ document.getElementById('review-img').addEventListener('change', function(event)
 	const files = event.target.files; // 선택된 파일들
 	const previewContainer = document.getElementById('image-preview-container');
 	previewContainer.innerHTML = ''; // 이전 프리뷰 삭제
-
-	if (files.length > 0) {
+	
+	// 이미지는 3장 까지만 업로드 가능
+	if (files.length > 3) {
+		previewContainer.innerHTML = '<p><i class="fa-solid fa-circle-exclamation"></i>  리뷰 이미지는 최대 3개까지 등록 가능합니다.</p>';
+	} else if (files.length > 0 && files.length < 4) {
 		Array.from(files).forEach(file => {
 			const reader = new FileReader();
 
@@ -37,6 +40,6 @@ document.getElementById('review-img').addEventListener('change', function(event)
 			reader.readAsDataURL(file); //파일을 data url로 읽어오기
 		});
 	} else {
-		previewContainer.innerHTML = '<p>No images selected.</p>';
+		previewContainer.innerHTML = '<p>선택된 이미지가 없습니다.</p>';
 	}
 });
