@@ -4,7 +4,12 @@ let storeMarkers = {};
 let overlays = {};
 let isFetching = false;
 const validStates = ["PENDING", "CONFIRMED"];
-
+window.addEventListener('message', (event) => {
+  const routeData = event.data;
+  console.log("Received Route Data:", routeData);
+  sessionStorage.setItem('routeData', JSON.stringify(routeData));
+  location.href = `/rider/pickupStart/${routeData.orderId}`;
+});
 // 주문 업데이트 비교 함수
 const isDifferent = (newOrdersForStore, prevOrdersForStore) => {
 	if (newOrdersForStore.length !== prevOrdersForStore.length) return true;
@@ -49,7 +54,7 @@ const updateStoreMarkerAndOverlay = (storeName, firstOrder, additionalOrdersCoun
 	storeMarkers[storeName] = marker;
 
 	// 새 오버레이 추가
-	const overlayContent = `
+	const overlayContent = ` 
         <div style="padding:10px; cursor:pointer;" data-uniq="${storeName}-${Date.now()}">
             <div style="background-color: ${bgColor}; margin-bottom: 10px; padding: 10px; border-radius: 10px; color: ${textColor}; font-weight: bold;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -60,7 +65,7 @@ const updateStoreMarkerAndOverlay = (storeName, firstOrder, additionalOrdersCoun
                 </div>
             </div>
         </div>
-    `;
+    ;`
 	const overlay = new kakao.maps.CustomOverlay({
 		position: storePosition,
 		content: overlayContent,
@@ -124,6 +129,10 @@ async function fetchOrders() {
 				delete storeOrders[storeName];
 			}
 		}
+		// 주문 목록 갱신 후, 모든 매장 주문 목록을 다시 표시
+		for (const storeName in storeOrders) {
+			displayOrdersForStore(storeName);
+		}
 	} catch (error) {
 		console.error("주문을 가져오는 중 오류 발생:", error);
 	} finally {
@@ -143,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 	});
 
 	await fetchOrders();
-	setInterval(fetchOrders, 60000); // 60초마다 주문 새로고침
+	setInterval(fetchOrders, 30000); // 30초마다 주문 새로고침
 
 	document.addEventListener('click', function(e) {
 		if (e.target && e.target.classList.contains('view-orders')) {
@@ -176,6 +185,7 @@ function displayOrdersForStore(storeName) {
 		let borderColor = '#ccc';
 		if (order.orderToRider === 'PENDING') borderColor = '#bdc3c7';
 		else if (order.orderToRider === 'CONFIRMED') borderColor = '#2ecc71';
+		else if (order.orderToRider === 'DISPATCHED') borderColor = '#3498db';
 
 		orderDiv.innerHTML = `
             <div class="order-card" style="border: 3px solid ${borderColor}; border-radius: 10px; padding: 10px; margin-bottom: 10px;">
@@ -188,150 +198,260 @@ function displayOrdersForStore(storeName) {
                 <p>배달 상태: <span>${order.orderToRider}</span></p>
                 <p>배달 주소: <span>${order.deliveryAddress}</span></p>
                 <button class="assign-btn" data-order-id="${order.orderId}">배차</button>
-                <button class="cancel-btn" data-order-id="${order.orderId}">취소</button>
             </div>
-        `;
+        ;`
 
 		orderItemsContainer.appendChild(orderDiv);
 	});
 }
 
 document.addEventListener("click", async (e) => {
-  if (e.target.classList.contains("assign-btn")) {
-    const orderId = e.target.dataset.orderId;
-    console.log("클릭한 주문의 orderId:", orderId);
+	if (e.target.classList.contains("assign-btn")) {
+		const orderId = e.target.dataset.orderId;
+		console.log("클릭한 주문의 orderId:", orderId);
 
-    try {
-      const routeWindow = window.open('', '_blank', 'width=800,height=600');
+		try {
+			const orderResponse = await fetch(`/rider/api/orders/${orderId}/navi`);
+			if (!orderResponse.ok) throw new Error('주문 정보를 가져오는 데 실패했습니다.');
+			const order = await orderResponse.json();
 
-      // 1. 새 창 초기 HTML 작성
-      routeWindow.document.body.innerHTML = `
+			const REST_API_KEY = '6a82e6474b08332bbf4be73f53d5c0bb';
+			const url = 'https://apis-navi.kakaomobility.com/v1/directions';
+
+
+			const storeLat = order.storeLatitude;
+			const storeLng = order.storeLongitude;
+			const endLat = order.deliveryAddressLatitude;
+			const endLng = order.deliveryAddressLongitude;
+
+
+
+			const origin = `${riderLng},${riderLat}`;
+			const destination = `${endLng},${endLat}`;
+			const waypoints = `${storeLng},${storeLat}`;
+			console.log("origin:", origin);
+			console.log("destination:", destination);
+			console.log("waypoints:", waypoints);
+
+			const headers = {
+				'Authorization': `KakaoAK ${REST_API_KEY}`,
+				'Content-Type': 'application/json'
+			};
+
+			const queryParams = new URLSearchParams({
+				origin,
+				destination,
+				waypoints,
+				timestamp: Date.now().toString()
+			});
+			const requestUrl = `${url}?${queryParams}`;
+
+			const routeresponse = await fetch(requestUrl, {
+				method: 'GET',
+				headers: headers
+			});
+
+			if (!routeresponse.ok) throw new Error('경로 정보 요청 실패');
+			const routeData = await routeresponse.json();
+
+			const path1 = []; // 출발지 → 경유지
+			const path2 = []; // 경유지 → 목적지
+
+			// 각 구간별 폴리라인 경로 추출
+			routeData.routes[0].sections[0].roads.forEach(road => {
+			  const vertexes = road.vertexes;
+			  for (let i = 0; i < vertexes.length; i += 2) {
+			    path1.push({ lat: vertexes[i + 1], lng: vertexes[i] });
+			  }
+			});
+
+			routeData.routes[0].sections[1].roads.forEach(road => {
+			  const vertexes = road.vertexes;
+			  for (let i = 0; i < vertexes.length; i += 2) {
+			    path2.push({ lat: vertexes[i + 1], lng: vertexes[i] });
+			  }
+			});
+
+			console.log(routeData.routes[0].sections.length);
+			console.log(riderLat, riderLng);
+
+			console.log("path1 length:", path1.length);
+			console.log("path2 length:", path2.length);
+			console.log("map 객체:", map);
+			console.log(routeData);
+			// 새 창 열기
+			const routeWindow = window.open('', '_blank', 'width=1500,height=1500');
+
+			if (!routeWindow || routeWindow.closed) {
+				alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+				return;
+			}
+
+			// 새 창 HTML 작성
+			routeWindow.document.write(`
         <html>
           <head>
             <title>길찾기 결과</title>
             <meta charset="utf-8" />
-            <style>
-              body { font-family: sans-serif; padding: 1rem; }
-              #map { width: 100%; height: 400px; margin-bottom: 1rem; }
-            </style>
+			<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+			<style>
+			  body { margin:0; padding:0; font-family: 'Segoe UI', sans-serif; }
+			  #map { width: 100vw; height: 100vh; }
+			  .info-box {
+			    position: absolute;
+			    top: 1rem;
+			    left: 1rem;
+			    z-index: 1000;
+			    background: rgba(255,255,255,0.95);
+			    border-radius: 0.5rem;
+			    padding: 1rem;
+			    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+			    max-width: 300px;
+			  }
+			  .btn-accept {
+			    width: 100%;
+			    margin-top: 0.5rem;
+			  }
+			  .overlay-content {
+			    background-color: #fff;
+			    border: 1px solid #000;
+			    padding: 5px;
+			    font-size: 12px;
+			    color: #333;
+			    border-radius: 5px;
+			 }
+			</style>
+            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a82eb7e13124954eb1c020ac4cece497"></script>
           </head>
           <body>
-            <h1>길찾기 결과</h1>
             <div id="map"></div>
-            <p id="summary"></p>
-            <button id="accept-btn">배차 수락</button>
+			<div class="info-box">
+			  <h5 class="mb-2">배달 경로 정보</h5>
+			  <p id="summary" class="mb-2 text-muted"></p>
+			  <button id="accept-btn" class="btn btn-primary btn-accept">배차 수락</button>
+			</div>
+
+            <script>
+			const startLat = ${riderLat};  // 라이더 현재 위치
+			const startLng = ${riderLng};
+			const waypointLat = ${storeLat};  // 경유지: 가게 위치
+			const waypointLng = ${storeLng};
+			const endLat = ${endLat};        // 목적지: 고객 주소
+			const endLng = ${endLng};
+			const path1 = ${JSON.stringify(path1)};
+			const path2 = ${JSON.stringify(path2)};
+            const summaryText = "거리: ${(routeData.routes[0].summary.distance / 1000).toFixed(2)} km, 시간: ${(routeData.routes[0].summary.duration / 60).toFixed(1)} 분";
+
+              const mapContainer = document.getElementById('map');
+              const mapOption = {
+                center: new kakao.maps.LatLng(startLat, startLng),
+                level: 4
+              };
+              const map = new kakao.maps.Map(mapContainer, mapOption);
+
+              // 출발지 마커
+              new kakao.maps.Marker({
+                map: map,
+                position: new kakao.maps.LatLng(startLat, startLng)
+              });
+			  //경유지(=가게 위치) 마커 추가
+			   new kakao.maps.Marker({
+			     map: map,
+			     position: new kakao.maps.LatLng(waypointLat, waypointLng)
+			   });
+              // 도착지 마커
+              new kakao.maps.Marker({
+                map: map,
+                position: new kakao.maps.LatLng(endLat, endLng)
+              });
+			  // 출발지 오버레이
+			  const startOverlay = new kakao.maps.CustomOverlay({
+		      map: map,
+		      position: new kakao.maps.LatLng(startLat, startLng),
+		      content: '<div class="overlay-content">라이더 허브 주소</div>',
+		      yAnchor: 1
+		  	  });
+
+			  // 경유지 오버레이
+			  const waypointOverlay = new kakao.maps.CustomOverlay({
+			  map: map,
+			  position: new kakao.maps.LatLng(waypointLat, waypointLng),
+			  content: '<div class="overlay-content">가게 위치</div>',
+			  yAnchor: 1
+			  });
+
+			  // 도착지 오버레이
+			  const endOverlay = new kakao.maps.CustomOverlay({
+			  map: map,
+			  position: new kakao.maps.LatLng(endLat, endLng),
+			  content: '<div class="overlay-content">배달 장소</div>',
+			  yAnchor: 1
+			  });
+			  
+			  //경로 폴리라인
+			  const polyline1 = new kakao.maps.Polyline({
+			    path: path1.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+			    strokeWeight: 5,
+			    strokeColor: '#FF0000',
+			    strokeOpacity: 1,
+			    strokeStyle: 'solid'
+			  });
+
+			  const polyline2 = new kakao.maps.Polyline({
+			    path: path2.map(p => new kakao.maps.LatLng(p.lat, p.lng)),
+			    strokeWeight: 5,
+			    strokeColor: '#0000FF',
+			    strokeOpacity: 1,
+			    strokeStyle: 'solid'
+			  });
+
+			  polyline1.setMap(map);
+			  polyline2.setMap(map);
+
+              document.getElementById('summary').innerText = summaryText;
+
+              document.getElementById('accept-btn').addEventListener('click', async () => {
+                try {
+                  const res = await fetch('/rider/api/orders/assign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: "${orderId}" })
+                  });
+                  if (res.ok) {
+                    alert('배차 완료');
+					// 경로 데이터를 부모창에 전달
+					const routeData = {
+					orderId: "${orderId}",
+					start: { lat: startLat, lng: startLng },
+					waypoint: { lat: waypointLat, lng: waypointLng },
+					end: { lat: endLat, lng: endLng },
+					path1: path1,
+					path2: path2
+					};
+					
+					if (window.opener && !window.opener.closed) {
+					    window.opener.fetchOrders();  // 부모 창의 주문 목록 갱신
+						 window.opener.postMessage(routeData, '*');
+					  }
+                  } else {
+                    alert('배차 수락 실패');
+                  }
+				  window.close();
+                } catch (err) {
+                  console.error(err);
+                  alert('오류 발생');
+                }
+              });
+            </script>
           </body>
         </html>
-      `;
+      `);
 
-      // 2. 주문 정보와 경로 계산
-      const orderResponse = await fetch(`/rider/api/orders/${orderId}/navi`);
-      if (!orderResponse.ok) throw new Error('주문 정보를 가져오는 데 실패했습니다.');
-      const order = await orderResponse.json();
+			routeWindow.document.close();
 
-      const startLat = order.storeLatitude;
-      const startLng = order.storeLongitude;
-      const endLat = order.deliveryAddressLatitude;
-      const endLng = order.deliveryAddressLongitude;
-
-      const API_KEY = 'e55542fa93e461f8923c2c474499e925';
-      const routeResponse = await fetch(`https://apis-navi.kakaomobility.com/v1/directions?origin=${startLng},${startLat}&destination=${endLng},${endLat}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `KakaoAK ${API_KEY}`
-        }
-      });
-
-      if (!routeResponse.ok) throw new Error('길찾기 API 요청 실패');
-      const routeData = await routeResponse.json();
-
-      const summaryText = `거리: ${(routeData.routes[0].summary.distance / 1000).toFixed(2)} km, 시간: ${(routeData.routes[0].summary.duration / 60).toFixed(1)} 분`;
-
-      const path = [];
-      routeData.routes[0].sections[0].roads.forEach(road => {
-        const vertexes = road.vertexes;
-        for (let i = 0; i < vertexes.length; i += 2) {
-          path.push({ lat: vertexes[i + 1], lng: vertexes[i] });
-        }
-      });
-
-      // 3. 카카오맵 스크립트 동적 로드 (새 창에서)
-      const script = routeWindow.document.createElement('script');
-      script.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740&autoload=false&libraries=services';
-      script.onload = () => {
-        routeWindow.Kakao.maps.load(() => {
-          // 4. 지도 초기화
-          const map = new routeWindow.Kakao.maps.Map(routeWindow.document.getElementById('map'), {
-            center: new routeWindow.Kakao.maps.LatLng(startLat, startLng),
-            level: 5
-          });
-
-          // 5. 경로 (Polyline) 표시
-          const polyline = new routeWindow.Kakao.maps.Polyline({
-            path: path.map(coord => new routeWindow.Kakao.maps.LatLng(coord.lat, coord.lng)),
-            strokeWeight: 5,
-            strokeColor: '#FF0000',
-            strokeOpacity: 0.8,
-            strokeStyle: 'solid'
-          });
-          polyline.setMap(map);
-
-          // 6. 마커 표시 (출발지점 및 도착지점)
-          const startMarker = new routeWindow.Kakao.maps.Marker({
-            position: new routeWindow.Kakao.maps.LatLng(startLat, startLng),
-            title: '출발지'
-          });
-          startMarker.setMap(map);
-
-          const endMarker = new routeWindow.Kakao.maps.Marker({
-            position: new routeWindow.Kakao.maps.LatLng(endLat, endLng),
-            title: '도착지'
-          });
-          endMarker.setMap(map);
-
-          // 7. 마커에 오버레이 추가 (출발지, 도착지)
-          const startOverlay = new routeWindow.Kakao.maps.InfoWindow({
-            content: '<div>출발지</div>'
-          });
-          startOverlay.open(map, startMarker);
-
-          const endOverlay = new routeWindow.Kakao.maps.InfoWindow({
-            content: '<div>도착지</div>'
-          });
-          endOverlay.open(map, endMarker);
-
-          // 8. 경로의 거리 및 시간 표시
-          routeWindow.document.getElementById('summary').innerText = summaryText;
-
-          // 9. 배차 수락 버튼 이벤트
-          routeWindow.document.getElementById('accept-btn').addEventListener('click', async () => {
-            const res = await fetch('/rider/api/orders/assign', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ orderId })
-            });
-
-            if (res.ok) {
-              alert('배차 완료');
-              routeWindow.close();
-            } else {
-              alert('배차 수락 실패');
-            }
-          });
-        });
-      };
-
-      routeWindow.document.head.appendChild(script);
-
-      // 10. 새 창으로 데이터 전달 (필요할 경우 추가)
-      routeWindow.addEventListener('load', () => {
-        routeWindow.postMessage({ startLat, startLng, endLat, endLng, summaryText, path, orderId }, '*');
-      });
-      
-      await fetchOrders();
-    } catch (error) {
-      alert("배차 요청 중 오류 발생: " + error.message);
-    }
-  }
+		} catch (error) {
+			console.error(error);
+			alert('오류가 발생했습니다. 다시 시도해 주세요.');
+		}
+	}
 });
-
