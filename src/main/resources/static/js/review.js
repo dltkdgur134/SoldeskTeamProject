@@ -31,7 +31,7 @@ document.getElementById('review-img').addEventListener('change', function(event)
 				const img = document.createElement('img');
 				img.src = e.target.result; // 이미지 소스 설정
 				img.alt = file.name;
-				img.style = 'max-width: 100px; height: auto; margin: 5px; border: 3px solid #ffef99; padding: 5px; border-radius: 5px;';
+				img.style = 'max-width: 100px; height: auto; margin: 5px; border: 3px solid  #667EFF; padding: 5px; border-radius: 5px;';
 
 				// 프리뷰 컨테이너 안에 이미지 넣기
 				previewContainer.appendChild(img);
@@ -43,3 +43,20 @@ document.getElementById('review-img').addEventListener('change', function(event)
 		previewContainer.innerHTML = '<p>선택된 이미지가 없습니다.</p>';
 	}
 });
+
+function checkReview() {
+	const ratingStars = document.getElementById('rating-stars');
+	if (ratingStars.value < 1) {
+		ratingStars.classList.add("is-invalid");
+		ratingStars.classList.remove("is-valid")
+		return false;
+	} else {
+		ratingStars.classList.add("is-valid");
+		ratingStars.classList.remove("is-invalid");
+		return true;
+	}
+	
+}
+
+
+

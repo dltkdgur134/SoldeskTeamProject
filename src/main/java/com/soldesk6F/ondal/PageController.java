@@ -38,12 +38,6 @@ public class PageController {
 		return "content/faq";
 	}
 	
-	@GetMapping("/writeReview")
-	public String writeReview() {
-		
-		return "content/writeReview";
-	}
-	
 	private final OrderService orderService;
 
     @GetMapping("/orderHistory")

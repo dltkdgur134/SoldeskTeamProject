@@ -18,25 +18,16 @@
 
 #review-content {
 	resize: none;
-	height: 300px;
+	height: 200px;
 }
 
 input[type="file"] {
   display: none;
 }
 
-#image-preview{
-	display: none; 
-	max-width: 100%; 
-	height: auto; 
-	border: 1px solid #ccc; 
-	padding: 5px;
-}
-
 #image-preview-container p {
 	color: red;
 }
-
 
 .custom-file-upload {
   border: 3px solid #667EFF;
@@ -47,4 +38,22 @@ input[type="file"] {
   width: 70%;
   text-align: center;
   color: #667EFF;
+}
+
+.custom-file-upload:hover {
+	background-color: #667EFF;
+	color: white;
+}
+
+#review-store-name {
+	font-size: 2rem;
+}
+
+#reg-review-form-btn {
+	font-size: 1rem;
+}
+
+#review-footer-list li{
+	font-size: 0.7rem;
+	color: gray;
 }
