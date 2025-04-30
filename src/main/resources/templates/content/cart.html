@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<meta charset="UTF-8">
+	<title>장바구니</title>
+	<link th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/cart.css}" rel="stylesheet" />
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="cart-container">
+			<h2 th:if="${not #lists.isEmpty(cartItems)}">
+				가게명 > <span th:text="${cart.store.storeName}"></span>
+			</h2>
+			
+			<div class="cart-empty" th:if="${#lists.isEmpty(cartItems)}">
+				<img src="/img/cart/empty_cart.png" alt="텅 빈 장바구니" class="empty-cart-img">
+				<p class="empty-cart-msg">장바구니가 텅 비었어요</p>
+			</div>
+
+			<div class="cart-item" th:each="item : ${cartItems}" th:unless="${#lists.isEmpty(cartItems)}">
+				<img th:src="@{${item.menu.menuImg}}" alt="메뉴 이미지">
+				<h4 th:text="${item.menu.menuName}"></h4>
+				<p th:text="'옵션: ' + ${item.options}"></p>
+				<p th:text="'가격: ' + (${item.menu.price} + ${item.optionTotalPrice}) + '원'"></p>
+				<div>
+					<button class="btn-decrease" data-id="[[${item.cartItemUuidAsString()}]]">-</button>
+					<span th:text="${item.quantity}"></span>
+					<button class="btn-increase" data-id="[[${item.cartItemUuidAsString()}]]">+</button>
+				</div>
+				<button class="btn-change-option" data-id="[[${item.cartItemUuidAsString()}]]">옵션 변경</button>
+				<button class="btn-delete-item" data-id="[[${item.cartItemUuidAsString()}]]">삭제</button>
+			</div>
+
+			<div class="order-summary" th:if="${not #lists.isEmpty(cartItems)}">
+				<p th:text="'결제금액: ' + ${totalPrice} + '원'"></p>
+				<button>주문하기</button>
+			</div>
+		</div>
+	</div>
+	<div layout:fragment="js">
+		<script th:src="@{/js/index.js}"></script>
+		<script th:src="@{/js/cart.js}"></script>
+	</div>
+</body>
+</html>

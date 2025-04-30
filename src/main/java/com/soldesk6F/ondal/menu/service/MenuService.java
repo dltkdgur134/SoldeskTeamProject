@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.soldesk6F.ondal.menu.dto.MenuDto;
+import com.soldesk6F.ondal.menu.dto.MenuMapper;
 import com.soldesk6F.ondal.menu.dto.MenuOrderDto;
 import com.soldesk6F.ondal.menu.dto.MenuRegisterDto;
 import com.soldesk6F.ondal.menu.entity.Menu;
@@ -86,48 +87,14 @@ public class MenuService {
 			e.printStackTrace();
 		}
 
-		String joinedOpt1 = (dto.getMenuOptions1() != null && !dto.getMenuOptions1().isEmpty())
-			? String.join("온달", dto.getMenuOptions1())
-			: "";
+		String joinedOpt1 = MenuMapper.listToJoinedString(dto.getMenuOptions1());
+		String joinedOpt1Price = MenuMapper.priceListToJoinedString(dto.getMenuOptions1Price());
 
-		String joinedOpt1Price = (dto.getMenuOptions1Price() != null && !dto.getMenuOptions1Price().isEmpty())
-			? dto.getMenuOptions1Price().stream()
-				.map(s -> s == null || s.isBlank() ? "0" : s)
-				.map(Integer::parseInt)
-				.map(String::valueOf)
-				.collect(Collectors.joining("온달"))
-			: "";
+		String joinedOpt2 = MenuMapper.listToJoinedString(dto.getMenuOptions2());
+		String joinedOpt2Price = MenuMapper.priceListToJoinedString(dto.getMenuOptions2Price());
 
-//		List<Integer> opt1Price = (dto.getMenuOptions1Price() != null) // 테스트용
-//			? dto.getMenuOptions1Price().stream()
-//				.map(s -> s == null || s.isBlank() ? "0" : s)
-//				.map(Integer::parseInt)
-//				.collect(Collectors.toList())
-//			: List.of();
-
-		String joinedOpt2 = (dto.getMenuOptions2() != null && !dto.getMenuOptions2().isEmpty())
-				? String.join("온달", dto.getMenuOptions2())
-				: "";
-
-			String joinedOpt2Price = (dto.getMenuOptions2Price() != null && !dto.getMenuOptions2Price().isEmpty())
-				? dto.getMenuOptions2Price().stream()
-					.map(s -> s == null || s.isBlank() ? "0" : s)
-					.map(Integer::parseInt)
-					.map(String::valueOf)
-					.collect(Collectors.joining("온달"))
-				: "";
-
-			String joinedOpt3 = (dto.getMenuOptions3() != null && !dto.getMenuOptions3().isEmpty())
-				? String.join("온달", dto.getMenuOptions3())
-				: "";
-
-			String joinedOpt3Price = (dto.getMenuOptions3Price() != null && !dto.getMenuOptions3Price().isEmpty())
-				? dto.getMenuOptions3Price().stream()
-					.map(s -> s == null || s.isBlank() ? "0" : s)
-					.map(Integer::parseInt)
-					.map(String::valueOf)
-					.collect(Collectors.joining("온달"))
-				: "";
+		String joinedOpt3 = MenuMapper.listToJoinedString(dto.getMenuOptions3());
+		String joinedOpt3Price = MenuMapper.priceListToJoinedString(dto.getMenuOptions3Price());
         
         MenuCategory category = menuCategoryRepository.findById(dto.getMenuCategoryId())
         	    .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
@@ -240,6 +207,31 @@ public class MenuService {
     	menuRepository.save(menu);
     }
     
+    public MenuDto getMenuDetail(UUID menuId) {
+    	Menu menu = menuRepository.findById(menuId)
+    		.orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다."));
+
+    	MenuDto dto = new MenuDto();
+
+    	dto.setMenuName(menu.getMenuName());
+    	dto.setDescription(menu.getDescription());
+    	dto.setPrice(menu.getPrice());
+    	dto.setMenuCategoryId(menu.getMenuCategory().getId());
+    	dto.setMenuImg(menu.getMenuImg());
+    	dto.setMenuStatus(menu.getMenuStatus());
+
+    	dto.setMenuOptions1(MenuMapper.joinedStringToList(menu.getMenuOptions1()));
+    	dto.setMenuOptions1Price(MenuMapper.joinedPriceStringToIntList(menu.getMenuOptions1Price()));
+
+    	dto.setMenuOptions2(MenuMapper.joinedStringToList(menu.getMenuOptions2()));
+    	dto.setMenuOptions2Price(MenuMapper.joinedPriceStringToIntList(menu.getMenuOptions2Price()));
+
+    	dto.setMenuOptions3(MenuMapper.joinedStringToList(menu.getMenuOptions3()));
+    	dto.setMenuOptions3Price(MenuMapper.joinedPriceStringToIntList(menu.getMenuOptions3Price()));
+
+    	return dto;
+    }
+    
     @Transactional
     public void deleteMenu(UUID menuId) throws Exception {
     	Menu menu = menuRepository.findById(menuId)
@@ -282,4 +274,10 @@ public class MenuService {
 
         menuRepository.save(menu);
     }
+    
+    public Menu findById(UUID menuId) {
+    	return menuRepository.findById(menuId)
+    		.orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다."));
+    }
+    
 }

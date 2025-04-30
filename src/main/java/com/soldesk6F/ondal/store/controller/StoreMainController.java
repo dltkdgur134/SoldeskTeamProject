@@ -20,9 +20,9 @@ public class StoreMainController {
 	private final StoreService storeService;
 	private final MenuService menuService;
 
-	@GetMapping("/store/{storeId}")
+	@GetMapping("/store/view/{storeId}")
 	public String viewStore(@PathVariable("storeId") UUID storeId, Model model) {
-		Store store = storeService.findById(storeId);
+		Store store = storeService.findByIdWithImgs(storeId);
 		if (store == null) {
 			throw new IllegalArgumentException("가게를 찾을 수 없습니다.");
 		}
@@ -30,6 +30,7 @@ public class StoreMainController {
 
 		model.addAttribute("store", store);
 		model.addAttribute("menus", menus);
+		model.addAttribute("storeImgs", store.getStoreImgs());
 
 		return "content/store/storeMain";
 	}

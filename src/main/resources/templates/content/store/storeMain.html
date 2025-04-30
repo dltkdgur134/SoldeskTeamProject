@@ -15,12 +15,19 @@
 		<section class="store-info">
 			<div class="store-image-slider">
 				<div class="slides" id="slides">
+					<div class="slide" th:if="${#lists.isEmpty(storeImgs)}">
+						<img th:src="@{/img/store/storeimg/default_img.jpg}" alt="기본 가게 이미지" />
+					</div>
+					
 					<div class="slide" th:each="img : ${storeImgs}">
-						<img th:src="@{${img.imgPath}}" alt="가게 이미지">
+						<img th:src="${img.storeImg}" alt="가게 이미지" />
 					</div>
 				</div>
+
 				<div class="dots" id="dots">
-					<span th:each="img, stat : ${storeImgs}" th:classappend="${stat.index == 0} ? 'active'" class="dot"></span>
+					<span th:if="${#lists.isEmpty(storeImgs)}" class="dot active"></span>
+
+					<span th:each="img, stat : ${storeImgs}" th:classappend="${stat.index == 0} ? ' active'" class="dot"></span>
 				</div>
 			</div>
 			<h1 th:text="${store.storeName}">가게명</h1>
@@ -34,14 +41,27 @@
 		</section>
 	
 		<section class="menu-tabs" id="category-buttons">
-			<button class="tab active" onclick="filterMenus('전체')">전체</button>
-			<button class="tab" onclick="filterMenus('메인')">메인</button>
-			<button class="tab" onclick="filterMenus('사이드')">사이드</button>
-			<button class="tab" onclick="filterMenus('음료')">음료</button>
+			<button class="tab active" onclick="filterMenus('전체', this)">전체</button>
+			<button class="tab" onclick="filterMenus('메인', this)">메인</button>
+			<button class="tab" onclick="filterMenus('사이드', this)">사이드</button>
+			<button class="tab" onclick="filterMenus('음료', this)">음료</button>
 		</section>
 	
 		<section class="menu-list" id="menu-list">
-			<div class="menu-card" th:each="menu : ${menus}" th:attr="data-category=${menu.menuCategory}">
+			<div class="menu-card" th:each="menu : ${menus}"
+				 th:data-id="${menu.menuId}"
+				 th:data-store-id="${menu.storeId}"
+			     th:data-name="${menu.menuName}"
+			     th:data-description="${menu.description}"
+			     th:data-price="${menu.price}"
+			     th:data-image="${menu.menuImg}"
+			     th:data-category="${menu.menuCategory}"
+			     th:data-option1="${#strings.isEmpty(menu.menuOptions1) ? '' : menu.menuOptions1}"
+			     th:data-option1-price="${menu.menuOptions1Price != null ? menu.menuOptions1Price : ''}"
+			     th:data-option2="${#strings.isEmpty(menu.menuOptions2) ? '' : menu.menuOptions2}"
+			     th:data-option2-price="${menu.menuOptions2Price != null ? menu.menuOptions2Price : ''}"
+			     th:data-option3="${#strings.isEmpty(menu.menuOptions3) ? '' : menu.menuOptions3}"
+			     th:data-option3-price="${menu.menuOptions3Price != null ? menu.menuOptions3Price : ''}">
 				<div class="image-wrapper">
 					<img th:src="@{${menu.menuImg}}" alt="메뉴 이미지" />
 				</div>
@@ -53,6 +73,26 @@
 				</div>
 			</div>
 		</section>
+		<div id="menu-modal" class="menu-modal hidden">
+			<div class="modal-content">
+				<button class="close-btn" id="close-modal-top">&times;</button>
+				<img id="menu-image" src="" alt="메뉴 이미지" />
+				<h2 id="menu-name"></h2>
+				<p id="menu-description"></p>
+				<p id="menu-price"></p>
+				<div id="menu-options" class="menu-options"></div>
+				<div class="cart-footer">
+					<div class="quantity-controls">
+						<button id="decrease-btn">−</button>
+						<span id="menu-quantity">1</span>
+						<button id="increase-btn">+</button>
+					</div>
+					<!--<div id="menu-total-price" class="menu-total-price">추가 금액: 0원</div>-->
+					<button id="add-to-cart-btn" class="add-to-cart-btn">0원 담기</button>
+				</div>
+				<!--<button id="close-modal-footer">닫기</button>-->
+			</div>
+		</div>
 	</div>
 	<div layout:fragment="js">
 		<script th:src="@{/js/index.js}"></script>
