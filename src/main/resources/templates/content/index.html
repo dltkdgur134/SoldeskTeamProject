@@ -79,84 +79,61 @@
 </script>
 
 
-  <div class="d-flex flex-column align-items-center px-5 w-100" sec:authorize="isAnonymous()">
-    
-    <!-- 검색창 전체 래퍼 -->
-    <div id="search-wrapper" class="w-100 d-flex justify-content-center align-items-center mt-3">
-      <!-- 주소 다시 입력 버튼 (처음엔 숨김) -->
-      <button id="reenter-address-btn" class="btn btn-outline-secondary me-2" style="display:none;">주소 다시 입력</button>
 
-      <div class="search">
-        <input id="main-input" type="text" class="search-input" placeholder="배달받을 주소를 입력하세요">
-        <a href="#" class="search-icon" id="main-btn"><i class="fa fa-search"></i></a>
-      </div>
+  
+<!-- 익명 사용자 전용 -->
+<div class="d-flex flex-column align-items-center px-5 w-100 mb-2"
+style="height: 10px;"
+ sec:authorize="isAnonymous()">
+
+  <div id="search-area"
+       class="d-flex justify-content-center p-0 mt-4"
+       style="max-width: 500px; width: 100%;">
+
+    <!-- 주소 다시 입력 버튼 -->
+    <button id="btn-address-reset"
+            class="	btn btn-outline-secondary flex-shrink-0 d-none me-2
+	               align-items-center justify-content-center px-3"
+            style="width: 140px; height: 48px; z-index: 4;">주소 다시 입력</button>
+	
+    <!-- 검색 박스 (자동 확장) -->
+    <div id="search-box"
+         class="d-flex flex-column bg-white border border-3 border-warning rounded-2 shadow-sm p-0 overflow-hidden"
+         style="width: 100%; max-width: 400px; height:48px; display: flex; align-items: center; z-index: 4;">
+
+      <!-- input-group -->
+	  <div class="input-group m-0"
+	  style="height: 48px;">
+
+	    <input type="text"
+	           class="form-control border-0 rounded-0 shadow-none"
+	           placeholder="배달받을 주소를 입력하세요"
+	           id="inp-search"
+	           autocomplete="off"/>
+
+	    <button id="btn-search"
+	            class="btn btn-warning d-flex align-items-center justify-content-center p-0 rounded-0"
+	            style="width:48px; height: 100%;">
+	      <i class="fa fa-search"></i>
+	    </button>	
+		
+	  </div>
+	  <div id="list-wrapper" class="d-none list-wrapper overflow-auto w-100 m-0 p-0">
+      <!-- 자동완성 리스트 -->
+      <ul id="list-autocomplete"
+          class="list-group w-100 mb-0 px-0"
+          style="top: 48px;">
+		  </ul>
     </div>
+	</div>
+	</div>
+
+
   </div>
-	<!-- <div class="gallery-container">
-		<div>
-			<a th:href="@{/list(category='fastfood')}">
-				<img src="/css/imgs/img1.png" alt="패스트푸드" class="imgs">
-				<span class="labels">패스트푸드</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='cn')}">
-				<img src="/css/imgs/img2.png" alt="중식" class="imgs">
-				<span class="labels">중식</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='kr')}">
-				<img src="/css/imgs/img3.png" alt="한식" class="imgs">
-				<span class="labels">한식</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='bunsik')}">
-				<img src="/css/imgs/img4.png" alt="분식" class="imgs">
-				<span class="labels">분식</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='chicken')}">
-				<img src="/css/imgs/img5.png" alt="치킨" class="imgs">
-				<span class="labels">치킨</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='pizza')}">
-				<img src="/css/imgs/img6.png" alt="피자" class="imgs">
-				<span class="labels">피자</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='jjimtang')}">
-				<img src="/css/imgs/img7.png" alt="찜탕" class="imgs">
-				<span class="labels">찜·탕</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='jp')}">
-				<img src="/css/imgs/img8.png" alt="일식" class="imgs">
-				<span class="labels">일식</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='roast')}">
-				<img src="/css/imgs/img9.png" alt="구이" class="imgs">
-				<span class="labels">구이</span>
-			</a>
-		</div>
-		<div>
-			<a th:href="@{/list(category='caffe')}">
-				<img src="/css/imgs/img10.png" alt="카페" class="imgs">
-				<span class="labels">카페</span>
-			</a>
-		</div>
-	</div> -->
+
 	<br>
 	<br>
-	<div class="container-md text-center px-3">
+	<div class="container-md text-center px-3 mt-3">
   			<div class="row d-flex justify-content-start">
     			<div class="col">
     				<a th:href="@{/list(category='fastfood')}">

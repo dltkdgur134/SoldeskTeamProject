@@ -15,7 +15,7 @@
 		<h2 class="text-center">내 점포</h2>
 		<div id="gallery-area">
 			<div th:each="store : ${myStores}" class="store-row">
-				<a th:href="@{/owner/storeManagement/{storeId}(storeId=${store.storeId})}" class="store-row2">
+				<a th:href="@{store-management/{id}(id=${store.storeId})}" class="store-row2">
 				    <img class="store-image"
      				th:src="${store.brandImg != null ? store.brandImg : '/img/store/default.png'}"
      				th:alt="${store.storeName}" />

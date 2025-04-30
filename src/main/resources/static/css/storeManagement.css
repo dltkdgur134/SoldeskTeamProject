@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	font-family: Arial, sans-serif;
+	font-family: "yisunshinM";
 }
 
 .app-container {
@@ -41,6 +41,20 @@ body {
 	margin-right: 20px;
 }
 
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: -400px;
+	width: 280px;
+	height: 100vh;
+	background-color: #1c1c1c;
+	color: white;
+	padding: 20px;
+	box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+	transition: left 0.3s ease;
+	z-index: 1000;
+}
+
 .sidebar-wrapper {
   display: flex;
   position: fixed;
@@ -53,20 +67,6 @@ body {
 
 .sidebar-wrapper.visible {
   left: 0;
-}
-
-.sidebar {
-	position: fixed;
-	top: 0;
-	left: -400px;
-	width: 250px;
-	height: 100vh;
-	background-color: #1c1c1c;
-	color: white;
-	padding: 20px;
-	box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-	transition: left 0.3s ease;
-	z-index: 1000;
 }
 
 .sidebar.visible {
@@ -82,22 +82,23 @@ body {
 	margin-bottom: 20px;
 }
 
-.close-btn {
-	background: none;
-	border: none;
-	color: white;
-	font-size: 16px;
-	cursor: pointer;
-}
-
 .sidebar-menu {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 }
 
+.sidebar-menu a {
+	text-decoration: none;
+}
+
+.sidebar-menu a button {
+	text-decoration: none;
+}
+
 .sidebar-btn {
 	background-color: #2d2d2d;
+	width: 100%;
 	border: none;
 	border-radius: 6px;
 	padding: 12px;
@@ -126,3 +127,13 @@ body {
 .sidebar-btn:hover {
 	background-color: #3c3c3c;
 }
+
+.close-btn {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+

@@ -62,12 +62,22 @@ $(function() {
 				}
 					  
 				// Simulating a search API call with sample data
-				const filteredData = results.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+				//const filteredData = results.filter(item => item.toLowerCase().includes(query.toLowerCase()));
 
 				// Show results in the dropdown
-				dropdown.innerHTML = filteredData.map(item => `<li onclick="handleSelection('${item}')">${item}</li>`).join('');
+				//dropdown.innerHTML = filteredData.map(item => `<li onclick="handleSelection('${item}')">${item}</li>`).join('');
 
-				dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
+				//dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
+				const filteredData = results.filter(item =>
+				               item.place_name.toLowerCase().includes(keyword.toLowerCase())
+				           );
+
+				           // Show filtered results in the dropdown
+				           dropdown.innerHTML = filteredData.map(item =>
+				               `<li onclick="handleSelection('${item.place_name}')">${item.place_name}</li>`
+				           ).join('');
+
+				           dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
 			}
 		})
 		
@@ -115,7 +125,7 @@ $(function() {
 
 });
 
-function fetchSearchResults(query, sampleData) {
+function fetchSearchResults(query) {
 	const dropdown = document.getElementById('dropdown-results');
 
 	if (!query) {
@@ -125,7 +135,7 @@ function fetchSearchResults(query, sampleData) {
 	}
 
 	// Simulating a search API call with sample data
-	//const sampleData = ['Apple', 'Banana', 'Cherry', 'Date', 'Grape', 'Kiwi', 'Mango', '서초구', '강남구', '관악구'];
+	const sampleData = ['Apple', 'Banana', 'Cherry', 'Date', 'Grape', 'Kiwi', 'Mango', '서초구', '강남구', '관악구'];
 	const filteredData = sampleData.filter(item => item.toLowerCase().includes(query.toLowerCase()));
 
 	// Show results in the dropdown

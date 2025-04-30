@@ -26,6 +26,9 @@ import com.soldesk6F.ondal.user.repository.OwnerRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import com.soldesk6F.ondal.useract.cart.entity.Cart;
+import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
 import java.util.UUID;
@@ -38,6 +41,7 @@ public class UserService {
     private final OwnerRepository ownerRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CartRepository cartRepository;
 
     @Value("${upload.path}")
     private String uploadDir;
@@ -109,6 +113,13 @@ public class UserService {
 	                .build();
 	
 	        userRepository.save(user);
+	        
+	        Cart cart = Cart.builder()
+        		.user(user)
+        		.store(null) // 혹은 default store 지정
+        		.build();
+        	cartRepository.save(cart);
+        	
 	        return true;
     	} catch (IOException e) {
             e.printStackTrace();

@@ -1,0 +1,30 @@
+.menu-header {
+	background: #ffc107;
+	color: white;
+	padding: 16px;
+	display: flex;
+	align-items: center;
+}
+
+.edit-btn, .save-btn, .add-btn {
+	background: #ffc107;
+	color: white;
+	border: none;
+	padding: 8px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+	margin-top: 8px;
+}
+
+.add-btn-wrap {
+	text-align: center;
+	margin: 20px 0;
+}
+
+.store-image {
+	width: 100px;
+	margin-right: 20px;
+	border-radius: 8px;
+}
+
+

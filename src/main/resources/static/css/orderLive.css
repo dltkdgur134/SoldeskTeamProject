@@ -3,7 +3,7 @@
 /* 전체 컨테이너: 좌우 분할 */
 .live-container {
   display: flex;
-  height: calc(100vh - 60px); /* header 높이만큼 빼주세요 */
+  height: calc(100vh - 300px); /* header 높이만큼 빼주세요 */
 }
 
 /* 왼쪽 메인 패널 */
@@ -29,6 +29,7 @@
 
 /* 오른쪽 채팅 패널 */
 .chat-panel {
+  max-height: 900px;
   width: 300px;
   display: flex;
   flex-direction: column;
@@ -39,7 +40,7 @@
 /* 메시지 리스트 */
 .chat-messages {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   overflow-y: auto;
 }
 

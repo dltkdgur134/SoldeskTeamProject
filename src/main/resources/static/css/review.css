@@ -1,0 +1,59 @@
+.rating {
+    float: left;
+}
+.rating span {
+    font-size: 30px;
+    cursor: pointer;
+    float: right;
+    color: gray;
+}
+
+.rating span:hover, .rating span:hover ~ span{
+    color: #ffe766;
+}
+
+.rating .selected {
+	color: #ffe766;
+}
+
+#review-content {
+	resize: none;
+	height: 200px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+#image-preview-container p {
+	color: red;
+}
+
+.custom-file-upload {
+  border: 3px solid #667EFF;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  width: 70%;
+  text-align: center;
+  color: #667EFF;
+}
+
+.custom-file-upload:hover {
+	background-color: #667EFF;
+	color: white;
+}
+
+#review-store-name {
+	font-size: 2rem;
+}
+
+#reg-review-form-btn {
+	font-size: 1rem;
+}
+
+#review-footer-list li{
+	font-size: 0.7rem;
+	color: gray;
+}

@@ -1,4 +1,4 @@
-package com.soldesk6F.ondal;
+package com.soldesk6F.ondal.store.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +26,7 @@ public class StoreRegController {
 	public String StoreList() {
 		return "content/store/storelist";
 	}
+	
 	
 	
 }

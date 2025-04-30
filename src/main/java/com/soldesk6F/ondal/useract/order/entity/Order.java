@@ -259,7 +259,7 @@ public class Order {
     	double storeLon = store.getStoreLongitude();
     	double distance = calculateDistance(storeLat, storeLon, deliveryAddressLatitude, deliveryAddressLongitude);
     	
-    	if (distance < 1.0) {
+    	if (distance < 1.0) { 
     		this.deliveryFee = 3000;
     	} else if (distance < 2.0) {
     		this.deliveryFee = 4000;
