@@ -20,7 +20,7 @@ public class StoreMainController {
 	private final StoreService storeService;
 	private final MenuService menuService;
 
-	@GetMapping("/store/{storeId}")
+	@GetMapping("/store/view/{storeId}")
 	public String viewStore(@PathVariable("storeId") UUID storeId, Model model) {
 		Store store = storeService.findByIdWithImgs(storeId);
 		if (store == null) {

@@ -150,6 +150,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	const modalMenuImage = document.getElementById('menu-image');
 	const closeModalFooterBtn = document.getElementById('close-modal-footer');
 	const closeModalTopBtn = document.getElementById('close-modal-top');
+	
+	let quantity = 1;
+	const quantityEl = document.getElementById('menu-quantity');
+	
+
+	
+	let basePrice = 0;
 
 	if (modal && modalMenuName && modalMenuDescription && modalMenuPrice && modalMenuImage) {
 		document.querySelectorAll('.menu-card').forEach(card => {
@@ -158,6 +165,77 @@ document.addEventListener('DOMContentLoaded', function () {
 				const description = card.getAttribute('data-description');
 				const price = card.getAttribute('data-price');
 				const imageUrl = card.getAttribute('data-image');
+				
+				const optionsContainer = document.getElementById('menu-options');
+
+				quantity = 1;
+				quantityEl.textContent = 1;
+
+				const decreaseBtn = document.getElementById('decrease-btn');
+				const increaseBtn = document.getElementById('increase-btn');
+
+				// 새로 바뀐 요소를 다시 참조
+				const newDecreaseBtn = decreaseBtn.cloneNode(true);
+				const newIncreaseBtn = increaseBtn.cloneNode(true);
+
+				decreaseBtn.parentNode.replaceChild(newDecreaseBtn, decreaseBtn);
+				increaseBtn.parentNode.replaceChild(newIncreaseBtn, increaseBtn);
+
+				// 이벤트 등록 (중복 방지됨)
+				newDecreaseBtn.addEventListener('click', () => {
+					if (quantity > 1) {
+						quantity--;
+						quantityEl.textContent = quantity;
+						updateTotalOptionPrice();
+					}
+				});
+
+				newIncreaseBtn.addEventListener('click', () => {
+					if (quantity < 99) {
+						quantity++;
+						quantityEl.textContent = quantity;
+						updateTotalOptionPrice();
+					}
+				});
+				
+				const addToCartBtn = document.getElementById('add-to-cart-btn');
+				if (addToCartBtn.dataset.listener !== 'true') {
+					addToCartBtn.addEventListener('click', () => {
+						const menuId = card.getAttribute('data-id'); // 메뉴 UUID를 data-id로 추가해놨다고 가정
+						const storeId = card.getAttribute('data-store-id');
+						const quantity = parseInt(quantityEl.textContent);
+						const selectedOptions = Array.from(document.querySelectorAll('input[name="menuOption"]:checked'))
+							.map(cb => cb.value);
+	
+						const data = {
+							menuId: menuId,
+							storeId: storeId,
+							quantity: quantity,
+							options: selectedOptions
+						};
+	
+						fetch('/api/cart/add', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(data)
+						})
+						.then(res => res.json())
+						.then(result => {
+							alert(result.message || '장바구니에 담겼습니다.');
+						})
+						.catch(error => {
+							console.error('담기 실패:', error);
+							alert('서버 오류로 장바구니에 담지 못했습니다.');
+						});
+					});
+					addToCartBtn.dataset.listener = 'true'; // 중복 방지
+				}
+				basePrice = parseInt(price);
+
+				modalMenuPrice.textContent = price + '원';
+				addToCartBtn.textContent = `${basePrice.toLocaleString()}원 담기`;
 
 				const option1 = card.getAttribute('data-option1');
 				const option1Price = card.getAttribute('data-option1-price');
@@ -171,81 +249,78 @@ document.addEventListener('DOMContentLoaded', function () {
 				modalMenuPrice.textContent = price + '원';
 				modalMenuImage.src = imageUrl;
 
-				const optionsContainer = document.getElementById('menu-options');
 				optionsContainer.innerHTML = '';
 
 				function createOptionCheckbox(optionName, optionPrice) {
-					if (optionName) {
-						const label = document.createElement('label');
-						const checkbox = document.createElement('input');
-						checkbox.type = 'checkbox';
-						checkbox.name = 'menuOption';
-						checkbox.value = optionName.trim();
+					if (!isValidOption(optionName, optionPrice)) return;
+					
+					const cleanName = String(optionName).replace(/[\[\]]/g, "").trim();
+					const cleanPrice = String(optionPrice).replace(/[\[\]]/g, "").trim();
 
-						checkbox.addEventListener('change', updateTotalOptionPrice); // 체크할 때 합산
+					const label = document.createElement('label');
+					const checkbox = document.createElement('input');
+					checkbox.type = 'checkbox';
+					checkbox.name = 'menuOption';
+					checkbox.value = optionName.trim();
 
-						label.appendChild(checkbox);
-						label.appendChild(document.createTextNode(
-							`${optionName.trim()} (+${optionPrice.trim()}원)`));
+					checkbox.addEventListener('change', updateTotalOptionPrice);
 
-						optionsContainer.appendChild(label);
-						optionsContainer.appendChild(document.createElement('br'));
-					}
+					label.appendChild(checkbox);
+					label.appendChild(document.createTextNode(
+						`${cleanName} +${cleanPrice}원`));
+
+					optionsContainer.appendChild(label);
+					optionsContainer.appendChild(document.createElement('br'));
 				}
 
-				// ② ★ 그리고 그 밑에 function updateTotalOptionPrice ~ 함수도 넣기 ★
 				function updateTotalOptionPrice() {
 					const checkboxes = optionsContainer.querySelectorAll('input[name="menuOption"]:checked');
-					let total = 0;
+					let optionTotal = 0;
 					checkboxes.forEach(checkbox => {
 						const label = checkbox.parentElement.textContent;
 						const priceMatch = label.match(/\+\s*([\d,]+)원/);
 						if (priceMatch) {
 							const price = parseInt(priceMatch[1].replace(',', ''));
-							total += price;
+							optionTotal += price;
 						}
 					});
-					document.getElementById('menu-total-price').textContent = `추가 금액: ${total.toLocaleString()}원`;
+					const total = (basePrice + optionTotal) * quantity;
+					/*document.getElementById('menu-total-price').textContent = `추가 금액: ${optionTotal.toLocaleString()}원`;*/
+					document.getElementById('add-to-cart-btn').textContent = `${total.toLocaleString()}원 담기`;
 				}
 				
-/*				function createOptionCheckbox(optionName, optionPrice) {
-					if (optionName) {
-						const label = document.createElement('label');
-						const checkbox = document.createElement('input');
-						checkbox.type = 'checkbox';
-						checkbox.name = 'menuOption';
-						checkbox.value = optionName.trim();
+				/*updateTotalOptionPrice();*/
+				
+				function isValidOption(name, price) {
+					const trimmedName = String(name ?? "").trim();
+					let trimmedPrice = String(price ?? "").trim();
 
-						label.appendChild(checkbox);
-						label.appendChild(document.createTextNode(
-							`${optionName.trim()} (+${optionPrice.trim()}원)`));
+					// 대괄호 제거
+					trimmedPrice = trimmedPrice.replace(/[\[\]]/g, "");
 
-						optionsContainer.appendChild(label);
-						optionsContainer.appendChild(document.createElement('br'));
-					}
+					return (
+						trimmedName !== "" &&
+						trimmedName.toLowerCase() !== "null" &&
+						trimmedName.toLowerCase() !== "undefined" &&
+						trimmedPrice !== "" &&
+						/^\d+$/.test(trimmedPrice)
+					);
 				}
+				
+				if (isValidOption(option1, option1Price)) createOptionCheckbox(option1, option1Price);
+				if (isValidOption(option2, option2Price)) createOptionCheckbox(option2, option2Price);
+				if (isValidOption(option3, option3Price)) createOptionCheckbox(option3, option3Price);
 
-				if (option1) createOptionCheckbox(option1, option1Price);
-				if (option2) createOptionCheckbox(option2, option2Price);
-				if (option3) createOptionCheckbox(option3, option3Price);
-
-				if (!option1 && !option2 && !option3) {
+				if (
+					!isValidOption(option1, option1Price) &&
+					!isValidOption(option2, option2Price) &&
+					!isValidOption(option3, option3Price)
+				) {
 					const noOption = document.createElement('p');
 					noOption.textContent = '선택 가능한 옵션이 없습니다.';
 					optionsContainer.appendChild(noOption);
-				}*/
-				
-				if (option1) createOptionCheckbox(option1, option1Price);
-				if (option2) createOptionCheckbox(option2, option2Price);
-				if (option3) createOptionCheckbox(option3, option3Price);
-
-				if (!option1 && !option2 && !option3) {
-					const noOption = document.createElement('p');
-					noOption.textContent = '선택 가능한 옵션이 없습니다.';
-					optionsContainer.appendChild(noOption);
 				}
-
-
+				
 				modal.style.display = 'flex';
 				document.body.style.overflow = 'hidden';
 			});

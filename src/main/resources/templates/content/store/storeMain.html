@@ -48,18 +48,20 @@
 		</section>
 	
 		<section class="menu-list" id="menu-list">
-			<div class="menu-card" th:each="menu : ${menus}" 
-			th:attr="data-name=${menu.menuName}, 
-					data-description=${menu.description}, 
-					data-price=${menu.price}, 
-					data-image=${menu.menuImg}, 
-					data-category=${menu.menuCategory}, 
-					data-option1=${menu.menuOptions1},
-					data-option1-price=${menu.menuOptions1Price},
-					data-option2=${menu.menuOptions2},
-					data-option2-price=${menu.menuOptions2Price},
-					data-option3=${menu.menuOptions3},
-					data-option3-price=${menu.menuOptions3Price}">
+			<div class="menu-card" th:each="menu : ${menus}"
+				 th:data-id="${menu.menuId}"
+				 th:data-store-id="${menu.storeId}"
+			     th:data-name="${menu.menuName}"
+			     th:data-description="${menu.description}"
+			     th:data-price="${menu.price}"
+			     th:data-image="${menu.menuImg}"
+			     th:data-category="${menu.menuCategory}"
+			     th:data-option1="${#strings.isEmpty(menu.menuOptions1) ? '' : menu.menuOptions1}"
+			     th:data-option1-price="${menu.menuOptions1Price != null ? menu.menuOptions1Price : ''}"
+			     th:data-option2="${#strings.isEmpty(menu.menuOptions2) ? '' : menu.menuOptions2}"
+			     th:data-option2-price="${menu.menuOptions2Price != null ? menu.menuOptions2Price : ''}"
+			     th:data-option3="${#strings.isEmpty(menu.menuOptions3) ? '' : menu.menuOptions3}"
+			     th:data-option3-price="${menu.menuOptions3Price != null ? menu.menuOptions3Price : ''}">
 				<div class="image-wrapper">
 					<img th:src="@{${menu.menuImg}}" alt="메뉴 이미지" />
 				</div>
@@ -79,8 +81,16 @@
 				<p id="menu-description"></p>
 				<p id="menu-price"></p>
 				<div id="menu-options" class="menu-options"></div>
-				<div id="menu-total-price" class="menu-total-price">추가 금액: 0원</div>
-				<button id="close-modal-footer">닫기</button>
+				<div class="cart-footer">
+					<div class="quantity-controls">
+						<button id="decrease-btn">−</button>
+						<span id="menu-quantity">1</span>
+						<button id="increase-btn">+</button>
+					</div>
+					<!--<div id="menu-total-price" class="menu-total-price">추가 금액: 0원</div>-->
+					<button id="add-to-cart-btn" class="add-to-cart-btn">0원 담기</button>
+				</div>
+				<!--<button id="close-modal-footer">닫기</button>-->
 			</div>
 		</div>
 	</div>
