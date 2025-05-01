@@ -22,7 +22,7 @@ public class DeliveryController {
 	private final OrderRepository orderRepository;
 	
 	
-	 // 배달 시작 페이지로 이동하는 메서드
+	 // 픽업 시작 페이지로 이동하는 메서드
 	@GetMapping("/pickupStart/{orderId}")
     public String startPickUp(@PathVariable("orderId") UUID orderId, Model model) {
 		model.addAttribute("orderId", orderId);
@@ -30,7 +30,7 @@ public class DeliveryController {
 		return "content/rider/pickUpStart";  // Thymeleaf의 템플릿 이름
     }
 	
-	
+	// 배달 시작 페이지로 이동 및 OrderToRider 값 변경
 	@PostMapping("/deliveryStart")
 	public String startDelivery(@RequestParam("orderId") UUID orderId, Model model) {
 	    // 주문 조회
@@ -48,7 +48,7 @@ public class DeliveryController {
 	     model.addAttribute("orderId", orderId);
 		 return "content/rider/deliveryStart";  // Thymeleaf의 템플릿 이름
 	}
-	
+	// 배달 완료 후 다시 riderHome 요청 및 OrderToRider 값 변경 (riderWallet에 배달료 만큼 추가) 
 	@PostMapping("/deliveryFin")
 	public String finishDelivery(@RequestParam("orderId") UUID orderId) {
 	    // 주문 조회

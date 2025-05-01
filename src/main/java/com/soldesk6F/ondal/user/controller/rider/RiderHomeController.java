@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,9 +28,11 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.dto.rider.RiderNaviDTO;
 import com.soldesk6F.ondal.user.dto.rider.RiderOrderDetailDTO;
 import com.soldesk6F.ondal.user.dto.rider.RiderOrderMarkerDTO;
+import com.soldesk6F.ondal.user.dto.rider.RiderStatusResponse;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
+import com.soldesk6F.ondal.user.service.RiderService;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
@@ -41,6 +45,9 @@ public class RiderHomeController {
 
     private final RiderRepository riderRepository;
     private final OrderRepository orderRepository;
+    
+    @Autowired
+    private RiderService riderService;
 
     @GetMapping("/home")
     public String riderHomeGet(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -72,7 +79,7 @@ public class RiderHomeController {
                     .deliveryFee(order.getDeliveryFee())
                     .build())
                 .toList();
-            
+            model.addAttribute("riderId", rider.getRiderId()); // 추가 부분
             model.addAttribute("ordersJson", markerDTOs);
             model.addAttribute("orders", ordersWithinRadius);
             model.addAttribute("rider", rider);
@@ -228,6 +235,25 @@ public class RiderHomeController {
             e.printStackTrace();
             throw new RuntimeException("서버 처리 중 오류 발생", e);
         }
+    }
+    
+    @PutMapping("/{riderId}/status")
+    public ResponseEntity<Void> changeRiderStatus(@PathVariable("riderId") UUID riderId) {
+        riderService.changeRiderStatus(riderId);
+        return ResponseEntity.ok().build();
+    }
+    // 상태 조회
+    @GetMapping("/{riderId}")
+    public ResponseEntity<RiderStatusResponse> getRider(@PathVariable("riderId") UUID riderId) {
+        Rider rider = riderRepository.findById(riderId)
+            .orElseThrow(() -> new RuntimeException("라이더를 찾을 수 없습니다"));
+
+        RiderStatusResponse response = new RiderStatusResponse(
+            rider.getRiderStatus().name(),
+            rider.getRiderStatus().getDescription()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
 

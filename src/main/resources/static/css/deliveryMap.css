@@ -90,13 +90,4 @@ body {
     background-color: #45a049;
 }
 
-.order-card .cancel-btn {
-    background-color: #f44336;
-    color: white;
-}
-
-.order-card .cancel-btn:hover {
-    background-color: #d73833;
-}
-
 

@@ -4,6 +4,7 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.dto.rider.RiderForm;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
+import com.soldesk6F.ondal.user.entity.Rider.RiderStatus;
 import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
@@ -12,6 +13,7 @@ import com.soldesk6F.ondal.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -134,6 +136,13 @@ public class RiderService {
         }
     }
     
-    
+ // RiderStatus 변경 서비스
+    public Rider changeRiderStatus(UUID riderId) {
+        Rider rider = riderRepository.findById(riderId)
+            .orElseThrow(() -> new RuntimeException("라이더를 찾을 수 없습니다"));
+
+        rider.setRiderStatus(rider.getRiderStatus().next());
+        return riderRepository.save(rider);
+    }
     
 }
