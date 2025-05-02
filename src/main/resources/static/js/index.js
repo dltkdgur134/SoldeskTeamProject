@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		showHistory();
 		
 	}else{
-		alert("여기");
 		showAddrHistory();
 	}
 
