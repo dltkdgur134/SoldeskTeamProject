@@ -1,7 +1,9 @@
 package com.soldesk6F.ondal.user.controller.rider;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.user.entity.Rider;
+import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
@@ -20,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeliveryController {
 	private final OrderRepository orderRepository;
-	
+	private final RiderRepository riderRepository;
 	
 	 // 픽업 시작 페이지로 이동하는 메서드
 	@GetMapping("/pickupStart/{orderId}")
@@ -50,8 +55,25 @@ public class DeliveryController {
 	}
 	// 배달 완료 후 다시 riderHome 요청 및 OrderToRider 값 변경 (riderWallet에 배달료 만큼 추가) 
 	@PostMapping("/deliveryFin")
-	public String finishDelivery(@RequestParam("orderId") UUID orderId) {
-	    // 주문 조회
+	public String finishDelivery(@AuthenticationPrincipal CustomUserDetails userDetails,
+			@RequestParam("orderId") UUID orderId,Model model) {
+		
+		String userId = userDetails.getUser().getUserId();
+		Optional<Rider> optionalRider = riderRepository.findByUser_UserId(userId);
+	    
+		if (optionalRider.isPresent()) {
+            Rider rider = optionalRider.get();
+            model.addAttribute("riderId", rider.getRiderId());
+            if(rider.getRiderStatus() == Rider.RiderStatus.DELIVERING){
+            	rider.setRiderStatus(Rider.RiderStatus.WAITING);
+            	riderRepository.save(rider);
+            }
+        } else {
+            // 예외 처리나 에러 페이지로 이동 가능
+        }
+		
+		
+		// 주문 조회
 	    Order order = orderRepository.findById(orderId)
 	            .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
 

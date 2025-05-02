@@ -90,7 +90,7 @@ public class Rider {
 		}
 		public RiderStatus next() {
 	        return switch (this) {
-	            case WAITING -> DELIVERING;
+	            case WAITING -> RESTING;
 	            case DELIVERING -> RESTING;
 	            case RESTING -> WAITING;
 	        };

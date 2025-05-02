@@ -168,9 +168,20 @@ public class RiderHomeController {
 
     @PostMapping("/api/orders/assign")
     @ResponseBody
-    public ResponseEntity<?> assignOrderToRider(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> assignOrderToRider(@AuthenticationPrincipal CustomUserDetails userDetails,
+    		@RequestBody Map<String, String> payload,Model model) {
         String orderId = payload.get("orderId");
-
+        String userId = userDetails.getUser().getUserId();
+        Optional<Rider> optionalRider = riderRepository.findByUser_UserId(userId);
+        
+        if (optionalRider.isPresent()) {
+            Rider rider = optionalRider.get();
+            model.addAttribute("riderId", rider.getRiderId());
+            rider.setRiderStatus(Rider.RiderStatus.DELIVERING);
+            riderRepository.save(rider);
+        } else {
+            // 예외 처리나 에러 페이지로 이동 가능
+        }
         // UUID 형식 검증
         if (!isValidUUID(orderId)) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", "잘못된 주문 ID 형식입니다."));
