@@ -3,6 +3,7 @@ package com.soldesk6F.ondal.user.controller.rider;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
+import com.soldesk6F.ondal.user.service.RiderService;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
@@ -26,10 +28,21 @@ import lombok.RequiredArgsConstructor;
 public class DeliveryController {
 	private final OrderRepository orderRepository;
 	private final RiderRepository riderRepository;
+	@Autowired
+	private RiderService riderService;
 	
 	 // 픽업 시작 페이지로 이동하는 메서드
 	@GetMapping("/pickupStart/{orderId}")
-    public String startPickUp(@PathVariable("orderId") UUID orderId, Model model) {
+    public String startPickUp(@PathVariable("orderId") UUID orderId, Model model,
+    		@AuthenticationPrincipal CustomUserDetails userDetails
+    		) {
+		String userId = userDetails.getUser().getUserId();
+		Optional<Rider> optionalRider = riderRepository.findByUser_UserId(userId);
+		if (optionalRider.isPresent()) {
+			Rider rider = optionalRider.get();
+			riderService.assignRiderToOrder(orderId, rider.getRiderId());
+		}
+		
 		model.addAttribute("orderId", orderId);
         // pickUpStart.html로 이동
 		return "content/rider/pickUpStart";  // Thymeleaf의 템플릿 이름
@@ -65,6 +78,7 @@ public class DeliveryController {
             Rider rider = optionalRider.get();
             model.addAttribute("riderId", rider.getRiderId());
             if(rider.getRiderStatus() == Rider.RiderStatus.DELIVERING){
+            	riderService.completeOrderAndRewardRider(orderId);
             	rider.setRiderStatus(Rider.RiderStatus.WAITING);
             	riderRepository.save(rider);
             }
