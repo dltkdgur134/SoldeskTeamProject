@@ -31,9 +31,10 @@
 
 
 
-
 	<!-- 카카오 맵 API -->
-	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a82eb7e13124954eb1c020ac4cece497"></script>
+	<!--a82eb7e13124954eb1c020ac4cece497
+		e5d3b43b5ba403cc978d5770a28e29af-->
+	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
 	<script>
 		window.onload = async function () {
 			const routeData = JSON.parse(sessionStorage.getItem("routeData"));
@@ -84,7 +85,9 @@
 						yAnchor: 1
 					});
 					// API 요청을 위한 URL과 파라미터 설정
-					const REST_API_KEY = '6a82e6474b08332bbf4be73f53d5c0bb';
+					//aa8f8d7334d919ea0276dfc23dd37cc5
+					//6a82e6474b08332bbf4be73f53d5c0bb
+					const REST_API_KEY = 'aa8f8d7334d919ea0276dfc23dd37cc5';
 					const url = 'https://apis-navi.kakaomobility.com/v1/directions';
 					const origin = `${routeData.start.lng},${routeData.start.lat}`;
 					const destination = `${routeData.waypoint.lng},${routeData.waypoint.lat}`;

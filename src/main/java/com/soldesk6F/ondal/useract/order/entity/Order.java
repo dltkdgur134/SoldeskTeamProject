@@ -75,7 +75,7 @@ public class Order {
     @Column(name = "cooking_start_time")
     private LocalDateTime cookingStartTime;
     
-    @Column(name = "real_cooking_time", updatable = false)
+    @Column(name = "real_cooking_time")
     private LocalTime realCookingTime;
     
     @Column(name = "delivery_start_time")
@@ -84,7 +84,7 @@ public class Order {
     @Column(name = "expect_delivery_time")
     private LocalTime expectDeliveryTime;
     
-    @Column(name = "real_delivery_time", updatable = false)
+    @Column(name = "real_delivery_time")
     private LocalTime realDeliveryTime;
     
     @Column(name = "delivery_address", nullable = false, length = 255)

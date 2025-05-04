@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.user.controller.rider;
 
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -196,6 +197,22 @@ public class RiderHomeController {
             }
 
             Order order = optionalOrder.get();
+            
+            // 🔽 프론트에서 분, 초 받기
+            String minuteStr = payload.get("expectMinute");
+            String secondStr = payload.get("expectSecond");
+
+            if (minuteStr != null && secondStr != null) {
+                try {
+                    int minute = Integer.parseInt(minuteStr);
+                    int second = Integer.parseInt(secondStr);
+                    LocalTime expectDeliveryTime = LocalTime.of(0, minute, second);
+                    order.setExpectDeliveryTime(expectDeliveryTime);  // 🔥 예상 배달 시간 저장
+                } catch (NumberFormatException | DateTimeException e) {
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("message", "잘못된 시간 형식입니다."));
+                }
+            }
+            
             order.setOrderToRider(Order.OrderToRider.DISPATCHED);  // 상태 변경
             orderRepository.save(order);
 

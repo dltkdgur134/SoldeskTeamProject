@@ -14,6 +14,9 @@ import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -160,33 +163,55 @@ public class RiderService {
         return riderRepository.save(rider);
     }
     
-    //RiderWallet에 배달료 넣기
     @Transactional
     public void completeOrderAndRewardRider(UUID orderId) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
 
+        // 상태 검증
+        if (order.getOrderToRider() != Order.OrderToRider.ON_DELIVERY) {
+            throw new RuntimeException("배달 완료가 불가능한 상태입니다.");
+        }
+
         Rider rider = order.getRider();
         if (rider == null) throw new RuntimeException("배정된 라이더가 없습니다.");
 
-        int deliveryFee = order.getDeliveryFee();
+        // 배달 완료 시간 계산 및 저장
+        LocalDateTime deliveryStartTime = order.getDeliveryStartTime();
+        if (deliveryStartTime == null) {
+            throw new RuntimeException("배달 시작 시간이 존재하지 않습니다.");
+        }
+
+        LocalDateTime startTime = order.getDeliveryStartTime();
+        LocalDateTime now = LocalDateTime.now();
+
+        Duration duration = Duration.between(startTime, now);
+        LocalTime realDeliveryTime = LocalTime.ofSecondOfDay(duration.getSeconds());
+
+        order.setRealDeliveryTime(realDeliveryTime);
+
         
-        // 배달료 검증 (음수 금액 방지)
+        
+        
+        order.setOrderToRider(Order.OrderToRider.COMPLETED);
+        orderRepository.save(order);
+
+        // 라이더 보상 처리
+        int deliveryFee = order.getDeliveryFee();
         if (deliveryFee <= 0) {
             throw new RuntimeException("유효하지 않은 배달료입니다.");
         }
 
-        // 지갑 금액 업데이트 (지갑 금액이 음수가 되지 않도록)
         int newWalletAmount = rider.getRiderWallet() + deliveryFee;
         if (newWalletAmount < 0) {
             throw new RuntimeException("지갑 금액이 음수로 설정될 수 없습니다.");
         }
 
         rider.setRiderWallet(newWalletAmount);
-
-        // 저장
-        riderRepository.save(rider);  // 라이더 지갑 업데이트
+        rider.setRiderStatus(Rider.RiderStatus.WAITING);
+        riderRepository.save(rider);
     }
+
     
     
     

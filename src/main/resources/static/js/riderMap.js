@@ -214,8 +214,9 @@ document.addEventListener("click", async (e) => {
 			const orderResponse = await fetch(`/rider/api/orders/${orderId}/navi`);
 			if (!orderResponse.ok) throw new Error('주문 정보를 가져오는 데 실패했습니다.');
 			const order = await orderResponse.json();
-
-			const REST_API_KEY = '6a82e6474b08332bbf4be73f53d5c0bb';
+			/*aa8f8d7334d919ea0276dfc23dd37cc5*/
+			/*6a82e6474b08332bbf4be73f53d5c0bb*/
+			const REST_API_KEY = 'aa8f8d7334d919ea0276dfc23dd37cc5';
 			const url = 'https://apis-navi.kakaomobility.com/v1/directions';
 
 
@@ -274,7 +275,16 @@ document.addEventListener("click", async (e) => {
 
 			console.log(routeData.routes[0].sections.length);
 			console.log(riderLat, riderLng);
+			const distance = routeData.routes[0].summary.distance;
+			const duration = routeData.routes[0].summary.duration;
+			const distanceKm = (distance / 1000).toFixed(2);
+			const minutes = Math.floor(duration/60);
+			const seconds = Math.floor(duration%60);
 
+			
+			
+			
+			
 			console.log("path1 length:", path1.length);
 			console.log("path2 length:", path2.length);
 			console.log("map 객체:", map);
@@ -321,7 +331,9 @@ document.addEventListener("click", async (e) => {
 			    border-radius: 5px;
 			 }
 			</style>
-            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a82eb7e13124954eb1c020ac4cece497"></script>
+			/*e5d3b43b5ba403cc978d5770a28e29af*/
+			/*a82eb7e13124954eb1c020ac4cece497*/
+            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
           </head>
           <body>
             <div id="map"></div>
@@ -340,10 +352,18 @@ document.addEventListener("click", async (e) => {
 			const endLng = ${endLng};
 			const path1 = ${JSON.stringify(path1)};
 			const path2 = ${JSON.stringify(path2)};
-            const summaryText = "거리: ${(routeData.routes[0].summary.distance / 1000).toFixed(2)} km, 시간: ${(routeData.routes[0].summary.duration / 60).toFixed(1)} 분";
+			const summaryText = "거리: ${distanceKm} km, 시간: ${minutes}분 ${seconds}초";
+			const distance = ${distance}; // 숫자 그대로
+			const duration = ${duration}; // 숫자 그대로
 
-              const mapContainer = document.getElementById('map');
-              const mapOption = {
+			console.log("총 거리 (m):", distance);
+			console.log("총 시간 (s):", duration);
+			console.log("총 거리 (km):", ${distanceKm});
+			console.log("분",${minutes});
+			console.log("초",${seconds});
+			
+			const mapContainer = document.getElementById('map');
+			const mapOption = {
                 center: new kakao.maps.LatLng(startLat, startLng),
                 level: 4
               };
@@ -411,14 +431,25 @@ document.addEventListener("click", async (e) => {
               document.getElementById('summary').innerText = summaryText;
 
               document.getElementById('accept-btn').addEventListener('click', async () => {
+				const expectMinute = ${minutes};  // 예상 배달 시간(분)
+				const expectSecond = ${seconds}; // 예상 배달 시간(초)
+				
                 try {
                   const res = await fetch('/rider/api/orders/assign', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId: "${orderId}" })
+                    body: JSON.stringify({
+						 orderId: "${orderId}",
+						 expectMinute: expectMinute,
+						 expectSecond: expectSecond
+					 })
                   });
                   if (res.ok) {
-                    alert('배차 완료');
+					// 예상 분,초를 서버에 전달
+					const data = await res.json();
+                    
+					alert('배차 완료');
+					
 					// 경로 데이터를 부모창에 전달
 					const routeData = {
 					orderId: "${orderId}",
@@ -430,8 +461,8 @@ document.addEventListener("click", async (e) => {
 					};
 					
 					if (window.opener && !window.opener.closed) {
-					    window.opener.fetchOrders();  // 부모 창의 주문 목록 갱신
 						 window.opener.postMessage(routeData, '*');
+					    window.opener.fetchOrders();  // 부모 창의 주문 목록 갱신
 					  }
                   } else {
                     alert('배차 수락 실패');
