@@ -115,30 +115,18 @@
       <div class="col-lg-8 order-1 order-lg-0">
         <!-- 장바구니 -->
         <h5 class="section-title">담은 메뉴</h5>
-        <div id="cartItems" class="list-group mb-4">
-          <!-- 예시 항목 1 -->
-          <div class="list-group-item py-3 d-flex align-items-center">
-            <img src="https://placehold.co/72" alt="" class="cart-item-img me-3" />
-            <div class="flex-grow-1">
-              <div class="d-flex justify-content-between">
-                <strong>치즈버거 세트</strong>
-                <span>₩7,000</span>
-              </div>
-              <small class="text-muted">콜라(대) · 케첩 추가</small>
-            </div>
-          </div>
-          <!-- 예시 항목 2 -->
-          <div class="list-group-item py-3 d-flex align-items-center">
-            <img src="https://placehold.co/72" alt="" class="cart-item-img me-3" />
-            <div class="flex-grow-1">
-              <div class="d-flex justify-content-between">
-                <strong>감자튀김</strong>
-                <span>₩3,000</span>
-              </div>
-              <small class="text-muted">+ 치즈소스</small>
-            </div>
-          </div>
-        </div>
+		<div id="cartItems" class="list-group mb-4" th:each="item : ${cids}">
+		    <div class="list-group-item py-3 d-flex align-items-center">
+		      <img th:src="${item.imageUrl}" alt="상품 이미지" class="cart-item-img me-3" />
+		      <div class="flex-grow-1">
+		        <div class="d-flex justify-content-between">
+		          <strong th:text="${item.menuName}">상품명</strong>
+		          <span th:text="'₩' + ${#numbers.formatInteger(item.totalPrice, 0)}">₩0</span>
+		        </div>
+		        <small class="text-muted" th:text="${item.optionDescription}">옵션정보</small>
+		      </div>
+		    </div>
+		  </div>
 
         <!-- 주소 & 라이더 요청사항 -->
         <div class="row g-3 align-items-start mb-4">
@@ -188,7 +176,7 @@
       <div class="col-lg-4">
         <div id="summaryBox" class="border rounded-4 p-4 shadow-sm bg-white">
           <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="allAgree" />
+            <input class="form-check-input" type="checkbox" id="allAgree"																																						 />
             <label class="form-check-label fw-bold" for="allAgree">모든 항목 동의</label>
           </div>
 

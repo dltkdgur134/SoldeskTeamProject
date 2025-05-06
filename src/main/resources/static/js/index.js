@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		if(!query)return;
 		
 		if(!hadAddress()){
-		
+			
 		sessionStorage.setItem("address" , query);
 		searchInput.value = sessionStorage.getItem("food") || "";
 		searchInput.setAttribute("placeholder" , "뭐 먹을까?");
