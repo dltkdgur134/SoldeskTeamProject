@@ -39,7 +39,9 @@ import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/owner")
 @RequiredArgsConstructor

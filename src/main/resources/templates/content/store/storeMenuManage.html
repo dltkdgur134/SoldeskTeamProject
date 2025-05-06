@@ -49,7 +49,7 @@
 		</div>
 	</div>
 	
-	<div id="menuModal" class="modal-overlay">
+	<div id="menuModal" class="modal-overlay" style="display: none;">
 		<div class="modal-content">
 			<span class="close-btn" onclick="closeMenuModal()">&times;</span>
 			<h2>메뉴 등록</h2>
@@ -67,8 +67,9 @@
 
 				<div id="option1-container" style="grid-column: span 2;"></div>
 				<button type="button" id="add-option-btn" style="grid-column: span 2;">+ 옵션 추가</button>
-
-				<select name="menuStatus">
+				
+				<label for="menuStatus">메뉴 상태</label>
+				<select name="menuStatus" id="menuStatus">
 					<option value="ACTIVE">판매 중</option>
 					<option value="SOLD_OUT">품절</option>
 				</select>
@@ -93,7 +94,7 @@
 				<input id="editPrice" name="price" type="number" required min="0" />
 				<textarea name="description" id="editDescription"></textarea>
 				<input type="file" name="menuImg" accept="image/*" />
-				<!-- 옵션, 상태 등 필요에 따라 추가 -->
+				<label for="editMenuStatus">메뉴 상태</label>
 				<select name="menuStatus" id="editMenuStatus">
 					<option value="ACTIVE">판매 중</option>
 					<option value="SOLD_OUT">품절</option>

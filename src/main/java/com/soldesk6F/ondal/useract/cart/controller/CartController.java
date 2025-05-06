@@ -28,7 +28,7 @@ import com.soldesk6F.ondal.useract.cart.service.CartService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/api/cart")
+@RequestMapping("/cart")
 @RequiredArgsConstructor
 public class CartController {
 
