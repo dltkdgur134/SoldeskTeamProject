@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,16 +45,21 @@ public class PaymentService {
 			nowSessionUUID = user.getUserUuid();
 			Optional<Cart> optCart = cartRepository.findById(cartUUID);
 			Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("해당 카트가 존재하지 않습니다."));
-			if (cart.getUser().getUserUuid().equals(nowSessionUUID)) {
+//			if (cart.getUser().getUserUuid().equals(nowSessionUUID)) {
 
 				List<CartItems> items = cartItemsRepository.findByCart_CartId(cart.getCartId());
 				if (items.isEmpty()) {
 					throw new IllegalArgumentException("카트에 담긴 아이템이 없습니다");
 				} else {
 					return items.stream().map(item -> {
+						
+					    List<String> options = (item.getOptions() == null)
+					            ? Collections.emptyList()
+					            : Arrays.asList(item.getOptions().split("온달"));
+						
 						return CartItemsDTO.builder().menuName(item.getMenu().getMenuName())
 								.menuPrice(item.getMenu().getPrice())
-								.optionNames(Arrays.asList(item.getOptions().split("온달")))
+								.optionNames(options)
 								.optionTotalPrice(item.getOptionTotalPrice()).quantity(item.getQuantity())
 								.totalPrice(item.getItemTotalPrice()).menuImg(item.getMenu().getMenuImg()).build();
 
@@ -62,7 +68,7 @@ public class PaymentService {
 
 			}
 
-		}
+//		}
 	    throw new IllegalStateException("결제 요청을 처리할 수 없습니다");
 	}
 	
