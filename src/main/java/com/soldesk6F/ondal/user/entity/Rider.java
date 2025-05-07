@@ -63,8 +63,21 @@ public class Rider {
 	@Column(name = "hub_address_longitude", nullable = false)
 	private double hubAddressLongitude;
 	
-	@Column(name = "rider_wallet",nullable = true )
-    private int riderWallet;
+	@Column(name = "owner_wallet",nullable = true )
+    private int ownerWallet; 
+	
+	@Column(name = "secondary_password_fail_count")
+	private int secondaryPasswordFailCount;
+
+	@Column(name = "last_secondary_password_fail_time")
+    private LocalDateTime lastSecondaryPasswordFailTime;
+    
+	@Column(name = "is_secondary_password_locked")
+    private boolean isSecondaryPasswordLocked;
+    
+	  @Column(name = "rider_wallet",nullable = true )
+	  private int riderWallet;
+
 
 	@CreationTimestamp
 	@Column(name = "registration_date", updatable = false)

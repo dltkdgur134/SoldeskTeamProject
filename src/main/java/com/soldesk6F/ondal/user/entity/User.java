@@ -82,6 +82,13 @@ public class User {
 	@Column(name = "created_date", nullable = false, updatable = false)
 	private LocalDateTime createdDate;
 
+	@Column(name = "ondal_wallet",nullable = true)
+    private int ondalWallet;
+	
+	@Column(name = "ondal_point",nullable = true)
+	private int ondalPoint;
+
+
 	@JsonIgnore
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)

@@ -27,13 +27,27 @@ public class StorePayController {
 		List<CartItemsDTO> cids =  paymentService.getAllCartItems(cartuuid);
 		int totalPrice = paymentService.getListTotalPrice(cids);
 		UserInfoDTO uid = paymentService.getUserInfo(cartuuid);
+		String storeName = paymentService.getCartStore(cartuuid);
+		
 		model.addAttribute("cids" , cids);
 		model.addAttribute("totalPrice" , totalPrice);
+		model.addAttribute("cartId",cartuuid);
+		model.addAttribute("storeName" ,storeName);
+		model.addAttribute("successUrl","https://localhost:8443/store/paySuccess");
 		model.addAttribute("userInfo" , uid);
 		return "/content/pay";
 	}
 	
-	
+	@GetMapping("/store/paySuccess")
+	public String showPaySuccessPage(    @RequestParam("paymentKey") String paymentKey,@RequestParam("orderId") String orderId,
+		    @RequestParam("amount") int amount,Model model) {
+		
+	    paymentService.confirmPayment(paymentKey, orderId, amount);
+
+		
+		
+		return "/content/index";
+	}
 	
 	
 	
