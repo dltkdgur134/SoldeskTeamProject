@@ -52,7 +52,7 @@ public class Rider {
     
 	@Column(name = "is_secondary_password_locked")
     private boolean isSecondaryPasswordLocked;
-	
+    
 	@Column(name = "vehicle_number", nullable = false, length = 20)
 	private String vehicleNumber;
 
@@ -97,6 +97,13 @@ public class Rider {
 		public String getDescription() {
 			return description;
 		}
+		public RiderStatus next() {
+	        return switch (this) {
+	            case WAITING -> RESTING;
+	            case DELIVERING -> RESTING;
+	            case RESTING -> WAITING;
+	        };
+	    }
 	}
 
 	public enum DeliveryRange {

@@ -49,19 +49,22 @@
 	
 		<section class="menu-list" id="menu-list">
 			<div class="menu-card" th:each="menu : ${menus}"
-				 th:data-id="${menu.menuId}"
-				 th:data-store-id="${menu.storeId}"
-			     th:data-name="${menu.menuName}"
-			     th:data-description="${menu.description}"
-			     th:data-price="${menu.price}"
-			     th:data-image="${menu.menuImg}"
-			     th:data-category="${menu.menuCategory}"
-			     th:data-option1="${#strings.isEmpty(menu.menuOptions1) ? '' : menu.menuOptions1}"
-			     th:data-option1-price="${menu.menuOptions1Price != null ? menu.menuOptions1Price : ''}"
-			     th:data-option2="${#strings.isEmpty(menu.menuOptions2) ? '' : menu.menuOptions2}"
-			     th:data-option2-price="${menu.menuOptions2Price != null ? menu.menuOptions2Price : ''}"
-			     th:data-option3="${#strings.isEmpty(menu.menuOptions3) ? '' : menu.menuOptions3}"
-			     th:data-option3-price="${menu.menuOptions3Price != null ? menu.menuOptions3Price : ''}">
+				th:data-id="${menu.menuId}"
+				th:data-store-id="${menu.storeId}"
+				th:data-name="${menu.menuName}"
+				th:data-description="${menu.description}"
+				th:data-price="${menu.price}"
+				th:data-image="${menu.menuImg}"
+				th:data-category="${menu.menuCategory}"
+				
+				th:data-option1="${menu.menuOptions1GroupName + ':' + #strings.arrayJoin(menu.menuOptions1, '@@__@@')}"
+				th:data-option1-price="${#strings.arrayJoin(menu.menuOptions1Price, '@@__@@')}"
+				 
+				th:data-option2="${menu.menuOptions2GroupName + ':' + #strings.arrayJoin(menu.menuOptions2, '@@__@@')}"
+				th:data-option2-price="${#strings.arrayJoin(menu.menuOptions2Price, '@@__@@')}"
+				
+				th:data-option3="${menu.menuOptions3GroupName + ':' + #strings.arrayJoin(menu.menuOptions3, '@@__@@')}"
+				th:data-option3-price="${#strings.arrayJoin(menu.menuOptions3Price, '@@__@@')}">
 				<div class="image-wrapper">
 					<img th:src="@{${menu.menuImg}}" alt="메뉴 이미지" />
 				</div>

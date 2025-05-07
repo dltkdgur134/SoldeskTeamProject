@@ -1,7 +1,8 @@
 import { dynamicCategories, renderEditCategorySelect } from './category.js';
-import { maxOption, editOptionCount } from './options.js';
+import { maxOption, fillEditOptions, editOptionCount } from './options.js';
 
 export function openMenuModal() {
+	document.getElementById("editMenuModal").style.display = "none";
 	document.getElementById("menuModal").style.display = "flex";
 }
 
@@ -12,6 +13,8 @@ export function closeMenuModal() {
 export function openEditMenuModal(menuId) {
 	const menu = window.menuList.find(m => m.menuId === menuId);
 	if (!menu) return;
+	
+	document.getElementById("menuModal").style.display = "none";
 
 	console.log("👉 선택할 카테고리 ID:", menu.menuCategoryId);
 	console.log("🧭 전체 카테고리 목록:", [...dynamicCategories.entries()]);
@@ -25,8 +28,12 @@ export function openEditMenuModal(menuId) {
 	document.getElementById('editMenuCategory').value = menu.menuCategory || "";
 	
 	renderEditCategorySelect(menu.menuCategoryId);
+	
+	fillEditOptions(menu);
+	
+	
 
-	const container = document.getElementById("edit-option-container");
+/*	const container = document.getElementById("edit-option-container");
 	container.innerHTML = "";
 	editOptionCount.value = 0;
 
@@ -55,13 +62,13 @@ export function openEditMenuModal(menuId) {
 				container.appendChild(div);
 			}
 		}
-	}
+	}  */
 
 	document.getElementById('editMenuModal').style.display = 'flex';
+	document.getElementById('deleteMenuId').value = menu.menuId;
 	const addBtn = document.getElementById("edit-add-option-btn");
 	addBtn.disabled = editOptionCount.value >= maxOption;
 	
-	document.getElementById('deleteMenuId').value = menu.menuId;
 }
 
 export function closeEditMenuModal() {

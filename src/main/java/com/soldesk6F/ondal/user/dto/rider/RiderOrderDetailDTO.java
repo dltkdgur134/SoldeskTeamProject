@@ -21,8 +21,6 @@ public class RiderOrderDetailDTO {
     private double storeLatitude;
     private double storeLongitude;
     private String deliveryAddress;
-    private double deliveryAddressLatitude;
-    private double deliveryAddressLongitude;
     private String orderTimeFormatted;
     private String deliveryRequest;
     private int deliveryFee;

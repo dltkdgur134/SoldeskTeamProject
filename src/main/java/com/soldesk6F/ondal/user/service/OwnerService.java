@@ -1,6 +1,11 @@
 package com.soldesk6F.ondal.user.service;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.owner.wallet.repository.OwnerWalletHistoryRepository;
+import com.soldesk6F.ondal.owner.wallet.service.OwnerWalletHistoryService;
 import com.soldesk6F.ondal.user.dto.owner.OwnerForm;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.Rider;
@@ -25,6 +32,13 @@ public class OwnerService {
 	private OwnerRepository ownerRepository;
 	@Autowired
     private PasswordEncoder passwordEncoder;
+	@Autowired
+	private OwnerWalletHistoryRepository ownerWalletHistoryRepository;
+	@Autowired
+	private OwnerWalletHistoryService ownerWalletHistoryService;
+	
+	
+	
 	// 이미 점주가 등록되어 있는지 확인
     public boolean isAlreadyOwner(String userId) {
     	// RiderRepository에서 해당 userId에 해당하는 Rider가 존재하는지 확인
@@ -107,12 +121,88 @@ public class OwnerService {
             return false; // 비밀번호가 일치하지 않으면 수정 실패
         }
     }
+    public boolean checkOwnerSecondaryPassword(Owner owner, String currentSecondaryPassword) {
+
+    	if (owner.isSecondaryPasswordLocked()) {
+            // 잠금 상태인지 체크
+            return false;
+        }
+    	// 최근 실패 시간과 현재 시간 차이로 리셋 여부 판단
+    	if (owner.getLastSecondaryPasswordFailTime() != null &&
+    	        Duration.between(owner.getLastSecondaryPasswordFailTime(), LocalDateTime.now()).toMinutes() > 10) {
+    	        owner.setSecondaryPasswordFailCount(0); // 10분 지나면 초기화
+    	    }
+
+    	boolean isCorrect = passwordEncoder.matches(currentSecondaryPassword, owner.getSecondaryPassword());
+    	
+    	if (isCorrect) {
+            owner.setSecondaryPasswordFailCount(0);
+            owner.setSecondaryPasswordLocked(false);
+            owner.setLastSecondaryPasswordFailTime(null);
+        } else {
+            owner.setSecondaryPasswordFailCount(owner.getSecondaryPasswordFailCount() + 1);
+            owner.setLastSecondaryPasswordFailTime(LocalDateTime.now());
+
+            if (owner.getSecondaryPasswordFailCount() >= 5) {
+                owner.setSecondaryPasswordLocked(true); // 5회 실패 시 잠금
+            }
+        }
+    	
+    	ownerRepository.save(owner); // 상태 저장
+        return isCorrect;
+    	
+    }
+    @Transactional
+    public String processWithdrawal(Owner owner, int withdrawAmount, String secondaryPassword) {
+        // 1. 출금 금액이 10,000원 미만인 경우
+        if (withdrawAmount < 10000) {
+            return "최소 출금 금액은 10,000원입니다.";
+        }
+        if (withdrawAmount % 1000 != 0) {
+        	return "출금은 1000원 단위로만 가능합니다.";
+        }
+     // ✅ 3. 하루 3회 제한 (개발단계: 주석 처리)
+        /*
+        LocalDate today = LocalDate.now();
+        int todayWithdrawCount = riderWalletHistoryService.countTodayWithdrawals(rider.getRiderId(), today);
+        if (todayWithdrawCount >= 3) {
+            return "출금은 하루 3회만 가능합니다.";
+        }
+        */
+        
+        // 2. 2차 비밀번호 검증
+        boolean isSecondaryPasswordValid = checkOwnerSecondaryPassword(owner, secondaryPassword);
+        if (!isSecondaryPasswordValid) {
+            return "잘못된 2차 비밀번호입니다.";
+        }
+
+        // 3. 출금 금액 검증 (잔액보다 많은 금액을 출금할 수 없음)
+        if (withdrawAmount > owner.getOwnerWallet()) {
+            return "잔액이 부족합니다.";
+        }
+
+        // 4. 수수료 계산 (출금 금액의 10%)
+        int fee = withdrawAmount / 10;  // 10% 수수료
+        int actualAmount = withdrawAmount + fee;
+
+        // 5. 출금 처리 (잔액에서 출금 금액 차감)
+        owner.setOwnerWallet(owner.getOwnerWallet() - actualAmount);
+        ownerRepository.save(owner);  // 변경된 정보 저장
+
+        // 6. 출금 내역 기록 (출금 기록을 DB에 저장)
+        ownerWalletHistoryService.saveWalletHistory(owner, withdrawAmount, fee, actualAmount, "출금 요청");
+
+        // 7. 성공 메시지 반환
+        return String.format("출금 성공! %d원이 출금되었습니다. (수수료 %d원)", actualAmount, fee);
+    }
     
     
     
-    
-    
-    
-    
+    public int countTodayWithdrawals(UUID ownerId, LocalDate today) {
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+        return ownerWalletHistoryRepository.countByOwner_OwnerIdAndCreatedDateBetween(
+        		ownerId, startOfDay, endOfDay);
+    }
     
 }
