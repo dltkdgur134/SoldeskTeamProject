@@ -23,28 +23,43 @@
 			</div>
 			<div class="cart-wrapper">
 				<div class="carts">
-					<div class="cart-item" th:each="item : ${cartItems}" th:unless="${#lists.isEmpty(cartItems)}">
-						<div class="cart-item-left">
-							<img th:src="@{${item.menu.menuImg}}" alt="메뉴 이미지">
-						</div>
-						<div class="cart-item-middle">
-							<h4 th:text="${item.menu.menuName}"></h4>
-							<div class="cart-options">
-								<div th:each="opt : ${item.cartItemOptions}">
-									<span th:text="${opt.groupName} + ' - ' + ${opt.optionName} + ' (+ ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
+					<div class="cart-item" th:each="item : ${cartItems}"
+						th:data-id="${item.cartItemsId}" 
+						th:classappend="' cart-item-card'"
+						th:data-base-price="${item.menu.price}"
+						th:unless="${#lists.isEmpty(cartItems)}">
+						<div class="cart-item-body">
+							<div class="cart-item-left">
+								<img th:src="@{${item.menu.menuImg}}" alt="메뉴 이미지">
+							</div>
+							<div class="cart-item-middle">
+								<h4 th:text="${item.menu.menuName}"></h4>
+								<p class="menu-base-price" th:text="'가격: ' + ${item.menu.price} + '원'"></p>
+								<div class="cart-options">
+									<div th:each="opt : ${item.cartItemOptions}">
+										<span th:text="${opt.groupName} + ' : ' + ${opt.optionName} + ' ( ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
+									</div>
+									<div class="cart-options cart-item-options">
+										<div th:each="opt : ${item.cartItemOptions}">
+											<span th:text="${opt.groupName} + ' : ' + ${opt.optionName} + ' ( ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
+										</div>
+									</div>
 								</div>
+								<p class="itemTotalPrice" th:text="'가격: ' + ${item.getItemTotalPrice} + '원'"></p>
 							</div>
-							<p th:text="'가격: ' + ${item.getItemTotalPrice} + '원'"></p>
 						</div>
-						<div class="cart-item-right">
-							<div class="quantity-controls">
-								<button class="btn-decrease" data-id="[[${item.cartItemUuidAsString()}]]">-</button>
-								<span th:text="${item.quantity}"></span>
-								<button class="btn-increase" data-id="[[${item.cartItemUuidAsString()}]]">+</button>
-							</div>
-							<div class="action-buttons">
-								<button class="btn-change-option" data-id="[[${item.cartItemUuidAsString()}]]">옵션 변경</button>
-								<button class="btn-delete-item" data-id="[[${item.cartItemUuidAsString()}]]">삭제</button>
+						<div class="cart-item-footer">
+							<button class="btn-change-option" th:data-id="${item.cartItemsId}">옵션 변경</button>
+							<div class="quantity-controls" 
+							     th:data-id="${item.cartItemsId}"
+							     th:data-price="${item.menu.price}" 
+							     th:data-total-price="${item.getItemTotalPrice}">
+								<button class="btn-decrease">
+									<span th:if="${item.quantity > 1}">-</span>
+									<span th:if="${item.quantity == 1}">🗑</span>
+								</button>
+								<span class="qty-num" th:text="${item.quantity}"></span>
+								<button class="btn-increase">+</button>
 							</div>
 						</div>
 					</div>
@@ -52,13 +67,30 @@
 			</div>
 			<div class="order-summary" th:if="${not #lists.isEmpty(cartItems)}">
 				<p th:text="'결제금액: ' + ${totalPrice} + '원'"></p>
-				<button>주문하기</button>
+				<form id="orderForm" th:action="@{/order/pay}" method="post">
+					<input type="hidden" name="cartId" th:value="${cart.cartId}" />
+					<button type="submit">주문하기</button>
+				</form>
 			</div>
+			<div id="optionModal" class="modal" style="display: none;">
+				<div id="option-modal-overlay" class="modal-overlay"></div>
+				<div class="modal-content">
+					<span class="close-btn">&times;</span>
+					<h3 id="modal-menu-name">옵션 변경</h3>
+					<form id="optionForm">
+						<div id="optionList"></div>
+						<input type="hidden" name="cartItemUuid" id="modal-cart-item-id">
+						<button id="save-options-btn">옵션 저장</button>
+					</form>
+				</div>
+			</div>
+			
 		</div>
 	</div>
 	<div layout:fragment="js">
 		<script th:src="@{/js/index.js}"></script>
 		<script th:src="@{/js/cart.js}"></script>
+		<script th:src="@{/js/cartOptionModal.js}"></script>
 	</div>
 </body>
 </html>
