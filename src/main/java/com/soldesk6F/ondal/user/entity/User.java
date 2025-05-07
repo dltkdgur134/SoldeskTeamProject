@@ -90,6 +90,12 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
+	
+	@Column(name = "ondal_wallet",nullable = true)
+    private int ondalWallet;
+	
+	@Column(name = "ondal_point",nullable = true)
+	private int ondalPoint;
 
 	public enum UserStatus {
 		ACTIVE("정상"), // 정상 회원

@@ -1,36 +1,47 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/Layouts}">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
 
 <head>
-	<style>
-		#map {
-			width: 100vw;
-			height: 100vh;
-		}
+<meta charset="UTF-8">
+<title>온달</title>
+<style>
+#map {
+	width: 100vw;
+	height: 100vh;
+}
 
-		.overlay-content {
-			background-color: #fff;
-			border: 1px solid #000;
-			padding: 5px;
-			font-size: 12px;
-			color: #333;
-			border-radius: 5px;
-		}
-	</style>
-	<link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/RiderIndex.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/riderStatus.css}" rel="stylesheet" />
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+.overlay-content {
+	background-color: #fff;
+	border: 1px solid #000;
+	padding: 5px;
+	font-size: 12px;
+	color: #333;
+	border-radius: 5px;
+}
+</style>
+<link th:fragment="css" th:href="@{/css/RiderCustom.css}"
+	rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/RiderIndex.css}"
+	rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/riderStatus.css}"
+	rel="stylesheet" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<script
+	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 
-	<!-- 카카오 맵 API -->
-	<!--a82eb7e13124954eb1c020ac4cece497
+<!-- 카카오 맵 API -->
+<!--a82eb7e13124954eb1c020ac4cece497
 	e5d3b43b5ba403cc978d5770a28e29af-->
-	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
+<script
+	src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
 
-	<script>
+<script>
 		window.onload = async function () {
 			const routeData = JSON.parse(sessionStorage.getItem("routeData"));
 			if (routeData) {
@@ -163,16 +174,17 @@
 		<div class="message">
 			<div id="map" style="width: 100%; height: 400px;"></div>
 		</div>
-			<div class="rider-status">
-				<div id="status-indicator" class="status-indicator delivering">
-					<span class="dot"></span>
-					<span class="label">배달중</span>
-				</div>
+		<div class="rider-status">
+			<div id="status-indicator" class="status-indicator delivering">
+				<span class="dot"></span> <span class="label">배달중</span>
 			</div>
+		</div>
 
-		<form th:action="@{/rider/deliveryFin}" method="post" style="display: inline;">
+		<form th:action="@{/rider/deliveryFin}" method="post"
+			style="display: inline;">
 			<input type="hidden" name="orderId" th:value="${orderId}">
-			<button type="submit" class="btn btn-success btn-lg" id="finDeliveryBtn">배달 완료!</button>
+			<button type="submit" class="btn btn-success btn-lg"
+				id="finDeliveryBtn">배달 완료!</button>
 		</form>
 	</div>
 	<script>

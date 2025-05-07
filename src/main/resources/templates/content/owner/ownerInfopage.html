@@ -4,39 +4,46 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-	<script th:src="@{/js/initialize.js}" ></script>
-	<script th:src="@{/js/zipcode.js}" ></script>
-	<script th:src="@{/js/update.js}" ></script>
-	<link th:fragment="css" th:href="@{/css/OwnerCustom.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
+<script th:src="@{/js/initialize.js}"></script>
+<script th:src="@{/js/zipcode.js}"></script>
+<script th:src="@{/js/update.js}"></script>
+<link th:fragment="css" th:href="@{/css/OwnerCustom.css}"
+	rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
 <meta charset="UTF-8">
 <title>온달</title>
 </head>
 <body>
 	<div layout:fragment="content" class="container py-5">
-	 <div th:if="${InfoUpdateError}" class="alert alert-danger text-center" role="alert"
-		style="margin-bottom: 20px;">
-		<span th:text="${InfoUpdateError}"></span>
+		<div th:if="${InfoUpdateError}" class="alert alert-danger text-center"
+			role="alert" style="margin-bottom: 20px;">
+			<span th:text="${InfoUpdateError}"></span>
 		</div>
-	<div th:if="${InfoUpdateSuccess}" class="alert alert-success" role="alert"
-			style="margin-bottom: 20px;">
+		<div th:if="${InfoUpdateSuccess}" class="alert alert-success"
+			role="alert" style="margin-bottom: 20px;">
 			<span th:text="${InfoUpdateSuccess}"></span>
+		</div>
+		<div th:if="${SecondaryPasswordError}"
+			class="alert alert-danger text-center" role="alert"
+			style="margin-bottom: 20px;">
+			<span th:text="${SecondaryPasswordError}"></span>
 		</div>
 		<div class="container text-center">
 			<div class="row justify-content-md-center">
 				<div class="col col-lg-2">
 					<a type="button" class="btn btn-link position-relative"
 						id="profile-pic-btn" data-bs-toggle="modal"
-						data-bs-target="#updateProfilePicModal"> 
-						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
+						data-bs-target="#updateProfilePicModal"> <img
+						th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
 	             ? #authentication.principal.user.userProfile 
 	             : '/img/userProfiles/' + #authentication.principal.user.userProfile}"
-								class="rounded-circle img-thumbnail img-fluid"
-								alt="Profile Picture" id="profile-pic"> 
-				<span class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle" id="profile-pic-update-btn">
-		    		<i class="fa-solid fa-pen-to-square"></i>
-		  		</span>
+						class="rounded-circle img-thumbnail img-fluid"
+						alt="Profile Picture" id="profile-pic"> <span
+						class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle"
+						id="profile-pic-update-btn"> <i
+							class="fa-solid fa-pen-to-square"></i>
+					</span>
 					</a>
 				</div>
 				<div class="col col-lg-2">
@@ -45,9 +52,9 @@
 						class="badge rounded-pill text-bg-primary justify-content-center"
 						th:text="${#authentication.principal.user.UserRole}"></span>
 				</div>
-	</div>
-	</div>
-	<br>
+			</div>
+		</div>
+		<br>
 		<div class="card info-card p-4">
 			<h6 class="card-title">
 				프로필 <a href="ownerMypage" data-bs-toggle="tooltip"
@@ -59,8 +66,8 @@
 					<li class="list-group-item d-flex justify-content-between"><Label>아이디</Label><strong
 						th:text="${#authentication.principal.user.userId}"></strong></li>
 					<li class="list-group-item d-flex justify-content-between"><Label>점주
-						닉네임</Label> <strong th:text="${owner.ownerNickname}"></strong> 
-						<a type="button" class="btn btn-secondary btn-sm"
+							닉네임</Label> <strong th:text="${owner.ownerNickname}"></strong> <a
+						type="button" class="btn btn-secondary btn-sm"
 						data-bs-toggle="modal" data-bs-target="#updateOwnerNicknameModal">수정</a>
 					</li>
 				</ul>
@@ -82,14 +89,14 @@
 							name="updateOwnerNicknameForm" autocomplete="off"
 							class="needs-validation" id="update-owner-nickname-form"
 							novalidate>
-						<div class="input-group mb-3">
+							<div class="input-group mb-3">
 								<span class="input-group-text" id="basic-addon2"> <i
 									class="fa-solid fa-id-card"></i>
 								</span> <input type="text" class="form-control" placeholder="점주 닉네임"
 									aria-label="ownerNickname" name="ownerNickname"
 									id="owner-nickname-input" aria-describedby="basic-addon2"
 									maxlength="10" th:value="${owner.ownerNickname}">
-	
+
 								<div class="invalid-feedback">
 									닉네임을 확인해주세요. <i data-bs-toggle="tooltip"
 										data-bs-placement="right"
@@ -97,12 +104,13 @@
 										class="fa-solid fa-circle-question"></i>
 								</div>
 								<div class="valid-feedback">닉네임 변경이 가능합니다.</div>
-							</div>	
+							</div>
 						</form>
 					</div>
 					<div class="modal-footer">
 						<button type="submit" class="btn btn-primary"
-							form="update-owner-nickname-form" id="update-ownerer-nickname-btn">변경</button>
+							form="update-owner-nickname-form"
+							id="update-ownerer-nickname-btn">변경</button>
 						<button type="button" class="btn btn-secondary"
 							data-bs-dismiss="modal">취소</button>
 					</div>
@@ -156,14 +164,52 @@
 			</h6>
 			<div class="card-body">
 				<ul class="list-group list-group-flush">
-					
-					<li class="list-group-item d-flex justify-content-between">
-					<label>2차 비밀번호</label> 
-					<strong>********</strong></li>
-					<li class="list-group-item d-flex justify-content-between">
-					<label>온달 지갑</label>
-					<strong th:text="${owner.ownerWallet}+'원'"></strong></li>
+
+					<li class="list-group-item d-flex justify-content-between"><label>2차
+							비밀번호</label> <strong>********</strong></li>
+					<li class="list-group-item d-flex justify-content-between"><label>온달
+							지갑</label> <strong th:text="${owner.ownerWallet}+'원'"></strong><a
+						class="btn btn-secondary btn-sm" href="/owner/ownerWallet"
+						data-bs-toggle="modal"
+						data-bs-target="#checkOwnerSecondaryPassword">출금하기</a></li>
 				</ul>
+				<div class="modal fade" id="checkOwnerSecondaryPassword"
+					data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+					aria-labelledby="checkOwnerSecondaryPasswordLabel"
+					aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h1 class="modal-title fs-5"
+									id="checkOwnerSecondaryPasswordLabel">2차 비밀번호 입력</h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<form th:action="@{/checkOwnerSecondaryPassword}" method="post"
+									name="checkOwnerSecondaryPasswordForm" autocomplete="off"
+									class="needs-validation" id="check-owner-secondary-form"
+									novalidate>
+
+									<div class="input-group mb-3">
+										<span class="input-group-text" id="basic-addon2"> <i
+											class="fa-solid fa-id-card"></i>
+										</span> <input type="password" class="form-control"
+											placeholder="2차 비밀번호" name="currentSecondaryPassword"
+											id="currentSecondary-input" aria-describedby="basic-addon2">
+									</div>
+								</form>
+							</div>
+							<div class="modal-footer">
+								<button type="submit" class="btn btn-primary"
+									form="check-owner-secondary-form"
+									id="check-owner-secondary-btn">확인</button>
+								<button type="button" class="btn btn-secondary"
+									data-bs-dismiss="modal">취소</button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
