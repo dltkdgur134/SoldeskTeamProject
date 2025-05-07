@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
+import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,10 @@ public class StorePayController {
 		
 		List<CartItemsDTO> cids =  paymentService.getAllCartItems(cartuuid);
 		int totalPrice = paymentService.getListTotalPrice(cids);
+		UserInfoDTO uid = paymentService.getUserInfo(cartuuid);
 		model.addAttribute("cids" , cids);
 		model.addAttribute("totalPrice" , totalPrice);
-		
+		model.addAttribute("userInfo" , uid);
 		return "/content/pay";
 	}
 	

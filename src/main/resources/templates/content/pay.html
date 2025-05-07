@@ -117,13 +117,13 @@
         <h5 class="section-title">담은 메뉴</h5>
 		<div id="cartItems" class="list-group mb-4" th:each="item : ${cids}">
 		    <div class="list-group-item py-3 d-flex align-items-center">
-		      <img th:src="${item.imageUrl}" alt="상품 이미지" class="cart-item-img me-3" />
+		      <img th:src="${item.menuImg}" alt="상품 이미지" class="cart-item-img me-3" />
 		      <div class="flex-grow-1">
 		        <div class="d-flex justify-content-between">
 		          <strong th:text="${item.menuName}">상품명</strong>
 		          <span th:text="'₩' + ${#numbers.formatInteger(item.totalPrice, 0)}">₩0</span>
 		        </div>
-		        <small class="text-muted" th:text="${item.optionDescription}">옵션정보</small>
+		        <small class="text-muted" th:text="${item.optionNames}">옵션정보</small>
 		      </div>
 		    </div>
 		  </div>
@@ -132,8 +132,8 @@
         <div class="row g-3 align-items-start mb-4">
           <div class="col-lg-6">
             <div class="section-title">배달 주소</div>
-            <p class="mb-1"><strong id="roadName">서울특별시 강남구 테헤란로 123</strong></p>
-            <p class="mb-2 text-muted" id="detailAddress">301호, 온달빌딩</p>
+            <p class="mb-1"><strong id="roadName" th:text="${userInfo.userLoc}"></strong></p>
+            <p class="mb-2 text-muted" id="detailAddress" th:text="${userInfo.userSepLoc}">301호, 온달빌딩</p>
             <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addressModal">변경</button>
           </div>
           <div class="col-lg-6">
@@ -145,7 +145,7 @@
         <!-- 연락처 -->
         <div class="mb-3">
           <div class="section-title">내 연락처</div>
-          <input type="tel" class="form-control" placeholder="010-1234-5678" />
+          <input type="tel" class="form-control" th:text="${userInfo.userTel}" readonly/>
         </div>
 
         <!-- 가게 요청사항 -->

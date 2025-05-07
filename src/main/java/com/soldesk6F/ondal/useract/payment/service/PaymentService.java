@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
+import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,9 +47,11 @@ public class PaymentService {
 			nowSessionUUID = user.getUserUuid();
 			Optional<Cart> optCart = cartRepository.findById(cartUUID);
 			Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("해당 카트가 존재하지 않습니다."));
-//			if (cart.getUser().getUserUuid().equals(nowSessionUUID)) {
+			if (cart.getUser().getUserUuid().equals(nowSessionUUID)) {
 
 				List<CartItems> items = cartItemsRepository.findByCart_CartId(cart.getCartId());
+				System.out.println("cartId from DB: " + cart.getCartId());
+
 				if (items.isEmpty()) {
 					throw new IllegalArgumentException("카트에 담긴 아이템이 없습니다");
 				} else {
@@ -68,7 +72,7 @@ public class PaymentService {
 
 			}
 
-//		}
+		}
 	    throw new IllegalStateException("결제 요청을 처리할 수 없습니다");
 	}
 	
@@ -79,6 +83,21 @@ public class PaymentService {
 			total += cid.getTotalPrice();
 		}
 		return total;
+	}
+	
+	
+	public UserInfoDTO getUserInfo(UUID cartUUID){
+		
+		Cart cart = cartRepository.getById(cartUUID);
+		if(cart == null) throw new IllegalStateException("해당하는 유저가 없습니다");
+		
+		return UserInfoDTO.builder()
+			    .userLoc(cart.getUser().getUserSelectedAddress().getAddress())
+			    .userSepLoc(cart.getUser().getUserSelectedAddress().getDetailAddress())
+			    .userTel(cart.getUser().getUserPhone())
+			    .build();
+				
+		
 	}
 	
 	
