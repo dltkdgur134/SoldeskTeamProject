@@ -44,7 +44,7 @@ public class Cart {
 	private User user;
 	
 	@ManyToOne
-	@JoinColumn(name = "store_id",nullable = false)
+	@JoinColumn(name = "store_id", nullable = true)
 	private Store store;
 	
 	@CreationTimestamp
@@ -60,6 +60,7 @@ public class Cart {
 		super();
 		this.user = user;
 		this.store = store;
+		this.cartItems = new ArrayList<>();
 	}
 	
 	 @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

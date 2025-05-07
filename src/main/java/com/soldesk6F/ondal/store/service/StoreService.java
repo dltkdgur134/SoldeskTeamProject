@@ -262,4 +262,10 @@ public class StoreService {
 
 		storeRepository.save(store);
 	}
+	
+	@Transactional(readOnly = true)
+	public Store findByIdWithImgs(UUID storeId) {
+		return storeRepository.findWithStoreImgsByStoreId(storeId)
+			.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+	}
 }

@@ -188,66 +188,7 @@ public class OwnerStoreController {
 		}
 		return times;
 	}
-	
-	@PostMapping("/storeManagement/{storeId}/menu-register")
-	public String registerMenu(@PathVariable("storeId") UUID storeId,
-	                           @ModelAttribute MenuRegisterDto menuDto,
-	                           @AuthenticationPrincipal CustomUserDetails userDetails,
-	                           RedirectAttributes redirectAttributes) {
-		
-	    try {
-	        menuService.registerMenu(storeId, menuDto, userDetails.getUser().getUserId());
-	        redirectAttributes.addFlashAttribute("result", 0);
-	        redirectAttributes.addFlashAttribute("resultMsg", "메뉴가 등록되었습니다.");
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        redirectAttributes.addFlashAttribute("result", 1);
-	        redirectAttributes.addFlashAttribute("resultMsg", "메뉴 등록에 실패했습니다.");
-	    }
-	    System.out.println(menuDto.getMenuCategoryId());
-	    return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
-	}
-	
-	@PostMapping("/storeManagement/{storeId}/menu-edit")
-	public String editMenu(@PathVariable("storeId") UUID storeId,
-	                       @ModelAttribute MenuRegisterDto menuDto,
-	                       @AuthenticationPrincipal CustomUserDetails userDetails,
-	                       RedirectAttributes redirectAttributes) {
 
-		try {
-			menuService.editMenu(storeId, menuDto, userDetails.getUser().getUserId());
-			redirectAttributes.addFlashAttribute("result", 0);
-			redirectAttributes.addFlashAttribute("resultMsg", "수정되었습니다.");
-		} catch (Exception e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "수정에 실패했습니다.");
-		}
-		return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
-	}
-	
-	@PostMapping("/storeManagement/{storeId}/menu-delete")
-	public String deleteMenu(@PathVariable("storeId") UUID storeId, @RequestParam("menuId") UUID menuId, RedirectAttributes redirectAttributes) {
-		try {
-			menuService.deleteMenu(menuId);
-			redirectAttributes.addFlashAttribute("message", "메뉴가 삭제되었습니다.");
-		} catch (Exception e) {
-		redirectAttributes.addFlashAttribute("error", "메뉴 삭제 중 오류 발생: " + e.getMessage());
-		}
-		return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
-	}
-	
-	@PostMapping("/menu-reorder")
-	@ResponseBody
-	public ResponseEntity<?> reorderMenu(@RequestBody List<MenuOrderDto> updates) {
-		try {
-			menuService.updateMenuOrder(updates);
-			return ResponseEntity.ok().build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
-	}
-	
 	@PostMapping("/storeManagement/{storeId}/info-manage/save")
 	public String updateStoreInfo(
 		@PathVariable("storeId") UUID storeId,
@@ -355,6 +296,55 @@ public class OwnerStoreController {
 		}
 
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";
+	}
+	
+	
+	@PostMapping("/storeManagement/{storeId}/menu-register")
+	public String registerMenu(@PathVariable("storeId") UUID storeId,
+	                           @ModelAttribute MenuRegisterDto menuDto,
+	                           @AuthenticationPrincipal CustomUserDetails userDetails,
+	                           RedirectAttributes redirectAttributes) {
+		
+	    try {
+	        menuService.registerMenu(storeId, menuDto, userDetails.getUser().getUserId());
+	        redirectAttributes.addFlashAttribute("result", 0);
+	        redirectAttributes.addFlashAttribute("resultMsg", "메뉴가 등록되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("result", 1);
+	        redirectAttributes.addFlashAttribute("resultMsg", "메뉴 등록에 실패했습니다.");
+	    }
+	    System.out.println(menuDto.getMenuCategoryId());
+	    return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
+	}
+	
+	@PostMapping("/storeManagement/{storeId}/menu-edit")
+	public String editMenu(@PathVariable("storeId") UUID storeId,
+	                       @ModelAttribute MenuRegisterDto menuDto,
+	                       @AuthenticationPrincipal CustomUserDetails userDetails,
+	                       RedirectAttributes redirectAttributes) {
+
+		try {
+			menuService.editMenu(storeId, menuDto, userDetails.getUser().getUserId());
+			redirectAttributes.addFlashAttribute("result", 0);
+			redirectAttributes.addFlashAttribute("resultMsg", "수정되었습니다.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "수정에 실패했습니다.");
+		}
+		return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
+	}
+	
+	@PostMapping("/storeManagement/{storeId}/menu-delete")
+	public String deleteMenu(@PathVariable("storeId") UUID storeId, @RequestParam("menuId") UUID menuId, RedirectAttributes redirectAttributes) {
+		try {
+			menuService.deleteMenu(menuId);
+			redirectAttributes.addFlashAttribute("message", "메뉴가 삭제되었습니다.");
+		} catch (Exception e) {
+		redirectAttributes.addFlashAttribute("error", "메뉴 삭제 중 오류 발생: " + e.getMessage());
+		}
+		return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
 	}
 	
 	

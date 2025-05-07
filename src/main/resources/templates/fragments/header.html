@@ -118,7 +118,7 @@
 								</a> 
 							</th:block>
 							<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
-								<a class="btn btn-link text-decoration-none" href="@{/regAddress}"> 
+								<a class="btn btn-link text-decoration-none" th:href="@{/regAddress}"> 
 									<small><i class="fa-solid fa-map-location-dot"></i> 주소등록</small>
 								</a> 
 							</th:block>
