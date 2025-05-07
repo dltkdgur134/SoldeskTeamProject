@@ -168,7 +168,7 @@ function deleteAddress(count) {
 		.then(response => {
 			// 응답 상태 확인 (200)
 			if (!response.ok) {
-				throw new Error('Address deletion failed with status: ' + response.status);
+				throw new Error('주소 삭제 실패 응답 상태: ' + response.status);
 			}
 			return response.json(); // 응답 상태 OK 시 JSON 파싱 진행
 		})
@@ -199,8 +199,8 @@ function deleteAddress(count) {
 			//window.location.href = "/myAddress?deleted=true";
 		})
 		.catch(error => {
-			console.error('Error occurred:', error);
-			alert('삭제 중 에러가 발생했습니다.');
+			console.error('오류 발생:', error);
+			alert('삭제 중 오류가 발생했습니다.');
 		});
 }
 

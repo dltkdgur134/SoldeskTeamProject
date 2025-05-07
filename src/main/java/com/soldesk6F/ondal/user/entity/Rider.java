@@ -44,6 +44,15 @@ public class Rider {
 	@Column(name = "secondary_password", nullable = false, length = 255)
 	private String secondaryPassword;
 
+	@Column(name = "secondary_password_fail_count")
+	private int secondaryPasswordFailCount;
+
+	@Column(name = "last_secondary_password_fail_time")
+    private LocalDateTime lastSecondaryPasswordFailTime;
+    
+	@Column(name = "is_secondary_password_locked")
+    private boolean isSecondaryPasswordLocked;
+	
 	@Column(name = "vehicle_number", nullable = false, length = 20)
 	private String vehicleNumber;
 

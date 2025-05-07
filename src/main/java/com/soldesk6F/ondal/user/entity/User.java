@@ -124,6 +124,12 @@ public class User {
 		}
 	}
 
+	@Column(name = "ondal_wallet",nullable = true)
+    private int ondalWallet;
+	
+	@Column(name = "ondal_point",nullable = true)
+	private int ondalPoint;
+	
 	@Builder
 	public User(String userId, String password, String userProfile, String userName, String nickName, String email,
 			String userPhone, RegAddress userSelectedAddress, String socialLoginProvider, UserRole userRole,
