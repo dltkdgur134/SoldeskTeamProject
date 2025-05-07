@@ -1,4 +1,5 @@
 .cart-empty {
+	display: none;
 	text-align: center;
 	padding: 50px 0;
 }
@@ -15,6 +16,15 @@
 	font-weight: bold;
 }
 
+.menu-base-price {
+	display: block;
+	font-size: 14px;
+	color: #888;
+	line-height: 1.5;
+	margin: 0;
+	max-height: 24px;
+}
+
 .cart-wrapper {
 	display: flex;
 	justify-content: center;
@@ -28,18 +38,22 @@
 
 .cart-item {
 	display: flex;
+	flex-direction: column;
 	gap: 12px;
 	padding: 16px;
-	border: 1px solid #eee;
 	border-radius: 12px;
-	background-color: #fff;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+	border: 1px solid #ddd;
 	margin-bottom: 16px;
+	background-color: #fff;
+}
+
+.cart-item-body {
+	display: flex;
+	gap: 30px;
 }
 
 .cart-item-left img {
-	width: 100px;
-	height: 100px;
+	max-width: 150px;
 	object-fit: cover;
 	border-radius: 8px;
 }
@@ -48,45 +62,197 @@
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	text-align: left;
 }
 
 .cart-item-middle h4 {
-	margin: 0;
-	font-size: 1.1rem;
-	font-weight: 600;
-	color: #333;
+	font-size: 17px;
+	font-weight: bold;
+	color: #111;
+	margin-bottom: 6px;
+	line-height: 1.4;
 }
 
 .cart-item-middle p {
-	margin: 4px 0;
-	font-size: 0.9rem;
-	color: #666;
+	line-height: 2;
 }
 
-.cart-item-right {
+.cart-options span {
+	font-size: 14px;
+	color: #888;
+	margin: 2px 0;
+}
+
+.cart-item-footer {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: flex-end;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 10px;
+}
+
+.cart-item-footer button {
+	padding: 4px 10px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	background-color: #f9f9f9;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.itemTotalPrice {
+	margin-top: 10px;
 }
 
 .quantity-controls {
 	display: flex;
 	align-items: center;
-	gap: 6px;
-	margin-bottom: 8px;
+	gap: 3px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	padding: 2px 6px;
+	height: 32px;
 }
 
 .quantity-controls button {
-	width: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	height: 28px;
+	width: 28px;
 	font-size: 16px;
+	line-height: 1;
+	vertical-align: middle;
+	padding: 0;
+}
+
+.quantity-controls span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	font-size: 16px;
+	text-align: center;
+	line-height: 1;
+	vertical-align: middle;
+	padding: 0;
+}
+
+.action-buttons {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 10px;
 }
 
 .action-buttons button {
-	margin-top: 4px;
-	font-size: 0.85rem;
+	padding: 4px 10px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	background-color: #f9f9f9;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.order-summary {
+	text-align: right;
+	padding: 20px;
+	font-size: 18px;
+	font-weight: bold;
+	border-top: 1px solid #eee;
+	background-color: #fff;
+	position: sticky;
+	bottom: 0;
+	z-index: 10;
 }
 
 
+/*  모달  */
+
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+}
+
+.modal-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.modal-content {
+	position: relative;
+	background: #fff;
+	padding: 30px;
+	border-radius: 10px;
+	width: 400px;
+	max-width: 90%;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+	z-index: 10000;
+}
+
+.close-btn {
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	font-size: 24px;
+	cursor: pointer;
+	color: #888;
+}
+
+#modal-menu-name {
+	margin-bottom: 15px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+#optionList {
+	margin-bottom: 20px;
+}
+
+.modal-option-row {
+	display: block;
+	margin: 0.25rem 0;
+	padding: 8px;
+	background-color: #f9f9f9;
+	border-radius: 6px;
+	font-size: 15px;
+}
+
+.modal-option-group {
+	margin-bottom: 1rem;
+	padding: 0.5rem;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background: #f9f9f9;
+}
+
+.group-title {
+	margin-bottom: 0.5rem;
+	font-weight: bold;
+}
+
+#optionForm button[type="submit"] {
+	width: 100%;
+	padding: 10px 0;
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+#optionForm button[type="submit"]:hover {
+	background-color: #45a049;
+}
