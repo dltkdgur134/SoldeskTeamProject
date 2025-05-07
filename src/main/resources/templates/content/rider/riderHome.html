@@ -1,32 +1,31 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/Layouts}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/Layouts}">
 
 <head>
-    <link th:fragment="css" th:href="@{/css/deliveryMap.css}"
-        rel="stylesheet" />
-    <link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
-    <link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-    <link th:fragment="css" th:href="@{/css/RiderIndex.css}" rel="stylesheet" />
-    <script
-        src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-<link th:fragment="css" th:href="@{/css/deliveryMap.css}"
-	rel="stylesheet" />
-<link th:fragment="css" th:href="@{/css/RiderCustom.css}"
-	rel="stylesheet" />
-<link th:fragment="css" th:href="@{/css/RiderIndex.css}" rel="stylesheet" />
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-<script
-	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<link th:fragment="css" th:href="@{/css/deliveryMap.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/RiderIndex.css}" rel="stylesheet" />
+	<link th:fragment="css" th:href="@{/css/riderStatus.css}" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 </head>
+
 <body>
 	<div layout:fragment="content">
 		<!-- 지도 영역 -->
 		<div id="map" style="width: 100%; height: 400px;"></div>
+		<div class="rider-status">
+			<div id="status-indicator" class="status-indicator waiting">
+				<span class="dot"></span>
+				<span class="label">대기</span>
+			</div>
+			<p id="summary" class="mb-2 text-muted"></p>
+			<button id="change-btn" class="btn btn-primary change-status">변 경</button>
+		</div>
+		<br>
 		<!-- 주문 목록 출력 -->
 		<div id="order-list">
 			<h4>주문 목록</h4>
@@ -34,10 +33,10 @@
 				<!-- 여기 안에 각 주문 항목이 동적으로 들어갑니다. -->
 			</div>
 		</div>
-
+		<!--a82eb7e13124954eb1c020ac4cece497
+		e5d3b43b5ba403cc978d5770a28e29af-->
 		<!-- Kakao Maps API -->
-		<script
-			src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3ed46db13320cf31ee95b563f78b8740"></script>
+		<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
 		<script src="/js/riderMap.js"></script>
 
 		<script th:inline="javascript">
@@ -48,6 +47,62 @@
 		<script th:inline="javascript">
 			const orders = /*[[${ordersJson}]]*/[];
 			console.log("📦 Orders loaded: ", orders);
+		</script>
+		<script th:inline="javascript">
+			const riderId = /*[[${riderId}]]*/ "fallback-id"; // riderId 동적으로 주입
+		</script>
+
+		<script>
+		  async function loadRiderStatus() {
+		    try {
+		      const res = await fetch(`/rider/${riderId}`);
+		      if (!res.ok) throw new Error(`서버 응답 오류: ${res.statusText}`);
+		      const rider = await res.json();
+		      if (rider && rider.riderStatus) {
+		        updateStatusIndicator(rider.riderStatus); 
+		      } else {
+		        throw new Error("유효한 상태 정보가 없습니다.");
+		      }
+		    } catch (e) {
+		      console.error("상태 로딩 실패", e);
+		      const label = document.querySelector("#status-indicator .label");
+		      if (label) label.textContent = "상태 불러오기 실패";
+		    }
+		  }
+
+		  // ✅ 여기가 loadRiderStatus 함수 바깥!
+		  document.getElementById("change-btn").addEventListener("click", async () => {
+		    try {
+		      await fetch(`/rider/${riderId}/status`, { method: "PUT" });
+		      await loadRiderStatus();
+		    } catch (e) {
+		      alert("상태 변경 실패");
+		      console.error(e);
+		    }
+		  });
+
+		  function updateStatusIndicator(status) {
+		    const indicator = document.getElementById("status-indicator");
+		    const label = indicator.querySelector(".label");
+		    indicator.className = "status-indicator"; // 초기화
+		    switch (status) {
+		      case "WAITING":
+		        indicator.classList.add("waiting");
+		        label.textContent = "대기";
+		        break;
+		      case "DELIVERING":
+		        indicator.classList.add("delivering");
+		        label.textContent = "배달 중";
+		        break;
+		      case "RESTING":
+		        indicator.classList.add("resting");
+		        label.textContent = "휴식 중";
+		        break;
+		    }
+		  }
+
+		  // ✅ 페이지 로드 시 실행
+		  loadRiderStatus();
 		</script>
 	</div>
 </body>

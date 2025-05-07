@@ -30,6 +30,10 @@ public class MenuDto {
 	private List<Integer> menuOptions2Price;
 	private List<String> menuOptions3;
 	private List<Integer> menuOptions3Price;
+	
+	private String menuOptions1GroupName;
+	private String menuOptions2GroupName;
+	private String menuOptions3GroupName;
 
 	private MenuStatus menuStatus;
 }

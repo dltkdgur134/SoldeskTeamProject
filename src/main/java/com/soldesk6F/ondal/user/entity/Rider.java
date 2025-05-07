@@ -88,6 +88,13 @@ public class Rider {
 		public String getDescription() {
 			return description;
 		}
+		public RiderStatus next() {
+	        return switch (this) {
+	            case WAITING -> RESTING;
+	            case DELIVERING -> RESTING;
+	            case RESTING -> WAITING;
+	        };
+	    }
 	}
 
 	public enum DeliveryRange {

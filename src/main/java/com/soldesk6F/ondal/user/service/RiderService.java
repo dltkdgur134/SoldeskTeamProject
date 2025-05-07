@@ -4,14 +4,21 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.dto.rider.RiderForm;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
+import com.soldesk6F.ondal.user.entity.Rider.RiderStatus;
 import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
 import jakarta.transaction.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +33,8 @@ public class RiderService {
     private UserRepository userRepository;
     @Autowired
     private RiderRepository riderRepository;
+    @Autowired
+    private OrderRepository orderRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     
@@ -133,6 +142,80 @@ public class RiderService {
             return false; // 비밀번호가 일치하지 않으면 수정 실패
         }
     }
+    public void assignRiderToOrder(UUID orderId, UUID riderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+
+        Rider rider = riderRepository.findById(riderId)
+            .orElseThrow(() -> new RuntimeException("라이더를 찾을 수 없습니다."));
+
+        // 주문에 라이더 배정
+        order.setRider(rider);// rider를 Order에 설정
+
+        orderRepository.save(order);  // 저장
+    }
+ // RiderStatus 변경 서비스
+    public Rider changeRiderStatus(UUID riderId) {
+        Rider rider = riderRepository.findById(riderId)
+            .orElseThrow(() -> new RuntimeException("라이더를 찾을 수 없습니다"));
+
+        rider.setRiderStatus(rider.getRiderStatus().next());
+        return riderRepository.save(rider);
+    }
+    
+    @Transactional
+    public void completeOrderAndRewardRider(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
+
+        // 상태 검증
+        if (order.getOrderToRider() != Order.OrderToRider.ON_DELIVERY) {
+            throw new RuntimeException("배달 완료가 불가능한 상태입니다.");
+        }
+
+        Rider rider = order.getRider();
+        if (rider == null) throw new RuntimeException("배정된 라이더가 없습니다.");
+
+        // 배달 완료 시간 계산 및 저장
+        LocalDateTime deliveryStartTime = order.getDeliveryStartTime();
+        if (deliveryStartTime == null) {
+            throw new RuntimeException("배달 시작 시간이 존재하지 않습니다.");
+        }
+
+        LocalDateTime startTime = order.getDeliveryStartTime();
+        LocalDateTime now = LocalDateTime.now();
+
+        Duration duration = Duration.between(startTime, now);
+        LocalTime realDeliveryTime = LocalTime.ofSecondOfDay(duration.getSeconds());
+
+        order.setRealDeliveryTime(realDeliveryTime);
+
+        
+        
+        
+        order.setOrderToRider(Order.OrderToRider.COMPLETED);
+        orderRepository.save(order);
+
+        // 라이더 보상 처리
+        int deliveryFee = order.getDeliveryFee();
+        if (deliveryFee <= 0) {
+            throw new RuntimeException("유효하지 않은 배달료입니다.");
+        }
+
+        int newWalletAmount = rider.getRiderWallet() + deliveryFee;
+        if (newWalletAmount < 0) {
+            throw new RuntimeException("지갑 금액이 음수로 설정될 수 없습니다.");
+        }
+
+        rider.setRiderWallet(newWalletAmount);
+        rider.setRiderStatus(Rider.RiderStatus.WAITING);
+        riderRepository.save(rider);
+    }
+
+    
+    
+    
+    
     
     
     
