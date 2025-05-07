@@ -47,7 +47,7 @@ public class StoreController {
         }
     }
     
-	@GetMapping("/list")
+	@GetMapping("/store/list")
 	public String showStoreList(@RequestParam(name = "category", required = false) String category,
     							Model model) {
     	model.addAttribute("selectedCategory", category);

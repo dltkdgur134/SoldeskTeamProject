@@ -2,12 +2,26 @@
 
 @font-face {
 	font-family: "acloud";
-	src: url(acloud.ttf);
+	src: url('acloud.ttf');
+}
+
+@font-face {
+	font-family: "taebaek";
+	src: url('taebaek.ttf');
+}
+
+@font-face {
+	font-family: "yisunshin";
+	src : url('yisunshinB.ttf'), format('truetype');
+}
+
+@font-face {
+	font-family: "siwol";
+	src : url('siwol.ttf');
 }
 
 body {
-	font-family: "yisunshinM";
-	text-align: center;
+	font-family: "siwol";
 }
 
 .imgs {

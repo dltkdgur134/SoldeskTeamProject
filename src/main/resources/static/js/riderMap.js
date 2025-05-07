@@ -199,7 +199,7 @@ function displayOrdersForStore(storeName) {
                 <p>배달 주소: <span>${order.deliveryAddress}</span></p>
                 <button class="assign-btn" data-order-id="${order.orderId}">배차</button>
             </div>
-        ;`
+        `
 
 		orderItemsContainer.appendChild(orderDiv);
 	});
