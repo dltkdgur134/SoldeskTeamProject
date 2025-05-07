@@ -87,7 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	  clearList();
 	  const hist = loadAddrHistory();
 	  
-	  hist.forEach(a => {if(!a)list.appendChild(createItem(a, /* isHistory */ true))});
+	  hist.forEach(a => {
+		if(!a)list.appendChild(createItem(a, /* isHistory */ true))});
 	  listWrapper.classList.remove('d-none');
 	  listWrapper.classList.add('d-flex');
 	}
