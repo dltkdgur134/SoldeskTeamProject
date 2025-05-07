@@ -167,4 +167,92 @@
 }
 
 
+/*  모달  */
 
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+}
+
+.modal-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.modal-content {
+	position: relative;
+	background: #fff;
+	padding: 30px;
+	border-radius: 10px;
+	width: 400px;
+	max-width: 90%;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+	z-index: 10000;
+}
+
+.close-btn {
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	font-size: 24px;
+	cursor: pointer;
+	color: #888;
+}
+
+#modal-menu-name {
+	margin-bottom: 15px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+#optionList {
+	margin-bottom: 20px;
+}
+
+.modal-option-row {
+	display: block;
+	margin: 0.25rem 0;
+	padding: 8px;
+	background-color: #f9f9f9;
+	border-radius: 6px;
+	font-size: 15px;
+}
+
+.modal-option-group {
+	margin-bottom: 1rem;
+	padding: 0.5rem;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background: #f9f9f9;
+}
+
+.group-title {
+	margin-bottom: 0.5rem;
+	font-weight: bold;
+}
+
+#optionForm button[type="submit"] {
+	width: 100%;
+	padding: 10px 0;
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+#optionForm button[type="submit"]:hover {
+	background-color: #45a049;
+}
