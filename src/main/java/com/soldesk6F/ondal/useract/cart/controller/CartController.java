@@ -21,6 +21,7 @@ import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.service.UserService;
 import com.soldesk6F.ondal.useract.cart.dto.CartAddRequestDto;
+import com.soldesk6F.ondal.useract.cart.dto.CartUpdateRequestDto;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.service.CartItemService;
 import com.soldesk6F.ondal.useract.cart.service.CartService;
@@ -70,6 +71,31 @@ public class CartController {
 
 		return ResponseEntity.ok(Map.of("message", "장바구니에 담았습니다!"));
 	}
+	
+//	@PostMapping("/api/cart/update-quantity")
+//	@ResponseBody
+//	public Map<String, Object> updateQuantity(@RequestBody CartUpdateRequestDto dto) {
+//		cartService.updateQuantity(dto.getCartItemUuid(), dto.getQuantity());
+//		int itemTotal = cartService.getUpdatedTotal(dto.getCartItemUuid());
+//		int cartTotal = cartService.getCartTotalPriceForUser();
+//
+//		return Map.of(
+//			"totalPrice", itemTotal, "cartTotalPrice", cartTotal
+//		);
+//	}
+//
+//	@PostMapping("/api/cart/delete")
+//	@ResponseBody
+//	public void deleteItem(@RequestBody Map<String, String> body) {
+//		cartService.deleteItem(UUID.fromString(body.get("cartItemUuid")));
+//	}
+//	
+//	@GetMapping("/api/cart/total-price")
+//	@ResponseBody
+//	public Map<String, Object> getTotalCartPrice() {
+//		int totalPrice = cartService.getCartTotalPriceForUser();
+//		return Map.of("cartTotalPrice", totalPrice);
+//	}
 	
 	
 }

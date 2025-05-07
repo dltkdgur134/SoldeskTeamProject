@@ -24,27 +24,33 @@
 			<div class="cart-wrapper">
 				<div class="carts">
 					<div class="cart-item" th:each="item : ${cartItems}" th:unless="${#lists.isEmpty(cartItems)}">
-						<div class="cart-item-left">
-							<img th:src="@{${item.menu.menuImg}}" alt="메뉴 이미지">
-						</div>
-						<div class="cart-item-middle">
-							<h4 th:text="${item.menu.menuName}"></h4>
-							<div class="cart-options">
-								<div th:each="opt : ${item.cartItemOptions}">
-									<span th:text="${opt.groupName} + ' - ' + ${opt.optionName} + ' (+ ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
+						<div class="cart-item-body">
+							<div class="cart-item-left">
+								<img th:src="@{${item.menu.menuImg}}" alt="메뉴 이미지">
+							</div>
+							<div class="cart-item-middle">
+								<h4 th:text="${item.menu.menuName}"></h4>
+								<p class="menu-base-price" th:text="'가격: ' + ${item.menu.price} + '원'"></p>
+								<div class="cart-options">
+									<div th:each="opt : ${item.cartItemOptions}">
+										<span th:text="${opt.groupName} + ' : ' + ${opt.optionName} + ' ( ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
+									</div>
 								</div>
+								<p class="itemTotalPrice" th:text="'가격: ' + ${item.getItemTotalPrice} + '원'"></p>
 							</div>
-							<p th:text="'가격: ' + ${item.getItemTotalPrice} + '원'"></p>
 						</div>
-						<div class="cart-item-right">
-							<div class="quantity-controls">
-								<button class="btn-decrease" data-id="[[${item.cartItemUuidAsString()}]]">-</button>
-								<span th:text="${item.quantity}"></span>
-								<button class="btn-increase" data-id="[[${item.cartItemUuidAsString()}]]">+</button>
-							</div>
-							<div class="action-buttons">
-								<button class="btn-change-option" data-id="[[${item.cartItemUuidAsString()}]]">옵션 변경</button>
-								<button class="btn-delete-item" data-id="[[${item.cartItemUuidAsString()}]]">삭제</button>
+						<div class="cart-item-footer">
+							<button class="btn-change-option" data-id="[[${item.cartItemUuidAsString()}]]">옵션 변경</button>
+							<div class="quantity-controls" 
+							     data-id="[[${item.cartItemUuidAsString()}]]" 
+							     data-price="${item.menu.price}" 
+							     data-total-price="${item.getItemTotalPrice}">
+								<button class="btn-decrease">
+									<span th:if="${item.quantity > 1}">-</span>
+									<span th:if="${item.quantity == 1}">🗑</span>
+								</button>
+								<span class="qty-num" th:text="${item.quantity}"></span>
+								<button class="btn-increase">+</button>
 							</div>
 						</div>
 					</div>
