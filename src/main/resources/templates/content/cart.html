@@ -36,9 +36,6 @@
 								<h4 th:text="${item.menu.menuName}"></h4>
 								<p class="menu-base-price" th:text="'가격: ' + ${item.menu.price} + '원'"></p>
 								<div class="cart-options">
-									<div th:each="opt : ${item.cartItemOptions}">
-										<span th:text="${opt.groupName} + ' : ' + ${opt.optionName} + ' ( ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
-									</div>
 									<div class="cart-options cart-item-options">
 										<div th:each="opt : ${item.cartItemOptions}">
 											<span th:text="${opt.groupName} + ' : ' + ${opt.optionName} + ' ( ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
@@ -80,7 +77,7 @@
 					<form id="optionForm">
 						<div id="optionList"></div>
 						<input type="hidden" name="cartItemUuid" id="modal-cart-item-id">
-						<button id="save-options-btn">옵션 저장</button>
+						<button id="save-options-btn" type="button">옵션 저장</button>
 					</form>
 				</div>
 			</div>

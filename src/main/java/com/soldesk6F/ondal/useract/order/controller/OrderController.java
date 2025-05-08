@@ -21,9 +21,11 @@ public class OrderController {
 	private final CartService cartService;
 
 	@PostMapping("/pay")
-	public String pay(@RequestParam UUID cartId, Model model) {
+	public String pay(@RequestParam("cartId") UUID cartId, Model model) {
 		Cart cart = cartService.findById(cartId);
 		model.addAttribute("cart", cart);
-		return "order/pay";
+		return "content/pay";
 	}
 }
+
+

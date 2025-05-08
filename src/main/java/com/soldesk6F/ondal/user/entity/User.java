@@ -94,8 +94,8 @@ public class User {
 	@Column(name = "ondal_wallet",nullable = true)
     private int ondalWallet;
 	
-	@Column(name = "ondal_point",nullable = true)
-	private int ondalPoint;
+	@Column(name = "ondal_pay",nullable = true)
+	private int ondalPay;
 
 	public enum UserStatus {
 		ACTIVE("정상"), // 정상 회원
