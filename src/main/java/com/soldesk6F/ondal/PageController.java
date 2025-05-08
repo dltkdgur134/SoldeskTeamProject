@@ -12,6 +12,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
+import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +23,14 @@ public class PageController {
 	
 	// 마이페이지 이동
 	@GetMapping (value = "/myPage")
-	public String goMyPage(Model model) {
+	public String goMyPage(@AuthenticationPrincipal CustomUserDetails userDetails,Model model) {
+		UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
+        User freshUser = userRepository.findById(userUuid)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        
+        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
+        model.addAttribute("ondalPay", freshUser.getOndalPay());
+        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
 		System.out.println("myPage 컨트롤러 진입");
 		return "content/myPage";
 	}
@@ -64,5 +73,22 @@ public class PageController {
 	public String goRegAddress() {
 		return "content/regAddress";
 	}
+	
+	
+	private final UserRepository userRepository;
+	
+	@GetMapping("/ondalPay")
+	public String goOndalPay(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+	    UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
+	    User freshUser = userRepository.findById(userUuid).orElseThrow();
+	    
+	    model.addAttribute("ondalWallet", freshUser.getOndalWallet());
+	    model.addAttribute("ondalPay", freshUser.getOndalPay());
+	    model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress()); // 실시간 주소
+
+	    return "content/user/ondalPay";
+	}
+	
+	
 	
 }
