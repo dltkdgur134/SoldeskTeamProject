@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -38,7 +39,6 @@ public class ReviewController {
 		return "content/myReview";
 	}
 	
-	
 	// 리뷰 작성페이지 이돟
 	@GetMapping("/writeReview/{orderId}")
 	public String goWriteReview(@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -63,6 +63,19 @@ public class ReviewController {
 		}
 	}
 	
+	@PutMapping("content/updateReview/")
+	public String updateReview(@AuthenticationPrincipal CustomUserDetails userDetails,
+			ReviewDTO reviewDTO,
+			@RequestParam("reviewImg") MultipartFile[] reviewImg,
+			RedirectAttributes redirectAttributes) {
+		
+		
+		return "";
+	}
+	
+	
+	
+	// 리뷰 삭제
 	@DeleteMapping("/content/deleteReview/{reviewId}")
 	public ResponseEntity<Map<String, Object>> deleteReview(@AuthenticationPrincipal CustomUserDetails userDetails,
 			@PathVariable("reviewId") UUID reviewId) {
