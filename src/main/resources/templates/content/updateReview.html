@@ -22,23 +22,25 @@
 		</div>
 	</div>
 	<div class="card info-card p-4">
-		<div class="card-title d-flex justify-content-center"><strong id="review-store-name" th:text="${order.store.storeName}"></strong></div>
-		<div class="card-body d-flex justify-content-center">
-			<th:block th:each="order : ${orderDetail}">
-				<strong id="review-menu-name" th:text="${order.menu.menuName}"></strong>
-			</th:block>
+		<div class="container d-flex justify-content-center">
+			<h4 class="card-title">
+				리뷰 수정
+			</h4>
 		</div>
-		<form class="p-3" name="regReviewForm" id="regReviewForm" th:action="@{/content/regReview}" enctype="multipart/form-data" onsubmit="return checkReview();" method="POST" autocomplete="off">
-			<input type="text" class="form-control" name="orderId" placeholder="Order ID" id="order-id" th:value="${order.orderId}" hidden="true" />
+		<form class="p-3" name="updateReviewForm" id="update-review-form" th:action="@{/content/updateReview}" enctype="multipart/form-data" onsubmit="return checkReview();" method="POST" autocomplete="off">
+			<div class="container d-flex justify-content-center">
+				<h2 th:text="${review.store.storeName}"></h2>
+			</div>
+			<input type="text" class="form-control" name="reviewId" placeholder="Review ID" id="review-id" th:value="${review.reviewId}" hidden="true"/>
 			<div class="container-fluid d-flex justify-content-center flex-column align-items-center">
 	    		<div class="rating mb-3">
-	  				<span id="5" class="fa-solid fa-moon mx-2"></span>
-	  				<span id="4" class="fa-solid fa-moon mx-2"></span>
-	  				<span id="3" class="fa-solid fa-moon mx-2"></span>
-	  				<span id="2" class="fa-solid fa-moon mx-2"></span>
-	  				<span id="1" class="fa-solid fa-moon mx-2"></span>
+	  				<span id="5" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="4" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="3" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="2" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="1" class="star fa-solid fa-moon mx-2"></span>
 				</div>
-				<input name="rating" class="form-control mb-3" id="rating-stars" type="text" hidden="true"/>
+				<input name="rating" class="form-control" id="rating-stars" type="text" th:value="${review.rating}" hidden="true"/>
 				<div class="invalid-feedback text-center">
 	     			달점을 선택해주세요!
 	   			</div>
@@ -48,18 +50,22 @@
 	  			<input type="file" class="form-control" id="review-img" name="reviewImg" multiple="multiple">
 			</div>
 			<div class="preview-container d-flex justify-content-center mt-3" id="image-preview-container">
-	    		
-	  		</div>
-	  		<div class="d-flex justify-content-end">
-	  			<div id="file-count"></div>
-	  		</div>
+    			<th:block th:each="reviewImg : ${reviewImgList}">
+        		<div class="preview-wrapper" style="position: relative; display: inline-block; margin: 5px;">
+            		<img th:src="${'/img/review/' + reviewImg.reviewImg}" 
+                		class="img-thumbnail existing-img" 
+                		style="max-width: 150px; height: auto; border: 3px solid #667EFF; padding: 5px; border-radius: 5px;" 
+                		th:attr="data-filename=${reviewImg.reviewImg}">
+        	</div>
+    </th:block>
+</div>
 			<div class="form-floating my-3">
-				<input type="text" class="form-control" name="reviewTitle" placeholder="리뷰 제목" id="review-title" maxlength="30"/>
+				<input type="text" class="form-control" name="reviewTitle" placeholder="리뷰 제목" id="review-title" maxlength="30" th:value="${review.reviewTitle}"/>
 				<label for="review-title">리뷰 제목</label>
 			</div>
 			
 			<div class="form-floating">
-	  			<textarea class="form-control" name="reviewContent" placeholder="리뷰를 작성해주세요." id="review-content" maxlength="255"></textarea>
+	  			<textarea class="form-control" name="reviewContent" placeholder="리뷰를 작성해주세요." id="review-content" maxlength="255" th:text="${review.reviewContent}"></textarea>
 	  			<label for="review-content">리뷰 내용</label>
 			</div>
 			<div class="d-flex justify-content-end">
@@ -67,7 +73,7 @@
 			</div>
 			<br>
 			<div class="d-flex justify-content-evenly my-3">
-				<button class="btn btn-warning" form="regReviewForm" id="reg-review-form-btn">작성</button>
+				<button class="btn btn-warning" form="updateReviewForm" id="update-review-form-btn">수정</button>
 				<a type="button" class="btn btn-secondary" th:href="@{/orderHistory}">뒤로가기</a>
 			</div>
 		</form>

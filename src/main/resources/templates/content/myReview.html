@@ -34,8 +34,8 @@
 				<th:block th:each="review : ${reviewList}">
 					<form th:id="review-form + ${reviewStat.count}" th:name="reviewForm + ${reviewStat.count}" action="" method="POST">
 						<div class="card mb-2">
-							<div class="card-header review-header p-3">
-								<div class="container d-flex justify-content-between align-items-center">
+							<div class="card-header review-header">
+								<div class="container d-flex justify-content-between align-items-center headers">
 									<a class="icon-link icon-link-hover" th:href="@{/store/view/{storeId}(storeId=${review.store.storeId})}">
 										<strong th:text="${review.store.storeName}"></strong> 
 										<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" 
@@ -46,7 +46,7 @@
 									</a>
 									<strong class="order-time" th:text="${#strings.substringBefore(#strings.replace(review.order.orderTime,'T', ' '), '.')}"></strong>
 								</div>
-								<div class="container d-flex justify-content-between align-items-center">
+								<div class="container d-flex justify-content-between align-items-center headers">
 									<div class="my-rating">
 		  								<span id="5" class="star fa-solid fa-moon me-1"></span>
 		  								<span id="4" class="star fa-solid fa-moon me-1"></span>
@@ -56,6 +56,14 @@
 									</div>
 									<input name="rating" class="form-control" th:id="rating-stars + ${reviewStat.count}" 
 										type="text" th:value="${review.rating}" hidden="true"/>
+									<div class="d-flex justify-content-end">
+									<span class="badge rounded-pill text-bg-primary me-2 d-flex justify-content-center align-items-center">
+										<a class="update-review-btn" 
+											th:id="update-review-btn + ${reviewStat.count}"
+											th:href="@{/updateReview/{reviewId}(reviewId=${review.reviewId})}">
+											수정
+										</a>
+									</span>
 									<span class="badge rounded-pill text-bg-secondary">
 										<button type="button" class="delete-review-btn" 
 											th:id="delete-review-btn + ${reviewStat.count}"
@@ -63,6 +71,8 @@
 											삭제
 										</button>
 									</span>
+									
+									</div>
 								</div>
 							</div>
 							<div class="card-body">
@@ -71,14 +81,14 @@
 				  				<p class="card-text">
 					    			<strong th:text="${review.reviewTitle} "></strong>
 				    				<br>
-					    			<strong th:text=${review.reviewContent}></strong>
+					    			<small th:text=${review.reviewContent}></small>
 				    				<br>
 				    				<th:block th:each="reviewImg : ${reviewImgMap[review.reviewId]}"> 
 				    					<img th:src="${'/img/review/'+ reviewImg.reviewImg}" /> 
 				    				</th:block>
 				    				<br>
 				    				<th:block th:each="orderDetails : ${review.order.orderDetails}">
-				    					<span class="badge menu-badge">
+				    					<span class="badge menu-badge mt-2">
 				    						<strong th:text="${orderDetails.menu.menuName}"></strong>
 				    					</span>
 				    				</th:block>

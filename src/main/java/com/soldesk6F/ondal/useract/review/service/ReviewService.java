@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +63,7 @@ public class ReviewService {
 				redirectAttributes.addFlashAttribute("result", 1);
 				redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
 			}
+			
 			String orderUUIDString = orderId.toString();
 			UUID orderUuid = UUID.fromString(orderUUIDString);
 			Optional<Order> findOrder = orderRepository.findById(orderUuid);
@@ -97,13 +99,14 @@ public class ReviewService {
 			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
 			return null;
 		}
+		
 		User user = findUser.get();
 		
 		Optional<List<Review>> findReviewList = reviewRepository.findAllByUser(user);
 		
 		if (findReviewList.isEmpty() || findReviewList.get().isEmpty()) {
 			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "작성한 리뷰가 없습니다..");
+			redirectAttributes.addFlashAttribute("resultMsg", "작성한 리뷰가 없습니다.");
 			return null;
 		}
 		// 맵에 이미지 파일들 (다수) 넣기 -> 키 = 리뷰 / 값 = 리뷰이미지 리스트
@@ -120,6 +123,42 @@ public class ReviewService {
 		return findReviewList;
 	}
 	
+	// 유저가 선택한 수정할 리뷰 반환
+	@Transactional(readOnly = true)
+	public Review getReview(CustomUserDetails userDetails,
+			UUID reviewId,
+			RedirectAttributes redirectAttributes,
+			Model model) {
+		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+		UUID userUuid = UUID.fromString(userUUIDString);
+		Optional<User> findUser = userRepository.findById(userUuid);
+		
+		if (findUser.isEmpty()) {
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
+			return null;
+		}
+		
+		User user = findUser.get();
+		
+		String reviewUUIDString = reviewId.toString();
+		UUID reviewUuid = UUID.fromString(reviewUUIDString);
+		Optional<Review> findReview = reviewRepository.findById(reviewUuid);
+		
+		if (findReview.isEmpty()) {
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 리뷰입니다.");
+			return null;
+		} 
+		
+		Review review = findReview.get();
+		Optional<List<ReviewImg>> findReviewImgList = reviewImgRepository.findAllByReview(review);
+		List<ReviewImg> reviewImgList = findReviewImgList.orElse(Collections.emptyList());
+		
+		model.addAttribute("review", review);
+		model.addAttribute("reviewImgList", reviewImgList);
+		return review;
+	}
 	
 	// 리뷰 작성
 	@Transactional
@@ -136,6 +175,7 @@ public class ReviewService {
     			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 ID입니다.");
     			return false;
 			}
+			
 			User user = findUser.get();
 			
 			String orderUUIDString = reviewDTO.getOrderUuidAsString();
@@ -148,8 +188,8 @@ public class ReviewService {
     			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 주문입니다.");
     			return false;
 			}
-			Order order = findOrder.get();
 			
+			Order order = findOrder.get();
 			Store store = order.getStore();
 			
 			if (store == null) {
@@ -157,6 +197,7 @@ public class ReviewService {
     			redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 가게입니다.");
     			return false;
 			} 
+			
 			double rating = Double.parseDouble(reviewDTO.getRating());
 			
 			String reviewTitle = reviewDTO.getReviewTitle().trim();
@@ -222,6 +263,7 @@ public class ReviewService {
 						redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 리뷰입니다.");
 						return false;
 					}
+					
 					Review registeredReview = findReview.get();
 					
 					String reviewImgFileName = image.getOriginalFilename();
@@ -230,9 +272,11 @@ public class ReviewService {
 					String savePath = new File(uploadReviewDir).getAbsolutePath();
 					System.out.println(savePath);
 					File saveFolder = new File(savePath);
+					
 					if (!saveFolder.exists()) {
 						saveFolder.mkdirs();
 					}
+					
 					// 지정한 upload directory로 파일 이동
 					File saveFile = new File(saveFolder, fileName);
 					image.transferTo(saveFile);
@@ -259,21 +303,58 @@ public class ReviewService {
 		}
 	}
 	
+	// 리뷰 이미지 수정
+		@Transactional
+		public boolean updateReviewImg(CustomUserDetails userDetails,
+				ReviewDTO reviewDTO,
+				MultipartFile[] reviewImage,
+				RedirectAttributes redirectAttributes) {
+			try {
+				
+				
+				
+				
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		
+	
+	
+	
+	
+	// 리뷰 정보 수정
 	@Transactional
 	public boolean updateReview(CustomUserDetails userDetails,
 			ReviewDTO reviewDTO,
 			RedirectAttributes redirectAttributes) {
 		try {
+			String reviewIdString = reviewDTO.getOrderUuidAsString();
+			UUID reviewUuid = UUID.fromString(reviewIdString);
+			Optional<Review> findReview = reviewRepository.findById(reviewUuid);
+			if (findReview.isEmpty()) {
+				redirectAttributes.addFlashAttribute("result", 1);
+				redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 리뷰입니다.");
+			}
+			Review review = findReview.get();
 			
+			double rating = Double.parseDouble(reviewDTO.getRating());
+			String reviewTitle = reviewDTO.getReviewTitle();
+			String reviewContent = reviewDTO.getReviewContent();
+			
+			review.updateReview(rating, reviewTitle, reviewContent);
+			review.setUpdatedDate(LocalDateTime.now());
+			
+			redirectAttributes.addFlashAttribute("result", 0);
+			redirectAttributes.addFlashAttribute("resultMsg", "리뷰가 수정되었습니다.");
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
-	
-	
-	
 	
 	// 리뷰 삭제
 	@Transactional
@@ -287,6 +368,7 @@ public class ReviewService {
 			if (findReview.isEmpty()) {
 				return false;
 			}
+			
 			Review review = findReview.get();
 			
 			String userUUIDString = userDetails.getUser().getUserUuidAsString();
@@ -296,20 +378,24 @@ public class ReviewService {
 			if (findUser.isEmpty()) {
 				return false;
 			}
+			
 			User user = findUser.get();
 			
 			if (!review.getUser().getUserUuidAsString().equals(user.getUserUuidAsString())) {
 				return false;
 			}
+			
 			Optional<List<ReviewImg>> findReviewImgList = reviewImgRepository.findAllByReview(review);
 			List<ReviewImg> reviewImgList = findReviewImgList.get();
 			String savePath = new File(uploadReviewDir).getAbsolutePath();
 			for (ReviewImg reviewImg : reviewImgList) {
 				String fileName = reviewImg.getReviewImg();
 				Path reviewImgPath = Paths.get(savePath, fileName);
+				
 				if (Files.exists(reviewImgPath)) {
 					Files.delete(reviewImgPath);
 				}
+				
 				reviewImgRepository.delete(reviewImg);
 			}
 			reviewRepository.delete(review);

@@ -49,6 +49,16 @@ public class ReviewController {
 		return "/content/writeReview";
 	}
 	
+	// 리뷰 정보 수정 페이지 이동 (선택한 주소만)
+	@GetMapping("/updateReview/{reviewId}")
+	public String goUpdateReview(@AuthenticationPrincipal CustomUserDetails userDetails,
+			@PathVariable("reviewId") UUID reviewId,
+			RedirectAttributes redirectAttributes,
+			Model model) {
+		reviewService.getReview(userDetails, reviewId, redirectAttributes, model);
+		return "/content/updateReview";
+	}
+	
 	// 리뷰 작성 (성공 시 주문 내역 이동 / 실패 시 홈페이지 이동)
 	@PostMapping("/content/regReview")
 	public String regReview(@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -63,6 +73,7 @@ public class ReviewController {
 		}
 	}
 	
+	// 리뷰 수정
 	@PutMapping("content/updateReview/")
 	public String updateReview(@AuthenticationPrincipal CustomUserDetails userDetails,
 			ReviewDTO reviewDTO,
