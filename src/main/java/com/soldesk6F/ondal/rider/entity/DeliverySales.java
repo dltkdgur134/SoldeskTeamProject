@@ -63,7 +63,10 @@ public class DeliverySales {
     @Column(name = "delivery_vat", nullable = false)
     private int deliveryVat;  // 부가세 (배달료의 10%로 설정 가능)
 
-
+    @Column(name = "rider_net_income",nullable = false)
+    private int riderNetIncome; //실제 수익 (배달료에서 부가세를 뺀 값)
+    
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_status", nullable = false)
     private DeliveryStatus deliveryStatus;  // 배달 상태 (배달 완료, 오배달, 배달 취소 등)
@@ -73,54 +76,18 @@ public class DeliverySales {
     	MISDELIVERED,  // 오배달
     	CANCELED  // 배달 취소
     }
-    
-    @Column(name = "delivery_sales_title", length = 30)
-    private String deliverySalesTitle;  // 라이더가 입력할 수 있는 제목 (선택 사항)
-    
-    @Lob
-    @Column(name = "delivery_content")
-    private String deliveryContent;  // 라이더가 입력할 수 있는 설명 (선택 사항)
 
-    @CreationTimestamp
-    @Column(name = "created_date", updatable = false)
-    private LocalDateTime createdDate;  // 매출 기록 생성 시간
-
-    @UpdateTimestamp
-    @Column(name = "updated_date")
-    private LocalDateTime updatedDate;  // 매출 기록 수정 시간
-
-    @PrePersist
-    @PreUpdate
-    public void updateTotalSales() {
-        if (this.deliveryStatus == DeliveryStatus.COMPLETED) {
-            // 배달이 완료된 경우에만 반영
-            int deliverySales = this.deliveryPrice - this.deliveryVat;
-
-            // 부가세가 배달료보다 크거나 부정적인 값이 되지 않도록 검증
-            if (deliverySales < 0) {
-                throw new IllegalArgumentException("배달 매출액은 부가세를 빼면 0 이상이어야 합니다.");
-            }
-
-            RiderManagement riderManagement = this.riderManagement;
-            riderManagement.setTotalSales(riderManagement.getTotalSales() + deliverySales);
-
-            // RiderManagement 업데이트 필요 (예시: EntityManager 또는 Repository 사용)
-            // riderManagementRepository.save(riderManagement);  // 예시 저장 작업
-        }
-    }
-    
     @Builder
 	public DeliverySales(RiderManagement riderManagement, Store store, Order order, int deliveryPrice,
-			int deliveryVat, DeliveryStatus deliveryStatus, String deliverySalesTitle, String deliveryContent) {
+			int deliveryVat,int riderNetIncome, DeliveryStatus deliveryStatus) {
 		super();
 		this.riderManagement = riderManagement;
 		this.store = store;
 		this.order = order;
 		this.deliveryPrice = deliveryPrice;
 		this.deliveryVat = deliveryVat;
+		this.riderNetIncome = riderNetIncome;
 		this.deliveryStatus = deliveryStatus;
-		this.deliverySalesTitle = deliverySalesTitle;
-		this.deliveryContent = deliveryContent;
 	}
     
     public String getDeliverySalesUuidAsString() {

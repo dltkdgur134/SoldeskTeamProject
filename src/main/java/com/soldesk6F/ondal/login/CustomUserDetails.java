@@ -20,6 +20,7 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
     private final User user;
     private Map<String, Object> attributes;
     private UserRole role;
+    private UUID riderId;
     
     
     public CustomUserDetails(User user ,  UserRole role) {

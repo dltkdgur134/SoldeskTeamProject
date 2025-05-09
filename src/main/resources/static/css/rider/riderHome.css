@@ -1,0 +1,21 @@
+@charset "UTF-8";
+.customoverlay {
+  position: relative;
+  bottom: 40px;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.customoverlay .title {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.customoverlay .fee {
+  color: #555;
+  margin-top: 4px;
+}

@@ -77,6 +77,7 @@ public class PageController {
 	
 	private final UserRepository userRepository;
 	
+	// 온달 페이 이동
 	@GetMapping("/ondalPay")
 	public String goOndalPay(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 	    UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());

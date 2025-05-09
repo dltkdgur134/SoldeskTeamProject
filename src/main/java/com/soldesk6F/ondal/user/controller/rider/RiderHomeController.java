@@ -108,9 +108,6 @@ public class RiderHomeController {
         } else {
             // 예외 처리나 에러 페이지로 이동 가능
         }
-    	
-    	
-    	
     	return "content/rider/riderInfopage"; 
     }
     
