@@ -77,7 +77,6 @@ public class OrderResponseDto {
         return OrderResponseDto.builder()
         	.userId(order.getUser() != null ? UUID.fromString(order.getUser().getUserId()) : null)
             .orderId(order.getOrderId())
-            .orderNumber(order.getOrderNumber())
             .orderToOwner(order.getOrderToOwner())
             .orderToRider(order.getOrderToRider())
             .deliveryAddress(order.getDeliveryAddress())
