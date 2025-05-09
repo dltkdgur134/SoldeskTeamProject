@@ -142,16 +142,35 @@
 	background-color: #ffb300;
 }
 
+.btn-group {
+	display: flex;
+	gap: 8px;
+}
+
+.delete-btn {
+	background-color: #ff6b6b;
+}
+
 .upload-btn {
-	margin-top: 10px;
 	padding: 10px 20px;
 	background-color: #ffcc00;
 	color: #333;
 	font-weight: bold;
+	font-size: revert;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
 	transition: background-color 0.3s;
+	margin: 3px;
+}
+
+.upload-btn:disabled {
+	background-color: gray;
+	cursor: not-allowed;
+}
+
+.upload-btn:disabled:hover {
+	background-color: gray;
 }
 
 .upload-btn:hover {
@@ -180,6 +199,76 @@
 	border: 1px solid #ccc;
 	border-radius: 5px;
 	box-sizing: border-box;
+}
+
+.preview-item img {
+	max-width: 350px;
+	max-height: 350px;
+	width: auto;
+	height: auto;
+	border-radius: 8px;
+	display: block;
+	margin-top: 15px;
+}
+
+.custom-file-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	gap: 10px;
+}
+
+.custom-file-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	overflow: hidden;
+}
+
+.custom-file-left span {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 200px;
+	display: inline-block;
+}
+
+.custom-file-name-and-buttons {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+.custom-file-wrapper span {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 250px; /* ✅ 텍스트가 1줄만 나오게 */
+	display: inline-block;
+}
+
+.custom-file-,
+.upload-btn {
+	height: 38px;
+	padding: 0 16px;
+	font-weight: bold;
+}
+
+.custom-file-btn {
+	padding: 6px 12px;
+	background-color: #e0e0e0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: revert;
+	font-weight: bold;
+	transition: background-color 0.2s;
+}
+
+.custom-file-btn:hover {
+	background-color: #ccc;
 }
 
 
