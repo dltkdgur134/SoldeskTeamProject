@@ -4,39 +4,46 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-	<script th:src="@{/js/initialize.js}" ></script>
-	<script th:src="@{/js/zipcode.js}" ></script>
-	<script th:src="@{/js/update.js}" ></script>
-	<link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-	<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
+<meta charset="UTF-8">
+<title>온달</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet">
+<link th:fragment="css" th:href="@{/css/RiderCustom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
+<script th:src="@{/js/initialize.js}"></script>
+<script th:src="@{/js/zipcode.js}"></script>
+<script th:src="@{/js/update.js}"></script>
 </head>
 <div layout:fragment="content" class="container py-5">
-   <div th:if="${InfoUpdateError}" class="alert alert-danger text-center" role="alert"
-	style="margin-bottom: 20px;">
-	<span th:text="${InfoUpdateError}"></span>
+	<div th:if="${InfoUpdateError}" class="alert alert-danger text-center"
+		role="alert" style="margin-bottom: 20px;">
+		<span th:text="${InfoUpdateError}"></span>
 	</div>
-<div th:if="${InfoUpdateSuccess}" class="alert alert-success" role="alert"
-		style="margin-bottom: 20px;">
+	<div th:if="${InfoUpdateSuccess}" class="alert alert-success"
+		role="alert" style="margin-bottom: 20px;">
 		<span th:text="${InfoUpdateSuccess}"></span>
 	</div>
-	
-	
-	
+	<div th:if="${SecondaryPasswordError}" class="alert alert-danger text-center"
+		role="alert" style="margin-bottom: 20px;">
+		<span th:text="${SecondaryPasswordError}"></span>
+	</div>
+
+
 	<div class="container text-center">
 		<div class="row justify-content-md-center">
 			<div class="col col-lg-2">
 				<a type="button" class="btn btn-link position-relative"
 					id="profile-pic-btn" data-bs-toggle="modal"
-					data-bs-target="#updateProfilePicModal"> 
-					<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
+					data-bs-target="#updateProfilePicModal"> <img
+					th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
              ? #authentication.principal.user.userProfile 
              : '/img/userProfiles/' + #authentication.principal.user.userProfile}"
-							class="rounded-circle img-thumbnail img-fluid"
-							alt="Profile Picture" id="profile-pic"> 
-			<span class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle" id="profile-pic-update-btn">
-	    		<i class="fa-solid fa-pen-to-square"></i>
-	  		</span>
+					class="rounded-circle img-thumbnail img-fluid"
+					alt="Profile Picture" id="profile-pic"> <span
+					class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle"
+					id="profile-pic-update-btn"> <i
+						class="fa-solid fa-pen-to-square"></i>
+				</span>
 				</a>
 			</div>
 			<div class="col col-lg-2">
@@ -61,8 +68,8 @@
 				<li class="list-group-item d-flex justify-content-between"><Label>아이디</Label><strong
 					th:text="${#authentication.principal.user.userId}"></strong></li>
 				<li class="list-group-item d-flex justify-content-between"><Label>라이더
-					닉네임</Label> <strong th:text="${rider.riderNickname}"></strong> 
-					<a type="button" class="btn btn-secondary btn-sm"
+						닉네임</Label> <strong th:text="${rider.riderNickname}"></strong> <a
+					type="button" class="btn btn-secondary btn-sm"
 					data-bs-toggle="modal" data-bs-target="#updateRiderNicknameModal">수정</a>
 				</li>
 			</ul>
@@ -161,23 +168,57 @@
 		</h6>
 		<div class="card-body">
 			<ul class="list-group list-group-flush">
-				
-				<li class="list-group-item d-flex justify-content-between">
-				<label>2차 비밀번호</label> 
-				<strong>********</strong></li>
-				<li class="list-group-item d-flex justify-content-between">
-				<label>허브주소</label> 
-				<strong th:text="${rider.riderHubAddress}">허브 주소</strong></li>
-				<li class="list-group-item d-flex justify-content-between">
-				<label>차량번호</label> 
-				<strong th:text="${rider.vehicleNumber}">차량번호</strong></li>
-				<li class="list-group-item d-flex justify-content-between">
-				<label>전화번호</label>
-				<strong th:text="${rider.riderPhone}">전화번호</strong></li>
-				<li class="list-group-item d-flex justify-content-between">
-				<label>온달 지갑</label>
-				<strong th:text="${rider.riderWallet}+'원'"></strong></li>
+
+				<li class="list-group-item d-flex justify-content-between"><label>2차
+						비밀번호</label> <strong>********</strong></li>
+				<li class="list-group-item d-flex justify-content-between"><label>허브주소</label>
+					<strong th:text="${rider.riderHubAddress}">허브 주소</strong></li>
+				<li class="list-group-item d-flex justify-content-between"><label>차량번호</label>
+					<strong th:text="${rider.vehicleNumber}">차량번호</strong></li>
+				<li class="list-group-item d-flex justify-content-between"><label>전화번호</label>
+					<strong th:text="${rider.riderPhone}">전화번호</strong></li>
+				<li class="list-group-item d-flex justify-content-between"><label>온달
+						지갑</label> <strong th:text="${rider.riderWallet}+'원'"></strong> <a
+					class="btn btn-secondary btn-sm" href="/rider/riderWallet"
+					data-bs-toggle="modal" data-bs-target="#checkRiderSecondaryPassword">출금하기</a>
+				</li>
 			</ul>
+			<div class="modal fade" id="checkRiderSecondaryPassword"
+				data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+				aria-labelledby="checkRiderSecondaryPasswordLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="checkRiderSecondaryPasswordLabel">2차
+								비밀번호 입력</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form th:action="@{/checkRiderSecondaryPassword}" method="post"
+								name="checkRiderSecondaryPasswordForm" autocomplete="off"
+								class="needs-validation" id="check-rider-secondary-form"
+								novalidate>
+
+								<div class="input-group mb-3">
+									<span class="input-group-text" id="basic-addon2"> <i
+										class="fa-solid fa-id-card"></i>
+									</span> <input type="password" class="form-control" placeholder="2차 비밀번호"
+										 name="currentSecondaryPassword"
+										id="currentSecondary-input" aria-describedby="basic-addon2">
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-primary"
+								form="check-rider-secondary-form"
+								id="check-rider-secondary-btn">확인</button>
+							<button type="button" class="btn btn-secondary"
+								data-bs-dismiss="modal">취소</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

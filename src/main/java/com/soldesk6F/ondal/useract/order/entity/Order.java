@@ -47,10 +47,7 @@ public class Order {
     @UuidGenerator	
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;
-    
-    @Column(name = "order_number", nullable = true)
-    private int orderNumber;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_uuid", nullable = true)
     @JsonIgnoreProperties({"orders"})
@@ -78,7 +75,7 @@ public class Order {
     @Column(name = "cooking_start_time")
     private LocalDateTime cookingStartTime;
     
-    @Column(name = "real_cooking_time", updatable = false)
+    @Column(name = "real_cooking_time")
     private LocalTime realCookingTime;
     
     @Column(name = "delivery_start_time")
@@ -87,7 +84,7 @@ public class Order {
     @Column(name = "expect_delivery_time")
     private LocalTime expectDeliveryTime;
     
-    @Column(name = "real_delivery_time", updatable = false)
+    @Column(name = "real_delivery_time")
     private LocalTime realDeliveryTime;
     
     @Column(name = "delivery_address", nullable = false, length = 255)
@@ -187,7 +184,7 @@ public class Order {
 		}
     }
     @Builder
-    public Order(User user, int orderNumber, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
+    public Order(User user, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
                  LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
                  LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress,
                  Double deliveryAddressLatitude, Double deliveryAddressLongitude, int deliveryFee,
@@ -196,7 +193,6 @@ public class Order {
                  List<OrderDetail> orderDetails) {
 
         this.user = user;
-        this.orderNumber = orderNumber;
         this.guestId = guestId;
         this.store = store;
         this.rider = rider;
@@ -263,7 +259,7 @@ public class Order {
     	double storeLon = store.getStoreLongitude();
     	double distance = calculateDistance(storeLat, storeLon, deliveryAddressLatitude, deliveryAddressLongitude);
     	
-    	if (distance < 1.0) {
+    	if (distance < 1.0) { 
     		this.deliveryFee = 3000;
     	} else if (distance < 2.0) {
     		this.deliveryFee = 4000;
@@ -296,5 +292,3 @@ public class Order {
             .plusSeconds(realDeliveryTime.getSecond());
     }
 }
-
-

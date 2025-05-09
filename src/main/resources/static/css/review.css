@@ -1,0 +1,116 @@
+.rating {
+    float: left;
+}
+.rating span {
+    font-size: 30px;
+    cursor: pointer;
+    float: right;
+    color: gray;
+}
+
+.rating span:hover, .rating span:hover ~ span{
+    color: #ffe766;
+}
+
+.rating .selected {
+	color: #ffe766;
+}
+
+.my-rating {
+	float: left;
+}
+
+.my-rating span {
+	font-size: 16px;
+	float: right;
+	color: gray;
+}
+
+.my-rating .selected {
+	color: #ffe766;
+}
+
+#review-content {
+	resize: none;
+	height: 230px;
+}
+
+#show-word-count {
+	font-size: 12px;
+	color: #667EFF;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+#image-preview-container p {
+	color: red;
+}
+
+.custom-file-upload {
+  border: 3px solid #667EFF;
+  border-radius: 5px;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  width: 70%;
+  text-align: center;
+  color: #667EFF;
+}
+
+.custom-file-upload:hover {
+	background-color: #667EFF;
+	color: white;
+}
+
+#review-store-name {
+	font-size: 2rem;
+}
+
+#reg-review-form-btn {
+	font-size: 1rem;
+}
+
+#review-footer-list li{
+	font-size: 0.7rem;
+	color: gray;
+}
+
+.icon-link {
+	text-decoration: none;
+	color: black;
+}
+
+.delete-review-btn {
+	border: none;
+	background-color: transparent;
+	color: white;
+}
+
+.menu-badge {
+	color: black;
+	border-radius: 20px;
+	background-color: none;
+	border: #E0E0E0 solid 2px;
+} 
+
+.review-header {
+	border: none;
+	background-color: transparent;
+}
+
+.card {
+	border:none;
+	box-shadow: null;	
+}
+
+.order-time {
+	font-size: 12px;
+}
+
+.review-header {
+	font-size: 18px;
+	font-style: italic; 
+} 
+

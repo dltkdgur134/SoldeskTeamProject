@@ -1,14 +1,15 @@
 import { openMenuModal, closeMenuModal, openEditMenuModal, closeEditMenuModal, setupGlobalModalEvents } from './modal.js';
 import { dynamicCategories, openCategoryModal, closeCategoryModal, 
 	addCategory, removeCategory, initCategoryButtons, 
-	saveDynamicCategories, renderCategorySelect, renderEditCategorySelect } from './category.js';
-import { addOptionField, addOptionCount, editOptionCount, removeOption } from './options.js';
+	saveDynamicCategories, renderCategorySelect, renderEditCategorySelect, initCategoryData } from './category.js';
+import { addOptionField, fillEditOptions, addOptionCount, editOptionCount/*, removeOption*/ } from './options.js';
 import { handleSubmit, deleteMenu, setupEditFormValidation, filterMenusByCategory } from './menuForm.js';
 
 
 console.log("✅ main.js loaded");
 document.addEventListener("DOMContentLoaded", async () => {
 	setupGlobalModalEvents();
+	initCategoryData();
 	
 	const storeId = document.body.dataset.storeId;
 	dynamicCategories.clear();
@@ -55,6 +56,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 	});
 	const menuForm = document.querySelector("#menuForm");
 	if (menuForm) {
+		menuForm.addEventListener("submit", event => {
+			const formData = new FormData(menuForm);
+			for (let pair of formData.entries()) {
+				console.log(`${pair[0]} = ${pair[1]}`);
+			}
+		});
 		menuForm.addEventListener("submit", handleSubmit);
 	}
 	const el = document.getElementById('menu-list-container');

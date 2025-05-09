@@ -1,34 +1,57 @@
 package com.soldesk6F.ondal.user.service;
 
-import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.user.dto.rider.RiderForm;
-import com.soldesk6F.ondal.user.entity.Rider;
-import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
-import com.soldesk6F.ondal.user.entity.User.UserRole;
-import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.RiderRepository;
-import com.soldesk6F.ondal.user.repository.UserRepository;
-
-import jakarta.transaction.Transactional;
-
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.rider.repository.RiderWalletHistoryRepository;
+import com.soldesk6F.ondal.rider.service.RiderWalletHistoryService;
+import com.soldesk6F.ondal.user.dto.rider.RiderForm;
+import com.soldesk6F.ondal.user.entity.Rider;
+import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
+import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.RiderRepository;
+import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
+
+import jakarta.transaction.Transactional;
+
 @Service
 public class RiderService {
 
+    private final RiderWalletHistoryRepository riderWalletHistoryRepository;
+
+	private final UserRepository userRepository;
+    private final RiderRepository riderRepository;
+    private final OrderRepository orderRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RiderWalletHistoryService riderWalletHistoryService;  // RiderWalletHistoryService 주입
+
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RiderRepository riderRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
+    public RiderService(
+            UserRepository userRepository,
+            RiderRepository riderRepository,
+            OrderRepository orderRepository,
+            PasswordEncoder passwordEncoder,
+            RiderWalletHistoryService riderWalletHistoryService, RiderWalletHistoryRepository riderWalletHistoryRepository) {
+        
+        this.userRepository = userRepository;
+        this.riderRepository = riderRepository;
+        this.orderRepository = orderRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.riderWalletHistoryService = riderWalletHistoryService;
+        this.riderWalletHistoryRepository = riderWalletHistoryRepository;  // 생성자 주입
+    }    
     
     // 이미 라이더가 등록되어 있는지 확인하는 메서드
     public boolean isAlreadyRider(String userId) {
@@ -133,7 +156,157 @@ public class RiderService {
             return false; // 비밀번호가 일치하지 않으면 수정 실패
         }
     }
+    public boolean checkRiderSecondaryPassword(Rider rider, String currentSecondaryPassword) {
+
+    	if (rider.isSecondaryPasswordLocked()) {
+            // 잠금 상태인지 체크
+            return false;
+        }
+    	// 최근 실패 시간과 현재 시간 차이로 리셋 여부 판단
+    	if (rider.getLastSecondaryPasswordFailTime() != null &&
+    	        Duration.between(rider.getLastSecondaryPasswordFailTime(), LocalDateTime.now()).toMinutes() > 10) {
+    	        rider.setSecondaryPasswordFailCount(0); // 10분 지나면 초기화
+    	    }
+
+    	boolean isCorrect = passwordEncoder.matches(currentSecondaryPassword, rider.getSecondaryPassword());
+    	
+    	if (isCorrect) {
+            rider.setSecondaryPasswordFailCount(0);
+            rider.setSecondaryPasswordLocked(false);
+            rider.setLastSecondaryPasswordFailTime(null);
+        } else {
+            rider.setSecondaryPasswordFailCount(rider.getSecondaryPasswordFailCount() + 1);
+            rider.setLastSecondaryPasswordFailTime(LocalDateTime.now());
+
+            if (rider.getSecondaryPasswordFailCount() >= 5) {
+                rider.setSecondaryPasswordLocked(true); // 5회 실패 시 잠금
+            }
+        }
+    	
+    	riderRepository.save(rider); // 상태 저장
+        return isCorrect;
+    	
+    }
+    
+    
+    //주문에 라이더 배정하기
+    public void assignRiderToOrder(UUID orderId, UUID riderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
+
+        Rider rider = riderRepository.findById(riderId)
+            .orElseThrow(() -> new RuntimeException("라이더를 찾을 수 없습니다."));
+
+        // 주문에 라이더 배정
+        order.setRider(rider);// rider를 Order에 설정
+
+        orderRepository.save(order);  // 저장
+    }
+    // RiderStatus 변경 서비스 (프론트에서 버튼 클릭으로 대기 <-> 휴식)
+    public Rider changeRiderStatus(UUID riderId) {
+        Rider rider = riderRepository.findById(riderId)
+            .orElseThrow(() -> new RuntimeException("라이더를 찾을 수 없습니다"));
+
+        rider.setRiderStatus(rider.getRiderStatus().next());
+        return riderRepository.save(rider);
+    }
+    
+    // OrderToRider 변경 및 배달료 riderWallet에 입금 (OrderToRider = COMPLETED)
+    @Transactional
+    public void completeOrderAndRewardRider(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
+
+        // 상태 검증
+        if (order.getOrderToRider() != Order.OrderToRider.ON_DELIVERY) {
+            throw new RuntimeException("배달 완료가 불가능한 상태입니다.");
+        }
+
+        Rider rider = order.getRider();
+        if (rider == null) throw new RuntimeException("배정된 라이더가 없습니다.");
+
+        // 배달 완료 시간 계산 및 저장
+        LocalDateTime deliveryStartTime = order.getDeliveryStartTime();
+        if (deliveryStartTime == null) {
+            throw new RuntimeException("배달 시작 시간이 존재하지 않습니다.");
+        }
+
+        LocalDateTime startTime = order.getDeliveryStartTime();
+        LocalDateTime now = LocalDateTime.now();
+
+        Duration duration = Duration.between(startTime, now);
+        LocalTime realDeliveryTime = LocalTime.ofSecondOfDay(duration.getSeconds());
+
+        order.setRealDeliveryTime(realDeliveryTime);
+        order.setOrderToRider(Order.OrderToRider.COMPLETED);
+        orderRepository.save(order);
+
+        // 라이더 보상 처리
+        int deliveryFee = order.getDeliveryFee();
+        if (deliveryFee <= 0) {
+            throw new RuntimeException("유효하지 않은 배달료입니다.");
+        }
+
+        int newWalletAmount = rider.getRiderWallet() + deliveryFee;
+        if (newWalletAmount < 0) {
+            throw new RuntimeException("지갑 금액이 음수로 설정될 수 없습니다.");
+        }
+
+        rider.setRiderWallet(newWalletAmount);
+        rider.setRiderStatus(Rider.RiderStatus.WAITING);
+        riderRepository.save(rider);
+    }
+    @Transactional
+    public String processWithdrawal(Rider rider, int withdrawAmount, String secondaryPassword) {
+        // 1. 출금 금액이 10,000원 미만인 경우
+        if (withdrawAmount < 10000) {
+            return "최소 출금 금액은 10,000원입니다.";
+        }
+        if (withdrawAmount % 1000 != 0) {
+        	return "출금은 1000원 단위로만 가능합니다.";
+        }
+     // ✅ 3. 하루 3회 제한 (개발단계: 주석 처리)
+        /*
+        LocalDate today = LocalDate.now();
+        int todayWithdrawCount = riderWalletHistoryService.countTodayWithdrawals(rider.getRiderId(), today);
+        if (todayWithdrawCount >= 3) {
+            return "출금은 하루 3회만 가능합니다.";
+        }
+        */
+        
+        // 2. 2차 비밀번호 검증
+        boolean isSecondaryPasswordValid = checkRiderSecondaryPassword(rider, secondaryPassword);
+        if (!isSecondaryPasswordValid) {
+            return "잘못된 2차 비밀번호입니다.";
+        }
+
+        // 3. 출금 금액 검증 (잔액보다 많은 금액을 출금할 수 없음)
+        if (withdrawAmount > rider.getRiderWallet()) {
+            return "잔액이 부족합니다.";
+        }
+
+        // 4. 수수료 계산 (출금 금액의 10%)
+        int fee = withdrawAmount / 10;  // 10% 수수료
+        int actualAmount = withdrawAmount + fee;
+
+        // 5. 출금 처리 (잔액에서 출금 금액 차감)
+        rider.setRiderWallet(rider.getRiderWallet() - actualAmount);
+        riderRepository.save(rider);  // 변경된 정보 저장
+
+        // 6. 출금 내역 기록 (출금 기록을 DB에 저장)
+        riderWalletHistoryService.saveWalletHistory(rider, withdrawAmount, fee, actualAmount, "출금 요청");
+
+        // 7. 성공 메시지 반환
+        return String.format("출금 성공! %d원이 출금되었습니다. (수수료 %d원)", actualAmount, fee);
+    }
     
     
     
+    public int countTodayWithdrawals(UUID riderId, LocalDate today) {
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+        return riderWalletHistoryRepository.countByRider_RiderIdAndCreatedDateBetween(
+        		riderId, startOfDay, endOfDay);
+    }
+
 }

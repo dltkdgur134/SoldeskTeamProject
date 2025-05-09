@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<meta charset="UTF-8">
+	<title>장바구니</title>
+	<link th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/cart.css}" rel="stylesheet" />
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="cart-container">
+			<h2 th:if="${not #lists.isEmpty(cartItems)}">
+				<span th:text="${cart.store.storeName}"></span>
+			</h2>
+			
+			<div class="cart-empty" th:if="${#lists.isEmpty(cartItems)}">
+				<img src="/img/cart/empty_cart.png" alt="텅 빈 장바구니" class="empty-cart-img">
+				<p class="empty-cart-msg">장바구니가 텅 비었어요</p>
+			</div>
+			<div class="cart-wrapper">
+				<div class="carts">
+					<div class="cart-item" th:each="item : ${cartItems}"
+						th:data-id="${item.cartItemsId}" 
+						th:classappend="' cart-item-card'"
+						th:data-base-price="${item.menu.price}"
+						th:unless="${#lists.isEmpty(cartItems)}">
+						<div class="cart-item-body">
+							<div class="cart-item-left">
+								<img th:src="@{${item.menu.menuImg}}" alt="메뉴 이미지">
+							</div>
+							<div class="cart-item-middle">
+								<h4 th:text="${item.menu.menuName}"></h4>
+								<p class="menu-base-price" th:text="'가격: ' + ${item.menu.price} + '원'"></p>
+								<div class="cart-options">
+									<div class="cart-options cart-item-options">
+										<div th:each="opt : ${item.cartItemOptions}">
+											<span th:text="${opt.groupName} + ' : ' + ${opt.optionName} + ' ( ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
+										</div>
+									</div>
+								</div>
+								<p class="itemTotalPrice" th:text="'가격: ' + ${item.getItemTotalPrice} + '원'"></p>
+							</div>
+						</div>
+						<div class="cart-item-footer">
+							<button class="btn-change-option" th:data-id="${item.cartItemsId}">옵션 변경</button>
+							<div class="quantity-controls" 
+							     th:data-id="${item.cartItemsId}"
+							     th:data-price="${item.menu.price}" 
+							     th:data-total-price="${item.getItemTotalPrice}">
+								<button class="btn-decrease">
+									<span th:if="${item.quantity > 1}">-</span>
+									<span th:if="${item.quantity == 1}">🗑</span>
+								</button>
+								<span class="qty-num" th:text="${item.quantity}"></span>
+								<button class="btn-increase">+</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="order-summary" th:if="${not #lists.isEmpty(cartItems)}">
+				<p th:text="'결제금액: ' + ${totalPrice} + '원'"></p>
+				<form id="orderForm" th:action="@{/order/pay}" method="post">
+					<input type="hidden" name="cartId" th:value="${cart.cartId}" />
+					<button type="submit">주문하기</button>
+				</form>
+			</div>
+			<div id="optionModal" class="modal" style="display: none;">
+				<div id="option-modal-overlay" class="modal-overlay"></div>
+				<div class="modal-content">
+					<span class="close-btn">&times;</span>
+					<h3 id="modal-menu-name">옵션 변경</h3>
+					<form id="optionForm">
+						<div id="optionList"></div>
+						<input type="hidden" name="cartItemUuid" id="modal-cart-item-id">
+						<button id="save-options-btn" type="button">옵션 저장</button>
+					</form>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<div layout:fragment="js">
+		<script th:src="@{/js/index.js}"></script>
+		<script th:src="@{/js/cart.js}"></script>
+		<script th:src="@{/js/cartOptionModal.js}"></script>
+	</div>
+</body>
+</html>

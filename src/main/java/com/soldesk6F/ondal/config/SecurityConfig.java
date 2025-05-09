@@ -94,7 +94,7 @@ public class SecurityConfig{
     			.ignoringRequestMatchers("/api/**") // REST API는 CSRF 무시
     		)
     		.authorizeHttpRequests(auth -> auth
-    			.requestMatchers("/**","/register", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
+    			.requestMatchers("/**","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
     			.requestMatchers("/api/category/**").hasAuthority("OWNER")
     			.requestMatchers("/owner/**").hasAnyRole("OWNER", "ALL")
     			.anyRequest().authenticated() 

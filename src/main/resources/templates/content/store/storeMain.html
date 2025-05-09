@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${store.storeName}">가게 이름</title>
+	<link th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/storeMain.css}" rel="stylesheet" />
+</head>
+<body>
+	<div layout:fragment="content">
+		<section class="store-info">
+			<div class="store-image-slider">
+				<div class="slides" id="slides">
+					<div class="slide" th:if="${#lists.isEmpty(storeImgs)}">
+						<img th:src="@{/img/store/storeimg/default_img.jpg}" alt="기본 가게 이미지" />
+					</div>
+					
+					<div class="slide" th:each="img : ${storeImgs}">
+						<img th:src="${img.storeImg}" alt="가게 이미지" />
+					</div>
+				</div>
+
+				<div class="dots" id="dots">
+					<span th:if="${#lists.isEmpty(storeImgs)}" class="dot active"></span>
+
+					<span th:each="img, stat : ${storeImgs}" th:classappend="${stat.index == 0} ? ' active'" class="dot"></span>
+				</div>
+			</div>
+			<h1 th:text="${store.storeName}">가게명</h1>
+			<p th:text="${store.storeAddress}">가게주소</p>
+			<p th:text="${store.storePhone}">전화번호</p>
+		</section>
+	
+		<section class="delivery-options">
+			<button class="active">배달</button>
+			<button>포장</button>
+		</section>
+	
+		<section class="menu-tabs" id="category-buttons">
+			<button class="tab active" onclick="filterMenus('전체', this)">전체</button>
+			<button class="tab" onclick="filterMenus('메인', this)">메인</button>
+			<button class="tab" onclick="filterMenus('사이드', this)">사이드</button>
+			<button class="tab" onclick="filterMenus('음료', this)">음료</button>
+		</section>
+	
+		<section class="menu-list" id="menu-list">
+			<div class="menu-card" th:each="menu : ${menus}"
+				th:data-id="${menu.menuId}"
+				th:data-store-id="${menu.storeId}"
+				th:data-name="${menu.menuName}"
+				th:data-description="${menu.description}"
+				th:data-price="${menu.price}"
+				th:data-image="${menu.menuImg}"
+				th:data-category="${menu.menuCategory}"
+				
+				th:data-option1="${menu.menuOptions1GroupName + ':' + #strings.arrayJoin(menu.menuOptions1, '@@__@@')}"
+				th:data-option1-price="${#strings.arrayJoin(menu.menuOptions1Price, '@@__@@')}"
+				 
+				th:data-option2="${menu.menuOptions2GroupName + ':' + #strings.arrayJoin(menu.menuOptions2, '@@__@@')}"
+				th:data-option2-price="${#strings.arrayJoin(menu.menuOptions2Price, '@@__@@')}"
+				
+				th:data-option3="${menu.menuOptions3GroupName + ':' + #strings.arrayJoin(menu.menuOptions3, '@@__@@')}"
+				th:data-option3-price="${#strings.arrayJoin(menu.menuOptions3Price, '@@__@@')}">
+				<div class="image-wrapper">
+					<img th:src="@{${menu.menuImg}}" alt="메뉴 이미지" />
+				</div>
+				<div class="menu-info">
+					<h3 th:text="${menu.menuName}">메뉴명</h3>
+					<p th:text="${menu.description}">메뉴 설명</p>
+					<p th:text="${menu.price} + '원'">가격</p>
+					<span th:if="${menu.menuStatus == 'SOLD_OUT'}" class="soldout">품절</span>
+				</div>
+			</div>
+		</section>
+		<div id="menu-modal" class="menu-modal hidden">
+			<div class="modal-content">
+				<button class="close-btn" id="close-modal-top">&times;</button>
+				<img id="menu-image" src="" alt="메뉴 이미지" />
+				<h2 id="menu-name"></h2>
+				<p id="menu-description"></p>
+				<p id="menu-price"></p>
+				<div id="menu-options" class="menu-options"></div>
+				<div class="cart-footer">
+					<div class="quantity-controls">
+						<button id="decrease-btn">−</button>
+						<span id="menu-quantity">1</span>
+						<button id="increase-btn">+</button>
+					</div>
+					<!--<div id="menu-total-price" class="menu-total-price">추가 금액: 0원</div>-->
+					<button id="add-to-cart-btn" class="add-to-cart-btn">0원 담기</button>
+				</div>
+				<!--<button id="close-modal-footer">닫기</button>-->
+			</div>
+		</div>
+	</div>
+	<div layout:fragment="js">
+		<script th:src="@{/js/index.js}"></script>
+		<script th:src="@{/js/storeMain.js}"></script>
+	</div>
+</body>
+</html>

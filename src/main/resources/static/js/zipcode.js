@@ -32,8 +32,8 @@ function regUserAddress() {
 						console.log('Kakao 응답:', result);
 						const location = result.documents[0];
 						if (location) {
-							document.getElementById('userAddresslongitude').value = parseFloat(location.y).toFixed(6);
-							document.getElementById('userAddresslatitude').value = parseFloat(location.x).toFixed(6);
+							document.getElementById('userAddresslatitude').value = parseFloat(location.y).toFixed(6);
+							document.getElementById('userAddresslongitude').value = parseFloat(location.x).toFixed(6);
 						} else {
 							alert('주소의 위치 정보를 찾을 수 없습니다.');
 						}

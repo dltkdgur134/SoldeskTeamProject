@@ -41,7 +41,6 @@ public class OwnerOrderController {
 
         // 🧠 주문 상태 업데이트 (expectCookingTime, cookingStartTime 포함)
         Order updatedOrder = orderService.acceptOrder(request.getOrderId(), completionTime);
-
         // 🔄 세션에 임시 저장된 cookingTime 제거 (있다면)
         Map<UUID, Integer> cookingTimes = (Map<UUID, Integer>) session.getAttribute("cookingTimes");
         if (cookingTimes != null) {

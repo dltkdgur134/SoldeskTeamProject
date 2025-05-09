@@ -12,6 +12,7 @@
 </head>
 <body th:attr="data-store-id=${store.storeId}" data-store-id="">
 	<header class="menu-header">
+		<img th:src="${store.brandImg != null} ? @{${store.brandImg}} : @{/img/default-store.png}" class="store-image" alt="가게 이미지" />
 		<h2 th:text="${store.storeName} + ' 메뉴 관리'">가게 이름 메뉴 관리</h2>
 	</header>
 	
@@ -48,7 +49,7 @@
 		</div>
 	</div>
 	
-	<div id="menuModal" class="modal-overlay">
+	<div id="menuModal" class="modal-overlay" style="display: none;">
 		<div class="modal-content">
 			<span class="close-btn" onclick="closeMenuModal()">&times;</span>
 			<h2>메뉴 등록</h2>
@@ -66,8 +67,9 @@
 
 				<div id="option1-container" style="grid-column: span 2;"></div>
 				<button type="button" id="add-option-btn" style="grid-column: span 2;">+ 옵션 추가</button>
-
-				<select name="menuStatus">
+				
+				<label for="menuStatus">메뉴 상태</label>
+				<select name="menuStatus" id="menuStatus">
 					<option value="ACTIVE">판매 중</option>
 					<option value="SOLD_OUT">품절</option>
 				</select>
@@ -92,7 +94,7 @@
 				<input id="editPrice" name="price" type="number" required min="0" />
 				<textarea name="description" id="editDescription"></textarea>
 				<input type="file" name="menuImg" accept="image/*" />
-				<!-- 옵션, 상태 등 필요에 따라 추가 -->
+				<label for="editMenuStatus">메뉴 상태</label>
 				<select name="menuStatus" id="editMenuStatus">
 					<option value="ACTIVE">판매 중</option>
 					<option value="SOLD_OUT">품절</option>
@@ -115,7 +117,7 @@
 	<script th:inline="javascript">
 		/*<![CDATA[*/
 		window.categoryList = JSON.parse([[${categoryListJson}]]); // 동작엔 문제 없음
-		window.menuList = [[${menuList}]];
+		window.menuList = [[${menuList}]]; // 동작엔 문제 없음2
 		/*]]>*/
 	</script>
 	<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>

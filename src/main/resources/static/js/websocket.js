@@ -16,7 +16,10 @@ function connectGlobalWebSocket() {
     console.log('🌐 WebSocket connected:', frame);
 
     stompClient.subscribe('/topic/user/' + userId, message => {
-      const data = JSON.parse(message.body);
+      const data = JSON.parse(message.body); // 서버에서 보낸 메시지를 JSON으로 파싱
+	  console.log("수신된 메시지:", data); // 수신된 데이터 로그
+	 
+	   // 수신된 데이터로 알림 표시
       showOrderNotification(data);
 
       if (data.orderId && !currentOrderIds.has(data.orderId)) {

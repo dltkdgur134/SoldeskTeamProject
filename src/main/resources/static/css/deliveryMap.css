@@ -2,11 +2,26 @@
 
 @font-face {
 	font-family: "acloud";
-	src: url(acloud.ttf);
+	src: url('acloud.ttf');
+}
+
+@font-face {
+	font-family: "taebaek";
+	src: url('taebaek.ttf');
+}
+
+@font-face {
+	font-family: "yisunshin";
+	src : url('yisunshinB.ttf'), format('truetype');
+}
+
+@font-face {
+	font-family: "siwol";
+	src : url('siwol.ttf');
 }
 
 body {
-	font-family: "yisunshinM";
+	font-family: "siwol";
 }
 
 .delivery-request {
@@ -88,15 +103,6 @@ body {
 
 .order-card .assign-btn:hover {
     background-color: #45a049;
-}
-
-.order-card .cancel-btn {
-    background-color: #f44336;
-    color: white;
-}
-
-.order-card .cancel-btn:hover {
-    background-color: #d73833;
 }
 
 

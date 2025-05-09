@@ -116,7 +116,7 @@ public class Menu {
 	private List<String> parseOptionNames(String optionString) {
 		if (optionString == null || optionString.isBlank())
 			return List.of();
-		return Arrays.stream(optionString.split("온달")).map(String::trim).collect(Collectors.toList());
+		return Arrays.stream(optionString.split("@@__@@")).map(String::trim).collect(Collectors.toList());
 	}
 
 	// 옵션 가격을 리스트로 변환
@@ -135,7 +135,7 @@ public class Menu {
 	private List<Integer> parseOptionPrices(String priceString) {
 		if (priceString == null || priceString.isBlank())
 			return List.of();
-		return Arrays.stream(priceString.split("온달")).map(String::trim).map(s -> s.isBlank() ? "0" : s)
+		return Arrays.stream(priceString.split("@@__@@")).map(String::trim).map(s -> s.isBlank() ? "0" : s)
 				.map(Integer::parseInt).collect(Collectors.toList());
 	}
 

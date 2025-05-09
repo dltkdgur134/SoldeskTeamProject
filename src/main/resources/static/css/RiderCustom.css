@@ -6,23 +6,28 @@
 }
 
 @font-face {
-	font-family: "yisunshin";
-	src : url('yisunshinB.ttf') format("truetype");
+	font-family: "taebaek";
+	src: url('taebaek.ttf');
 }
 
 @font-face {
-	font-family: "yisunshinM";
-	src : url('../css/yssM.ttf') format("truetype");
+	font-family: "yisunshin";
+	src : url('yisunshinB.ttf'), format('truetype');
+}
+
+@font-face {
+	font-family: "siwol";
+	src : url('siwol.ttf');
 }
 
 body {
-	font-family: "acloud"; 
-	font-family: "yisunshinM";
+	font-family: "siwol";
+	text-align: center;
 }
 
 .display-5 {
 	color: white;
-	font-family: "yisunshin" !important;
+	font-family: "taebaek" !important;
 }
 
 :root {
@@ -86,6 +91,12 @@ body {
     color: #000 !important;
     font-weight: bold;
   }
+  
+  .highlight-title{
+	color: black;	
+}
+  
+  
 /* role-logo의 기본 설정: opacity와 visibility로 보이기/숨기기 */
 .logo{
 	text-decoration: none;
@@ -189,4 +200,32 @@ body {
   background-color: #fdecea;
   color: #c62828;
 }
-
+#StartPickUp {
+	max-width: 80%;
+	max-height: 60vh; /* 뷰포트 높이의 60%까지만 */
+	height: auto;
+	width: auto;
+	display: block;
+	margin: 0 auto; /* 가운데 정렬 */
+}
+#startDeliveryBtn {
+	font-family: 'Gowun Dodum', sans-serif;
+	font-size: 2rem;
+	background-color: #f0f0f0;
+	color: #5A3E36;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 15px;
+	text-decoration: none;
+	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+	transition: background-color 0.2s ease;
+}
+.message-container {
+	background-color: white; /* 약간 회색빛 배경 */
+	border-radius: 10px; /* 둥근 모서리 */
+	padding: 50px;
+	text-align: center;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+	width: 80%;
+	margin: 50px auto; /* 화면 중앙 정렬 */
+}

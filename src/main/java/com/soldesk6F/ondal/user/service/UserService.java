@@ -22,10 +22,15 @@ import com.soldesk6F.ondal.login.CustomUserDetailsService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserStatus;
 import com.soldesk6F.ondal.user.entity.Owner;
+import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.repository.OwnerRepository;
+import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import com.soldesk6F.ondal.useract.cart.entity.Cart;
+import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
 import java.util.UUID;
@@ -36,8 +41,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final OwnerRepository ownerRepository;
+    private final RiderRepository riderRepository; 
     private final BCryptPasswordEncoder passwordEncoder;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CartRepository cartRepository;
+    private final RiderService riderSerivce;
 
     @Value("${upload.path}")
     private String uploadDir;
@@ -109,6 +117,13 @@ public class UserService {
 	                .build();
 	
 	        userRepository.save(user);
+	        
+	        Cart cart = Cart.builder()
+        		.user(user)
+        		.store(null) // 혹은 default store 지정
+        		.build();
+        	cartRepository.save(cart);
+        	
 	        return true;
     	} catch (IOException e) {
             e.printStackTrace();
@@ -394,6 +409,30 @@ public class UserService {
 			System.out.println("🔎 UserId로 Owner 찾기: " + u.getUserId());
 			return ownerRepository.findByUser_UserId(u.getUserId());
 		});
+	}
+	@Transactional
+	public void convertOndalWalletToPay(CustomUserDetails userDetails, int amount) {
+		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+    	UUID userUuid = UUID.fromString(userUUIDString);
+    	 User user = userRepository.findById(userUuid)
+    		        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    	 Rider rider = riderRepository.findByUser_UserUuid(userUuid) 
+    			 .orElseThrow(() -> new IllegalArgumentException("라이더를 찾을 수 없습니다."));
+    	 Owner owner = ownerRepository.findByUser_UserUuid(userUuid) 
+    			 .orElseThrow(() -> new IllegalArgumentException("점주를 찾을 수 없습니다."));
+	    int wallet = user.getOndalWallet();
+	    if (wallet < amount) {
+	        throw new IllegalArgumentException("온달 지갑 잔액이 부족합니다.");
+	    }
+	    rider.setRiderWallet(rider.getRiderWallet() - (amount/2));
+	    owner.setOwnerWallet(owner.getOwnerWallet() - (amount/2));
+
+	    user.setOndalWallet(wallet - amount);
+	    user.setOndalPay(user.getOndalPay() + amount);
+	    
+	    riderRepository.save(rider);
+	    ownerRepository.save(owner);
+	    userRepository.save(user);
 	}
 
 }

@@ -39,6 +39,13 @@ public class Payment {
 	@JoinColumn(name = "order_id" , nullable = false, unique = true)
 	private Order order;
 	
+    @Column(name = "payment_key", length = 200, nullable = false, unique = true)
+    private String paymentKey;    // Toss paymentKey
+
+    @Column(name = "toss_order_id", length = 64, nullable = false)
+    private String tossOrderId;
+	
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "payment_method",nullable = false)
 	private PaymentMethod paymentMethod;
@@ -46,6 +53,12 @@ public class Payment {
 	@Column(name = "amount", nullable = false)
 	private int amount;
 	
+    @Column(name = "requested_at", nullable = false)
+    private LocalDateTime requestedAt;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
+    
 	@CreationTimestamp
 	@Column(name = "payment_time" ,nullable = false,updatable = false)
 	private LocalDateTime paymentTime;
@@ -60,7 +73,7 @@ public class Payment {
 	
 	@Column(name = "refund_reason",length = 50,nullable = true)
 	private String refundReason;
-	
+		
 	public enum PaymentMethod{
 		CASH("현금"),
 		CREDIT("카드");
