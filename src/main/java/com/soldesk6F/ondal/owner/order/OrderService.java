@@ -33,6 +33,7 @@ import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -80,6 +81,7 @@ public class OrderService {
             .orElseThrow(() -> new RuntimeException("주문 없음"));
 
         order.setOrderToOwner(OrderToOwner.CONFIRMED);
+        order.setOrderToRider(OrderToRider.CONFIRMED);
         order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
         order.setCookingStartTime(LocalDateTime.now());
 
@@ -154,6 +156,11 @@ public class OrderService {
     }
     
     public List<Order> getOrdersByStore(UUID storeId) {
+        // 1) 매장 존재 확인이 필요하다면
+        storeRepository.findById(storeId)
+            .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
+
+        // 2) 실제로 주문만 조회
         return orderRepository.findByStore_StoreId(storeId);
     }
     
@@ -278,8 +285,12 @@ public class OrderService {
         detail.setPrice(menu.getPrice());
 
         order.addOrderDetail(detail); // 핵심! totalPrice 자동 계산됨
-
+        
         orderRepository.save(order);
+     // WebSocket으로 신규 주문 알림 발행
+        OrderResponseDto dtoForSocket = OrderResponseDto.from(order);
+        messagingTemplate.convertAndSend("/topic/store/" + store.getStoreId(), dtoForSocket);
+
     }
 
     

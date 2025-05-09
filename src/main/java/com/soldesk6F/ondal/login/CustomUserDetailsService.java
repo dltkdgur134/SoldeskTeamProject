@@ -25,8 +25,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
         this.onwerRepository = ownerRepository;
         this.riderRepository = riderRepository;
-        
-        
     }
 
     @Override
@@ -35,12 +33,5 @@ public class CustomUserDetailsService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         return new CustomUserDetails(user, user.getUserRole());
-        
-        
-        
     }
-    
-    
-    
-    
 }

@@ -47,7 +47,10 @@ public class Order {
     @UuidGenerator	
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;
-
+    
+    @Column(name = "order_number", nullable = true)
+    private int orderNumber;
+    
     @ManyToOne
     @JoinColumn(name = "user_uuid", nullable = true)
     @JsonIgnoreProperties({"orders"})
@@ -184,7 +187,7 @@ public class Order {
 		}
     }
     @Builder
-    public Order(User user, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
+    public Order(User user, int orderNumber, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
                  LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
                  LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress,
                  Double deliveryAddressLatitude, Double deliveryAddressLongitude, int deliveryFee,
@@ -193,6 +196,7 @@ public class Order {
                  List<OrderDetail> orderDetails) {
 
         this.user = user;
+        this.orderNumber = orderNumber;
         this.guestId = guestId;
         this.store = store;
         this.rider = rider;

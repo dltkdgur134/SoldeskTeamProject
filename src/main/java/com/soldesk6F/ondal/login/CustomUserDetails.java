@@ -49,7 +49,7 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
     }
     
     @Override
-    public String getPassword() {	
+    public String getPassword() {
         return user.getPassword();
     }
     
@@ -84,7 +84,8 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
 
 	@Override
 	public String getName() {
-        return attributes != null ? attributes.get("sub").toString() : user.getUserId();
+//        return attributes != null ? attributes.get("sub").toString() : user.getUserId();
+        return user.getUserUuid().toString(); // ✅ 이 부분이 핵심입니다.
 	}
 
 	@Override
@@ -92,4 +93,9 @@ public class CustomUserDetails implements UserDetails , OAuth2User {
 		return attributes;
 		
 	}
+	
+    @Override
+    public String toString() {
+        return user.getUserUuid().toString();
+    }
 }

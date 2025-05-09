@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,4 +36,8 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     	List<Order> findOrdersWithinRadius(@Param("lat") double lat,
     	                                   @Param("lng") double lng,
     	                                   @Param("radius") double radiusKm);
+    
+    // orderNumber 매일 초기화
+    @Query("SELECT MAX(o.orderNumber) FROM Order o WHERE DATE(o.orderTime) = :today")
+    Integer findMaxOrderNumberForToday(@Param("today") LocalDate today);
 }

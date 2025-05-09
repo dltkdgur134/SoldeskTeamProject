@@ -36,7 +36,7 @@ public class RegAddressController {
 			@RequestParam("address") String address, 
 			@RequestParam("detailAddress") String detailAddress,
 			@RequestParam("latitude") String latitude,
-			@RequestParam("longitude") String longitude, 
+			@RequestParam("longitude") String longitude,
 			RedirectAttributes redirectAttributes) {
 		regAddressService.regAddress(userDetails, redirectAttributes, address, detailAddress, latitude, longitude);
 		return "redirect:/myAddress";

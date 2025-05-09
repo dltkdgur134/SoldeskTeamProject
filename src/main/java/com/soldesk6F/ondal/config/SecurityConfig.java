@@ -3,6 +3,7 @@ package com.soldesk6F.ondal.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,8 +16,11 @@ import com.soldesk6F.ondal.login.CustomOAuth2UserService;
 import com.soldesk6F.ondal.login.CustomUserDetailsService;
 import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig{
 
     private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
@@ -25,28 +29,39 @@ public class SecurityConfig{
     private final CustomUserDetailsService customUserDetailsService;
 
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
-    		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
-        this.customUserDetailsService = customUserDetailsService;
-        this.customAuthFailureHandler = customAuthFailureHandler;
-        this.customOAuth2UserService = customOAuth2UserService;
-        this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
-        
-
-    }
+//    public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
+//    		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
+//        this.customUserDetailsService = customUserDetailsService;
+//        this.customAuthFailureHandler = customAuthFailureHandler;
+//        this.customOAuth2UserService = customOAuth2UserService;
+//        this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
+//        
+//
+//    }
 
 //    @Bean
 //    public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder();
 //    }
+    
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder())
-                .and()
-                .build();
+    	AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+        return builder.build();
+//        return http.getSharedObject(AuthenticationManagerBuilder.class)
+//                .userDetailsService(customUserDetailsService)
+//                .passwordEncoder(passwordEncoder())
+//                .and()
+//                .build();
     }
 
 //    @Bean
@@ -96,6 +111,7 @@ public class SecurityConfig{
 				.logoutSuccessUrl("/login?logout")
 				.permitAll()
 			)
+            .userDetailsService(customUserDetailsService)
 			.oauth2Login(oauth2 -> oauth2
 				.loginPage("/login/tryOAuthLogin")
 				.userInfoEndpoint(userInfo -> userInfo

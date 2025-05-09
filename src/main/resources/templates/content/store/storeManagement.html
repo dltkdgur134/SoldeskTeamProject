@@ -16,13 +16,10 @@
     
     <!-- 기존 storeManagement 전용 CSS·JS -->
     <link rel="stylesheet" th:href="@{/css/storeManagement.css}" />
-    <script defer th:src="@{/js/storeManagement.js}"></script>
     <link rel="stylesheet" th:href="@{/css/storeDashboard.css}">
-	<script th:src="@{/js/storeDashboard.js}"></script>
-
 </head>
 
-<body>
+<body th:attr="data-storeid=${storeId}">
 <div class="store-header">
 		<h1 th:text="${store.storeName}">점포명</h1>
 		<div class="store-info">
@@ -64,4 +61,6 @@
 
 	</div>
 </body>
+<script defer th:src="@{/js/storeManagement.js}"></script>
+<script th:src="@{/js/storeDashboard.js}"></script>
 </html>
