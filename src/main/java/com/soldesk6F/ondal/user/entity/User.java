@@ -210,11 +210,4 @@ public class User {
 	public String getUserUuidAsString() {
 		return userUuid != null ? userUuid.toString() : null;
 	}
-	@Transient // DB 컬럼이 아니므로 추가
-	public int getOndalWallet() {
-	    int riderWallet = this.rider != null ? this.rider.getRiderWallet() : 0;
-	    int ownerWallet = this.owner != null ? this.owner.getOwnerWallet() : 0;
-	    return riderWallet + ownerWallet;
-	}
-
 }

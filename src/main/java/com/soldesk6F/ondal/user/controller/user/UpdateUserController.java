@@ -167,12 +167,11 @@ public class UpdateUserController {
 	                          RedirectAttributes redirectAttributes) {
 		boolean isCorrect = userService.checkPassword(userDetails, Password, redirectAttributes);
 		if(isCorrect) {
-			try {
 				userService.convertOndalWalletToPay(userDetails, amount);
 				redirectAttributes.addFlashAttribute("success", amount + "원이 O Pay로 충전되었습니다.");
-			} catch (IllegalArgumentException e) {
-				redirectAttributes.addFlashAttribute("error", e.getMessage());
-			}
+		}else {
+			
+			redirectAttributes.addFlashAttribute("error", "충전이 실패했습니다.");
 		}
 
 	    return "redirect:/ondalPay"; // 충전 결과를 보여줄 페이지로 이동
