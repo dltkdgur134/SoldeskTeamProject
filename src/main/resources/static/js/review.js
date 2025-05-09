@@ -16,6 +16,15 @@ $('.rating span').click(function() {
 
 // 페이지 로딩 시 달점 표기
 $(function() {
+	var flashDurationInSeconds = 5;
+	 var flashContainerId = 'flash-messages';
+
+	 function removeFlashMessages() {
+	    $('#' + flashContainerId).remove();
+	 }
+	 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
+	
+	
 	const reviewForms = document.querySelectorAll("form[id^='review-form']");
 
 	reviewForms.forEach((form) => {
@@ -36,7 +45,7 @@ $(function() {
 			});
 		}
 	});
-	const reviewForm = document.querySelector("form[id^='update-review-form']");
+	const reviewForm = document.querySelector("form[id^='updateReviewForm']");
 	const ratingInput = reviewForm.querySelector("input[id^='rating-stars']");
 	const ratingValue = parseInt(ratingInput.value, 10);
 	if (!isNaN(ratingValue)) {
@@ -173,4 +182,42 @@ function deleteReview(count) {
 		console.error('오류 발생', error);
 		alert('삭제 중 오류가 발생했습니다.')
 	});
+}
+
+function getElapsedTime(createdTime) {
+	const now = new Date();
+	const created = new Date(createdTime);
+	
+	const seconds = Math.floor((now - created) / 1000); // milliseconds -> seconds
+	if (seconds < 60) {
+		return "방금 전";
+	} 
+	
+	const minutes = Math.floor(seconds / 60);
+	if (minutes < 60) {
+		return minutes + "분 전";
+	}
+	
+	const hours = Math.floor(minutes / 60);
+	if (hours < 24) {
+		return hours + "시간 전";
+	}
+	
+	const days = Math.floor(hours/ 24);
+	const weeks = Math.floor(days / 7);
+	const months = Math.floor(days / 30.43685);
+	const years = Math.floor(months / 12);
+	
+	if (days < 7) {
+		return days + "일 전";
+	}
+	
+	if (months < 1) {
+		return weeks + "주 전";
+	}
+	
+	if (months < 12) {
+		return months + "개월 전";
+	}
+	return years + "년 전";
 }

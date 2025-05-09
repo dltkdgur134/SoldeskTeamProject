@@ -50,7 +50,7 @@ public class ReviewController {
 	}
 	
 	// 리뷰 정보 수정 페이지 이동 (선택한 주소만)
-	@GetMapping("/updateReview/{reviewId}")
+	@GetMapping("/goUpdateReview/{reviewId}")
 	public String goUpdateReview(@AuthenticationPrincipal CustomUserDetails userDetails,
 			@PathVariable("reviewId") UUID reviewId,
 			RedirectAttributes redirectAttributes,
@@ -74,14 +74,19 @@ public class ReviewController {
 	}
 	
 	// 리뷰 수정
-	@PutMapping("content/updateReview/")
+	@PutMapping("content/updateReview")
 	public String updateReview(@AuthenticationPrincipal CustomUserDetails userDetails,
 			ReviewDTO reviewDTO,
-			@RequestParam("reviewImg") MultipartFile[] reviewImg,
+			@RequestParam(value = "reviewImg") MultipartFile[] reviewImg,
 			RedirectAttributes redirectAttributes) {
-		
-		
-		return "";
+		System.out.println(reviewImg[0]);
+		if (reviewImg != null && reviewImg.length > 0) {
+			reviewService.updateReview(userDetails, reviewDTO, redirectAttributes);
+			reviewService.updateReviewImg(userDetails, reviewDTO, reviewImg, redirectAttributes);
+		} else {
+			reviewService.updateReview(userDetails, reviewDTO, redirectAttributes);
+		}
+		return "redirect:/myReview";
 	}
 	
 	

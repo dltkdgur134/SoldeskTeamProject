@@ -28,7 +28,10 @@
 				리뷰 관리
 			</h4>
 			<div class="review-header">
-				내가 쓴 총 리뷰 <span th:text="${#lists.size(reviewList)}"></span> 개
+				내가 쓴 총 리뷰 <span th:text="${#lists.size(reviewList)}"></span> 개 
+			</div>
+			<div class="review-header-footer">
+				리뷰 수정   <span><i class="fa-solid fa-circle-question" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="리뷰 수정은 작성 후 3일 이내에만 가능합니다."></i></span>
 			</div>
 			<div class="card-body">
 				<th:block th:each="review : ${reviewList}">
@@ -44,7 +47,9 @@
   												6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
 										</svg>
 									</a>
-									<strong class="order-time" th:text="${#strings.substringBefore(#strings.replace(review.order.orderTime,'T', ' '), '.')}"></strong>
+									<!-- <strong class="order-time" th:text="${#strings.substringBefore(#strings.replace(review.order.orderTime,'T', ' '), '.')}"></strong> -->
+									<!-- <strong class="order-time" th:text="${#temporals.format(review.order.orderTime, 'yyyy-MM-dd')}"></strong> -->
+									<strong class="order-time" th:text="${orderDaysPassed[review.reviewId]}"></strong>
 								</div>
 								<div class="container d-flex justify-content-between align-items-center headers">
 									<div class="my-rating">
@@ -57,10 +62,10 @@
 									<input name="rating" class="form-control" th:id="rating-stars + ${reviewStat.count}" 
 										type="text" th:value="${review.rating}" hidden="true"/>
 									<div class="d-flex justify-content-end">
-									<span class="badge rounded-pill text-bg-primary me-2 d-flex justify-content-center align-items-center">
+									<span class="badge rounded-pill text-bg-primary me-2 d-flex justify-content-center align-items-center" th:if="${reviewDaysPassed[review.reviewId] < 4}">
 										<a class="update-review-btn" 
 											th:id="update-review-btn + ${reviewStat.count}"
-											th:href="@{/updateReview/{reviewId}(reviewId=${review.reviewId})}">
+											th:href="@{/goUpdateReview/{reviewId}(reviewId=${review.reviewId})}">
 											수정
 										</a>
 									</span>
@@ -83,9 +88,9 @@
 				    				<br>
 					    			<small th:text=${review.reviewContent}></small>
 				    				<br>
-				    				<th:block th:each="reviewImg : ${reviewImgMap[review.reviewId]}"> 
-				    					<img th:src="${'/img/review/'+ reviewImg.reviewImg}" /> 
-				    				</th:block>
+					    			<th:block th:each="reviewImg : ${reviewImgMap[review.reviewId]}"> 
+					    				<a href="#" role="button" data-bs-toggle="modal" data-bs-target="#imageModal"><img class="img-thumbnail img-fluid" th:src="${'/img/review/'+ reviewImg.reviewImg}" style="width: 30%;"/></a> 
+					    			</th:block>
 				    				<br>
 				    				<th:block th:each="orderDetails : ${review.order.orderDetails}">
 				    					<span class="badge menu-badge mt-2">
@@ -101,6 +106,58 @@
 					<button type="button" class="btn btn-secondary btn-lg" id="back-btn" 
 						onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	
 				</div>
+				
+				<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  					<div class="modal-dialog">
+    					<div class="modal-content">
+	      					<div class="modal-body">
+	      						<div class="d-flex justify-content-end">
+		        					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      						</div>
+	      						<div id="reviewImgCarousel" class="carousel slide">
+	  								<div class="carousel-indicators">
+	    								<button type="button" data-bs-target="#reviewImgCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+	    								<button type="button" data-bs-target="#reviewImgCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+	    								<button type="button" data-bs-target="#reviewImgCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+	  								</div>
+	  								<div class="carousel-inner">
+	    								<div class="carousel-item active">
+	      									<img th:src="@{/css/imgs/category1.webp}" class="d-block w-100" alt="...">
+	      									<div class="carousel-caption d-none d-md-block">
+	        									<h5>First slide label</h5>
+	        									<p>Some representative placeholder content for the first slide.</p>
+	      									</div>
+	    								</div>
+	    							<div class="carousel-item">
+								      <img th:src="@{/css/imgs/category2.webp}" class="d-block w-100" alt="...">
+								      <div class="carousel-caption d-none d-md-block">
+								        <h5>Second slide label</h5>
+								        <p>Some representative placeholder content for the second slide.</p>
+								      </div>
+								    </div>
+								    <div class="carousel-item">
+								      <img th:src="@{/css/imgs/category3.webp}" class="d-block w-100" alt="...">
+								      <div class="carousel-caption d-none d-md-block">
+								        <h5>Third slide label</h5>
+								        <p>Some representative placeholder content for the third slide.</p>
+								      </div>
+								    </div>
+								  </div>
+								  <button class="carousel-control-prev" type="button" data-bs-target="#reviewImgCarousel" data-bs-slide="prev">
+								    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+								    <span class="visually-hidden">Previous</span>
+								  </button>
+								  <button class="carousel-control-next" type="button" data-bs-target="#reviewImgCarousel" data-bs-slide="next">
+								    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+								    <span class="visually-hidden">Next</span>
+								  </button>
+								</div>
+	     					</div>
+    					</div>
+  					</div>
+				</div>
+				
+				
 			</div>
 		</div> 
 	</div>

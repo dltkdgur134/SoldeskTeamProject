@@ -128,6 +128,10 @@ input[type="file"] {
 	font-style: italic; 
 } 
 
+.review-header-footer {
+	font-size: 12px;
+}
+
 .headers {
 	padding: 0px;
 }
