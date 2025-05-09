@@ -1,0 +1,231 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "acloud";
+	src: url('acloud.ttf');
+}
+
+@font-face {
+	font-family: "taebaek";
+	src: url('taebaek.ttf');
+}
+
+@font-face {
+	font-family: "yisunshin";
+	src : url('yisunshinB.ttf'), format('truetype');
+}
+
+@font-face {
+	font-family: "siwol";
+	src : url('siwol.ttf');
+}
+
+body {
+	font-family: "siwol";
+	text-align: center;
+}
+
+.display-5 {
+	color: white;
+	font-family: "taebaek" !important;
+}
+
+:root {
+	--bs-link-color: black;
+	--bs-link-hover-color: #6C0C0C;
+}
+
+
+.btn-primary {
+    background-color: #404040 !important;
+    border: none !important;
+    color: #fff !important;
+  }
+
+  .btn-primary:hover {
+    background-color: black !important;
+  }
+
+.btn-secondary {
+	background-color: grey;
+	border: none !important;
+	color: #fff !important;
+}
+
+.info-card {
+      max-width: 600px;
+      margin: auto;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+	color: black;
+}
+
+.navbar-light {
+    background-color: #6C0C0C !important; /* custom background */
+  }
+
+  .navbar-light .navbar-brand,
+  .navbar-light .nav-link {
+    color: #000 !important; /* text color */
+  }
+
+  .navbar-light .nav-link:hover {
+    color: #6C0C0C !important; /* hover color */
+  }
+
+  .nav-pills .nav-link {
+    color: #333 !important; /* base text */
+    background-color: transparent;
+  }
+
+  .nav-pills .nav-link:hover {
+    color: #cc5200 !important;
+    background-color: #ffe0b2 !important;
+  }
+
+  .nav-pills .nav-link.active {
+    background-color: #6C0C0C !important;
+    color: #000 !important;
+    font-weight: bold;
+  }
+  
+  .highlight-title{
+	color: black;	
+}
+  
+  
+/* role-logo의 기본 설정: opacity와 visibility로 보이기/숨기기 */
+.logo{
+	text-decoration: none;
+    color: white;
+}
+.role-logo-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px); /* 살짝 위로 숨겨놓음 */
+    transition: all 1s ease-in-out;
+    pointer-events: none; /* 클릭 막기 */
+    position: static;  /* 레이아웃에 영향 안 주게 */
+}
+
+.role-logo-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: all 1s ease-in-out;
+    pointer-events: auto;
+    position: inherit;
+}
+
+
+.tooltip .tooltip-inner {
+  font-size: 9px; /* Adjust size */
+  padding: 4px 8px; /* Optional: Adjust padding */
+}
+
+.card-title a {
+	color: #6C0C0C;
+}
+
+.footer-sns-link i{
+	color: black;
+	box-shadow: black 5px;
+}
+
+.footer-sns-link i:hover {
+	color: #6C0C0C;
+}
+
+.footer-sns-link i:active {
+	color: #D39E00;
+}
+
+.footer-sns-link:visited {
+	color: black;
+}
+
+.badge {
+	font-size: 14px;
+}
+
+.offcanvas-backdrop {
+    z-index: 1040;
+}
+
+.offcanvas {
+    z-index: 1050;
+}
+
+#profile-pic {
+	width: 100px;
+	top: -3em;
+}
+
+#profile-pic:hover {
+	background-color: #ffef99;
+	opacity: 0.7;
+	cursor: pointer;
+} 
+
+#profile-pic-update-btn {
+	background-color: #F5F5F5 !important;
+	border: none !important;
+	border-radius:50%;
+	width:30px;
+	height:30px;
+	justify-content: center;
+	vertical-align: middle;
+}
+
+#profile-pic-update-btn i {
+	font-size: 18px;
+}
+
+.alert {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #e6f9e6;
+  color: #2e7d32;
+}
+
+.alert-danger {
+  background-color: #fdecea;
+  color: #c62828;
+}
+#StartPickUp {
+	max-width: 80%;
+	max-height: 60vh; /* 뷰포트 높이의 60%까지만 */
+	height: auto;
+	width: auto;
+	display: block;
+	margin: 0 auto; /* 가운데 정렬 */
+}
+#startDeliveryBtn {
+	font-family: 'Gowun Dodum', sans-serif;
+	font-size: 2rem;
+	background-color: #f0f0f0;
+	color: #5A3E36;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 15px;
+	text-decoration: none;
+	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+	transition: background-color 0.2s ease;
+}
+.message-container {
+	background-color: white; /* 약간 회색빛 배경 */
+	border-radius: 10px; /* 둥근 모서리 */
+	padding: 50px;
+	text-align: center;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+	width: 80%;
+	margin: 50px auto; /* 화면 중앙 정렬 */
+}

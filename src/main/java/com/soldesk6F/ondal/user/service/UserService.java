@@ -420,6 +420,9 @@ public class UserService {
     			 .orElseThrow(() -> new IllegalArgumentException("라이더를 찾을 수 없습니다."));
     	 Owner owner = ownerRepository.findByUser_UserUuid(userUuid) 
     			 .orElseThrow(() -> new IllegalArgumentException("점주를 찾을 수 없습니다."));
+    	 
+    	 
+    	 
 	    int wallet = user.getOndalWallet();
 	    if (wallet < amount) {
 	        throw new IllegalArgumentException("온달 지갑 잔액이 부족합니다.");
