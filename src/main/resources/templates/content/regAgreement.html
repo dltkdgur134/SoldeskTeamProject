@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" 
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
 <head>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" th:href="@{/css/regAgreement.css}">
-	<title>회원가입 동의</title>
+	<link rel="stylesheet" th:href="@{/css/regAgreement.css}" />
+	<link rel="stylesheet" th:href="@{/css/custom.css}" />
 </head>
 <body>
-	<div class="agreement-container">
+	<div layout:fragment="content" id="agreement-container" class="container my-5">
 		<h2>약관 동의</h2>
     
 		<div class="checkbox-group">
@@ -37,7 +39,6 @@
 		<form action="/register" method="get">
 			<button type="submit" class="submit-btn" id="agreeBtn" disabled>다음</button>
 		</form>
-	</div>
 
 	<script>
 		const checkAll = document.getElementById("checkAll");
@@ -62,5 +63,6 @@
 			agreeBtn.disabled = !allRequiredChecked;
 		}
 	</script>
+	</div>
 </body>
 </html>

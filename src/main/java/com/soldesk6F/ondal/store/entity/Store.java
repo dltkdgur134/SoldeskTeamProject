@@ -7,21 +7,30 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
+import org.locationtech.jts.geom.Point;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.soldesk6F.ondal.menu.entity.MenuCategory;
 import com.soldesk6F.ondal.user.entity.Owner;
+import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -29,6 +38,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
@@ -44,22 +54,32 @@ public class Store {
 	
 	@ManyToOne
 	@JoinColumn(name = "owner_id" , nullable = false)
+	@JsonIgnoreProperties({"user"})
 	private Owner owner;
+	
+	@Column(name = "business_num" , nullable = false , length = 10)
+	private String businessNum;
+	
 	
 	@Column(name = "store_name", nullable = false, length = 20)
     private String storeName;
 
+	
     @Column(name = "category", nullable = false, length = 20)
     private String category;
 
     @Column(name = "store_phone", nullable = false, length = 13)
     private String storePhone;
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<StoreImg> storeImgs = new ArrayList<>();
-
+    
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BrandImg> brandImgs = new ArrayList<>();
+    private List<StoreIntroduceImg> StoreIntroduceImgs = new ArrayList<>();
+    
+    @Column(name = "brand_img", length = 255)
+    private String brandImg;
 
     @Column(name = "store_address", nullable = false, length = 80)
     private String storeAddress;
@@ -69,18 +89,32 @@ public class Store {
 
     @Column(name = "store_longitude", nullable = false)
     private double storeLongitude;
+    
+    @Column(name = "store_location",  columnDefinition = "POINT SRID 4326" , nullable = true)
+    private Point storeLocation;
 
-    @Column(name = "delivery_range", nullable = false)
-    private double deliveryRange;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_range")
+    private DeliveryRange deliveryRange;
 
     @Lob
     @Column(name = "store_introduce")
     private String storeIntroduce;
 
-    @Column(name = "opening_time", nullable = false)
+    @Lob
+    @Column(name = "store_event")
+    private String storeEvent;
+
+    @Lob
+    @Column(name = "food_origin",nullable = false)
+    private String foodOrigin;
+
+    @JsonIgnore
+    @Column(name = "opening_time")
     private LocalTime openingTime;
 
-    @Column(name = "closing_time", nullable = false)
+    @JsonIgnore
+    @Column(name = "closing_time")
     private LocalTime closingTime;
 
     @Column(name = "holiday", length = 50)
@@ -90,9 +124,14 @@ public class Store {
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus;
 
+    @JsonIgnore
     @CreationTimestamp
-    @Column(name = "registration_date", updatable = false)
+    @Column(name = "registration_date", updatable = false,nullable = false)
     private LocalDateTime registrationDate;
+    
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)	 // 카테고리 정렬 순서 저장 컬럼
+    @OrderBy("order ASC")
+    private List<MenuCategory> menuCategories;
 
     public enum StoreStatus {
         OPEN("영업중"),
@@ -111,23 +150,47 @@ public class Store {
         }
     }
 
+    public enum DeliveryRange {
+		ONE_KM(1), THREE_KM(3), FIVE_KM(5);
+
+		private final int km;
+
+		DeliveryRange(int km) {
+			this.km = km;
+		}
+
+		public int getKm() {
+			return km;
+		}
+
+		public static DeliveryRange fromKm(int km) {
+			for (DeliveryRange range : values()) {
+				if (range.km == km)
+					return range;
+			}
+			throw new IllegalArgumentException("Invalid delivery range: " + km);
+		}
+	}
     public void addStoreImg(StoreImg img) {
         img.setStore(this);
         this.storeImgs.add(img);
     }
-
-    public void addBrandImg(BrandImg img) {
-        img.setStore(this);
-        this.brandImgs.add(img);
+    
+    public void addStoreIntroduceImg(StoreIntroduceImg img) {
+    	img.setStore(this);
+    	this.StoreIntroduceImgs.add(img);
     }
+
     
     @Builder
-    public Store(Owner owner, String storeName, String category, String storePhone,
-                 List<StoreImg> storeImgs, List<BrandImg> brandImgs, String storeAddress,
-                 double storeLatitude, double storeLongitude, double deliveryRange,
-                 String storeIntroduce, LocalTime openingTime, LocalTime closingTime,
+    public Store(Owner owner,String businessNum, String storeName, String category, String storePhone,
+                 List<StoreImg> storeImgs,List<StoreIntroduceImg> StoreIntroduceImgs, String brandImg, String storeAddress,
+                 double storeLatitude, double storeLongitude, DeliveryRange deliveryRange,
+                 String storeIntroduce, String storeEvent , String foodOrigin,
+                 LocalTime openingTime, LocalTime closingTime,
                  String holiday, StoreStatus storeStatus) {
         this.owner = owner;
+        this.businessNum = businessNum;
         this.storeName = storeName;
         this.category = category;
         this.storePhone = storePhone;
@@ -136,15 +199,18 @@ public class Store {
         if (storeImgs != null) {
             storeImgs.forEach(this::addStoreImg);
         }
-        if (brandImgs != null) {
-            brandImgs.forEach(this::addBrandImg);
+       
+        if (StoreIntroduceImgs != null) {
+        	StoreIntroduceImgs.forEach(this::addStoreIntroduceImg);
         }
-
+        this.brandImg = brandImg;
         this.storeAddress = storeAddress;
         this.storeLatitude = storeLatitude;
         this.storeLongitude = storeLongitude;
         this.deliveryRange = deliveryRange;
         this.storeIntroduce = storeIntroduce;
+        this.storeEvent = storeEvent;
+        this.foodOrigin = foodOrigin;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.holiday = holiday;
@@ -154,6 +220,5 @@ public class Store {
     public String getStoreUuidAsString() {
 	    return storeId != null ? storeId .toString() : null;
 	}
-	
 	
 }

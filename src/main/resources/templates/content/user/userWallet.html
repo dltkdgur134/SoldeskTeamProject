@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:href="@{/css/Custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/update.css}" rel="stylesheet" />
+	<script th:src="@{/js/zipcode.js}"></script>
+	<script th:src="@{/js/initialize.js}"></script>
+	<script th:src="@{/js/register.js}"></script>
+</head>
+<div layout:fragment="content" class="container py-5">
+  <div class="card info-card p-4">
+    <h3 class="mb-4">온달 지갑</h3>
+
+    <!-- 현재 잔액 -->
+    <div class="mb-3">
+      <label class="form-label">현재 잔액</label>
+      <div class="form-control-plaintext fw-bold fs-5 text-primary">
+        <span th:text="${#numbers.formatInteger(ondalWallet, 0, 'COMMA')}"></span> 원
+      </div>
+    </div>
+
+    <!-- 구매 폼 -->
+    <form th:action="@{/user/goToPoints}" method="post" id="goToPoints">
+      <div class="mb-3">
+        <div class="form-text text-danger">
+          온달 지갑은 라이더 지갑과 점주 지갑의 합본입니다. 온달 지갑에서 포인트를 구매하세요!
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="Password" class="form-label">비밀번호</label>
+        <input type="password" class="form-control" id="Password" name="Password">
+      </div>
+      <button type="submit" class="btn btn-primary">쿠폰 구매하러 가기</button>
+    </form>
+  </div>
+</div>
+</html>

@@ -1,0 +1,85 @@
+<!-- templates/fragments/storeDashboard-modal.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <!-- 이 안의 div를 “modal” 프래그먼트로 정의 -->
+  <th:block th:fragment="modal">
+    <div
+      class="modal fade"
+      id="newOrderPopup"
+      tabindex="-1"
+      aria-labelledby="newOrderPopupLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <!-- 모달 헤더 -->
+          <div class="modal-header">
+            <h5 class="modal-title" id="newOrderPopupLabel">새 주문 도착!</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <!-- 모달 바디 -->
+          <div class="modal-body">
+            <p>주문 정보: <span id="orderInfo"></span></p>
+            <p>옵션: <span id="orderOptions"></span></p>
+            <p>수량: <span id="orderCount"></span></p>
+            <p>금액: <span id="orderPrice"></span></p>
+            <hr />
+            <p>가게 요청사항: <span id="storeRequest"></span></p>
+            <p>배달 요청사항: <span id="deliveryRequest"></span></p>
+            <p>수저 포함 여부: <span id="needSpoon"></span></p>
+            <hr />
+            <p>주문번호: <span id="orderId"></span></p>
+            <p>연락처: <span id="contactNumber"></span></p>
+            <p>배달 주소: <span id="address"></span></p>
+            <hr />
+            <!-- 배달 완료 예정 시간(5분 간격 조절) -->
+            <div class="mb-3">
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                onclick="changeTime(-5)"
+              >
+                -5분
+              </button>
+              <input
+                type="text"
+                id="completionTime"
+                value="0"
+                size="4"
+                class="text-center"
+              />
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                onclick="changeTime(5)"
+              >
+                +5분
+              </button>
+            </div>
+          </div>
+          <!-- 모달 푸터 -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="acceptBtn">
+              접수
+            </button>
+            <button type="button" class="btn btn-danger" id="rejectBtn">
+              거부
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</html>

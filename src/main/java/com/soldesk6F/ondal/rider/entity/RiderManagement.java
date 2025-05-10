@@ -48,9 +48,6 @@ public class RiderManagement {
     @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;  // 최초 매출 발생 시점
 
-    @UpdateTimestamp
-    @Column(name = "updated_date")
-    private LocalDateTime updatedDate;  // 매출이 갱신될 때마다 업데이트
 
  // 총 매출액과 부가세를 업데이트하는 메서드
     public void updateTotalSalesAndVat(int deliverySales, int deliveryVat) {

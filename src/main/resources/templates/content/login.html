@@ -6,14 +6,9 @@
 	layout:decorate="~{layouts/Layouts}"
 >
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>온달 로그인</title>
-<script th:src="@{/js/index.js}"></script>
-<link th:fragment="css" rel = "stylesheet" th:href = "@{/css/login.css}">
-<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
-<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet" />
-<link th:fragment="css" th:href="@{/css/update.css}" rel="stylesheet" />
+	<script th:src="@{/js/index.js}"></script>
+	<link rel = "stylesheet" th:href = "@{/css/login.css}">
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
 </head>
 <body>
 
@@ -21,11 +16,11 @@
     <h1>로그인</h1>
     <form method="post" th:action="@{/login/tryLogin}">
       <div class="form-group">
-        <label for="username">아이디</label>
+        <label class = "loginLabels" for="username">아이디</label>
         <input type="text" id="username" name="username" placeholder="아이디를 입력하세요" required />
       </div>
       <div class="form-group">
-        <label for="password">비밀번호</label>
+        <label  class = "loginLabels" for="password">비밀번호</label>
         <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required />
       </div>
       <button type="submit" class="login-btn">로그인</button>
@@ -35,8 +30,8 @@
     	<a><img th:src="@{/css/imgs/naverLoginBtn.png}" class = "oAuthBtnImg"></a>
     </div>
     <div class="extra-links">
-      <a href="/regAgreement">회원가입</a>
-      <a href="/find-password">비밀번호 찾기</a>
+      <a th:href="@{/regAgreement}">회원가입</a>
+      <a th:href="@{/find-password}">비밀번호 찾기</a>
     </div>
   </div>
 
