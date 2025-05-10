@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.soldesk6F.ondal.menu.entity.Menu;
 
 import jakarta.persistence.CollectionTable;
@@ -35,6 +36,7 @@ public class OrderDetail {
 	
 	@ManyToOne
 	@JoinColumn(name = "order_id" , nullable = false)
+	@JsonIgnore
 	private Order order;
 	
 	@ManyToOne

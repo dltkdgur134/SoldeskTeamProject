@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gallery Fragment</title>
+</head>
+<body>
+    <div class="gallery-container" th:fragment="foodGallery">
+        <div th:each="store : ${stores}">
+            <a href="#" class="labels" th:text="${store.name}">가게 이름</a>
+            <img class="imgs" th:src="@{${store.imageUrl}}">
+        </div>
+    </div>
+</body>
+</html>
