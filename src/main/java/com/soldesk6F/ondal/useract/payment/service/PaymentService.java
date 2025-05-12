@@ -2,7 +2,6 @@ package com.soldesk6F.ondal.useract.payment.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
@@ -32,7 +30,6 @@ import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +37,6 @@ import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -174,7 +170,7 @@ public class PaymentService {
 //	}
 	
 	@Transactional
-	public void confirmPayment(String paymentKey, String orderId, int amount) {
+	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
 	    String url = "https://api.tosspayments.com/v1/payments/confirm";
 
 	    Map<String, Object> requestBody = new HashMap<>();
@@ -195,8 +191,9 @@ public class PaymentService {
 	    try {
 	        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 	        if (!response.getStatusCode().is2xxSuccessful()) {
-	            throw new IllegalStateException("결제 승인 실패: " + response.getBody());
 	            
+	        	return false;
+//	        	throw new IllegalStateException("결제 승인 실패: " + response.getBody());
 	        }
 	        ObjectMapper objectMapper = new ObjectMapper();
 	        TossPaymentResponse tossResponse=null;
@@ -253,9 +250,9 @@ public class PaymentService {
 	        orderRepository.save(order);
 	        cartRepository.deleteById(cartUUID);
 	        
-	        
+	        return true;
 	    } catch (HttpClientErrorException e) {
-	        throw new IllegalArgumentException("토스 결제 승인 에러: " + e.getResponseBodyAsString(), e);
+	    	return false;
 	    }
 	}
 	

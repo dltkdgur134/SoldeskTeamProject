@@ -42,11 +42,11 @@ public class StorePayController {
 	public String showPaySuccessPage(@RequestParam("paymentKey") String paymentKey,@RequestParam("orderId") String orderId,
 		    @RequestParam("amount") int amount,Model model) {
 		
-			paymentService.confirmPayment(paymentKey, orderId, amount);
-
-		
-		
-		return "/content/index";
+			if(paymentService.confirmPayment(paymentKey, orderId, amount)) {
+				return "/content/index";
+			}else {
+				return "/content/errorPage";
+			}
 	}
 	
 	
