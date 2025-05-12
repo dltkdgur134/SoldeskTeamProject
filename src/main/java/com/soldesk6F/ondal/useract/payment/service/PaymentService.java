@@ -47,7 +47,6 @@ public class PaymentService {
 	private final CartItemsRepository cartItemsRepository;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final OrderService orderService;
-	private final 
 	
 	
 	@Value("${toss.secret-key}")
@@ -55,7 +54,6 @@ public class PaymentService {
 	
 
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
-
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new IllegalStateException("로그인된 사용자가 없습니다");
@@ -132,7 +130,38 @@ public class PaymentService {
 		
 	}
 	
-	
+//	public String confirmPayment(String paymentKey, String orderId, int amount) {
+//	    String url = "https://api.tosspayments.com/v1/payments/confirm";
+//
+//	    Map<String, Object> requestBody = new HashMap<>();
+//	    requestBody.put("paymentKey", paymentKey);
+//	    requestBody.put("orderId", orderId);
+//	    requestBody.put("amount", amount);
+//
+//	    String encodedKey = Base64.getEncoder()
+//	        .encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+//
+//	    HttpHeaders headers = new HttpHeaders();
+//	    headers.setContentType(MediaType.APPLICATION_JSON);
+//	    headers.set("Authorization", "Basic " + encodedKey);
+//
+//	    HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+//	    RestTemplate restTemplate = new RestTemplate();
+//
+//	    try {
+//	        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+//
+//	        if (!response.getStatusCode().is2xxSuccessful()) {
+//	            throw new IllegalStateException("결제 승인 실패: " + response.getBody());
+//	        }
+//
+//	        // 여기서 그냥 JSON 전체 문자열 리턴
+//	        return "<pre>" + response.getBody() + "</pre>";
+//
+//	    } catch (HttpClientErrorException e) {
+//	        return "<pre>토스 결제 승인 에러:\n" + e.getResponseBodyAsString() + "</pre>";
+//	    }
+//	}
 	
 	public void confirmPayment(String paymentKey, String orderId, int amount) {
 	    String url = "https://api.tosspayments.com/v1/payments/confirm";
@@ -169,7 +198,13 @@ public class PaymentService {
 	        User user = cud.getUser();
 	        
 	        
-	        Order order = order.builder().store(cart.getStore()).user(cart.getUser()).totalPrice(tossResponse.getTotalAmount()).
+	        Order order = Order.builder()
+	        	    .store(cart.getStore())
+	        	    .user(cart.getUser())
+	        	    .totalPrice(tossResponse.getTotalAmount())
+	        	    .storeRequest(tossResponse.getMetaData().getReqStore())
+	        	    .deliveryRequest(tossResponse.getMetaData().getReqDel())
+	        	    .build();
 	        		
 	        
 	    } catch (HttpClientErrorException e) {

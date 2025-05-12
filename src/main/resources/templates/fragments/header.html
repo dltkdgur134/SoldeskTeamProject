@@ -320,7 +320,7 @@ resources/templates/fragments/header.html
 								</a> 
 							</th:block>
 							<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
-								<a class="btn btn-link text-decoration-none" href="@{/regAddress}"> 
+								<a class="btn btn-link text-decoration-none" th:href="@{/regAddress}"> 
 									<small><i class="fa-solid fa-map-location-dot"></i> 주소등록</small>
 								</a> 
 							</th:block>
@@ -401,5 +401,4 @@ resources/templates/fragments/header.html
 	</div>
 </div>
 
->>>>>>> 4bc1647b13adab0e6712ec8c76dc2204e23989f0
 </html>

@@ -39,14 +39,14 @@ public class StorePayController {
 	}
 	
 	@GetMapping("/store/paySuccess")
-	public String showPaySuccessPage(    @RequestParam("paymentKey") String paymentKey,@RequestParam("orderId") String orderId,
+	public String showPaySuccessPage(@RequestParam("paymentKey") String paymentKey,@RequestParam("orderId") String orderId,
 		    @RequestParam("amount") int amount,Model model) {
 		
-	    paymentService.confirmPayment(paymentKey, orderId, amount);
+	    String str = paymentService.confirmPayment(paymentKey, orderId, amount);
 
 		
 		
-		return "/content/index";
+		return str;
 	}
 	
 	
