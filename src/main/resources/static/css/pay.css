@@ -1,0 +1,61 @@
+:root {
+    --brand-yellow: #ffe65d;
+    --brand-border: #000000;
+  }
+
+  body {
+    background-color: #fffdf0;
+    font-family: "Pretendard", "Noto Sans KR", sans-serif;
+    color: #000;
+  }
+
+  /* ──────── 상단 네비게이션 ──────── */
+  .navbar-custom {
+    background-color: var(--brand-yellow);
+  }
+
+  .back-btn {
+    font-size: 1.7rem;
+    color: #000;
+  }
+
+  /* ──────── 장바구니 아이템 ──────── */
+  .cart-item-img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 2px solid var(--brand-border);
+  }
+
+  /* ──────── 섹션 헤드라인 ──────── */
+  .section-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  /* ──────── 고정 요약 박스 ──────── */
+  #summaryBox {
+    position: sticky;
+    top: 85px;
+  }
+
+  .price-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+  }
+
+  .total-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  /* ──────── 반응형 레이아웃 개선 ──────── */
+  @media (max-width: 991.98px) {
+    #summaryBox {
+      top: auto;
+      margin-top: 1.5rem;
+    }
+  }

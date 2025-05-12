@@ -35,7 +35,7 @@ public class AdminActions {
     private UUID actionId;  // 활동 ID (PK)
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", nullable = false)
+    @JoinColumn(name = "admin_login_id", nullable = false)
     private Admin admin;  // 관리자 ID (FK)
 
     @Column(name = "action_type", nullable = false, length = 50)

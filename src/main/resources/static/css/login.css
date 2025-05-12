@@ -55,6 +55,13 @@
       box-sizing: border-box;
     }
 
+	
+	input[readonly] {
+	  background-color: var(--white);
+	  color: var(--black);
+	  opacity: 1;
+	  cursor: default;
+	}
     /* 로그인 버튼 */
     .login-btn {
       width: 100%;
@@ -90,7 +97,7 @@
     .extra-links {
       text-align: center;
       margin-top: 20px;
-    }
+    }	
     .extra-links a {
       color: var(--black);
       text-decoration: none;
@@ -107,4 +114,8 @@
       margin-top: 40px;
       color: var(--black);
       font-size: 14px;
+    }
+    
+    .loginLabels {
+    	text-align: left;
     }

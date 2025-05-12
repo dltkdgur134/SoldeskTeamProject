@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+  <meta charset="UTF-8">
+  <title>테스트 주문 생성</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<div layout:fragment="content" style="text-align: center;">
+  <h2>테스트 주문 생성</h2>
+
+  <form id="testOrderForm" th:action="@{/testOrder/create}" method="post">
+    <!-- 1. Store 선택 -->
+    <label for="storeSelect">가게 선택:</label>
+    <select id="storeSelect" name="storeId" required>
+      <option value="">-- 가게 선택 --</option>
+      <option th:each="store : ${stores}"
+              th:value="${store.storeId}"
+              th:text="${store.storeName}">
+      </option>
+    </select>
+
+    <!-- 2. Menu 선택 -->
+    <label for="menuSelect">메뉴 선택:</label>
+    <select id="menuSelect" name="menuId" required>
+      <option value="">-- 메뉴 선택 --</option>
+    </select>
+
+    <!-- 3. 수량 -->
+    <label for="quantity">수량:</label>
+    <input type="number" id="quantity" name="quantity" value="1" min="1" required />
+
+    <!-- 4. 주문 버튼 -->
+    <button type="submit">주문 생성</button>
+  </form>
+
+  <script>
+    // 스토어 선택 시 해당 메뉴 불러오기
+    $(document).on("change", "#storeSelect", function() {
+      const storeId = $(this).val();
+      if (!storeId) return;
+
+      $.ajax({
+        url: "/testOrder/menus/" + storeId,
+        method: "GET",
+        success: function(menus) {
+          const $menuSelect = $("#menuSelect");
+          $menuSelect.empty();
+          $menuSelect.append('<option value="">-- 메뉴 선택 --</option>');
+          menus.forEach(menu => {
+            $menuSelect.append(`<option value="${menu.menuId}">${menu.menuName}</option>`);
+          });
+        },
+        error: function() {
+          alert("메뉴 목록을 불러오지 못했습니다.");
+        }
+      });
+    });
+  </script>
+  
+  <hr>
+<h2>테스트 메뉴 생성</h2>
+
+<form id="testMenuForm" th:action="@{/testOrder/createMenu}" method="post">
+  <!-- 1. Store 선택 -->
+  <label for="menuStoreSelect">가게 선택:</label>
+  <select id="menuStoreSelect" name="storeId" required>
+    <option value="">-- 가게 선택 --</option>
+    <option th:each="store : ${stores}"
+            th:value="${store.storeId}"
+            th:text="${store.storeName}"></option>
+  </select>
+
+  <!-- 2. 메뉴명 -->
+  <label for="menuName">메뉴 이름:</label>
+  <input type="text" id="menuName" name="menuName" required />
+
+  <!-- 3. 가격 -->
+  <label for="menuPrice">가격:</label>
+  <input type="number" id="menuPrice" name="price" required />
+
+  <!-- 4. 메뉴 생성 버튼 -->
+  <button type="submit">메뉴 생성</button>
+</form>
+</div>
+</html>

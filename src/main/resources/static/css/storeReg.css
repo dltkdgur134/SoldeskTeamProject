@@ -1,0 +1,54 @@
+.trial-banner {
+  background: linear-gradient(to bottom, #fffbe6, #fff3c4);
+  text-align: center;
+  padding: 60px 20px;
+  border-radius: 12px;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.highlight-text {
+  font-size: 42px;
+  margin: 0 0 30px;
+}
+
+.highlight-text strong {
+  color: #222;
+}
+
+.highlight-text span {
+  color: #e7a400;
+  font-weight: 700;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn {
+  font-size: 16px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn.online {
+  background-color: #ffcd38;
+  color: #333;
+  flex: initial;
+}
+
+.btn.online:hover {
+  background-color: #ffbb00;
+}
+
+

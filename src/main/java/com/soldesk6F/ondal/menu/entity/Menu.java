@@ -13,6 +13,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -44,6 +45,10 @@ public class Menu {
 
 	@Column(name = "menu_name", nullable = false, length = 15)
 	private String menuName;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "category_id")
+	private MenuCategory menuCategory;
 
 	@Lob
 	@Column(name = "description")
@@ -76,6 +81,11 @@ public class Menu {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "menu_status", length = 20)
 	private MenuStatus menuStatus;
+	
+	@Column(name = "menu_order")
+	private Integer menuOrder;
+	
+	private UUID menuCategoryId;
 
 	public enum MenuStatus {
 		ACTIVE, INACTIVE, SOLD_OUT
@@ -106,7 +116,7 @@ public class Menu {
 	private List<String> parseOptionNames(String optionString) {
 		if (optionString == null || optionString.isBlank())
 			return List.of();
-		return Arrays.stream(optionString.split("온달")).map(String::trim).collect(Collectors.toList());
+		return Arrays.stream(optionString.split("@@__@@")).map(String::trim).collect(Collectors.toList());
 	}
 
 	// 옵션 가격을 리스트로 변환
@@ -125,16 +135,17 @@ public class Menu {
 	private List<Integer> parseOptionPrices(String priceString) {
 		if (priceString == null || priceString.isBlank())
 			return List.of();
-		return Arrays.stream(priceString.split("온달")).map(String::trim).map(s -> s.isBlank() ? "0" : s)
+		return Arrays.stream(priceString.split("@@__@@")).map(String::trim).map(s -> s.isBlank() ? "0" : s)
 				.map(Integer::parseInt).collect(Collectors.toList());
 	}
 
 	@Builder
-	public Menu(Store store, String menuName, String description, int price, String menuImg,
+	public Menu(Store store, String menuName, MenuCategory menuCategory, String description, int price, String menuImg,
 			String menuOptions1, String menuOptions1Price, String menuOptions2, String menuOptions2Price,
 			String menuOptions3, String menuOptions3Price, MenuStatus menuStatus) {
 		this.store = store;
 		this.menuName = menuName;
+		this.menuCategory = menuCategory;
 		this.description = description;
 		this.price = price;
 		this.menuImg = menuImg;

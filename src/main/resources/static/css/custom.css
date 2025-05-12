@@ -6,30 +6,59 @@
 }
 
 @font-face {
-	font-family: "yisunshin";
-	src : url('yisunshinB.ttf') format("truetype");
+	font-family: "taebaek";
+	src: url('taebaek.ttf');	
 }
 
 @font-face {
-	font-family: "yisunshinM";
-	src : url('yisunshinM.ttf') format("truetype");
+	font-family: "yisunshin";
+	src : url('yisunshinB.ttf'), format('truetype');
+}
+
+@font-face {
+	font-family: "siwol";
+	src : url('siwol.ttf');
 }
 
 body {
-	font-family: "acloud";
+	font-family: "siwol"; 
 }
 
 .display-5 {
 	color: white;
-	font-family: "yisunshin" !important;
+	font-family: "taebaek" !important;
 }
+
+@media (max-width: 1200px) {
+  .display-5 {
+    font-size: 4vw;
+  }
+}
+
+@media (max-width: 992px) {
+  .display-5 {
+    font-size: 3.5vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .display-5 {
+    font-size: 3vw;
+  }
+}
+
+@media (max-width: 576px) {
+  .display-5 {
+    font-size:calc(1rem + 2vw);
+  }
+} 
 
 :root {
 	--bs-link-color: black;
 	--bs-link-hover-color: #FFDF33;
 }
 
-
+/* 기본 버튼 */
 .btn-primary {
     background-color: #404040 !important;
     border: none !important;
@@ -40,10 +69,34 @@ body {
     background-color: black !important;
   }
 
+/* myPage 버튼 */
 .btn-secondary {
 	background-color: grey;
 	border: none !important;
 	color: #fff !important;
+	font-size:12pt;
+	font-weight: 800;
+}
+
+/* 노란 버튼 */
+.btn-success {
+	background-color: #FFE766;
+	border: none !important;
+	color: black !important;
+	font-size: 16pt;
+	font-weight: 800;
+	width: 100%;
+}
+
+.btn-success:hover {
+	background-color: #FFEF99;
+}
+
+/* 모바일 화면 (넓이 480px 이하) 에서 적용할 css */
+@media only screen and (max-width: 480px) {
+	#header-profile-pic {
+		width: 30%;
+	}
 }
 
 .info-card {
@@ -51,6 +104,10 @@ body {
       margin: auto;
       border-radius: 1rem;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.highlight-title{
+	color: black;	
 }
 
 .navbar-brand {
@@ -85,6 +142,29 @@ body {
     color: #000 !important;
     font-weight: bold;
   }
+/* role-logo의 기본 설정: opacity와 visibility로 보이기/숨기기 */
+.logo{
+	text-decoration: none;
+    color: white;
+}
+.role-logo-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px); /* 살짝 위로 숨겨놓음 */
+    transition: all 1s ease-in-out;
+    pointer-events: none; /* 클릭 막기 */
+    position: static;  /* 레이아웃에 영향 안 주게 */
+}
+
+.role-logo-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: all 1s ease-in-out;
+    pointer-events: auto;
+    position: inherit;
+}
+
 
 
 .tooltip .tooltip-inner {
@@ -125,6 +205,20 @@ body {
     z-index: 1050;
 }
 
+/* 마이페이지 */
+
+#profile-nickName {
+	color: black;
+	font-weight: 900;
+}
+
+
+#profile-id {
+	color: gray;
+	font-weight: 900;
+	font-size: 12pt;
+}
+
 #profile-pic {
 	width: 100px;
 	top: -3em;
@@ -150,4 +244,59 @@ body {
 	font-size: 18px;
 }
 
+.alert {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
 
+.alert-success {
+  background-color: #e6f9e6;
+  color: #2e7d32;
+}
+
+.alert-danger {
+  background-color: #fdecea;
+  color: #c62828;
+}
+#kakao-logo {
+	width: 30%;
+}
+.grayscale { filter: grayscale(100%); }
+
+#login-reg-card .list-group-item {
+	background-color: #FFEF99;
+	color: black;
+}
+
+#login-reg-card .list-group-item:hover {
+	background-color: #FFE766;
+} 
+
+.modal-header {
+	background-color: #FFEF99;
+}
+
+/* 회원 탈퇴 */
+
+.delete-agree-msg {
+	color: #FF7833;
+	font-size: 10pt;
+	margin-bottom: 0;
+}
+
+.delete-agree-msg strong {
+	color: black;
+}
+
+.form-check > .invalid-feedback {
+	color: red;
+	font-weight: 800;
+}
+
+/* 주소 관리 */
+
+#default-address-badge {
+	font-size: 8pt;
+} 

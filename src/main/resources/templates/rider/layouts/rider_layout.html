@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rider Dashboard</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-DQvkBjpPgn7RC31MCQoOeC9TI2kdqa4+BSgNMNj8v77fdC77Kj5zpWFTJaaAoMbC" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/js/bootstrap.bundle.min.js" integrity="sha384-YUe2LzesAfftltw+PEaao2tjU/QATaW/rOitAq67e0CT0Zi2VVRL0oC4+gAaeBKu" crossorigin="anonymous"></script>
+  	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script> 
+  	<script th:src="@{/js/jQuery.js}"></script>
+  	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script> 
+	<!-- 각 페이지의 script가 작성될 위치 -->
+    <th:block layout:fragment="js"></th:block>
+    <!-- 각 페이지의 css가 작성될 위치 -->
+    <th:block layout:fragment="css"></th:block>
+    <!-- SockJS / STOMP 라이브러리 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/webjars/org.webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+</head>
+<body>
+<h1>라이더 페이지</h1>
+
+<div id="assignedOrders">
+    <!-- 라이더가 맡은 주문 목록 표시 -->
+</div>
+
+<script>
+let stompClient = null;
+const riderId = "rider999"; // 실제 라이더 ID/UUID
+
+function connect() {
+    const socket = new SockJS('/stomp');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function(frame) {
+        console.log("Rider connected: " + frame);
+        // /topic/rider/{riderId} 구독
+        stompClient.subscribe('/topic/rider/' + riderId, function(message) {
+            const updatedOrder = JSON.parse(message.body);
+            handleRiderOrderUpdate(updatedOrder);
+        });
+    });
+}
+
+function handleRiderOrderUpdate(order) {
+    // 라이더가 배달해야 할 주문이
+    // 새로운 상태가 되었을 때 UI 갱신
+    alert("배달 주문 상태 변경: " + order.orderStatus);
+
+    // 필요하면 DOM 업데이트, 목록 새로고침, 알림창 등
+}
+
+window.onload = connect;
+</script>
+
+</body>
+</html>

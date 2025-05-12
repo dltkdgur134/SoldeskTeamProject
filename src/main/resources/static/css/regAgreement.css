@@ -1,17 +1,21 @@
 body {
-	font-family: Arial, sans-serif;
 	background-color: #f5f6f7;
-	display: flex;
+<<<<<<< HEAD
 	justify-content: center;
-	padding: 50px;
+=======
+	/* display: flex;
+	justify-content: center; 
+	padding: 50px;*/
+>>>>>>> ad96f6f3d46ce8f959a6bb1440f5c153d9d66b3b
 }
 
-.agreement-container {
+#agreement-container {
 	background-color: white;
 	padding: 30px;
 	border-radius: 10px;
 	width: 500px;
 	box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+	margin: 30px auto;
 }
 
 h2 {
