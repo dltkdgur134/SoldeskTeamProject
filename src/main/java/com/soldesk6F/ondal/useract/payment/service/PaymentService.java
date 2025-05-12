@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -10,19 +11,24 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
+import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
+import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
@@ -47,6 +53,7 @@ public class PaymentService {
 
 	private final CartRepository cartRepository;
 	private final CartItemsRepository cartItemsRepository;
+	private final OrderRepository orderRepository;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final OrderService orderService;
 	private final OrderDetailRepository orderDetailRepository;
@@ -166,6 +173,7 @@ public class PaymentService {
 //	    }
 //	}
 	
+	@Transactional
 	public void confirmPayment(String paymentKey, String orderId, int amount) {
 	    String url = "https://api.tosspayments.com/v1/payments/confirm";
 
@@ -191,7 +199,14 @@ public class PaymentService {
 	            
 	        }
 	        ObjectMapper objectMapper = new ObjectMapper();
-	        TossPaymentResponse tossResponse = objectMapper.readValue(response.getBody(), TossPaymentResponse.class); 
+	        TossPaymentResponse tossResponse=null;
+			try {
+				tossResponse = objectMapper.readValue(response.getBody(), TossPaymentResponse.class);
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			} 
 	        UUID cartUUID = UUID.fromString(orderId);
 	        
 	        Optional<Cart> optCart = cartRepository.findById(cartUUID);
@@ -200,16 +215,44 @@ public class PaymentService {
 	        CustomUserDetails cud = (CustomUserDetails) auth.getPrincipal();
 	        User user = cud.getUser();
 	        
+	        List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
 	        
-	        Order order = Order.builder()
+	        Order order = null;
+	        for(CartItems cartItem : cart.getCartItems()) {
+	        	OrderDetail orderDetail = new OrderDetail();
+	        	
+	        	orderDetail.setMenu(cartItem.getMenu());
+	        	orderDetail.setPrice(cartItem.getItemTotalPrice());
+	        	orderDetail.setQuantity(cartItem.getQuantity());
+	        	orderDetail.setOptionNames(cartItem.getOptionsAsList());
+	        	List<Integer> ciop = new ArrayList<Integer>();
+	        	for(CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
+	        		ciop.add(cartItemOption.getOptionPrice());
+	        	}
+	        	orderDetail.setOptionPrices(ciop);
+	        	orderDetailList.add(orderDetail);
+	        }
+	        
+	        
+	        
+	        order = Order.builder()
 	        	    .store(cart.getStore())
 	        	    .user(cart.getUser())
 	        	    .totalPrice(tossResponse.getTotalAmount())
-	        	    .storeRequest(tossResponse.getMetaData().getReqStore())
-	        	    .deliveryRequest(tossResponse.getMetaData().getReqDel())
-	        	    .orderDetails()
+	        	    .storeRequest(tossResponse.getMetadata().getReqStore())
+	        	    .deliveryRequest(tossResponse.getMetadata().getReqDel())
+	        	    .orderDetails(orderDetailList)
+	        	    .deliveryAddress(user.getUserSelectedAddress().getAddress())
+	        	    .deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
+	        	    .deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 	        	    .build();
-	        		
+	       for(OrderDetail od : order.getOrderDetails()) {
+	    	   od.setOrder(order);
+	       }     		
+	       
+	        orderRepository.save(order);
+	        cartRepository.deleteById(cartUUID);
+	        
 	        
 	    } catch (HttpClientErrorException e) {
 	        throw new IllegalArgumentException("토스 결제 승인 에러: " + e.getResponseBodyAsString(), e);
