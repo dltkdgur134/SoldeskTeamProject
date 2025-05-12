@@ -103,6 +103,8 @@ public class RiderService {
 
 	}
 
+	
+	
 	@Transactional
 	public void updateRiderInfo(String userId, String riderNickname, String vehicleNumber, String riderPhone,
 			String riderHubAddress, double hubAddressLatitude, double hubAddressLongitude,
@@ -282,7 +284,7 @@ public class RiderService {
 	    riderManagementRepository.save(riderManagement);
 	}
 
-
+	//출금 서비스 (현금화)
 	@Transactional
 	public String processWithdrawal(Rider rider, int withdrawAmount, String secondaryPassword) {
 		// 1. 출금 금액이 10,000원 미만인 경우
@@ -290,7 +292,7 @@ public class RiderService {
 			return "최소 출금 금액은 10,000원입니다.";
 		}
 		if (withdrawAmount % 1000 != 0) {
-			return "출금은 1000원 단위로만 가능합니다.";
+			return "출금은 1,000원 단위로만 가능합니다.";
 		}
 		// ✅ 3. 하루 3회 제한 (개발단계: 주석 처리)
 		/*
@@ -302,34 +304,68 @@ public class RiderService {
 		// 2. 2차 비밀번호 검증
 		boolean isSecondaryPasswordValid = checkRiderSecondaryPassword(rider, secondaryPassword);
 		if (!isSecondaryPasswordValid) {
-			return "잘못된 2차 비밀번호입니다.";
+			return "2차 비밀번호가 일치하지 않습니다.";
 		}
 
-		// 3. 출금 금액 검증 (잔액보다 많은 금액을 출금할 수 없음)
-		if (withdrawAmount > rider.getRiderWallet()) {
+
+		// 3. 수수료 계산 (출금 금액의 10%)
+		int fee = withdrawAmount / 10; // 10% 수수료
+		int actualAmount = withdrawAmount + fee;
+		// 출금 금액 검증 (잔액보다 많은 금액을 출금할 수 없음)
+		if (actualAmount > rider.getRiderWallet()) {
 			return "잔액이 부족합니다.";
 		}
 
-		// 4. 수수료 계산 (출금 금액의 10%)
-		int fee = withdrawAmount / 10; // 10% 수수료
-		int actualAmount = withdrawAmount + fee;
-
-		// 5. 출금 처리 (잔액에서 출금 금액 차감)
+		// 4. 출금 처리 (잔액에서 출금 금액 차감)
 		rider.setRiderWallet(rider.getRiderWallet() - actualAmount);
 		riderRepository.save(rider); // 변경된 정보 저장
 
-		// 6. 출금 내역 기록 (출금 기록을 DB에 저장)
+		// 5. 출금 내역 기록 (출금 기록을 DB에 저장)
 		riderWalletHistoryService.saveWalletHistory(rider, withdrawAmount, fee, actualAmount, "출금 요청");
 
-		// 7. 성공 메시지 반환
+		// 6. 성공 메시지 반환
 		return String.format("출금 성공! %d원이 출금되었습니다. (수수료 %d원)", actualAmount, fee);
 	}
 
+	// riderWallet -> ondalWallet
+	@Transactional
+	public String convertRiderWalletToOndalWallet(Rider rider, int amount, String secondaryPassword) {
+		if (amount < 10000) {
+            return "최소 출금 금액은 10,000원입니다.";
+        }
+    	
+    	if (amount % 1000 != 0) {
+            return "전환은 1,000원 단위로만 가능합니다.";
+        }
+
+	    if (!checkRiderSecondaryPassword(rider, secondaryPassword)) {
+	        return "2차 비밀번호가 일치하지 않습니다.";
+	    }
+
+
+	    int fee = amount / 10;
+	    int actualAmount = amount - fee;
+	    if (actualAmount > rider.getRiderWallet()) {
+	    	return "잔액이 부족합니다.";
+	    }
+
+	    rider.setRiderWallet(rider.getRiderWallet() - actualAmount);
+	    rider.getUser().setOndalWallet(rider.getUser().getOndalWallet() + amount);
+
+	    riderRepository.save(rider);
+	    userRepository.save(rider.getUser());
+
+	    riderWalletHistoryService.saveWalletHistory(
+	        rider, amount, fee, amount, "온달 지갑 전환"
+	    );
+
+	    return String.format("전환 성공! %d원이 전환되었습니다. (수수료 %d원)", amount, fee);
+	}
+	
 	public int countTodayWithdrawals(UUID riderId, LocalDate today) {
 		LocalDateTime startOfDay = today.atStartOfDay();
 		LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 		return riderWalletHistoryRepository.countByRider_RiderIdAndCreatedDateBetween(riderId, startOfDay, endOfDay);
 	}
-
 
 }
