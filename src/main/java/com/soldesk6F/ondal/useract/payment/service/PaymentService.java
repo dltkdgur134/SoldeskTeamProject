@@ -21,6 +21,8 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
+import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
@@ -47,6 +49,7 @@ public class PaymentService {
 	private final CartItemsRepository cartItemsRepository;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final OrderService orderService;
+	private final OrderDetailRepository orderDetailRepository;
 	
 	
 	@Value("${toss.secret-key}")
@@ -204,6 +207,7 @@ public class PaymentService {
 	        	    .totalPrice(tossResponse.getTotalAmount())
 	        	    .storeRequest(tossResponse.getMetaData().getReqStore())
 	        	    .deliveryRequest(tossResponse.getMetaData().getReqDel())
+	        	    .orderDetails()
 	        	    .build();
 	        		
 	        

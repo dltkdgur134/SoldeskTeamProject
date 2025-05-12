@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -231,36 +232,73 @@ public class StoreService {
 				StoreImg storeImg = new StoreImg();
 				storeImg.setStore(store);
 				storeImg.setStoreImg("/img/store/storeimg/" + filename);
-				
+
 				storeImgRepository.save(storeImg);
 			}
 		}
 
 		storeRepository.save(store);
 	}
+	
+	@Transactional
+	public void updateStoreImg(UUID storeId, String userId, UUID storeImgId, MultipartFile newImgFile) throws IOException {
+		Store store = getStoreForOwner(storeId, userId);
 
-	public void uploadStoreIntroduceImgs(UUID storeId, String loginUserId, MultipartFile[] storeIntroduceImgs)
-			throws IOException {
-		Store store = storeRepository.findById(storeId)
-				.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+		StoreImg target = store.getStoreImgs().stream()
+			.filter(i -> i.getStoreImgId().equals(storeImgId))
+			.findFirst()
+			.orElseThrow(() -> new IllegalArgumentException("소개 이미지를 찾을 수 없습니다."));
 
-		String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/img/store/storeintroduce/";
-		Files.createDirectories(Paths.get(uploadDir));
+		// 기존 이미지 삭제
+		Path oldPath = Paths.get(target.getStoreImg().replaceFirst("/img", "src/main/resources/static/img"));
+		Files.deleteIfExists(oldPath);
 
-		for (MultipartFile file : storeIntroduceImgs) {
-			if (!file.isEmpty()) {
-				String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-				Path filePath = Paths.get(uploadDir, filename);
-				Files.write(filePath, file.getBytes());
+		// 새 이미지 저장
+		String savedPath = saveImageFile(newImgFile, "store-introduce");
+		target.setStoreImg(savedPath);
+	}
+	
+	@Transactional
+	public void deleteStoreImg(UUID storeId, String userId, UUID storeImgId) throws IOException {
+		Store store = getStoreForOwner(storeId, userId);
 
-				StoreIntroduceImg img = new StoreIntroduceImg();
-				img.setStore(store);
-				img.setStoreIntroduceImg("/img/store/storeintroduce/" + filename);
-				store.addStoreIntroduceImg(img);
-			}
-		}
+		StoreImg target = store.getStoreImgs().stream()
+			.filter(i -> i.getStoreImgId().equals(storeImgId))
+			.findFirst()
+			.orElseThrow(() -> new IllegalArgumentException("소개 이미지를 찾을 수 없습니다."));
 
-		storeRepository.save(store);
+		// 실제 파일 삭제
+		Path imgPath = Paths.get(target.getStoreImg().replaceFirst("/img", "src/main/resources/static/img"));
+		Files.deleteIfExists(imgPath);
+
+		// 엔티티 제거
+		store.getStoreImgs().remove(target);
+		storeImgRepository.delete(target);
+	}
+	
+	private String saveImageFile(MultipartFile file, String subFolder) throws IOException {
+		String baseDir = new File("").getAbsolutePath();  // 프로젝트 루트 경로
+
+		// 저장 경로 설정 (절대경로로)
+		Path uploadPath = Paths.get(baseDir, "src", "main", "resources", "static", "img", subFolder);
+		if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+
+		// 저장 파일명 구성
+		String originalFilename = file.getOriginalFilename();
+		if (originalFilename == null) throw new IllegalArgumentException("파일 이름이 없습니다.");
+
+		String ext = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+		List<String> allowedExtensions = List.of(".jpg", ".jpeg", ".png", ".gif");
+		if (!allowedExtensions.contains(ext)) throw new IllegalArgumentException("지원하지 않는 확장자입니다: " + ext);
+
+		String filename = UUID.randomUUID() + ext;
+
+		// 파일 저장
+		Path fullPath = uploadPath.resolve(filename);
+		file.transferTo(fullPath.toFile());
+
+		// 반환값은 웹 경로
+		return "/img/" + subFolder + "/" + filename;
 	}
 	
 	@Transactional(readOnly = true)

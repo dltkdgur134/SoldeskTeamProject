@@ -34,6 +34,7 @@ public class CartItemOption {
     private String groupName;
     private String optionName;
     private int optionPrice;
+//    private Integer groupIndex;
 
     @Builder
     public CartItemOption(CartItems cartItem, String groupName, String optionName, int optionPrice) {

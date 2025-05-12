@@ -149,6 +149,65 @@ public class UpdateRiderController {
 
 	    return "redirect:/rider/riderInfopage";
 	}
+	
+	@GetMapping("rider/riderWallet")
+    public String showRiderWallet(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+		String userId = userDetails.getUser().getUserId();
+		Rider rider = riderService.getRiderByUserId(userId); // rider 정보 불러오기
+		model.addAttribute("rider", rider);
+		return "content/rider/riderWallet"; 
+    }
+	
+	@PostMapping("/checkRiderSecondaryPassword")
+	public String checkRiderSecondaryPassword(
+			@RequestParam(value = "currentSecondaryPassword", required = false) String currentSecondaryPassword,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes redirectAttributes
+			){
+		String userId = userDetails.getUser().getUserId();
+		Rider rider = riderRepository.findByUser_UserId(userId)
+				.orElseThrow(() -> new IllegalArgumentException("라이더 정보가 존재하지 않습니다."));
+		
+		if (rider.isSecondaryPasswordLocked()) {
+		    redirectAttributes.addFlashAttribute("SecondaryPasswordError",
+		        "2차 비밀번호가 5회 이상 틀려 입력이 잠겼습니다. 10분 후 다시 시도하세요.");
+		    return "redirect:/rider/riderInfopage";
+		}
+		boolean isCorrect = riderService.checkRiderSecondaryPassword(rider, currentSecondaryPassword);
+
+		if (isCorrect) {
+	        return "redirect:/rider/riderWallet";
+	    }
+		// 실패한 경우 현재 실패 횟수 가져와서 메시지 구성
+	    int failCount = rider.getSecondaryPasswordFailCount();
+	    int remaining = 5 - failCount;
+	    redirectAttributes.addFlashAttribute("SecondaryPasswordError",
+	            "잘못된 2차 비밀번호입니다. (" + failCount + "회 실패, " + remaining + "회 남음)");
+
+		return "redirect:/rider/riderInfopage"; //2차 비밀번호 확인 실패 시 라이더 정보 페이지로
+	}
+	@PostMapping("/rider/withdraw")
+	public String withdraw(
+	        @RequestParam("withdrawAmount") int withdrawAmount,
+	        @RequestParam("secondaryPassword") String secondaryPassword,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        RedirectAttributes redirectAttributes) {
+
+	    String userId = userDetails.getUser().getUserId();
+	    Rider rider = riderService.getRiderByUserId(userId);  // 라이더 정보 가져오기
+
+	    // 출금 처리 서비스 호출
+	    String resultMessage = riderService.processWithdrawal(rider, withdrawAmount, secondaryPassword);
+
+	    if (resultMessage.startsWith("출금 성공")) {
+	        redirectAttributes.addFlashAttribute("withdrawMessage", resultMessage);
+	    } else {
+	        redirectAttributes.addFlashAttribute("withdrawError", resultMessage);
+	    }
+
+	    return "redirect:/rider/riderWallet";
+	}
+
 
 
 }

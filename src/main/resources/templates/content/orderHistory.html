@@ -7,6 +7,7 @@
     <title>User Order History</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js"></script>
+    <script th:src="@{/js/update.js}"></script>
 	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
 	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
 	<link th:fragment="css" th:href="@{/css/orderHistory.css}" rel="stylesheet" />
@@ -16,7 +17,14 @@
 
  <section layout:fragment="content">
   <h1>유저 주문 내역</h1>
-
+	<div class="container text-center">
+		<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+			<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+		<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+			<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+	</div>
   <div class="order-history">
     <p th:if="${history == null or #lists.isEmpty(history)}" class="no-orders">
       아직 주문 내역이 없습니다.
