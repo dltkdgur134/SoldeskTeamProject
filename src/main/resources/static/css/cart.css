@@ -11,15 +11,15 @@
 }
 
 .empty-cart-msg {
-	font-size: 18px;
 	color: #333;
+	font-size: 18px;
 	font-weight: bold;
 }
 
 .menu-base-price {
 	display: block;
-	font-size: 14px;
 	color: #888;
+	font-size: 14px;
 	line-height: 1.5;
 	margin: 0;
 	max-height: 24px;
@@ -39,14 +39,14 @@
 
 .cart-item {
 	display: flex;
-	background-color: #fff;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 	flex-direction: column;
 	gap: 12px;
+	margin-bottom: 20px;
 	padding: 20px;
 	border: 1px solid #ddd;
-	margin-bottom: 20px;
+	border-radius: 12px;
+	background-color: #fff;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -62,8 +62,8 @@
 
 .cart-item-left img {
 	max-width: 150px;
-	object-fit: cover;
 	border-radius: 8px;
+	object-fit: cover;
 }
 
 .cart-item-middle {
@@ -74,11 +74,11 @@
 }
 
 .cart-item-middle h4 {
+	color: #111;
 	font-size: 17px;
 	font-weight: bold;
-	color: #111;
-	margin-bottom: 6px;
 	line-height: 1.4;
+	margin-bottom: 6px;
 }
 
 .cart-item-middle p {
@@ -86,8 +86,8 @@
 }
 
 .cart-options span {
-	font-size: 14px;
 	color: #888;
+	font-size: 14px;
 	margin: 2px 0;
 }
 
@@ -100,12 +100,12 @@
 }
 
 .cart-item-footer button {
-	padding: 4px 10px;
+	background-color: #f9f9f9;
 	border: 1px solid #ccc;
 	border-radius: 6px;
-	background-color: #f9f9f9;
-	font-size: 13px;
 	cursor: pointer;
+	font-size: 13px;
+	padding: 4px 10px;
 }
 
 .itemTotalPrice {
@@ -116,26 +116,27 @@
 	display: flex;
 	align-items: center;
 	gap: 3px;
+	height: 32px;
+	padding: 2px 6px;
 	border: 1px solid #ccc;
 	border-radius: 6px;
-	padding: 2px 6px;
-	height: 32px;
 }
 
 .quantity-controls button {
-	background-color: white;
-	border: 0px;
-	border-radius: 6px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	height: 30px;
 	width: 30px;
+	height: 30px;
+	background-color: white;
+	border: 0px;
+	border-radius: 6px;
+	cursor: pointer;
 	font-size: 18px;
 	line-height: 1;
-	vertical-align: middle;
 	padding: 0;
 	transition: background-color 0.2s ease;
+	vertical-align: middle;
 }
 
 .quantity-controls button:hover {
@@ -150,8 +151,8 @@
 	font-size: 16px;
 	text-align: center;
 	line-height: 1;
-	vertical-align: middle;
 	padding: 0;
+	vertical-align: middle;
 }
 
 .action-buttons {
@@ -162,36 +163,36 @@
 }
 
 .action-buttons button {
-	padding: 4px 10px;
+	background-color: #f9f9f9;
 	border: 1px solid #ccc;
 	border-radius: 6px;
-	background-color: #f9f9f9;
-	font-size: 13px;
 	cursor: pointer;
+	font-size: 13px;
+	padding: 4px 10px;
 }
 
 .order-summary {
-	background-color: #fff;
-	border-top: 1px solid #eee;
-	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
-	padding: 16px 24px;
-	text-align: right;
-	font-size: 18px;
-	font-weight: bold;
 	position: sticky;
 	bottom: 0;
 	z-index: 10;
+	background-color: #fff;
+	border-top: 1px solid #eee;
+	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
+	font-size: 18px;
+	font-weight: bold;
+	padding: 16px 24px;
+	text-align: right;
 }
 
 .order-summary button {
 	margin-left: 20px;
 	background-color: #404040;
-	color: #fff;
 	border: none;
-	padding: 10px 20px;
 	border-radius: 6px;
-	font-size: 15px;
+	color: #fff;
 	cursor: pointer;
+	font-size: 15px;
+	padding: 10px 20px;
 	transition: background-color 0.2s ease;
 }
 
@@ -199,19 +200,18 @@
 	background-color: black !important;
 }
 
-/*  모달  */
-
+/* 모달 */
 .modal {
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
+	z-index: 9999;
 	background: rgba(0, 0, 0, 0.5);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	z-index: 9999;
 }
 
 .modal-overlay {
@@ -224,22 +224,22 @@
 
 .modal-content {
 	position: relative;
-	background: #fff;
-	padding: 30px;
-	border-radius: 10px;
-	width: 400px;
-	max-width: 90%;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 	z-index: 10000;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+	max-width: 90%;
+	padding: 30px;
+	width: 400px;
 }
 
 .close-btn {
 	position: absolute;
 	top: 10px;
 	right: 15px;
-	font-size: 24px;
-	cursor: pointer;
 	color: #888;
+	cursor: pointer;
+	font-size: 24px;
 }
 
 #modal-menu-name {
@@ -253,38 +253,46 @@
 }
 
 .modal-option-row {
-	display: block;
-	margin: 0.25rem 0;
-	padding: 8px;
 	background-color: #f9f9f9;
 	border-radius: 6px;
+	display: block;
 	font-size: 15px;
+	margin: 0.25rem 0;
+	padding: 8px;
 }
 
 .modal-option-group {
-	margin-bottom: 1rem;
-	padding: 0.5rem;
+	background: #f9f9f9;
 	border: 1px solid #ddd;
 	border-radius: 8px;
-	background: #f9f9f9;
+	margin-bottom: 1rem;
+	padding: 0.5rem;
 }
 
 .group-title {
-	margin-bottom: 0.5rem;
 	font-weight: bold;
+	margin-bottom: 0.5rem;
 }
 
 #optionForm button[type="submit"] {
-	width: 100%;
-	padding: 10px 0;
 	background-color: #4CAF50;
-	color: white;
 	border: none;
 	border-radius: 6px;
-	font-size: 16px;
+	color: white;
 	cursor: pointer;
+	font-size: 16px;
+	padding: 10px 0;
+	width: 100%;
 }
 
 #optionForm button[type="submit"]:hover {
 	background-color: #45a049;
 }
+
+.error-msg {
+	color: red;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+

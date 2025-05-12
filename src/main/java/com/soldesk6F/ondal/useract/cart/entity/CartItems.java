@@ -48,6 +48,15 @@ public class CartItems {
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
 
+    @Column(name = "menu_name")
+    private String menuName;
+
+    @Column(name = "menu_price")
+    private int menuPrice;
+
+    @Column(name = "menu_image")
+    private String menuImage;
+
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
@@ -63,7 +72,7 @@ public class CartItems {
     private int optionTotalPrice;
 
     public int getItemTotalPrice() {
-        return (menu.getPrice() + optionTotalPrice) * quantity;
+        return (menuPrice + optionTotalPrice) * quantity;
     }
 
     @Builder

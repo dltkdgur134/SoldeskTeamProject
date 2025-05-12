@@ -38,6 +38,9 @@ public class CartItemService {
 		cartItem.setMenu(menu);
 		cartItem.setQuantity(quantity);
 		cartItem.setAddedTime(LocalDateTime.now()); // @CreationTimestamp 대체 가능
+		cartItem.setMenuName(menu.getMenuName());
+		cartItem.setMenuPrice(menu.getPrice());
+		cartItem.setMenuImage(menu.getMenuImg());
 
 		int totalOptionPrice = 0;
 		List<CartItemOption> cartItemOptions = new ArrayList<>();
