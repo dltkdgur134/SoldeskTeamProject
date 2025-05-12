@@ -25,6 +25,9 @@
 	
 			<section class="store-info-section">
 				<h3>점포 정보 수정</h3>
+				<div th:if="${resultMsg != ''}" class="alert-message" style="color: red; margin-bottom: 15px;">
+					<p th:text="${resultMsg}"></p>
+				</div>
 				<form id="store-info-form" th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage/save'}" method="post">
 					<div class="form-group">
 						<label>가게 이름</label>
@@ -140,13 +143,22 @@
 			</section>
 	
 			<section class="store-img-section">
+				<hr style="margin: 40px 0; border: none; border-top: 2px solid darkgray;" />
 				<h3>가게 브랜드 이미지</h3>
-				<div th:if="${resultMsg != ''}" class="alert-message" style="color: red; margin-bottom: 15px;">
-					<p th:text="${resultMsg}"></p>
+				<div th:if="${brandResultMsg != ''}" class="alert-message" style="color: red; margin-bottom: 15px;">
+					<p th:text="${brandResultMsg}"></p>
 				</div>
 				<form id="brand-img-form" th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage/upload-brandImg'}" method="post" enctype="multipart/form-data">
-					<input type="file" name="brandImg" accept="image/*" />
-					<button type="submit" class="upload-btn">사진 업로드</button>
+					<div class="form-group">
+						<input type="file" id="brandImgInput" name="brandImg" accept="image/*" style="display: none;" />
+						<div class="custom-file-wrapper">
+							<button type="button" class="custom-file-btn" onclick="document.getElementById('brandImgInput').click()">파일 선택</button>
+							<span id="brandImgName">
+								<span th:if="${store.brandImg != null}" th:text="${#strings.substring(store.brandImg, store.brandImg.lastIndexOf('/') + 1)}">선택된 파일 없음</span>
+							</span>
+						</div>
+						<button type="submit" class="upload-btn" style="width: 125px">사진 업로드</button>
+					</div>
 				</form>
 	
 				<div class="preview-item" th:if="${store.brandImg != null}">
@@ -155,17 +167,51 @@
 			</section>
 	
 			<section class="store-img-section">
+				<hr style="margin: 40px 0; border: none; border-top: 2px solid darkgray;" />
 				<h3>가게 소개 이미지</h3>
-				<form id="store-img-form" th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage/upload-storeImg'}" method="post" enctype="multipart/form-data">
-					<input type="file" name="storeImgs" multiple accept="image/*" />
-					<button type="submit" class="upload-btn">사진 업로드</button>
-				</form>
-	
+				<h4 style="font-size:14px;">이미지 크기 1350x300 추천</h4>
+				<div th:if="${storeImgResultMsg != ''}" class="alert-message" style="color: red; margin-bottom: 15px;">
+					<p th:text="${storeImgResultMsg}"></p>
+				</div>
+
 				<div class="store-img-preview">
-					<div th:each="img : ${storeImgs}" class="preview-item">
-						<img th:src="@{${img.imgPath}}" alt="가게 이미지 미리보기" />
+					<div th:each="img : ${store.storeImgs}" class="preview-item">
+						<img th:src="@{${img.storeImg}}" alt="가게 이미지 미리보기" style="max-width: 1350px; max-height: 350px;" />
+						<form th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage/updateOrDelete-storeImg/' + ${img.storeImgId}}" method="post" enctype="multipart/form-data">
+						 	<input type="file" name="updatedImg" th:attr="id=|storeImgInput_${img.storeImgId}|" accept="image/*" style="display: none;" />
+							
+							<div class="custom-file-wrapper">
+								<div class="custom-file-left">
+									<button type="button" class="custom-file-btn"
+									        th:attr="onclick=|document.getElementById('storeImgInput_' + '${img.storeImgId}').click()|">
+										파일 선택
+									</button>
+									<span th:id="|storeImgName_${img.storeImgId}|"
+									      th:text="${#strings.substring(img.storeImg, img.storeImg.lastIndexOf('/') + 1)}">
+										선택된 파일 없음
+									</span>
+								</div>
+
+								<div class="btn-group">
+									<button type="submit" class="upload-btn"
+									        th:attr="id=|changeBtn_${img.storeImgId}|" name="action" value="update" disabled>
+										이미지 교체
+									</button>
+									<button type="submit" class="upload-btn delete-btn" name="action" value="delete">삭제</button>
+								</div>
+							</div>
+						</form>
 					</div>
 				</div>
+
+				<form id="store-img-form" th:action="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage/upload-storeImg'}" method="post" enctype="multipart/form-data">
+					<div class="custom-file-wrapper" style="margin-top: 20px;">
+						<button type="button" class="custom-file-btn" onclick="document.getElementById('newStoreImgInput').click()">이미지 추가</button>
+						<span id="newStoreImgName">선택된 파일 없음</span>
+					</div>
+					<input type="file" name="storeImgs" id="newStoreImgInput" multiple accept="image/*" style="display: none;" />
+					<button type="submit" class="upload-btn">사진 업로드</button>
+				</form>
 			</section>
 	
 		</main>

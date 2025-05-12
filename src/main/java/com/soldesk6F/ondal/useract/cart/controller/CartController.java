@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.useract.cart.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +33,7 @@ import com.soldesk6F.ondal.useract.cart.dto.CartItemOptionSaveDto;
 import com.soldesk6F.ondal.useract.cart.dto.CartOptionDto;
 import com.soldesk6F.ondal.useract.cart.dto.CartUpdateRequestDto;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
+import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemRepository;
 import com.soldesk6F.ondal.useract.cart.service.CartItemService;
@@ -129,6 +132,14 @@ public class CartController {
 		parseOptions(menu.getMenuOptions2(), menu.getMenuOptions2Price(), optionDtos);
 		parseOptions(menu.getMenuOptions3(), menu.getMenuOptions3Price(), optionDtos);
 
+		List<CartItemOption> selectedOptions = cartItem.getCartItemOptions();
+
+		for (CartOptionDto dto : optionDtos) {
+			boolean isSelected = selectedOptions.stream()
+				.anyMatch(opt -> opt.getOptionName().equals(dto.getName())
+				              && opt.getGroupName().equals(dto.getGroupName()));
+			dto.setSelected(isSelected);
+		}
 		return optionDtos;
 	}
 	
@@ -156,16 +167,18 @@ public class CartController {
 	
 	@PostMapping("/api/cart-item/save-options")
 	@ResponseBody
-	public ResponseEntity<?> saveCartItemOptions(@RequestBody CartItemOptionSaveDto dto) {
+	public ResponseEntity<Map<String, String>> saveCartItemOptions(@RequestBody CartItemOptionSaveDto dto) {
 		CartItems cartItem = cartItemRepository.findById(dto.getCartItemUuid())
 			.orElseThrow(() -> new IllegalArgumentException("장바구니 항목을 찾을 수 없습니다."));
 
 		cartItemService.updateOptions(cartItem, dto.getOptions());
 
-		return ResponseEntity
-				.ok()
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(Map.of("message", "옵션이 저장되었습니다."));
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "옵션이 저장되었습니다.");
+
+		return ResponseEntity.ok()
+			.contentType(MediaType.APPLICATION_JSON)
+			.body(response);
 	}
 	
 	

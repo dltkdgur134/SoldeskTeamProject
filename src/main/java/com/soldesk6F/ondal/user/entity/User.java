@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.user.entity;
 
+import java.beans.Transient;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,17 +12,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.OverridesAttribute;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +42,12 @@ public class User {
 
 	@Column(name = "user_id", nullable = false, length = 50)
 	private String userId;
+	
+	@OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+	private Rider rider;
 
+	@OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+	private Owner owner;
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
@@ -82,6 +88,13 @@ public class User {
 	@Column(name = "created_date", nullable = false, updatable = false)
 	private LocalDateTime createdDate;
 
+	@Column(name = "ondal_wallet",nullable = true)
+    private int ondalWallet;
+	
+	@Column(name = "ondal_point",nullable = true)
+	private int ondalPoint;
+
+
 	@JsonIgnore
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
@@ -91,8 +104,7 @@ public class User {
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
 	
-	@Column(name = "ondal_wallet",nullable = true)
-    private int ondalWallet;
+
 	
 	@Column(name = "ondal_pay",nullable = true)
 	private int ondalPay;
@@ -204,6 +216,4 @@ public class User {
 	public String getUserUuidAsString() {
 		return userUuid != null ? userUuid.toString() : null;
 	}
-	
-
 }

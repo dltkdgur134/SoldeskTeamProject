@@ -67,7 +67,7 @@
 
 .address-search-wrapper {
 	display: flex;
-	width: 300px; /* ✅ 다른 input들과 똑같이 맞춤 */
+	width: 300px;
 	gap: 8px;
 	align-items: center;
 }
@@ -109,9 +109,9 @@
 
 .holiday-checkboxes {
 	display: flex;
-	flex-direction: column; /* 요일을 세로로 배치 */
+	flex-direction: column;
 	flex-wrap: wrap;
-	height: 160px; /* 높이를 주면 2열로 넘길 수 있음, 안주면 세로로 쭉 */
+	height: 160px;
 	padding: 15px;
 	border: 1px solid #ccc;
 	border-radius: 8px;
@@ -142,16 +142,35 @@
 	background-color: #ffb300;
 }
 
+.btn-group {
+	display: flex;
+	gap: 8px;
+}
+
+.delete-btn {
+	background-color: #ff6b6b;
+}
+
 .upload-btn {
-	margin-top: 10px;
 	padding: 10px 20px;
 	background-color: #ffcc00;
 	color: #333;
 	font-weight: bold;
+	font-size: revert;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
 	transition: background-color 0.3s;
+	margin: 3px;
+}
+
+.upload-btn:disabled {
+	background-color: gray;
+	cursor: not-allowed;
+}
+
+.upload-btn:disabled:hover {
+	background-color: gray;
 }
 
 .upload-btn:hover {
@@ -166,7 +185,7 @@
 }
 
 .form-group label {
-	width: 150px; /* 제목 너비 고정 */
+	width: 150px;
 	font-weight: bold;
 	color: #333;
 	text-align: right;
@@ -182,5 +201,74 @@
 	box-sizing: border-box;
 }
 
+.preview-item img {
+	max-width: 350px;
+	max-height: 350px;
+	width: auto;
+	height: auto;
+	border-radius: 8px;
+	display: block;
+	margin-top: 15px;
+}
+
+.custom-file-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	gap: 10px;
+}
+
+.custom-file-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	overflow: hidden;
+}
+
+.custom-file-left span {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 200px;
+	display: inline-block;
+}
+
+.custom-file-name-and-buttons {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+.custom-file-wrapper span {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 250px;
+	display: inline-block;
+}
+
+.custom-file-,
+.upload-btn {
+	height: 38px;
+	padding: 0 16px;
+	font-weight: bold;
+}
+
+.custom-file-btn {
+	padding: 6px 12px;
+	background-color: #e0e0e0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.2s;
+	font-size: revert;
+}
+
+.custom-file-btn:hover {
+	background-color: #ccc;
+}
 
 

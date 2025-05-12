@@ -48,7 +48,7 @@
 		</section>
 	
 		<section class="menu-list" id="menu-list">
-			<div class="menu-card" th:each="menu : ${menus}"
+			<div th:class="'menu-card'" th:each="menu : ${menus}"
 				th:data-id="${menu.menuId}"
 				th:data-store-id="${menu.storeId}"
 				th:data-name="${menu.menuName}"
@@ -56,6 +56,7 @@
 				th:data-price="${menu.price}"
 				th:data-image="${menu.menuImg}"
 				th:data-category="${menu.menuCategory}"
+				th:data-status="${menu.menuStatus}"
 				
 				th:data-option1="${menu.menuOptions1GroupName + ':' + #strings.arrayJoin(menu.menuOptions1, '@@__@@')}"
 				th:data-option1-price="${#strings.arrayJoin(menu.menuOptions1Price, '@@__@@')}"
@@ -70,7 +71,7 @@
 				</div>
 				<div class="menu-info">
 					<h3 th:text="${menu.menuName}">메뉴명</h3>
-					<p th:text="${menu.description}">메뉴 설명</p>
+					<p th:text="${menu.description}" style="color: gray">메뉴 설명</p>
 					<p th:text="${menu.price} + '원'">가격</p>
 					<span th:if="${menu.menuStatus == 'SOLD_OUT'}" class="soldout">품절</span>
 				</div>
@@ -80,7 +81,7 @@
 			<div class="modal-content">
 				<button class="close-btn" id="close-modal-top">&times;</button>
 				<img id="menu-image" src="" alt="메뉴 이미지" />
-				<h2 id="menu-name"></h2>
+				<h3 id="menu-name"></h3>
 				<p id="menu-description"></p>
 				<p id="menu-price"></p>
 				<div id="menu-options" class="menu-options"></div>
