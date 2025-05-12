@@ -131,11 +131,13 @@ public class Payment {
 	}
 
 	@Builder
-	public Payment(User user,Order order, PaymentMethod paymentMethod, int amount, PaymentStatus paymentStatus,
+	public Payment(User user,Order order,String paymentKey,String tossOrderId, PaymentMethod paymentMethod, int amount, PaymentStatus paymentStatus,
 			PaymentUsageType paymentUsageType,String refundReason) {
 		super();
 		this.user = user;
 		this.order = order;
+		this.paymentKey = paymentKey;
+		this.tossOrderId = tossOrderId;
 		this.paymentMethod = paymentMethod;
 		this.amount = amount;
 		this.paymentUsageType = paymentUsageType;
