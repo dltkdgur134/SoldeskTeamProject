@@ -85,7 +85,6 @@ public class PageController {
 	    
 	    model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	    model.addAttribute("ondalPay", freshUser.getOndalPay());
-	    model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress()); // 실시간 주소
 
 	    return "content/user/ondalPay";
 	}

@@ -133,7 +133,7 @@ public class UpdateUserController {
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	        model.addAttribute("ondalPay", freshUser.getOndalPay());
 	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
-			return "/content/user/ondalPay";
+			return "redirect:/ondalPay";
 		}
 		
 		return "redirect:/myPage";

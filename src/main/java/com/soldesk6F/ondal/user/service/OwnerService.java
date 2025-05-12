@@ -159,7 +159,7 @@ public class OwnerService {
             return "최소 출금 금액은 10,000원입니다.";
         }
         if (withdrawAmount % 1000 != 0) {
-        	return "출금은 1000원 단위로만 가능합니다.";
+        	return "출금은 1,000원 단위로만 가능합니다.";
         }
      // ✅ 3. 하루 3회 제한 (개발단계: 주석 처리)
         /*
@@ -173,17 +173,17 @@ public class OwnerService {
         // 2. 2차 비밀번호 검증
         boolean isSecondaryPasswordValid = checkOwnerSecondaryPassword(owner, secondaryPassword);
         if (!isSecondaryPasswordValid) {
-            return "잘못된 2차 비밀번호입니다.";
+            return "2차 비밀번호가 일치하지 않습니다.";
         }
 
-        // 3. 출금 금액 검증 (잔액보다 많은 금액을 출금할 수 없음)
-        if (withdrawAmount > owner.getOwnerWallet()) {
-            return "잔액이 부족합니다.";
-        }
 
         // 4. 수수료 계산 (출금 금액의 10%)
         int fee = withdrawAmount / 10;  // 10% 수수료
         int actualAmount = withdrawAmount + fee;
+        // 출금 금액 검증 (잔액보다 많은 금액을 출금할 수 없음)
+        if (actualAmount > owner.getOwnerWallet()) {
+        	return "잔액이 부족합니다.";
+        }
 
         // 5. 출금 처리 (잔액에서 출금 금액 차감)
         owner.setOwnerWallet(owner.getOwnerWallet() - actualAmount);
@@ -195,7 +195,50 @@ public class OwnerService {
         // 7. 성공 메시지 반환
         return String.format("출금 성공! %d원이 출금되었습니다. (수수료 %d원)", actualAmount, fee);
     }
-    
+    @Transactional
+    public String convertOwnerWalletToOndalWallet(Owner owner, int amount, String secondaryPassword) {
+        // 1. 유효성 검증
+    	if (amount < 10000) {
+            return "최소 출금 금액은 10,000원입니다.";
+        }
+    	
+    	if (amount % 1000 != 0) {
+            return "전환은 1,000원 단위로만 가능합니다.";
+        }
+
+        if (!checkOwnerSecondaryPassword(owner, secondaryPassword)) {
+            return "2차 비밀번호가 일치하지 않습니다.";
+        }
+
+        if (owner.getOwnerWallet() < amount) {
+            return "잔액이 부족합니다.";
+        }
+
+        // 2. 수수료 계산 및 실 전환 금액
+        int fee = amount / 10; // 10% 수수료
+        int actualAmount = amount + fee;
+     
+        //  출금 금액 검증 (잔액보다 많은 금액을 출금할 수 없음)
+        if (actualAmount > owner.getOwnerWallet()) {
+        	return "잔액이 부족합니다.";
+        }
+
+        // 3. 금액 차감 및 ondalWallet 증가
+        owner.setOwnerWallet(owner.getOwnerWallet() - actualAmount);
+        owner.getUser().setOndalWallet(owner.getUser().getOndalWallet() + amount);
+
+        // 4. 저장
+        ownerRepository.save(owner);
+        userRepository.save(owner.getUser());
+
+        // 5. 이력 저장
+        ownerWalletHistoryService.saveWalletHistory(
+            owner, amount, fee, amount, "온달 지갑 전환"
+        );
+
+        return String.format("전환 성공! %d원이 전환되었습니다. (수수료 %d원)", amount, fee);
+    }
+
     
     
     public int countTodayWithdrawals(UUID ownerId, LocalDate today) {
