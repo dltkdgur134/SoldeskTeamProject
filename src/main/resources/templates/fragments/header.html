@@ -1,3 +1,205 @@
+<!--<<<<<<< HEAD
+resources/templates/fragments/header.html
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
+<head>
+<script th:src="@{/js/index.js}"></script>
+</head>
+
+<div th:fragment="header">
+	<nav class="navbar navbar-light">
+		<div class="container-fluid justify-content-evenly">
+			 로그인 안한 사람들을 위한 로고 
+			<div sec:authorize="isAnonymous()" style="position: relative;">
+				<a href="javascript:void(0);" class = logo onclick="toggleRoleLogos()">
+				<img src="/css/imgs/Logo_ondal_Home.png"
+					class="img-fluid me-2" width="50" height="50" style="position: relative;">
+				</a> 
+				<a href="/" class = "logo role-logo-hidden"> <img src="/css/imgs/Logo_ondal.png" 
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+			</div>
+			 로그인한 사람들을 위한 로고 
+			<div sec:authorize="isAuthenticated()"
+				th:with="role=${#authentication.principal.user.userRole.name()}" style="position: relative;">
+
+				<a href="javascript:void(0);" onclick="toggleRoleLogos()" class = logo>
+				<img src="/css/imgs/Logo_ondal_Home.png" 
+					class="img-fluid me-2" width="50" height="50">
+				</a>
+				 기본 로고: USER, RIDER, OWNER, ALL 역할에서 보이게 
+				<a href="/" class = "logo role-logo-hidden"
+					th:if="${role == 'USER' or role == 'RIDER' or role == 'OWNER' or role == 'ALL'}">
+					<img src="/css/imgs/Logo_ondal.png" 
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+
+				 RIDER 로고: RIDER, ALL 역할에서 보이게 
+				<a href="/rider/home" class = "logo role-logo-hidden"
+				th:if="${role == 'RIDER' or role == 'ALL'}">
+					<img src="/css/imgs/Logo_rider.png" 
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+				 RIDER 로고: OWNER, ALL 역할에서 보이게  
+				<a href="/owner/home" class = "logo role-logo-hidden"
+				 th:if="${role == 'OWNER' or role == 'ALL'}"> 
+					<img src="/css/imgs/Logo_owner.png" 
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+
+			</div>
+			<h1 class="display-5">
+				<b class="highlight-title">온</b>라인 배<b class="highlight-title">달</b>
+			</h1>
+			<a class="btn btn-primary btn-lg" data-bs-toggle="offcanvas"
+				href="#menu-list" role="button" aria-controls="menu-list"> <i
+				class="fa-solid fa-bars"></i>
+			</a>
+		</div>
+	</nav>
+
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="menu-list"
+		data-bs-backdrop="true" aria-labelledby="menu-label">
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="menu-label">
+				<img src="/css/imgs/Logo_ondal.png" alt="" width="30" height="30"
+					class="img-fluid">
+			</h5>
+			<button type="button" class="btn-close text-reset"
+				data-bs-dismiss="offcanvas" aria-label="Close"></button>
+		</div>
+		<div class="container text-center" sec:authorize="isAnonymous()">
+			<div class="list-group" id="login-reg-card">
+  				<a href="/login" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">로그인 <i class="fa-solid fa-right-to-bracket"></i></strong></a>
+  				<a href="/regAgreement" class="list-group-item list-group-item-action list-group-item-warning"><strong class="login-reg-card-text">회원가입 <i class="fa-solid fa-user-plus"></i></strong></a>
+			</div>
+		</div>
+		<div class="container" sec:authorize="isAuthenticated()">
+			<div class="card shadow-sm" style="">
+				<div class="row g-0">
+					<div class="col-md-4 p-3 text-center">
+						<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
+             				? #authentication.principal.user.userProfile 
+             				: '/img/userProfiles/' + #authentication.principal.user.userProfile}"
+							class="rounded-circle img-thumbnail img-fluid"
+							alt="Profile Picture" id="header-profile-pic">
+						<div class="mt-2">
+							<span class="badge bg-success"
+								th:text="${#authentication.principal.user.userRole}"></span>
+						</div>
+					</div>
+					<div class="col-md-8 d-flex text-start">
+						<div class="card-body my-2">
+							<h5	class="card-title"
+								th:text="${#authentication.principal.user.nickName}"></h5>
+							<p class="card-text">
+								<i class="fas fa-map-marker-alt"></i>
+								<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
+								<small th:text="${#authentication.principal.user.userSelectedAddress.address} + ' ' + 
+									${#authentication.principal.user.userSelectedAddress.detailAddress}"></small>
+								</th:block>
+								<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
+									<strong>주소를 등록해주세요.</strong>
+								</th:block> 
+							</p>
+						</div>
+
+					</div>
+					<div class="card-footer bg-white">
+						<div class="d-flex justify-content-around">
+							<a class="btn btn-link text-decoration-none" th:href="@{/infopage}">
+							<a class="btn btn-link text-decoration-none" th:href="@{/myPage}">
+								<small><i class="fas fa-edit"></i>마이페이지</small>
+							</a> 
+							<th:block th:if="${#authentication.principal.user.userSelectedAddress} != null">
+								<a class="btn btn-link text-decoration-none" th:href="@{/myAddress}"> 
+									<small><i class="fas fa-map-marker-alt"></i> 주소관리</small>
+								</a> 
+							</th:block>
+							<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
+								<a class="btn btn-link text-decoration-none" th:href="@{/regAddress}"> 
+									<small><i class="fa-solid fa-map-location-dot"></i> 주소등록</small>
+								</a> 
+							</th:block>
+							<a class="btn btn-link text-decoration-none" href="/logout">
+								<small><i class="fas fa-share"></i> 로그아웃</small>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="offcanvas-body" sec:authorize="isAnonymous()">
+			<nav class="nav flex-column">
+  				<a class="nav-link active" aria-current="page" href="#">주문내역</a>
+  				<a class="nav-link" href="#">공지사항</a>
+  				<a class="nav-link" th:href="@{/faqs}">FAQ</a>
+				</nav>
+		</div>
+		<div class="offcanvas-body" sec:authorize="isAuthenticated()" th:with="role=${#authentication.principal.user.userRole.name()}">
+			<ul class="nav justify-content-between nav-pills mb-3" id="pills-tab"
+				role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="pills-home-tab"
+						data-bs-toggle="pill" data-bs-target="#pills-home" type="button"
+						tabindex="1" role="tab" aria-controls="pills-home"
+						aria-selected="true">유저</button>
+				</li>
+				<li class="nav-item" role="presentation" th:if="${role == 'OWNER' or role == 'ALL'}">
+					<button class="nav-link" id="pills-owner-tab" data-bs-toggle="pill"
+						data-bs-target="#pills-owner" type="button" role="tab"
+						aria-controls="pills-owner" tabindex="2" aria-selected="false">사장님</button>
+				</li>
+				<li class="nav-item" role="presentation" th:if="${role == 'RIDER' or role == 'ALL'}">
+					<button class="nav-link" id="pills-rider-tab" data-bs-toggle="pill"
+						data-bs-target="#pills-rider" type="button" role="tab"
+						aria-controls="pills-rider" tabindex="3" aria-selected="false">라이더</button>
+				</li>
+			</ul>
+			<div class="tab-content" id="pills-tabContent">
+				<div class="tab-pane fade show active" id="pills-home"
+					role="tabpanel" aria-labelledby="pills-home-tab">
+					<ul class="nav flex-column">
+						<li class="nav-item"><a class="nav-link" aria-current="page"
+							href="myAddress" sec:authorize="isAuthenticated()">주소 선택</a></li>
+						<li class="nav-item"><a class="nav-link" href="#" sec:authorize="isAuthenticated()">찜 목록</a></li>
+						<li class="nav-item"><a class="nav-link" th:href="@{/orderHistory}" sec:authorize="isAuthenticated()">주문 내역</a></li>
+						<li class="nav-item"><a class="nav-link" href="testOrder" sec:authorize="isAuthenticated()">테스트 주문</a></li>
+						<li class="nav-item"><a class="nav-link" th:href="@{/myPage}" sec:authorize="isAuthenticated()">마이페이지</a></li>
+						<li class="nav-item"><a class="nav-link" th:href="@{/faqs}">FAQ</a></li>
+					</ul>
+				</div>
+				<div class="tab-pane fade" id="pills-owner" role="tabpanel"
+					aria-labelledby="pills-profile-tab">
+					<ul class="nav flex-column">
+						<li class="nav-item"><a class="nav-link" aria-current="page"
+							href="#">대시보드 이동</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">공지</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">운영정보 관리</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">메뉴 품질
+								관리</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">리뷰 관리</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">마이페이지</a></li>
+					</ul>
+				</div>
+				<div class="tab-pane fade" id="pills-rider" role="tabpanel"
+					aria-labelledby="pills-contact-tab">
+					<ul class="nav flex-column">
+						<li class="nav-item"><a class="nav-link" aria-current="page"
+							href="#">공지</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">운영정보 관리</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">배달 관리</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">마이페이지</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+=======-->
 <!--resources/templates/fragments/header.html-->
 
 <!DOCTYPE html>
@@ -118,7 +320,8 @@
 								</a> 
 							</th:block>
 							<th:block th:if="${#authentication.principal.user.userSelectedAddress} == null">
-								<a class="btn btn-link text-decoration-none" href="@{/regAddress}"> 
+								<a class="btn btn-link text-decoration-none" th:href="@{/regAddress}"> 
+
 									<small><i class="fa-solid fa-map-location-dot"></i> 주소등록</small>
 								</a> 
 							</th:block>
@@ -180,6 +383,7 @@
 						<li class="nav-item"><a class="nav-link" href="#">메뉴 품질
 								관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">리뷰 관리</a></li>
+
 						<li class="nav-item"><a class="nav-link" href="/owner/ownerInfopage">마이페이지</a></li>
 					</ul>
 				</div>
@@ -189,8 +393,10 @@
 						<li class="nav-item"><a class="nav-link" aria-current="page"
 							href="#">공지</a></li>
 						<li class="nav-item"><a class="nav-link" href="#">운영정보 관리</a></li>
+
 						<li class="nav-item"><a class="nav-link" href="/rider/management">배달 관리</a></li>
 						<li class="nav-item"><a class="nav-link" href="/rider/riderInfopage">마이페이지</a></li>
+
 					</ul>
 				</div>
 			</div>

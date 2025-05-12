@@ -6,7 +6,7 @@
 	layout:decorate="~{layouts/Layouts}"
 >
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>온라인 배달 – 결제</title>
 
@@ -20,7 +20,13 @@
 	<script>
 	  window.addEventListener("DOMContentLoaded", function () {
 	    const payBtn = document.getElementById("pay-btn");
-
+		const totalValue = document.getElementById("savedTotalPrice");
+		const totalPrice = parseInt(totalValue.value);
+		const cartValue = document.getElementById("savedCartId");
+		const storeNameValue = document.getElementById("savedStoreName");
+		const successUrlValue = document.getElementById("savedSuccessUrl");
+		const reqDelValue = document.getElementById("reqDel");
+		const reqStoreValue = document.getElementById("reqStore");
 	    if (!payBtn) {
 	      console.error("결제 버튼이 문서에 존재하지 않습니다.");
 	      return;
@@ -28,14 +34,17 @@
 
 	    payBtn.addEventListener("click", function () {
 	      const tossPayments = TossPayments("test_ck_Z61JOxRQVEEOgm2alYRRVW0X9bAq");
-
+			alert(totalPrice);
 	      tossPayments.requestPayment({
-	        amount: 1,
-	        orderId: "321231dsa",
-	        orderName: "kimchi",
-	        successUrl: "https://ondal.com",
+	        amount: totalPrice,
+	        orderId: cartValue.value,
+	        orderName: storeNameValue.value,
+	        successUrl: successUrlValue.value,
 	        failUrl: "https://ondal.com",
-	        method: "CARD"
+			metadata:{
+				reqDel:reqDel.value,
+				reqStore:reqStore.value
+			}
 	      });
 	    });
 	  });
@@ -115,55 +124,43 @@
       <div class="col-lg-8 order-1 order-lg-0">
         <!-- 장바구니 -->
         <h5 class="section-title">담은 메뉴</h5>
-        <div id="cartItems" class="list-group mb-4">
-          <!-- 예시 항목 1 -->
-          <div class="list-group-item py-3 d-flex align-items-center">
-            <img src="https://placehold.co/72" alt="" class="cart-item-img me-3" />
-            <div class="flex-grow-1">
-              <div class="d-flex justify-content-between">
-                <strong>치즈버거 세트</strong>
-                <span>₩7,000</span>
-              </div>
-              <small class="text-muted">콜라(대) · 케첩 추가</small>
-            </div>
-          </div>
-          <!-- 예시 항목 2 -->
-          <div class="list-group-item py-3 d-flex align-items-center">
-            <img src="https://placehold.co/72" alt="" class="cart-item-img me-3" />
-            <div class="flex-grow-1">
-              <div class="d-flex justify-content-between">
-                <strong>감자튀김</strong>
-                <span>₩3,000</span>
-              </div>
-              <small class="text-muted">+ 치즈소스</small>
-            </div>
-          </div>
-        </div>
+		<div id="cartItems" class="list-group mb-4" th:each="item : ${cids}">
+		    <div class="list-group-item py-3 d-flex align-items-center">
+		      <img th:src="${item.menuImg}" alt="상품 이미지" class="cart-item-img me-3" />
+		      <div class="flex-grow-1">
+		        <div class="d-flex justify-content-between">
+		          <strong th:text="${item.menuName}">상품명</strong>
+		          <span th:text="'₩' + ${#numbers.formatInteger(item.totalPrice, 0)}">₩0</span>
+		        </div>
+		        <small class="text-muted" th:text="${item.optionNames}">옵션정보</small>
+		      </div>
+		    </div>
+		  </div>
 
         <!-- 주소 & 라이더 요청사항 -->
         <div class="row g-3 align-items-start mb-4">
           <div class="col-lg-6">
             <div class="section-title">배달 주소</div>
-            <p class="mb-1"><strong id="roadName">서울특별시 강남구 테헤란로 123</strong></p>
-            <p class="mb-2 text-muted" id="detailAddress">301호, 온달빌딩</p>
+            <p class="mb-1"><strong id="roadName" th:text="${userInfo.userLoc}"></strong></p>
+            <p class="mb-2 text-muted" id="detailAddress" th:text="${userInfo.userSepLoc}">301호, 온달빌딩</p>
             <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addressModal">변경</button>
           </div>
           <div class="col-lg-6">
             <div class="section-title">라이더 요청사항</div>
-            <textarea class="form-control" rows="3" placeholder="예: 문 앞에 두고 벨 눌러주세요"></textarea>
+            <textarea class="form-control" id = "reqDel" rows="3" placeholder="예: 문 앞에 두고 벨 눌러주세요"></textarea>
           </div>
         </div>
 
         <!-- 연락처 -->
         <div class="mb-3">
           <div class="section-title">내 연락처</div>
-          <input type="tel" class="form-control" placeholder="010-1234-5678" />
+          <input type="tel" class="form-control" th:value="${userInfo.userTel}" readonly/>
         </div>
 
         <!-- 가게 요청사항 -->
         <div class="mb-4">
           <div class="section-title">가게 요청사항</div>
-          <textarea class="form-control" rows="3" placeholder="예: 덜 맵게 해주세요"></textarea>
+          <textarea class="form-control" id = "reqStore" rows="3" placeholder="예: 덜 맵게 해주세요"></textarea>
         </div>
 
         <!-- 이용 약관 동의 -->
@@ -188,20 +185,37 @@
       <div class="col-lg-4">
         <div id="summaryBox" class="border rounded-4 p-4 shadow-sm bg-white">
           <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="allAgree" />
+            <input class="form-check-input" type="checkbox" id="allAgree"																																						 />
             <label class="form-check-label fw-bold" for="allAgree">모든 항목 동의</label>
           </div>
 
-          <div class="price-line mb-1"><span>상품 합계</span><span id="subtotal">₩10,000</span></div>
-          <div class="price-line mb-1"><span>할인</span><span id="discount">-₩1,000</span></div>
-          <hr />
-          <div class="price-line total-price">
-            <span>총 결제금액</span><span id="totalPrice">₩9,000</span>
-          </div>
-          <button class="btn btn-primary w-100 btn-lg mt-3" id="pay-btn">₩9,000 결제하기</button>
+		  <div class="price-line mb-1">
+		    <span>상품 합계</span>
+		    <span id="subtotal" th:text="|₩${#numbers.formatInteger(totalPrice, 3, 'COMMA')}|"></span>
+		  </div>
+
+		  <div class="price-line mb-1">
+		    <span>할인</span>
+		    <span id="discount">-₩1,000</span>
+		  </div>
+
+		  <hr />
+
+		  <div class="price-line total-price">
+		    <span>총 결제금액</span>
+		    <span id="totalPrice" th:text="|₩${#numbers.formatInteger(totalPrice, 3, 'COMMA')}|"></span>
+		  </div>
+
+		  <button class="btn btn-primary w-100 btn-lg mt-3" id="pay-btn"
+		          th:text="|₩${#numbers.formatInteger(totalPrice, 3, 'COMMA')} 결제하기|">
+		  </button>
         </div>
       </div>
     </div>
+	<input type="hidden" id="savedTotalPrice" th:value="${totalPrice}" />
+	<input type="hidden" id="savedStoreName" th:value="${storeName}" />
+	<input type="hidden" id="savedCartId" th:value="${cartId}" />
+	<input type="hidden" id="savedSuccessUrl" th:value="${successUrl}" />
   </div>
 
   <!-- ────────── 주소 변경 모달 ────────── -->

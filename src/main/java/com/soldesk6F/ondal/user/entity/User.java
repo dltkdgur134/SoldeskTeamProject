@@ -88,6 +88,13 @@ public class User {
 	@Column(name = "created_date", nullable = false, updatable = false)
 	private LocalDateTime createdDate;
 
+	@Column(name = "ondal_wallet",nullable = true)
+    private int ondalWallet;
+	
+	@Column(name = "ondal_point",nullable = true)
+	private int ondalPoint;
+
+
 	@JsonIgnore
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
@@ -97,8 +104,7 @@ public class User {
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
 	
-	@Column(name = "ondal_wallet",nullable = true)
-    private int ondalWallet;
+
 	
 	@Column(name = "ondal_pay",nullable = true)
 	private int ondalPay;
@@ -210,11 +216,4 @@ public class User {
 	public String getUserUuidAsString() {
 		return userUuid != null ? userUuid.toString() : null;
 	}
-	@Transient // DB 컬럼이 아니므로 추가
-	public int getOndalWallet() {
-	    int riderWallet = this.rider != null ? this.rider.getRiderWallet() : 0;
-	    int ownerWallet = this.owner != null ? this.owner.getOwnerWallet() : 0;
-	    return riderWallet + ownerWallet;
-	}
-
 }

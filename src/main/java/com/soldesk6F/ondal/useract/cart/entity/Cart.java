@@ -36,7 +36,7 @@ public class Cart {
 	@Id
 	@GeneratedValue
 	@UuidGenerator
-	@Column(name = "cart_id",nullable = false , unique =  true)
+	@Column(name = "cart_id",nullable = false , unique =  true ,columnDefinition = "BINARY(16)")
 	private UUID cartId;
 	
 	@OneToOne

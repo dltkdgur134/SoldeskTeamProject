@@ -41,7 +41,7 @@ public class CartItems {
     private UUID cartItemsId;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id", nullable = false)
+    @JoinColumn(name = "cart_id", nullable = false, columnDefinition = "BINARY(16)")
     private Cart cart;
 
     @ManyToOne
