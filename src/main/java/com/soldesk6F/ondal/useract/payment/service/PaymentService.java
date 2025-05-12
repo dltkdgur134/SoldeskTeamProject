@@ -1,6 +1,5 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,32 +32,21 @@ import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-=======
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentUsageType;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
->>>>>>> Lee.SH
 
 import lombok.RequiredArgsConstructor;
 
@@ -66,13 +54,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 
-<<<<<<< HEAD
 	private final CartRepository cartRepository;
 	private final CartItemsRepository cartItemsRepository;
 	private final OrderRepository orderRepository;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final OrderService orderService;
 	private final OrderDetailRepository orderDetailRepository;
+	private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
 	
 	
 	@Value("${toss.secret-key}")
@@ -276,9 +265,7 @@ public class PaymentService {
 	}
 	
 	
-=======
-    private final PaymentRepository paymentRepository;
-    private final UserRepository userRepository;
+    
 
     @Transactional
     public void processOndalWalletPayment(UUID userUuid, String paymentKey, String tossOrderId, int amount) {
@@ -303,5 +290,4 @@ public class PaymentService {
         user.setOndalWallet(currentWallet + amount);
         userRepository.save(user); // dirty checking 돼도 되지만 명시적으로 저장
     }
->>>>>>> Lee.SH
 }

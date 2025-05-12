@@ -15,8 +15,3 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 	
 	
 }
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> Lee.SH
