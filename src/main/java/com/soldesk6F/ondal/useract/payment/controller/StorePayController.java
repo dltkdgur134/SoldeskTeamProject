@@ -48,6 +48,7 @@ public class StorePayController {
 		model.addAttribute("cartId",cartuuid);
 		model.addAttribute("storeName" ,storeName);
 		model.addAttribute("successUrl","https://localhost:8443/store/paySuccess");
+		model.addAttribute("failUrl" , "https://localhost:8443/store/payFail");
 		model.addAttribute("userInfo" , uid);
 		return "/content/pay";
 	}
@@ -56,10 +57,35 @@ public class StorePayController {
 	public String showPaySuccessPage(@RequestParam("paymentKey") String paymentKey,@RequestParam("orderId") String orderId,
 		    @RequestParam("amount") int amount,Model model) {
 		
-			paymentService.confirmPayment(paymentKey, orderId, amount);
-		
-		return "/content/index";
+			if(paymentService.confirmPayment(paymentKey, orderId, amount)) {
+				return "/content/index";
+			}else {
+				return "/content/errorPage";
+			}
+
+
 	}
+
+	@GetMapping("/store/payFail")
+	public String showPaySuccessPage(@RequestParam("code") String code,@RequestParam("message") String message,
+		   Model model) {
+		model.addAttribute("code" , code);
+		model.addAttribute("message" , message);
+		
+		
+		return "/content/payFail";
+
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	private String validateCartItems(Cart cart, RedirectAttributes redirectAttributes) {
 		for (CartItems item : cart.getCartItems()) {
