@@ -23,7 +23,16 @@
 			
 		</div>
 		<div class="container d-flex justify-content-center my-3" id="result-status"></div>
-		<div class="card info-card p-4">
+		<div class="card info-card p-4 text-center" th:if="${reviewList == null}">
+			<h4 class="card-title">
+				작성한 리뷰가 없습니다!
+			</h4>
+			<div class="container d-flex justify-content-center">
+				<button type="button" class="btn btn-secondary btn-lg" id="back-btn" 
+					onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	
+			</div>
+		</div>
+		<div class="card info-card p-4" th:if="${reviewList != null}">
 			<h4 class="card-title">
 				리뷰 관리
 			</h4>
@@ -128,12 +137,12 @@
 	                    							<button class="carousel-control-prev" type="button"
 	                            						th:data-bs-target="'#reviewImgCarousel' + ${reviewStat.count}" data-bs-slide="prev">
 	                        							<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-	                       				 				<span class="visually-hidden">Previous</span>
+	                       				 				<span class="visually-hidden">이전</span>
 	                    							</button>
 	                    							<button class="carousel-control-next" type="button"
 	                            						th:data-bs-target="'#reviewImgCarousel' + ${reviewStat.count}" data-bs-slide="next">
 	                        							<span class="carousel-control-next-icon" aria-hidden="true"></span>
-	                        							<span class="visually-hidden">Next</span>
+	                        							<span class="visually-hidden">다음</span>
 	                    							</button>
 	                							</div>
 	                							</div>
