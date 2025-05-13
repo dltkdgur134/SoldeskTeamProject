@@ -17,14 +17,14 @@ $('.rating span').click(function() {
 // 페이지 로딩 시 달점 표기
 $(function() {
 	var flashDurationInSeconds = 5;
-	 var flashContainerId = 'flash-messages';
+	var flashContainerId = 'flash-messages';
 
-	 function removeFlashMessages() {
-	    $('#' + flashContainerId).remove();
-	 }
-	 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
-	
-	
+	function removeFlashMessages() {
+		$('#' + flashContainerId).remove();
+	}
+	setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
+
+	// 리뷰 조회 페이지용
 	const reviewForms = document.querySelectorAll("form[id^='review-form']");
 
 	reviewForms.forEach((form) => {
@@ -45,6 +45,8 @@ $(function() {
 			});
 		}
 	});
+	
+	// 리뷰 수정 페이지용
 	const reviewForm = document.querySelector("form[id^='updateReviewForm']");
 	const ratingInput = reviewForm.querySelector("input[id^='rating-stars']");
 	const ratingValue = parseInt(ratingInput.value, 10);
@@ -80,14 +82,14 @@ document.getElementById('review-img').addEventListener('change', function(event)
 				const img = document.createElement('img');
 				img.src = e.target.result; // 이미지 소스 설정
 				img.alt = file.name;
-				img.style = 'max-width: 150px; height: auto; margin: 5px; border: 3px solid  #667EFF; padding: 5px; border-radius: 5px;';
+				img.style = 'max-width: 150px; height: 150px; margin: 5px; border: 3px solid  #667EFF; padding: 5px; border-radius: 5px;';
 
 				// 프리뷰 컨테이너 안에 이미지 넣기
 				previewContainer.appendChild(img);
-				
+
 				// 선택된 업로드할 이미지 개수 표기
 				fileCount.innerHTML = "(" + files.length + "/3)";
-				
+
 				// 파일 개수가 3개면 글자색을 빨간색으로 변경
 				if (files.length == 3) {
 					fileCount.style.color = "red";
@@ -139,85 +141,48 @@ function checkReview() {
 function deleteReview(count) {
 	const form = document.getElementById('review-form' + count);
 	const reviewId = form.reviewId;
-	
+
 	const btn = document.getElementById('delete-review-btn' + count);
 	btn.innerHTML = "<span class='spinner-border spinner-border-sm' aria-hidden='true'></span>";
 	fetch('/content/deleteReview/' + reviewId.value, {
 		method: "delete",
 		headers: {
-			'Content-Type' : 'application/json'
+			'Content-Type': 'application/json'
 		}
-	})	
-	.then(response => {
-		if (!response.ok) {
-			throw new Error('리뷰 삭제 실패 응답 상태: ' + response.status);
-		}
-		return response.json();
 	})
-	.then(data => {
-		if (data.result === 0) {
-			const container = document.getElementById('result-msg-container');
-			const statusContainer = document.getElementById('result-status');
-			
-			container.innerHTML = 
-				"<div class='alert alert-success' id='flash-messages' role='alert'>" +
-				"<i class='fa-solid fa-circle-check'></i>" +
-				"<strong>" + data.resultMsg + "</strong>" +
-				"</div>";
-			statusContainer.innerHTML = 
-				"<div class='spinner-border text-dark'' role='status'><span class='visually-hidden'>로딩중...</span></div>";
-			var flashDurationInSeconds = 2;
-			var flashContainerId = 'result-msg-container';
-			
-			function removeFlashMessages() {
-				$('#' + flashContainerId).remove();
-			} setTimeout(removeFlashMessages, flashDurationInSeconds * 500); // 요청 응답 메시지 표시
-			
-		} else {
-			alert(data.resultMsg); // 에러 메시지
-		}
-		setTimeout(function() {location.reload(); }, 1000); // 페이지 새로고침
-	})
-	.catch(error => {
-		console.error('오류 발생', error);
-		alert('삭제 중 오류가 발생했습니다.')
-	});
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('리뷰 삭제 실패 응답 상태: ' + response.status);
+			}
+			return response.json();
+		})
+		.then(data => {
+			if (data.result === 0) {
+				const container = document.getElementById('result-msg-container');
+				const statusContainer = document.getElementById('result-status');
+
+				container.innerHTML =
+					"<div class='alert alert-success' id='flash-messages' role='alert'>" +
+					"<i class='fa-solid fa-circle-check'></i>" +
+					"<strong>" + data.resultMsg + "</strong>" +
+					"</div>";
+				statusContainer.innerHTML =
+					"<div class='spinner-border text-dark'' role='status'><span class='visually-hidden'>로딩중...</span></div>";
+				var flashDurationInSeconds = 2;
+				var flashContainerId = 'result-msg-container';
+
+				function removeFlashMessages() {
+					$('#' + flashContainerId).remove();
+				} setTimeout(removeFlashMessages, flashDurationInSeconds * 500); // 요청 응답 메시지 표시
+
+			} else {
+				alert(data.resultMsg); // 에러 메시지
+			}
+			setTimeout(function() { location.reload(); }, 1000); // 페이지 새로고침
+		})
+		.catch(error => {
+			console.error('오류 발생', error);
+			alert('삭제 중 오류가 발생했습니다.')
+		});
 }
 
-function getElapsedTime(createdTime) {
-	const now = new Date();
-	const created = new Date(createdTime);
-	
-	const seconds = Math.floor((now - created) / 1000); // milliseconds -> seconds
-	if (seconds < 60) {
-		return "방금 전";
-	} 
-	
-	const minutes = Math.floor(seconds / 60);
-	if (minutes < 60) {
-		return minutes + "분 전";
-	}
-	
-	const hours = Math.floor(minutes / 60);
-	if (hours < 24) {
-		return hours + "시간 전";
-	}
-	
-	const days = Math.floor(hours/ 24);
-	const weeks = Math.floor(days / 7);
-	const months = Math.floor(days / 30.43685);
-	const years = Math.floor(months / 12);
-	
-	if (days < 7) {
-		return days + "일 전";
-	}
-	
-	if (months < 1) {
-		return weeks + "주 전";
-	}
-	
-	if (months < 12) {
-		return months + "개월 전";
-	}
-	return years + "년 전";
-}

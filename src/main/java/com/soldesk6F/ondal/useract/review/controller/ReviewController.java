@@ -79,10 +79,13 @@ public class ReviewController {
 			ReviewDTO reviewDTO,
 			@RequestParam(value = "reviewImg") MultipartFile[] reviewImg,
 			RedirectAttributes redirectAttributes) {
-		System.out.println(reviewImg[0]);
-		if (reviewImg != null && reviewImg.length > 0) {
-			reviewService.updateReview(userDetails, reviewDTO, redirectAttributes);
-			reviewService.updateReviewImg(userDetails, reviewDTO, reviewImg, redirectAttributes);
+		if (!reviewService.isMultipartFileEmpty(reviewImg)) {
+			if (!reviewService.updateReview(userDetails, reviewDTO, redirectAttributes)) {
+				reviewService.updateReviewImg(userDetails, reviewDTO, reviewImg, redirectAttributes); 
+			} else {
+				reviewService.updateReviewImg(userDetails, reviewDTO, reviewImg, redirectAttributes);
+				reviewService.updateReview(userDetails, reviewDTO, redirectAttributes);
+			}
 		} else {
 			reviewService.updateReview(userDetails, reviewDTO, redirectAttributes);
 		}

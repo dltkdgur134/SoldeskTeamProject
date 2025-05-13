@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +115,9 @@ public class ReviewService {
 		}
 		List<Review> reviewList = findReviewList.get();
 		
+		// 최신 날짜가 리스트 앞 쪽에
+		reviewList.sort((r1, r2) -> r2.getCreatedDate().compareTo(r1.getCreatedDate()));
+		
 		// 리뷰 작성 후 지난 일 수 계산 후 맵에 담기
 		Map<UUID, Long> reviewDaysPassed = new HashMap<>();
 		
@@ -171,6 +175,7 @@ public class ReviewService {
 		}
 		
 		Review review = findReview.get();
+		
 		Optional<List<ReviewImg>> findReviewImgList = reviewImgRepository.findAllByReview(review);
 		List<ReviewImg> reviewImgList = findReviewImgList.orElse(Collections.emptyList());
 		
@@ -259,7 +264,7 @@ public class ReviewService {
 				return false;
 			}
 			
-			if (reviewImage != null) {
+			if (!isMultipartFileEmpty(reviewImage)) {
 				int count = 1;
 				for (MultipartFile image : reviewImage) {
 					String orderUUIDString = reviewDTO.getOrderUuidAsString();
@@ -321,6 +326,12 @@ public class ReviewService {
 		}
 	}
 	
+	// 업로드한 파일이 존재하는지 확인하는 method
+	public boolean isMultipartFileEmpty(MultipartFile[] files) {
+		return files == null || files.length == 0 || 
+		           Arrays.stream(files).allMatch(MultipartFile::isEmpty);
+	}
+
 	// 리뷰 이미지 수정
 	@Transactional
 	public boolean updateReviewImg(CustomUserDetails userDetails,
@@ -328,6 +339,12 @@ public class ReviewService {
 			MultipartFile[] reviewImage,
 			RedirectAttributes redirectAttributes) {
 		try {
+			if (isMultipartFileEmpty(reviewImage)) {
+				redirectAttributes.addFlashAttribute("result", 1);
+				redirectAttributes.addFlashAttribute("resultMsg", "업로드한 사진이 없습니다.");
+				return false;
+			}
+			
 			String userUUIDString = userDetails.getUser().getUserUuidAsString();
 			UUID userUuid = UUID.fromString(userUUIDString);
 			Optional<User> findUser = userRepository.findById(userUuid);
@@ -338,33 +355,39 @@ public class ReviewService {
 				return false;
 			}
 			
-			if (reviewImage != null && reviewImage.length > 0) {
-				String reviewIdString = reviewDTO.getReviewUuidAsString();
-				UUID reviewUuid = UUID.fromString(reviewIdString);
-				Optional<Review> findReview = reviewRepository.findById(reviewUuid);
-				if (findReview.isEmpty()) {
-					redirectAttributes.addFlashAttribute("result", 1);
-					redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 리뷰입니다.");
-					return false;
+			String reviewIdString = reviewDTO.getReviewUuidAsString();
+			UUID reviewUuid = UUID.fromString(reviewIdString);
+			Optional<Review> findReview = reviewRepository.findById(reviewUuid);
+			if (findReview.isEmpty()) {
+				redirectAttributes.addFlashAttribute("result", 1);
+				redirectAttributes.addFlashAttribute("resultMsg", "존재하지 않는 리뷰입니다.");
+				return false;
+			}
+			Review review = findReview.get();
+			
+			// 이미지 파일을 하나라도 업로드하면 기존 이미지들 삭제
+			Optional<List<ReviewImg>> findReviewImgList = reviewImgRepository.findAllByReview(review);
+			List<ReviewImg> reviewImgList = findReviewImgList.get();
+			String savePath = new File(uploadReviewDir).getAbsolutePath();
+			
+			for (ReviewImg reviewImg : reviewImgList) {
+				String fileName = reviewImg.getReviewImg();
+				Path reviewImgPath = Paths.get(savePath, fileName);
+				if (Files.exists(reviewImgPath)) {
+					Files.delete(reviewImgPath);
 				}
-				Review review = findReview.get();
-				
-				// 이미지 파일을 하나라도 업로드하면 기존 이미지들 삭제
-				Optional<List<ReviewImg>> findReviewImgList = reviewImgRepository.findAllByReview(review);
-				List<ReviewImg> reviewImgList = findReviewImgList.get();
-				String savePath = new File(uploadReviewDir).getAbsolutePath();
-				for (ReviewImg reviewImg : reviewImgList) {
-					String fileName = reviewImg.getReviewImg();
-					Path reviewImgPath = Paths.get(savePath, fileName);
-					if (Files.exists(reviewImgPath)) {
-						Files.delete(reviewImgPath);
-					}
-					reviewImgRepository.delete(reviewImg);
-					reviewImgRepository.flush();
-				}
-				
+				reviewImgRepository.delete(reviewImg);
+				reviewImgRepository.flush();
+			}
+			
+			if (review.getUser().getUserUuidAsString().equals(userDetails.getUser().getUserUuidAsString())) {
 				int count = 1;
 				for (MultipartFile image : reviewImage) {
+					// 이미지 파일이 없으면 다음 loop
+					if (image.isEmpty()) {
+						continue;
+					}
+					
 					String reviewImgFileName = image.getOriginalFilename();
 					String extension = reviewImgFileName.substring(reviewImgFileName.lastIndexOf(".") + 1);
 					String fileName = review.getReviewUuidAsString() + "_" + count + "." + extension;
@@ -386,11 +409,11 @@ public class ReviewService {
 					count ++;
 				}
 				redirectAttributes.addFlashAttribute("result", 0);
-    			redirectAttributes.addFlashAttribute("resultMsg", "리뷰가 수정되었습니다.");
+    			redirectAttributes.addFlashAttribute("resultMsg", "리뷰 이미지가 변경되었습니다.");
 				return true;
 			}
 			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "업로드한 사진이 없습니다.");
+			redirectAttributes.addFlashAttribute("resultMsg", "리뷰 수정 권한이 업습니다.");
 			return false;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -418,17 +441,35 @@ public class ReviewService {
 			}
 			Review review = findReview.get();
 			
-			double rating = Double.parseDouble(reviewDTO.getRating());
+			double newRating = Double.parseDouble(reviewDTO.getRating());
+			String newReviewTitle = reviewDTO.getReviewTitle().trim();
+			String newReviewContent = reviewDTO.getReviewContent();
 			
-			review.updateReview(rating, reviewDTO.getReviewTitle(), reviewDTO.getReviewContent());
-			review.setUpdatedDate(LocalDateTime.now());
-			
-			redirectAttributes.addFlashAttribute("result", 0);
-			redirectAttributes.addFlashAttribute("resultMsg", "리뷰가 수정되었습니다.");
-			return true;
+			// 로그인 된 유저가 해당 리뷰를 작성한 유저와 일치하는지 확인
+			if (review.getUser().getUserUuidAsString().equals(userDetails.getUser().getUserUuidAsString())) {
+				// 리뷰 내용에 변경사항이 있는지 확인
+				if (review.getRating() == newRating 
+						&& review.getReviewTitle().equals(newReviewTitle)
+						&& review.getReviewContent().equals(newReviewContent)) {
+					redirectAttributes.addFlashAttribute("result", 1);
+					redirectAttributes.addFlashAttribute("resultMsg", "수정 사항이 없습니다.");
+					return false;
+				}
+				
+				review.updateReview(newRating, newReviewTitle, newReviewContent);
+				review.setUpdatedDate(LocalDateTime.now());
+				
+				redirectAttributes.addFlashAttribute("result", 0);
+				redirectAttributes.addFlashAttribute("resultMsg", "리뷰가 수정되었습니다.");
+				return true;
+			}
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "아이디가 일치하지 않습니다.");
+			return false;
 		} catch (Exception e) {
-			System.err.println("Transaction rollback due to: " + e.getMessage());
 			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("result", 1);
+			redirectAttributes.addFlashAttribute("resultMsg", "리뷰 수정에 실패했습니다.");
 			return false;
 		}
 	}

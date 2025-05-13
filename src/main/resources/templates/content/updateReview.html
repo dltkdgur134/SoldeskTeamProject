@@ -52,14 +52,14 @@
 			</div>
 			<div class="preview-container d-flex justify-content-center mt-3" id="image-preview-container">
     			<th:block th:each="reviewImg : ${reviewImgList}">
-        		<div class="preview-wrapper" style="position: relative; display: inline-block; margin: 5px;">
-            		<img th:src="${'/img/review/' + reviewImg.reviewImg}" 
-                		class="img-thumbnail existing-img" 
-                		style="max-width: 150px; height: auto; border: 3px solid #667EFF; padding: 5px; border-radius: 5px;" 
-                		th:attr="data-filename=${reviewImg.reviewImg}">
-        	</div>
-    </th:block>
-</div>
+        			<div class="preview-wrapper" style="position: relative; display: inline-block; margin: 5px;">
+            			<img th:src="${'/img/review/' + reviewImg.reviewImg}" 
+                			class="img-thumbnail existing-img" 
+                			style="max-width: 150px; height: 150px; border: 3px solid #667EFF; padding: 5px; border-radius: 5px;" 
+                			th:attr="data-filename=${reviewImg.reviewImg}">
+        			</div>
+   			 	</th:block>
+			</div>
 			<div class="form-floating my-3">
 				<input type="text" class="form-control" name="reviewTitle" placeholder="리뷰 제목" id="review-title" maxlength="30" th:value="${review.reviewTitle}"/>
 				<label for="review-title">리뷰 제목</label>
