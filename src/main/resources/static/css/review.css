@@ -143,11 +143,11 @@ input[type="file"] {
 
 /* 모달 (팝업) */
 .carousel-control-prev-icon {
-	background-color: rgba(0, 0, 0, 0.1);
+	background-color: rgba(0, 0, 0, 0.4);
 }
 
 .carousel-control-next-icon {
-	background-color: rgba(0, 0, 0, 0.1);
+	background-color: rgba(0, 0, 0, 0.4);
 }
 
 .carousel-caption {
