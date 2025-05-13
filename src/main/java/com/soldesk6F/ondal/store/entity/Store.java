@@ -185,7 +185,7 @@ public class Store {
     @Builder
     public Store(Owner owner,String businessNum, String storeName, String category, String storePhone,
                  List<StoreImg> storeImgs,List<StoreIntroduceImg> StoreIntroduceImgs, String brandImg, String storeAddress,
-                 double storeLatitude, double storeLongitude, DeliveryRange deliveryRange,
+                 double storeLatitude, double storeLongitude, Point storeLocation, DeliveryRange deliveryRange,
                  String storeIntroduce, String storeEvent , String foodOrigin,
                  LocalTime openingTime, LocalTime closingTime,
                  String holiday, StoreStatus storeStatus) {
@@ -195,7 +195,6 @@ public class Store {
         this.category = category;
         this.storePhone = storePhone;
 
-        // 이미지 리스트 추가
         if (storeImgs != null) {
             storeImgs.forEach(this::addStoreImg);
         }
@@ -207,6 +206,7 @@ public class Store {
         this.storeAddress = storeAddress;
         this.storeLatitude = storeLatitude;
         this.storeLongitude = storeLongitude;
+        this.storeLocation = storeLocation;
         this.deliveryRange = deliveryRange;
         this.storeIntroduce = storeIntroduce;
         this.storeEvent = storeEvent;

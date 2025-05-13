@@ -18,6 +18,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +55,9 @@ public class StoreService {
 				.orElseThrow(() -> new IllegalStateException("해당 아이디로 등록된 점주 정보가 없습니다."));
 
 		String brandImgPath = null;
+		
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+		Point location = geometryFactory.createPoint(new Coordinate(dto.getLongitude(), dto.getLatitude()));
 
 		MultipartFile file = dto.getBrandImg();
 		if (file != null && !file.isEmpty()) {
@@ -76,10 +83,11 @@ public class StoreService {
 			}
 		}
 
-		Store store = Store.builder().owner(owner).businessNum(dto.getBusinessNum()).storeName(dto.getStoreName())
+		Store store = Store.builder()
+				.owner(owner).businessNum(dto.getBusinessNum()).storeName(dto.getStoreName())
 				.category(dto.getCategory()).storePhone(dto.getStorePhone()).storeAddress(dto.getStoreAddress())
-				.storeLatitude(dto.getLatitude()).storeLongitude(dto.getLongitude())
-				.storeStatus(Store.StoreStatus.CLOSED).brandImg(brandImgPath) // ✅ 이 부분만 이미지 저장
+				.storeLatitude(dto.getLatitude()).storeLongitude(dto.getLongitude()).storeLocation(location)
+				.storeStatus(Store.StoreStatus.CLOSED).brandImg(brandImgPath)
 				.foodOrigin("").build();
 
 		storeRepository.save(store);
