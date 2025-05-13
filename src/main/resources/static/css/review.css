@@ -144,12 +144,10 @@ input[type="file"] {
 /* 모달 (팝업) */
 .carousel-control-prev-icon {
 	background-color: rgba(0, 0, 0, 0.1);
-	color: rgba(255, 255, 255, 0.1);
 }
 
 .carousel-control-next-icon {
 	background-color: rgba(0, 0, 0, 0.1);
-	color: rgba(255, 255, 255, 0.1);
 }
 
 .carousel-caption {
@@ -168,5 +166,5 @@ input[type="file"] {
 	right: 10px; 
 	z-index: 1050;
 	font-size: 1.5em;
+	background-color: rgba(255, 255, 255, 0.5);
 }
-
