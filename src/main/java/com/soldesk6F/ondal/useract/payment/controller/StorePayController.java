@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -29,7 +30,7 @@ public class StorePayController {
 	private final PaymentService paymentService;
 	
 
-	@GetMapping("/store/pay")
+	@PostMapping("/store/pay")
 	public String tryPay(@RequestParam("cartUUID")UUID cartuuid , Model model, RedirectAttributes redirectAttributes) {
 		Cart cart = cartService.findById(cartuuid);
 
@@ -47,6 +48,7 @@ public class StorePayController {
 		model.addAttribute("cartId",cartuuid);
 		model.addAttribute("storeName" ,storeName);
 		model.addAttribute("successUrl","https://localhost:8443/store/paySuccess");
+		model.addAttribute("failUrl" , "https://localhost:8443/store/payFail");
 		model.addAttribute("userInfo" , uid);
 		return "/content/pay";
 	}
@@ -63,6 +65,27 @@ public class StorePayController {
 
 
 	}
+
+	@GetMapping("/store/payFail")
+	public String showPaySuccessPage(@RequestParam("code") String code,@RequestParam("message") String message,
+		   Model model) {
+		model.addAttribute("code" , code);
+		model.addAttribute("message" , message);
+		
+		
+		return "/content/payFail";
+
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	private String validateCartItems(Cart cart, RedirectAttributes redirectAttributes) {
 		for (CartItems item : cart.getCartItems()) {
