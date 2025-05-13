@@ -30,6 +30,8 @@ import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
+import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
+
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +55,7 @@ public class PaymentService {
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final OrderService orderService;
 	private final OrderDetailRepository orderDetailRepository;
+	private final PaymentRepository paymentRepository;
 	
 	
 	@Value("${toss.secret-key}")
