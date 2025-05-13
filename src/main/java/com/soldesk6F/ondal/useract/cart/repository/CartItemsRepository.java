@@ -11,6 +11,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 public interface CartItemsRepository extends JpaRepository<CartItems, UUID> {
 
 	List<CartItems>findByCart_CartId(UUID cartId);
+	void deleteByCart_cartId(UUID cartId);
 	
 	
 	

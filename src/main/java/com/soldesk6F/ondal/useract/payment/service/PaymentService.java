@@ -2,7 +2,6 @@ package com.soldesk6F.ondal.useract.payment.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,12 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
@@ -32,7 +32,11 @@ import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
-import org.springframework.stereotype.Service;
+import com.soldesk6F.ondal.useract.payment.entity.Payment;
+import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
+import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
+import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
+
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +44,6 @@ import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +60,7 @@ public class PaymentService {
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final OrderService orderService;
 	private final OrderDetailRepository orderDetailRepository;
+	private final PaymentRepository paymentRepository;
 	
 	
 	@Value("${toss.secret-key}")
@@ -174,7 +178,7 @@ public class PaymentService {
 //	}
 	
 	@Transactional
-	public void confirmPayment(String paymentKey, String orderId, int amount) {
+	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
 	    String url = "https://api.tosspayments.com/v1/payments/confirm";
 
 	    Map<String, Object> requestBody = new HashMap<>();
@@ -195,10 +199,13 @@ public class PaymentService {
 	    try {
 	        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 	        if (!response.getStatusCode().is2xxSuccessful()) {
-	            throw new IllegalStateException("결제 승인 실패: " + response.getBody());
 	            
+	        	return false;
+//	        	throw new IllegalStateException("결제 승인 실패: " + response.getBody());
 	        }
 	        ObjectMapper objectMapper = new ObjectMapper();
+	        objectMapper.registerModule(new JavaTimeModule());
+	        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	        TossPaymentResponse tossResponse=null;
 			try {
 				tossResponse = objectMapper.readValue(response.getBody(), TossPaymentResponse.class);
@@ -249,15 +256,75 @@ public class PaymentService {
 	       for(OrderDetail od : order.getOrderDetails()) {
 	    	   od.setOrder(order);
 	       }     		
-	       
-	        orderRepository.save(order);
+	       	Payment payment = new Payment();
+	       	payment.setOrder(order);
+	       	payment.setAmount(tossResponse.getTotalAmount());
+	       	payment.setPaymentKey(tossResponse.getPaymentKey());
+	       	payment.setTossOrderId(tossResponse.getOrderId());
+	       	payment.setUser(user);	       	
+	       	payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
+	       	payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
+	       	payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
+	       	switch(tossResponse.getMethod()) {
+	       	case "카드":
+	       		payment.setPaymentMethod(PaymentMethod.CREDIT);
+	       		break;
+	       	default :
+	       		payment.setPaymentMethod(PaymentMethod.CASH);
+	       		break;
+	       	
+	       	}
+	       	switch(tossResponse.getStatus()) {
+	       	case "DONE":
+	       		payment.setPaymentStatus(PaymentStatus.COMPLETED);
+	       		break;
+	       	case "READY":
+	       	case "IN_PROGRESS":
+	       		payment.setPaymentStatus(PaymentStatus.CANCELLED);
+	       		break;
+	        default:
+	        	payment.setPaymentStatus(PaymentStatus.CANCELLED);
+	        	break;
+	       	}
+	       	
+	       	orderRepository.save(order);
+	       	cartItemsRepository.deleteByCart_cartId(cartUUID);
 	        cartRepository.deleteById(cartUUID);
+	        paymentRepository.save(payment);
 	        
-	        
+	        return true;
 	    } catch (HttpClientErrorException e) {
-	        throw new IllegalArgumentException("토스 결제 승인 에러: " + e.getResponseBodyAsString(), e);
+	    	return false;
 	    }
 	}
+	
+	
+	
+	
+	
+	
+	@Transactional
+	public void refundTossPayment(String paymentKey, String cancelReason) {
+	    String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
+
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON);
+	    String secretKey = tossSecretKey;
+	    String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+	    headers.set("Authorization", "Basic " + encodedAuth);
+
+	    Map<String, String> body = new HashMap<>();
+	    body.put("cancelReason", cancelReason);
+
+	    HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+	    RestTemplate restTemplate = new RestTemplate();
+
+	    ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+	    System.out.println("환불 응답: " + response.getBody());
+	    
+	    
+	}	
 	
 	
 }
