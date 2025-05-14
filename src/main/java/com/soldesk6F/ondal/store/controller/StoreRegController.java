@@ -12,10 +12,10 @@ public class StoreRegController {
 		return "content/store/storeReg";
 	}
 
-	@GetMapping("/storeReg/submit")
-	public String storeSubmit() {
-		return "content/store/submit";
-	}
+	/*
+	 * @GetMapping("/storeReg/submit") public String storeSubmit() { return
+	 * "content/store/submit"; }
+	 */
 	
 	@GetMapping("/content/store/storeRegSuccess")
 	public String showStoreRegSuccessPage() {
