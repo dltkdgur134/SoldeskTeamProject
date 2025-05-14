@@ -10,6 +10,9 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
 	<script src="https://js.tosspayments.com/v1"></script>
 </head>
 <div layout:fragment="content" class="container py-5">
+<div th:if="${success}" class="alert alert-success"
+		th:text="${success}"></div>
+	<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
   <div class="card info-card p-4">
     <h3 class="mb-4">온달 지갑</h3>
 
