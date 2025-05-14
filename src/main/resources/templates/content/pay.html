@@ -25,29 +25,52 @@
 		const cartValue = document.getElementById("savedCartId");
 		const storeNameValue = document.getElementById("savedStoreName");
 		const successUrlValue = document.getElementById("savedSuccessUrl");
+		const failUrlValue = document.getElementById("savedFailUrl");
 		const reqDelValue = document.getElementById("reqDel");
 		const reqStoreValue = document.getElementById("reqStore");
+		const agreementService = document.getElementById("term1");
+		const agreementPrivate = document.getElementById("term2");
+		const agreementMarketing = document.getElementById("term3");
+		const checkAll = document.getElementById("allAgree");
+		
 	    if (!payBtn) {
 	      console.error("결제 버튼이 문서에 존재하지 않습니다.");
 	      return;
 	    }
 
 	    payBtn.addEventListener("click", function () {
+		  if(!(agreementPrivate.checked&&agreementPrivate.checked)){
+			alert("필수 동의항목을 체크하셔야합니다");
+			return;
+		  }
 	      const tossPayments = TossPayments("test_ck_Z61JOxRQVEEOgm2alYRRVW0X9bAq");
-			alert(totalPrice);
 	      tossPayments.requestPayment({
 	        amount: totalPrice,
 	        orderId: cartValue.value,
 	        orderName: storeNameValue.value,
 	        successUrl: successUrlValue.value,
-	        failUrl: "https://ondal.com",
+	        failUrl: failUrlValue.value,
 			metadata:{
 				reqDel:reqDel.value,
 				reqStore:reqStore.value
 			}
 	      });
 	    });
+		
+		
 	  });
+	  function toggleAll(source) {
+	    const checkboxes = document.querySelectorAll('.term-check');
+	    checkboxes.forEach(cb => cb.checked = source.checked);
+	  }
+
+	  // 2) 개별 항목 체크 변경 시 → 전체 동의 상태 갱신
+	  function syncAllAgree() {
+	    const allAgree = document.getElementById("allAgree");
+	    const checkboxes = document.querySelectorAll('.term-check');
+	    allAgree.checked = Array.from(checkboxes).every(cb => cb.checked);
+	  }
+
 	</script>
   <style>
     /* ──────── 컬러 팔레트 & 기본 글꼴 ──────── */
@@ -167,15 +190,15 @@
         <div>
           <div class="section-title">이용 약관 동의</div>
           <div class="form-check mb-1">
-            <input class="form-check-input term-check" type="checkbox" id="term1" />
+            <input class="form-check-input term-check" type="checkbox" id="term1" onclick="syncAllAgree()" />
             <label class="form-check-label" for="term1">[필수] 서비스 이용약관 동의</label>
           </div>
           <div class="form-check mb-1">
-            <input class="form-check-input term-check" type="checkbox" id="term2" />
+            <input class="form-check-input term-check" type="checkbox" id="term2" onclick="syncAllAgree()" />
             <label class="form-check-label" for="term2">[필수] 개인정보 처리방침 동의</label>
           </div>
           <div class="form-check mb-3">
-            <input class="form-check-input term-check" type="checkbox" id="term3" />
+            <input class="form-check-input term-check" type="checkbox" id="term3" onclick="syncAllAgree()" />
             <label class="form-check-label" for="term3">[선택] 마케팅 정보 수신 동의</label>
           </div>
         </div>
@@ -185,7 +208,7 @@
       <div class="col-lg-4">
         <div id="summaryBox" class="border rounded-4 p-4 shadow-sm bg-white">
           <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="allAgree"																																						 />
+            <input class="form-check-input" type="checkbox" id="allAgree" onclick="toggleAll(this)"/>
             <label class="form-check-label fw-bold" for="allAgree">모든 항목 동의</label>
           </div>
 
@@ -216,6 +239,7 @@
 	<input type="hidden" id="savedStoreName" th:value="${storeName}" />
 	<input type="hidden" id="savedCartId" th:value="${cartId}" />
 	<input type="hidden" id="savedSuccessUrl" th:value="${successUrl}" />
+	<input type="hidden" id="savedFailUrl" th:value="${failUrl}" />
   </div>
 
   <!-- ────────── 주소 변경 모달 ────────── -->

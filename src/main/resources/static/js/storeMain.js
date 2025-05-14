@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
-	// 메뉴 필터링
 	function filterMenus(category) {
 		const menuCards = document.querySelectorAll('.menu-card');
 		menuCards.forEach(card => {
 			const cardCategory = card.getAttribute('data-category');
-			card.style.display = (category === '전체' || cardCategory === category) ? 'block' : 'none';
+			card.style.display = (category === '전체' || cardCategory === category) ? 'flex' : 'none';
 		});
 		document.querySelectorAll('.menu-tabs .tab').forEach(btn => btn.classList.remove('active'));
 	}
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		btn.classList.add('active');
 	};
 
-	// 슬라이더
 	let currentSlide = 0;
 	const slidesContainer = document.getElementById('slides');
 	const slideItems = document.querySelectorAll('#slides .slide');
@@ -32,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		dot.addEventListener('click', () => showSlide(index));
 	});
 
-	// 드래그 슬라이더
 	let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = 0, animationID;
 	function getPositionX(event) {
 		return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
@@ -85,9 +82,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (movedBy > 50) currentSlide--;
 		setPositionByIndex();
 	}
-	setPositionByIndex(); // 초기 세팅
+	setPositionByIndex();
 
-	// 메뉴 모달
 	const modal = document.getElementById('menu-modal');
 	const modalMenuName = document.getElementById('menu-name');
 	const modalMenuDescription = document.getElementById('menu-description');
@@ -100,13 +96,20 @@ document.addEventListener('DOMContentLoaded', function () {
 	let basePrice = 0;
 
 	document.querySelectorAll('.menu-card').forEach(card => {
+		const status = card.getAttribute("data-status");
+
+		if (status === 'SOLD_OUT') {
+			card.classList.add("sold-out");
+			card.setAttribute("title", "품절된 메뉴입니다");
+			return;
+		}
+		
 		card.addEventListener('click', () => {
 			const name = card.getAttribute('data-name');
 			const description = card.getAttribute('data-description');
 			const price = card.getAttribute('data-price');
 			const imageUrl = card.getAttribute('data-image');
 
-			// 모달 정보 초기화
 			quantity = 1;
 			basePrice = parseInt(price);
 			quantityEl.textContent = '1';
@@ -131,11 +134,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (names.length === 0 || prices.length === 0) continue;
 
-				// 옵션 그룹 박스 생성
 				const groupBox = document.createElement("div");
 				groupBox.className = "option-group-box";
 
-				// 그룹명 제목
 				const groupTitle = document.createElement("p");
 				groupTitle.textContent = groupName;
 				groupTitle.className = "option-group-title";
@@ -363,12 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			optionsContainer.appendChild(noOption);
 		}
 	}
-	
-	
-	
-	
 
-	// 모달 닫기
 	function closeModal() {
 		modal.style.display = 'none';
 		document.body.style.overflow = 'auto';

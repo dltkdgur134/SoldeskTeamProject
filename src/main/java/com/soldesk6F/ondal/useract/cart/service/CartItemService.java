@@ -3,7 +3,9 @@ package com.soldesk6F.ondal.useract.cart.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -32,12 +34,26 @@ public class CartItemService {
 
 	public void addItemToCart(Cart cart, Menu menu, Store store, int quantity, List<CartOptionDto> selectedOptions) {
 		cart.setStore(store);
+		
+		for (CartItems existingItem : cart.getCartItems()) {
+			boolean sameMenu = existingItem.getMenu().getMenuId().equals(menu.getMenuId());
+			boolean sameOptions = isSameOptions(existingItem.getCartItemOptions(), selectedOptions);
+
+			if (sameMenu && sameOptions) {
+				existingItem.setQuantity(existingItem.getQuantity() + quantity);
+				cartItemRepository.save(existingItem);
+				return;
+			}
+		}
 
 		CartItems cartItem = new CartItems();
 		cartItem.setCart(cart);
 		cartItem.setMenu(menu);
 		cartItem.setQuantity(quantity);
 		cartItem.setAddedTime(LocalDateTime.now()); // @CreationTimestamp 대체 가능
+		cartItem.setMenuName(menu.getMenuName());
+		cartItem.setMenuPrice(menu.getPrice());
+		cartItem.setMenuImage(menu.getMenuImg());
 
 		int totalOptionPrice = 0;
 		List<CartItemOption> cartItemOptions = new ArrayList<>();
@@ -60,11 +76,52 @@ public class CartItemService {
 
 		cartRepository.save(cart);
 	}
+	
+	private boolean isSameOptions(List<CartItemOption> existingOptions, List<CartOptionDto> newOptions) {
+		if (existingOptions.size() != newOptions.size()) return false;
+
+		for (CartOptionDto newOpt : newOptions) {
+			boolean matched = existingOptions.stream()
+				.anyMatch(existingOpt ->
+					existingOpt.getGroupName().equals(newOpt.getGroupName()) &&
+					existingOpt.getOptionName().equals(newOpt.getName()) &&
+					existingOpt.getOptionPrice() == newOpt.getPrice());
+			if (!matched) return false;
+		}
+		return true;
+	}
 
 	@Transactional
 	public void updateOptions(CartItems cartItem, List<CartOptionDto> options) {
-		cartItemOptionRepository.deleteByCartItem(cartItem);
+		UUID cartItemId = cartItem.getCartItemsId();
+		Cart cart = cartItem.getCart();
 
+		List<CartItems> allItems = cart.getCartItems();
+
+		// 병합 대상 먼저 찾기
+		for (CartItems other : allItems) {
+			if (other.getCartItemsId().equals(cartItemId)) continue;
+
+			boolean sameMenu =
+				other.getMenu().getMenuId().equals(cartItem.getMenu().getMenuId()) &&
+				other.getMenuPrice() == cartItem.getMenuPrice() &&
+				Objects.equals(other.getMenuImage(), cartItem.getMenuImage());
+
+			boolean sameOptions = isSameOptions(other.getCartItemOptions(), options);
+
+			if (sameMenu && sameOptions) {
+				// 병합
+				other.setQuantity(other.getQuantity() + cartItem.getQuantity());
+				cart.getCartItems().remove(cartItem);
+				cartItemRepository.delete(cartItem);
+				return;
+			}
+		}
+
+		// 병합 대상 없을 경우: 옵션 갱신
+
+		// 기존 옵션 삭제
+		cartItemOptionRepository.deleteByCartItem(cartItem);
 
 		// 새 옵션 저장
 		List<CartItemOption> newOptions = options.stream()
@@ -72,9 +129,10 @@ public class CartItemService {
 			.collect(Collectors.toList());
 		cartItemOptionRepository.saveAll(newOptions);
 
-		// 옵션 총합 가격 저장
+		// 옵션 총합 저장
 		int totalOptionPrice = newOptions.stream().mapToInt(CartItemOption::getOptionPrice).sum();
 		cartItem.setOptionTotalPrice(totalOptionPrice);
+
 		cartItemRepository.save(cartItem);
 	}
 }

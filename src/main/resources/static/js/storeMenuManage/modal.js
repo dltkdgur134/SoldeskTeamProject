@@ -31,39 +31,6 @@ export function openEditMenuModal(menuId) {
 	
 	fillEditOptions(menu);
 	
-	
-
-/*	const container = document.getElementById("edit-option-container");
-	container.innerHTML = "";
-	editOptionCount.value = 0;
-
-	for (let i = 1; i <= 3; i++) {
-		const nameKey = `menuOptions${i}`;
-		const priceKey = `menuOptions${i}Price`;
-
-		if (menu[nameKey] && menu[priceKey]) {
-			const names = Array.isArray(menu[nameKey]) ? menu[nameKey] : menu[nameKey].split("온달");
-			const prices = Array.isArray(menu[priceKey]) ? menu[priceKey] : menu[priceKey].split("온달");
-
-			for (let j = 0; j < names.length; j++) {
-				if (names[j].trim() === "") continue;
-
-				editOptionCount.value++;
-
-				const div = document.createElement("div");
-				div.className = "option-group";
-				div.innerHTML = `
-					<label>옵션 ${editOptionCount.value}</label><br>
-					<input type="text" name="menuOptions${editOptionCount.value}[]" value="${names[j].trim()}" required />
-					<input type="number" name="menuOptions${editOptionCount.value}Price[]" value="${String(prices[j]).trim() || 0}" required />
-					<button type="button" onclick="removeOption(this)">삭제</button>
-				`;
-
-				container.appendChild(div);
-			}
-		}
-	}  */
-
 	document.getElementById('editMenuModal').style.display = 'flex';
 	document.getElementById('deleteMenuId').value = menu.menuId;
 	const addBtn = document.getElementById("edit-add-option-btn");

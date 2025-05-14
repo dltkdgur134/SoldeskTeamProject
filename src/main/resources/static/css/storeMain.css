@@ -55,17 +55,38 @@
 
 .menu-list {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 	gap: 15px;
 	padding: 20px;
 }
 
 .menu-card {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 10px;
+	gap: 10px;
 	background: white;
 	border-radius: 10px;
 	overflow: hidden;
 	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 	cursor: pointer;
+}
+
+.menu-card .image-wrapper {
+	flex-shrink: 0;
+	width: 100px;
+	height: 100px;
+}
+.menu-card .image-wrapper img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 10px;
+}
+.menu-card .menu-info {
+	flex: 1;
+	padding: 0;
 }
 
 .menu-card img {
@@ -74,8 +95,61 @@
 	object-fit: cover;
 }
 
+.menu-card.sold-out {
+	position: relative;
+	cursor: not-allowed;
+}
+
+.menu-card.sold-out .image-wrapper img, 
+.menu-card.sold-out .menu-info {
+	filter: grayscale(100%);
+	opacity: 0.6;
+}
+
+.menu-card.sold-out .image-wrapper::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url('/img/menu/soldout_overlay.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	pointer-events: none;
+	z-index: 2;
+}
+
 .menu-info {
 	padding: 10px;
+}
+
+.menu-info .h3, h3 {
+	font-size: 1.2rem;
+}
+
+.menu-category-group {
+	margin-bottom: 30px;
+}
+
+#menu-image {
+	border-radius: 5px;
+}
+
+#menu-name {
+	margin: 10px;
+}
+
+#menu-description {
+	color: gray;
+}
+
+.category-title {
+	font-size: 18px;
+	font-weight: bold;
+	margin: 10px 0 0 5px;
+	color: #333;
 }
 
 .soldout {

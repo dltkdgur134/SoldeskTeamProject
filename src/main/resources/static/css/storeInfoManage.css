@@ -67,7 +67,7 @@
 
 .address-search-wrapper {
 	display: flex;
-	width: 300px; /* ✅ 다른 input들과 똑같이 맞춤 */
+	width: 300px;
 	gap: 8px;
 	align-items: center;
 }
@@ -109,9 +109,9 @@
 
 .holiday-checkboxes {
 	display: flex;
-	flex-direction: column; /* 요일을 세로로 배치 */
+	flex-direction: column;
 	flex-wrap: wrap;
-	height: 160px; /* 높이를 주면 2열로 넘길 수 있음, 안주면 세로로 쭉 */
+	height: 160px;
 	padding: 15px;
 	border: 1px solid #ccc;
 	border-radius: 8px;
@@ -185,7 +185,7 @@
 }
 
 .form-group label {
-	width: 150px; /* 제목 너비 고정 */
+	width: 150px;
 	font-weight: bold;
 	color: #333;
 	text-align: right;
@@ -245,7 +245,7 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	max-width: 250px; /* ✅ 텍스트가 1줄만 나오게 */
+	max-width: 250px;
 	display: inline-block;
 }
 
@@ -262,14 +262,13 @@
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	cursor: pointer;
-	font-size: revert;
 	font-weight: bold;
 	transition: background-color 0.2s;
+	font-size: revert;
 }
 
 .custom-file-btn:hover {
 	background-color: #ccc;
 }
-
 
 
