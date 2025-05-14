@@ -17,8 +17,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.soldesk6F.ondal.config.SecurityConfig;
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
 import com.soldesk6F.ondal.owner.order.OrderService;
+import com.soldesk6F.ondal.user.controller.user.DeleteUserController;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
@@ -32,6 +35,7 @@ import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
+import com.soldesk6F.ondal.useract.payment.dto.TossRefundResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
@@ -55,6 +59,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final SecurityConfig securityConfig;
+
+    private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
+
+    private final DeleteUserController deleteUserController;
+
 	private final CartRepository cartRepository;
 	private final CartItemsRepository cartItemsRepository;
 	private final OrderRepository orderRepository;
@@ -66,6 +76,9 @@ public class PaymentService {
 	
 	@Value("${toss.secret-key}")
     private String tossSecretKey;
+
+
+ 
 	
 
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
@@ -279,10 +292,10 @@ public class PaymentService {
 	       		break;
 	       	case "READY":
 	       	case "IN_PROGRESS":
-	       		payment.setPaymentStatus(PaymentStatus.CANCELLED);
+	       		payment.setPaymentStatus(PaymentStatus.CANCELED);
 	       		break;
 	        default:
-	        	payment.setPaymentStatus(PaymentStatus.CANCELLED);
+	        	payment.setPaymentStatus(PaymentStatus.CANCELED);
 	        	break;
 	       	}
 	       	
@@ -323,7 +336,33 @@ public class PaymentService {
 	    RestTemplate restTemplate = new RestTemplate();
 
 	    ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-
+	    ObjectMapper om = new ObjectMapper();
+        om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        TossRefundResponse tossRefundResponse;
+		try {
+			tossRefundResponse = om.readValue(response.getBody(),TossRefundResponse.class);
+			switch(tossRefundResponse.getStatus()) {
+			case "COMPLETED":
+				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.COMPLETED);
+				break;
+			case "PENDING":
+				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.WAITING_FOR_REFUND);
+				break;
+			case "CANCELED":
+				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.REFUNDED);
+			default:
+				System.out.println("여기서 걸림");
+				break;
+			}
+			
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+        
+	    
+	    
 	    System.out.println("환불 응답: " + response.getBody());
 	    
 	    

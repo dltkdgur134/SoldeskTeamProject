@@ -12,23 +12,22 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/favorites")
 public class FavoritesController {
 
 	private final FavoritesService favoritesService;
 	
 	
-	@GetMapping("/showFavorites")
+	@GetMapping("/favorites")
 	public String showFavorites(Model model) {
 		
 		
 		
+		model.addAttribute("favoriteStores");
 		
 		
 		
 		
-		
-		return null;
+		return "/content/favorites";
 		
 	}
 	

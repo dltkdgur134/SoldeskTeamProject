@@ -100,7 +100,7 @@ public class Payment {
 
 	public enum PaymentStatus {
 		COMPLETED("결제 완료"),
-		CANCELLED("결제 취소"),
+		CANCELED("결제 취소"),
 		WAITING_FOR_REFUND("환불 대기"),
 		REFUNDED("환불 완료");
 
