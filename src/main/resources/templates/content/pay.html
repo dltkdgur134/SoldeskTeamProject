@@ -204,7 +204,10 @@
             <input class="form-check-input" type="checkbox" id="allAgree" onclick="toggleAll(this)"/>
             <label class="form-check-label fw-bold" for="allAgree">모든 항목 동의</label>
           </div>
-
+		  <div id="paySelect" class="d-flex justify-content-center align-items-center gap-3 mb-4">
+		    <img src="/css/imgs/o-pay.png" class="img-fluid" style="max-width: 120px; width: 35%; height: auto;" alt="opay">
+		    <img src="/css/imgs/toss.png" class="img-fluid" style="max-width: 120px; width: 35%; height: auto;" alt="toss">
+		  </div>
 		  <div class="price-line mb-1">
 		    <span>상품 합계</span>
 		    <span id="subtotal" th:text="|₩${#numbers.formatInteger(totalPrice, 3, 'COMMA')}|"></span>
