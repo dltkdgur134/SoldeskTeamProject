@@ -43,7 +43,7 @@ public class Payment {
 	private User user;
 
 	@OneToOne
-	@JoinColumn(name = "order_id", unique = true)
+	@JoinColumn(name = "order_id", unique = true, nullable = true)
 	private Order order;
 
 	@Column(name = "payment_key", length = 200, nullable = false, unique = true)
@@ -150,3 +150,4 @@ public class Payment {
 	}
 
 }
+

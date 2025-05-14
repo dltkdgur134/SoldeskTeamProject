@@ -24,11 +24,11 @@ public class FavoritesService {
 		if(SecurityContextHolder.getContext().getAuthentication() instanceof CustomUserDetails instanceCud) {
 			cud = instanceCud;
 		}
-		favoritesRepository.findByUser_UserUuid(cud.getUser());
+//		favoritesRepository.findByUser_UserUuid(cud.getUser());
 		
 		
 		
-		
+		return null;
 	}
 	
 	

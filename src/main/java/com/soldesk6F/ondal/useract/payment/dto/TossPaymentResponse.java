@@ -30,8 +30,5 @@ public class TossPaymentResponse {
     	private String reqStore;
     	
     }
-    
-    
-    
-    
+
 }

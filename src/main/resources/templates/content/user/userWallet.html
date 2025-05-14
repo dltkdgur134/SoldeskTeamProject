@@ -6,11 +6,13 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
 <head>
 	<link th:href="@{/css/Custom.css}" rel="stylesheet" />
 	<link th:href="@{/css/update.css}" rel="stylesheet" />
-	<script th:src="@{/js/zipcode.js}"></script>
-	<script th:src="@{/js/initialize.js}"></script>
-	<script th:src="@{/js/register.js}"></script>
+	<script th:src="@{/js/ondalPay.js}"></script>
+	<script src="https://js.tosspayments.com/v1"></script>
 </head>
 <div layout:fragment="content" class="container py-5">
+<div th:if="${success}" class="alert alert-success"
+		th:text="${success}"></div>
+	<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
   <div class="card info-card p-4">
     <h3 class="mb-4">온달 지갑</h3>
 
@@ -20,20 +22,50 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
       <div class="form-control-plaintext fw-bold fs-5 text-primary">
         <span th:text="${#numbers.formatInteger(ondalWallet, 0, 'COMMA')}"></span> 원
       </div>
+      <!-- 결제 모달 트리거 버튼 -->
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+				data-bs-target="#chargeModal">온달 지갑 충전</button>
+		</div>
+		<!-- 모달 -->
+		<div class="modal fade" id="chargeModal" tabindex="-1"
+			aria-labelledby="chargeModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="chargeModalLabel">온달 지갑 충전</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form id="chargeForm">
+							<div class="mb-3">
+								<label for="amount" class="form-label">충전 금액</label> <input
+									type="number" class="form-control" id="amount" name="amount"
+									placeholder="충전할 금액을 입력하세요" required>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" id="chargeButton">결제</button>
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">취소</button>
+					</div>
+				</div>
+			</div>
     </div>
 
     <!-- 구매 폼 -->
     <form th:action="@{/user/goToPoints}" method="post" id="goToPoints">
       <div class="mb-3">
         <div class="form-text text-danger">
-          온달 지갑은 라이더 지갑과 점주 지갑의 합본입니다. 온달 지갑에서 포인트를 구매하세요!
+          온달 지갑을 충전하세요!
         </div>
       </div>
       <div class="mb-3">
         <label for="Password" class="form-label">비밀번호</label>
         <input type="password" class="form-control" id="Password" name="Password">
       </div>
-      <button type="submit" class="btn btn-primary">쿠폰 구매하러 가기</button>
+      <button type="submit" class="btn btn-primary">온달 페이</button>
     </form>
   </div>
 </div>
