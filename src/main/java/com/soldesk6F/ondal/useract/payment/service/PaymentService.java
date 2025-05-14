@@ -26,6 +26,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
@@ -242,22 +243,8 @@ public class PaymentService {
 	        
 	        
 	        
-	        order = Order.builder()
-	        	    .store(cart.getStore())
-	        	    .user(cart.getUser())
-	        	    .totalPrice(tossResponse.getTotalAmount())
-	        	    .storeRequest(tossResponse.getMetadata().getReqStore())
-	        	    .deliveryRequest(tossResponse.getMetadata().getReqDel())
-	        	    .orderDetails(orderDetailList)
-	        	    .deliveryAddress(user.getUserSelectedAddress().getAddress())
-	        	    .deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
-	        	    .deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
-	        	    .build();
-	       for(OrderDetail od : order.getOrderDetails()) {
-	    	   od.setOrder(order);
-	       }     		
+
 	       	Payment payment = new Payment();
-	       	payment.setOrder(order);
 	       	payment.setAmount(tossResponse.getTotalAmount());
 	       	payment.setPaymentKey(tossResponse.getPaymentKey());
 	       	payment.setTossOrderId(tossResponse.getOrderId());
@@ -277,6 +264,18 @@ public class PaymentService {
 	       	switch(tossResponse.getStatus()) {
 	       	case "DONE":
 	       		payment.setPaymentStatus(PaymentStatus.COMPLETED);
+		        order = Order.builder()
+		        	    .store(cart.getStore())
+		        	    .user(cart.getUser())
+		        	    .totalPrice(tossResponse.getTotalAmount())
+		        	    .storeRequest(tossResponse.getMetadata().getReqStore())
+		        	    .deliveryRequest(tossResponse.getMetadata().getReqDel())
+		        	    .orderDetails(orderDetailList)
+		        	    .deliveryAddress(user.getUserSelectedAddress().getAddress())
+		        	    .deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
+		        	    .deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
+		        	    .orderToOwner(OrderToOwner.PENDING)
+		        	    .build();
 	       		break;
 	       	case "READY":
 	       	case "IN_PROGRESS":
@@ -287,10 +286,14 @@ public class PaymentService {
 	        	break;
 	       	}
 	       	
+	       	for(OrderDetail od : order.getOrderDetails()) {
+	       		od.setOrder(order);
+	       	}     		
+	       	payment.setOrder(order);
 	       	orderRepository.save(order);
+	       	paymentRepository.save(payment);
 	       	cartItemsRepository.deleteByCart_cartId(cartUUID);
 	        cartRepository.deleteById(cartUUID);
-	        paymentRepository.save(payment);
 	        
 	        return true;
 	    } catch (HttpClientErrorException e) {
