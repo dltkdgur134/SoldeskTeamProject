@@ -1,5 +1,20 @@
 package com.soldesk6F.ondal.useract.favorites.repository;
 
-public interface FavoritesRepository {
+import java.util.Optional;
+import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.soldesk6F.ondal.useract.favorites.entity.Favorites;
+
+public interface FavoritesRepository extends JpaRepository<Favorites, UUID> {
+
+	
+	
+	Optional<Favorites> findByUser_UserUuid(UUID userUUID);
+	
+	
+	
+	
+	
 }

@@ -66,7 +66,7 @@
 			<div class="order-summary" th:if="${not #lists.isEmpty(cartItems)}">
 				<p th:text="'결제금액: ' + ${totalPrice} + '원'"></p>
 				<form id="orderForm" th:action="@{/store/pay}" method="post">
-					<input type="hidden" name="cartId" th:value="${cart.cartId}" />
+					<input type="hidden" name="cartUUID" th:value="${cart.cartId}" />
 					<button type="submit">주문하기</button>
 				</form>
 			</div>

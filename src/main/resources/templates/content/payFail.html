@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<script th:src="@{/js/index.js}"></script>
+	<link th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<style>
+
+	  .payment-fail-card {
+	    max-width: 360px;
+	    margin: 80px auto;
+	    padding: 40px 20px;
+	    border-radius: 12px;
+	    background-color: #fff;
+	    text-align: center;
+	    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+	  }
+	  .payment-fail-title {
+	    font-weight: 700;
+	    font-size: 1.75rem;
+	    margin-top: 28px;
+	    margin-bottom: 12px;
+	  }
+	  .payment-fail-reason {
+	    color: #e74c3c; /* 빨간색 */
+	    font-weight: 600;
+	    margin-top: 10px;
+	    margin-bottom: 24px;
+	  }
+	  .payment-btn {
+	    width: 100%;
+	    font-size: 1.05rem;
+	    font-weight: 700;
+	    padding: 12px 0;
+	    border-radius: 40px;
+	  }
+	  .circle-image-wrapper {
+	    width: 160px;
+	    height: 160px;
+	    border-radius: 50%;
+	    overflow: hidden;
+	    background-color: #f8f8f8;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+		border: solid black 2px;
+	  }
+	  .circle-image-wrapper img {
+	    width: 100%;
+	    height: 100%;
+	    object-fit: cover; /* 꽉 채우기 */
+	  }
+	</style>
+</head>
+
+<div layout:fragment="content" class="payment-fail-card">
+
+	<div class="circle-image-wrapper mx-auto mb-3">
+	  <img
+	    th:src="@{/css/imgs/cryingCharacter.png}"
+	    alt="결제 실패 캐릭터"
+	    class="img-fluid"
+	  />
+	</div>
+
+  <div class="payment-fail-title">결제실패</div>
+
+  <p class="mb-1">죄송합니다.<br />주문하신 내역의 결제가 실패하였습니다.</p>
+  <p class="mb-0">확인 후 다시 시도하시거나<br />고객센터로 연락주십시오.</p>
+
+  <div class="payment-fail-reason" th:text="|사유:${message}|">
+  </div>
+
+  <div class="d-grid gap-2">
+    <button type="button" class="btn btn-dark payment-btn">
+      결제 다시하기
+    </button>
+    <button type="button" class="btn btn-outline-dark payment-btn">
+      문의하러가기
+    </button>
+  </div>
+</div>
+
+
+
+</html>	

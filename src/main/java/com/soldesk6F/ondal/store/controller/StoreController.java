@@ -34,6 +34,11 @@ public class StoreController {
         return storeService.getStoresByCategory(category);
     }
     
+    @GetMapping("/store/register")
+    public String showStoreRegisterForm() {
+    	return "content/store/submit";
+    }
+    
     @PostMapping("/store/register")
     public String registerStore(@ModelAttribute StoreRegisterDto dto,
                                 @AuthenticationPrincipal CustomUserDetails userDetails,

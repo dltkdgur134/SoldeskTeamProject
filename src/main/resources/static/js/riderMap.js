@@ -216,7 +216,7 @@ document.addEventListener("click", async (e) => {
 			const order = await orderResponse.json();
 			/*aa8f8d7334d919ea0276dfc23dd37cc5*/
 			/*6a82e6474b08332bbf4be73f53d5c0bb*/
-			const REST_API_KEY = 'aa8f8d7334d919ea0276dfc23dd37cc5';
+			const REST_API_KEY = 'aa8f8d7334d919ea0276dfc23dd37cc5	';
 			const url = 'https://apis-navi.kakaomobility.com/v1/directions';
 
 

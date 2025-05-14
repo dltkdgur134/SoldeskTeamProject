@@ -72,10 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				});
 				if (!res.ok) throw new Error(`서버 오류 (${res.status})`);
 
-				const contentType = res.headers.get('content-type') || '';
-				const data = contentType.includes('application/json') ? await res.json() : { message: '옵션 저장 완료' };
+				/*const contentType = res.headers.get('content-type') || '';*/
+				/*const data = contentType.includes('application/json') ? await res.json() : { message: '옵션 저장 완료' };*/
 
-				alert(data.message);
+				/*alert(data.message);*/
 				setTimeout(() => location.reload(), 300);
 			} catch (err) {
 				console.error('❌ 옵션 저장 에러:', err);

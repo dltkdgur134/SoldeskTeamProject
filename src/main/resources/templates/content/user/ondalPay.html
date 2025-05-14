@@ -12,16 +12,16 @@
 <link th:href="@{/css/user/ondalPay.css}" rel="stylesheet" />
 </head>
 <div layout:fragment="content" class="container py-5">
-<div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+	<div th:if="${success}" class="alert alert-success"
+		th:text="${success}"></div>
+	<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 	<div class="card info-card p-4">
 		<h3 class="mb-4">온달 지갑</h3>
 		<!-- 현재 잔액 -->
 		<div class="mb-3">
 			<label class="form-label">현재 잔액</label>
 			<div class="form-control-plaintext fw-bold fs-5 text-primary">
-				<span
-					th:text="${#numbers.formatInteger(ondalWallet, 0, 'COMMA')}"></span>
+				<span th:text="${#numbers.formatInteger(ondalWallet, 0, 'COMMA')}"></span>
 				원
 			</div>
 		</div>
@@ -30,8 +30,7 @@
 		<div class="mb-3">
 			<label class="form-label">현재 잔액</label>
 			<div class="form-control-plaintext fw-bold fs-5 text-primary">
-				<span
-					th:text="${#numbers.formatInteger(ondalPay, 0, 'COMMA')}"></span>
+				<span th:text="${#numbers.formatInteger(ondalPay, 0, 'COMMA')}"></span>
 				원
 			</div>
 		</div>

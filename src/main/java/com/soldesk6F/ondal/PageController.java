@@ -15,6 +15,8 @@ import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -85,9 +87,19 @@ public class PageController {
 	    
 	    model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	    model.addAttribute("ondalPay", freshUser.getOndalPay());
-	    model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress()); // 실시간 주소
 
 	    return "content/user/ondalPay";
+	}
+	// 온달 페이 이동
+	@GetMapping("/userWallet")
+	public String goUserWallet(@AuthenticationPrincipal CustomUserDetails userDetails, Model model
+			) {
+		UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
+		User freshUser = userRepository.findById(userUuid).orElseThrow();
+		
+		model.addAttribute("ondalWallet", freshUser.getOndalWallet());
+		
+		return "content/user/UserWallet";
 	}
 	
 	
