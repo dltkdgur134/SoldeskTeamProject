@@ -96,8 +96,7 @@
 				    				<br>
 					    			<th:block th:each="reviewImg : ${reviewImgMap[review.reviewId]}"> 
 					    				<a href="#" role="button" data-bs-toggle="modal" th:attr="data-bs-target=${'#imageModal' + reviewStat.count}"><img 
-					    				class="img-thumbnail review-img-preview" th:src="${'/img/review/'+ reviewImg.reviewImg}" 
-					    				style="width: 30%;"/></a> 
+					    				class="img-thumbnail review-img-preview" th:src="${'/img/review/'+ reviewImg.reviewImg}"/></a> 
 					    			</th:block>
 				    				<br>
 				    				<th:block th:each="orderDetails : ${review.order.orderDetails}">
