@@ -109,9 +109,9 @@ public class UpdateUserController {
 	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 	        
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
-	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
+	        model.addAttribute("userUUID", freshUser.getUserUuidAsString());
 	        
-			return "/content/user/userWallet";
+			return "redirect:/userWallet";
 	    }
 
 		return "redirect:/myPage";
@@ -153,9 +153,9 @@ public class UpdateUserController {
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	        model.addAttribute("ondalPay", freshUser.getOndalPay());
 	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
-			return "/content/user/ondalPay";
+			return "redirect:/ondalPay";
 	    }
-		return "/content/user/userWallet";
+		return "redirect:/userWallet";
 	}
 	
 	

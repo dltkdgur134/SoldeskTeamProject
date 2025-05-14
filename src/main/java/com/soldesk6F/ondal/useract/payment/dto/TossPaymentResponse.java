@@ -13,6 +13,8 @@ public class TossPaymentResponse {
     private String paymentKey;
     private String orderId;
     private String status;
+    private String approvedAt;
+    private String method;
     private int totalAmount;
 
     @JsonProperty("metadata") // JSON 키 이름과 변수 이름이 다를 경우 지정
@@ -24,8 +26,5 @@ public class TossPaymentResponse {
     	private String reqStore;
     	
     }
-    
-    
-    
-    
+
 }
