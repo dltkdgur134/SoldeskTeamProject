@@ -7,16 +7,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+import com.soldesk6F.ondal.useract.payment.dto.PaymentHistoryDTO;
+import com.soldesk6F.ondal.useract.payment.service.PaymentHistoryService;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -102,6 +102,32 @@ public class PageController {
 		return "content/user/UserWallet";
 	}
 	
-	
+	private final PaymentHistoryService paymentHistoryService;
+	// 온달 지갑 충전 결제 내역
+	@GetMapping("/userPayHistory")
+	public String getUserPayHistoryPage(
+	    @AuthenticationPrincipal CustomUserDetails userDetails,
+	    @RequestParam(name = "status" ,required = false, defaultValue = "ALL") String status,
+	    @RequestParam(name = "days" ,required = false) Integer days,
+	    @RequestParam(name = "usage",required = false) String usage,
+	    Model model) {
+
+	    // status, days, usage 값 로그 찍기 확인
+	    System.out.println("status = " + status + ", days = " + days + ", usage = " + usage);
+
+	    String userUUID = userDetails.getUser().getUserUuidAsString();
+
+	    List<PaymentHistoryDTO> filteredList = paymentHistoryService.getFilteredPaymentHistory(userUUID, status, usage, days);
+
+	    model.addAttribute("payHistoryList", filteredList);
+
+	    // 뷰에 필터 현재 상태도 넘겨줘야 클라이언트에서 필터 버튼 상태 유지 가능
+	    model.addAttribute("currentStatus", status);
+	    model.addAttribute("currentDays", days);
+	    model.addAttribute("currentUsage", usage);
+
+	    return "content/user/userPayHistory";  // JSP나 Thymeleaf 뷰 이름
+	}
+
 	
 }

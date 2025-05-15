@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+    <link th:href="@{/css/Custom.css}" rel="stylesheet" />
+    <link th:href="@{/css/user/UserPayHistory.css}" rel="stylesheet" />
+    <script th:src="@{/js/payHistoryFilter.js}"></script> <!-- 필터 JS -->
+</head>
+<div layout:fragment="content" class="container py-5">
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="card info-card p-4">
+        <h4 class="mb-3">결제 내역</h4>
+
+        <!-- 필터 버튼 -->
+        <div class="filter-btn-group">
+            <button class="btn btn-outline-primary" onclick="filterByStatus('ALL')">전체</button>
+            <button class="btn btn-outline-success" onclick="filterByStatus('COMPLETED')">완료</button>
+            <button class="btn btn-outline-danger" onclick="filterByStatus('CANCELED')">결제 취소</button>
+            <button class="btn btn-outline-warning" onclick="filterByStatus('REFUNDED')">환불</button>
+            <button class="btn btn-outline-secondary" onclick="filterByDays(30)">최근 30일</button>
+            <button class="btn btn-outline-secondary" onclick="filterByDays(90)">최근 90일</button>
+            <button class="btn btn-outline-info" onclick="filterByUsage('ONDAL_WALLET')">온달 지갑 충전 내역</button>
+            <button class="btn btn-outline-dark" onclick="filterByUsage('ORDER_PAYMENT')">주문 결제 내역 </button>
+            <a id="excelDownloadBtn" class="btn btn-outline-dark float-end" href="#">엑셀 다운로드</a>
+        </div>
+
+        <!-- 결제 내역 테이블 -->
+        <table class="table table-bordered text-center" id="payHistoryTable">
+            <thead class="thead-light">
+                <tr>
+                    <th>결제 수단</th>
+                    <th>금액</th>
+                    <th>요청 시각</th>
+                    <th>승인 시각</th>
+                    <th>상태</th>
+                    <th>용도</th>
+                    <th>환불 사유</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="payment : ${payHistoryList}"
+                    th:data-status="${payment.paymentStatus}"
+                    th:data-usage="${payment.paymentUsageType != null ? payment.paymentUsageType.name() : 'UNKNOWN'}"
+                    th:data-requested="${payment.requestedAt}">
+                    <td th:text="${payment.paymentMethod}">CARD</td>
+                    <td th:text="${#numbers.formatInteger(payment.amount, 3, 'COMMA') + '원'}">10,000원</td>
+                    <td th:text="${#temporals.format(payment.requestedAt, 'yyyy-MM-dd HH:mm')}">2025-05-14 13:00</td>
+                    <td th:text="${payment.approvedAt != null ? #temporals.format(payment.approvedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                    <td th:text="${payment.paymentStatus}">COMPLETED</td>
+                    <td th:text="${payment.paymentUsageType != null ? payment.paymentUsageType.description : '-'}">온달 지갑 충전</td>
+    				<td>
+  						<span th:if="${payment.refundReason != null}" th:text="${payment.refundReason}"></span>
+					
+  					<div th:if="${payment.refundReason == null and payment.paymentStatus.name() == 'COMPLETED'}" >
+				    <div th:switch="${payment.paymentUsageType.name()}">
+				      
+				      <!-- 온달 지갑 충전일 때 -->
+				      <form th:case="'ONDAL_WALLET'" th:action="@{/user/refund}" method="post" style="display:inline;">
+				        <input type="hidden" name="paymentKey" th:value="${payment.paymentKey}" />
+				        <select name="refundReason" required>
+				          <option value="">-- 환불 사유 선택 --</option>
+				          <option value="사용자 요청">사용자 요청</option>
+				          <option value="오류 결제">오류 결제</option>
+				          <option value="이중 결제">이중 결제</option>
+				          <option value="서비스 불만족">서비스 불만족</option>
+				          <option value="기타">기타</option>
+        				</select>
+				        <button type="submit" class="refund-btn">환불</button>
+				      </form>
+				      
+				      <!-- 주문 결제일 때 -->
+				      <div th:case="'ORDER_PAYMENT'">
+				        <a th:href="@{/contact}" class="contact-btn">문의하기</a>
+				      </div>
+				    </div>
+				  </div>
+				</td>
+                </tr>
+                <tr th:if="${payHistoryList.empty}">
+                    <td colspan="8">결제 내역이 없습니다.</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-top: 10px; font-size: 14px; color: #555;">
+  		주문 결제는 즉시 환불이 불가하여 문의 부탁드립니다.
+		</div>
+    </div>
+   <script th:inline="javascript">
+    var currentStatus = /*[[${currentStatus}]]*/"-";
+    var currentDays = /*[[${currentDays}]]*/0;
+    var currentUsage = /*[[${currentUsage}]]*/"-";
+</script>
+</div>
+
+</html>

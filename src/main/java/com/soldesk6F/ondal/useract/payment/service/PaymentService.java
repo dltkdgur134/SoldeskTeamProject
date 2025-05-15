@@ -1,7 +1,9 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -49,13 +51,13 @@ import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
+import com.soldesk6F.ondal.useract.payment.dto.PaymentHistoryDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.TossRefundResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
-import com.soldesk6F.ondal.useract.payment.entity.PaymentFailLog;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentFailLogRepository;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 
@@ -259,9 +261,25 @@ public class PaymentService {
 			payment.setPaymentKey(tossResponse.getPaymentKey());
 			payment.setTossOrderId(tossResponse.getOrderId());
 			payment.setUser(user);
-			payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
-			payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
 			payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
+			// 요청 시각 (OffsetDateTime, 예: 2025-05-15T01:10:16Z)
+			OffsetDateTime requestedAt = tossResponse.getRequestedAt();
+
+			// UTC 기준 시간을 서울 시간으로 변환
+			ZonedDateTime seoulRequestedAt = requestedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
+			// 엔티티에 저장할 때 LocalDateTime으로 변환 (서울 시간 기준)
+			payment.setRequestedAt(seoulRequestedAt.toLocalDateTime());
+
+			// 승인 시각도 동일하게 처리
+			OffsetDateTime approvedAt = tossResponse.getApprovedAt();
+			if (approvedAt != null) {
+			    ZonedDateTime seoulApprovedAt = approvedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
+			    payment.setApprovedAt(seoulApprovedAt.toLocalDateTime());
+			}
+
+			
+			
 			switch (tossResponse.getMethod()) {
 			case "카드":
 				payment.setPaymentMethod(PaymentMethod.CREDIT);
@@ -360,8 +378,22 @@ public class PaymentService {
 	                .refundReason(null)
 	                .build();
 
-	        payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
-	        payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
+	     // 요청 시각 (OffsetDateTime, 예: 2025-05-15T01:10:16Z)
+	        OffsetDateTime requestedAt = tossResponse.getRequestedAt();
+
+	        // UTC 기준 시간을 서울 시간으로 변환
+	        ZonedDateTime seoulRequestedAt = requestedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
+
+	        // 엔티티에 저장할 때 LocalDateTime으로 변환 (서울 시간 기준)
+	        payment.setRequestedAt(seoulRequestedAt.toLocalDateTime());
+
+	        // 승인 시각도 동일하게 처리
+	        OffsetDateTime approvedAt = tossResponse.getApprovedAt();
+	        if (approvedAt != null) {
+	            ZonedDateTime seoulApprovedAt = approvedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
+	            payment.setApprovedAt(seoulApprovedAt.toLocalDateTime());
+	        }
+
 
 	        // 결제 방식에 따라 설정
 	        switch (tossResponse.getStatus()) {
@@ -417,13 +449,24 @@ public class PaymentService {
 	
 	
 	@Transactional
-	public void refundTossPayment(String paymentKey, String cancelReason) {
+	public void refundTossPayment(String paymentKey, String cancelReason, UUID userUuid) {
+	    Payment payment = paymentRepository.findByPaymentKey(paymentKey)
+	        .orElseThrow(() -> new IllegalArgumentException("해당 결제 정보를 찾을 수 없습니다."));
+
+	    // 온달 지갑 환불 시 잔액 체크 (환불 요청 전)
+	    if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
+	        User user = userRepository.findByUserUuid(userUuid)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+	        int newBalance = user.getOndalWallet() - payment.getAmount();
+	        if (newBalance < 0) throw new IllegalStateException("잔액 부족하여 환불을 진행할 수 없습니다.");
+	    }
+
 	    String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
 
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.APPLICATION_JSON);
-	    String secretKey = tossSecretKey;
-	    String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+	    String encodedAuth = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
 	    headers.set("Authorization", "Basic " + encodedAuth);
 
 	    Map<String, String> body = new HashMap<>();
@@ -433,38 +476,54 @@ public class PaymentService {
 	    RestTemplate restTemplate = new RestTemplate();
 
 	    ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
 	    ObjectMapper om = new ObjectMapper();
-        om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        TossRefundResponse tossRefundResponse;
-		try {
-			tossRefundResponse = om.readValue(response.getBody(),TossRefundResponse.class);
-			switch(tossRefundResponse.getStatus()) {
-			case "COMPLETED":
-				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.COMPLETED);
-				break;
-			case "PENDING":
-				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.WAITING_FOR_REFUND);
-				break;
-			case "CANCELED":
-				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.REFUNDED);
-			default:
-				System.out.println("여기서 걸림");
-				break;
-			}
-			
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-        
-	    
-	    
+	    om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	    try {
+	        TossRefundResponse tossRefundResponse = om.readValue(response.getBody(), TossRefundResponse.class);
+
+	        // 환불 사유 저장
+	        payment.setRefundReason(cancelReason);
+
+	        switch (tossRefundResponse.getStatus()) {
+	            case "COMPLETED":
+	                payment.setPaymentStatus(Payment.PaymentStatus.COMPLETED);
+	                break;
+
+	            case "PENDING":
+	                payment.setPaymentStatus(Payment.PaymentStatus.WAITING_FOR_REFUND);
+	                break;
+
+	            case "CANCELED":
+	                payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
+
+	                // 온달 지갑 환불 차감 처리
+	                if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
+	                    User user = userRepository.findByUserUuid(userUuid)
+	                        .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+	                    int newBalance = user.getOndalWallet() - payment.getAmount();
+	                    user.setOndalWallet(newBalance);
+	                    userRepository.save(user); // 변경 사항 저장
+	                }
+	                break;
+
+	            default:
+	                System.out.println("알 수 없는 상태: " + tossRefundResponse.getStatus());
+	                break;
+	        }
+
+	        paymentRepository.save(payment); // 상태 및 환불 사유 저장
+
+	    } catch (JsonProcessingException e) {
+	        throw new RuntimeException("환불 응답 파싱 오류", e);
+	    }
+
 	    System.out.println("환불 응답: " + response.getBody());
-	    
-	    
-	}	
+	}
+
+
+
 	
-	
-	    
 }
