@@ -43,10 +43,10 @@ public class Payment {
 	private User user;
 
 	@OneToOne
-	@JoinColumn(name = "order_id", unique = true)
+	@JoinColumn(name = "order_id", unique = true, nullable = true)
 	private Order order;
 
-	@Column(name = "payment_key", length = 200, nullable = false, unique = true)
+	@Column(name = "payment_key", length = 200, nullable = true)
 	private String paymentKey; // Toss paymentKey
 
 	@Column(name = "toss_order_id", length = 64, nullable = false)
@@ -85,7 +85,7 @@ public class Payment {
 	private PaymentUsageType paymentUsageType;
 
 	public enum PaymentMethod {
-		CASH("현금"), CREDIT("카드");
+		CASH("현금"), CREDIT("카드"),ONDALPAY("온달페이");
 
 		private final String description;
 
@@ -100,7 +100,7 @@ public class Payment {
 
 	public enum PaymentStatus {
 		COMPLETED("결제 완료"),
-		CANCELLED("결제 취소"),
+		CANCELED("결제 취소"),
 		WAITING_FOR_REFUND("환불 대기"),
 		REFUNDED("환불 완료");
 
@@ -116,7 +116,7 @@ public class Payment {
 	}
 
 	public enum PaymentUsageType {
-		ORDER_PAYMENT("주문 결재"), // 배달 주문 결제용
+		ORDER_PAYMENT("주문 결제"), // 배달 주문 결제용
 		ONDAL_WALLET("온달 지갑 충전"); // 온달 지갑 충전용
 
 		private final String description;
@@ -150,3 +150,4 @@ public class Payment {
 	}
 
 }
+

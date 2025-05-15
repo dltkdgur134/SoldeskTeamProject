@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
@@ -18,6 +20,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.service.CartService;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
+import com.soldesk6F.ondal.useract.payment.service.PaymentFailLogService;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class StorePayController {
 
 	private final CartService cartService;
 	private final PaymentService paymentService;
+	private final PaymentFailLogService paymentFailLogService;
 	
 
 	@PostMapping("/store/pay")
@@ -67,8 +71,18 @@ public class StorePayController {
 	}
 
 	@GetMapping("/store/payFail")
-	public String showPaySuccessPage(@RequestParam("code") String code,@RequestParam("message") String message,
+	public String showPaySuccessPage(
+			@RequestParam("orderId") String orderId,
+			@RequestParam("code") String code,
+			@RequestParam("message") String message,
+			@RequestParam(value = "paymentKey", required = false) String paymentKey,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
 		   Model model) {
+		
+		String userUUIDString = userDetails.getUser().getUserUuidAsString();
+		UUID userUUID = UUID.fromString(userUUIDString);
+		
+		paymentFailLogService.logOrderPaymentFailure(paymentKey, orderId, code, message, userUUID);
 		model.addAttribute("code" , code);
 		model.addAttribute("message" , message);
 		
@@ -77,14 +91,6 @@ public class StorePayController {
 
 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	private String validateCartItems(Cart cart, RedirectAttributes redirectAttributes) {
@@ -140,6 +146,8 @@ public class StorePayController {
 			}
 		}
 	}
+	
+	
 
 	
 	

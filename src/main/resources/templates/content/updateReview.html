@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/update.css}" rel="stylesheet" />
+	<link th:href="@{/css/review.css}" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<script th:src="@{/js/initialize.js}"></script>
+	<script th:src="@{/js/review.js}" defer></script>
+</head>
+
+<div layout:fragment="content" class="container py-5">
+	<div class="container text-center">
+		<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+			<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+		<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+			<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+	</div>
+	<div class="card info-card p-4">
+		<div class="container d-flex justify-content-center">
+			<h4 class="card-title">
+				리뷰 수정
+			</h4>
+		</div>
+		<form class="p-3" name="updateReviewForm" id="updateReviewForm" th:action="@{/content/updateReview}" enctype="multipart/form-data" onsubmit="return checkReview();" method="POST" autocomplete="off">
+			<div class="container d-flex justify-content-center">
+				<h2 th:text="${review.store.storeName}"></h2>
+			</div>
+			<input type="text" class="form-control" name="reviewId" placeholder="Review ID" id="review-id" th:value="${review.reviewId}" hidden="true"/>
+			<input type="hidden" name="_method" value="put"/>
+			<div class="container-fluid d-flex justify-content-center flex-column align-items-center">
+	    		<div class="rating mb-3">
+	  				<span id="5" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="4" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="3" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="2" class="star fa-solid fa-moon mx-2"></span>
+	  				<span id="1" class="star fa-solid fa-moon mx-2"></span>
+				</div>
+				<input name="rating" class="form-control" id="rating-stars" type="text" th:value="${review.rating}" hidden="true"/>
+				<div class="invalid-feedback text-center">
+	     			달점을 선택해주세요!
+	   			</div>
+			</div>
+			<div class="d-flex justify-content-center mb-3">
+	  			<label for="review-img" class="custom-file-upload"><i class="fa-solid fa-camera"></i>  사진 첨부하기</label> 
+	  			<input type="file" class="form-control" id="review-img" name="reviewImg" multiple="multiple">
+			</div>
+			<div class="preview-container d-flex justify-content-center mt-3" id="image-preview-container">
+    			<th:block th:each="reviewImg : ${reviewImgList}">
+        			<div class="preview-wrapper" style="position: relative; display: inline-block; margin: 5px;">
+            			<img th:src="${'/img/review/' + reviewImg.reviewImg}" 
+                			class="img-thumbnail existing-img" 
+                			style="max-width: 150px; height: 150px; border: 3px solid #667EFF; padding: 5px; border-radius: 5px;" 
+                			th:attr="data-filename=${reviewImg.reviewImg}">
+        			</div>
+   			 	</th:block>
+			</div>
+			<div class="form-floating my-3">
+				<input type="text" class="form-control" name="reviewTitle" placeholder="리뷰 제목" id="review-title" maxlength="30" th:value="${review.reviewTitle}"/>
+				<label for="review-title">리뷰 제목</label>
+			</div>
+			
+			<div class="form-floating">
+	  			<textarea class="form-control" name="reviewContent" placeholder="리뷰를 작성해주세요." id="review-content" maxlength="255" th:text="${review.reviewContent}"></textarea>
+	  			<label for="review-content">리뷰 내용</label>
+			</div>
+			<div class="d-flex justify-content-end">
+				<div id="show-word-count"></div>
+			</div>
+			<br>
+			<div class="d-flex justify-content-evenly my-3">
+				<button class="btn btn-warning" form="updateReviewForm" id="update-review-form-btn">수정</button>
+				<a type="button" class="btn btn-secondary" th:href="@{/myReview}">뒤로가기</a>
+			</div>
+		</form>
+		<ul class="list-group list-group-flush" id="review-footer-list">
+	  		<li class="list-group-item">
+	  			작성한 리뷰는 닉네임, 프로필 이미지와 함께 누구나 볼 수 있도록 공개됩니다. 리뷰 내용에 민간함 개인정보가 포함되지 않도록 조심해주세요.
+	  		</li>
+	  		<li class="list-group-item">
+	  			솔직하게 작성하신 리뷰는 주문을 고민하는 분들께 큰 도움이 됩니다. 하지만, 허위 리뷰나 명예훼손, 욕설, 타인비방글 등 선량한 업주나 
+	  			제 3자의 권리를 침해하는 게시물은 서비스 이용약관이나 관련 법률에 따라 제재를 받을 수 있습니다.
+	  		</li>
+	  		<li class="list-group-item">
+	  			㈜평강공주의남자들은 위와 같은 게시물 작성자에게 경고, 주의 등의 조치를 취할 수 있고, 해당 게시물을 삭제하거나 보이지 않게 할 수 있습니다. 
+	  			게시에 따른 책임은 작성자에게 있으며, ㈜평강공주의남자들은 이에 대한 법적 책임을 지지 않습니다.
+	  		</li>
+		</ul>
+	</div>
+</div>
+</html>

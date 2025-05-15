@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/favorites")
 public class FavoritesController {
 
 	private final FavoritesService favoritesService;
@@ -83,17 +82,21 @@ public class FavoritesController {
 		return ResponseEntity.ok().build();
 	}
 	
-	@GetMapping("/showFavorites")
+	@GetMapping("/favorites")
 	public String showFavorites(Model model) {
 		
 		
 		
+<<<<<<< HEAD
+		//model.addAttribute("favoriteStores" , favoritesService.);
+=======
+//		model.addAttribute("favoriteStores" , favoritesService.);
+>>>>>>> Lee.SH
 		
 		
 		
 		
-		
-		return null;
+		return "/content/favorites";
 		
 	}
 	

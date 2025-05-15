@@ -107,12 +107,14 @@ public class UpdateUserController {
 			UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
 	        User freshUser = userRepository.findById(userUuid)
 	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-	        
+	        redirectAttributes.addFlashAttribute("success", "비밀번호 확인 성공");
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
-	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
+	        model.addAttribute("userUUID", freshUser.getUserUuidAsString());
 	        
-			return "/content/user/userWallet";
-	    }
+			return "redirect:/userWallet";
+	    }else {
+	    	redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
+		}
 
 		return "redirect:/myPage";
 	}
@@ -129,11 +131,13 @@ public class UpdateUserController {
 			UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
 	        User freshUser = userRepository.findById(userUuid)
 	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-	        
+	        redirectAttributes.addFlashAttribute("success", "비밀번호 확인 성공");
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	        model.addAttribute("ondalPay", freshUser.getOndalPay());
 	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
-			return "/content/user/ondalPay";
+			return "redirect:/ondalPay";
+		}else {
+			redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
 		}
 		
 		return "redirect:/myPage";
@@ -149,13 +153,15 @@ public class UpdateUserController {
 			UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
 	        User freshUser = userRepository.findById(userUuid)
 	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-	        
+	        redirectAttributes.addFlashAttribute("success", "비밀번호 확인 성공");
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	        model.addAttribute("ondalPay", freshUser.getOndalPay());
 	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
-			return "/content/user/ondalPay";
-	    }
-		return "/content/user/userWallet";
+			return "redirect:/ondalPay";
+	    }else {
+	    	redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
+		}
+		return "redirect:/userWallet";
 	}
 	
 	
@@ -171,7 +177,7 @@ public class UpdateUserController {
 				redirectAttributes.addFlashAttribute("success", amount + "원이 O Pay로 충전되었습니다.");
 		}else {
 			
-			redirectAttributes.addFlashAttribute("error", "충전이 실패했습니다.");
+			redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
 		}
 
 	    return "redirect:/ondalPay"; // 충전 결과를 보여줄 페이지로 이동
