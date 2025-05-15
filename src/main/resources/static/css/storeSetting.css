@@ -1,11 +1,32 @@
 body {
     margin: 0;
     font-family: "yisunshinM";
-    background-color: #f5dcc4;
+}
+
+.setting-container {
+	width: 50%;
+	min-height: 600px;
+	margin: auto;
+	text-align: justify;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	border-radius: 3%;
+	padding: 12px;
+}
+
+.fst-container {
+	margin: 10px 0;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	border-radius: 3%;
+	padding: 12px;
+}
+
+.snd-container {
+	margin: 10px 0;
+	border-top: 0.5px solid lightgray;
+	padding: 12px;
 }
 
 .setting-header {
-    background-color: #b9d6ec;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -15,7 +36,6 @@ body {
 
 .tab-buttons {
     display: flex;
-    background-color: #f4caaa;
     border-bottom: 2px solid #888;
 }
 
@@ -40,7 +60,6 @@ body {
 
 .delivery-wrapper {
     padding: 20px;
-    background-color: #fbe0c3;
     border-radius: 10px;
     min-height: 200px;
 }

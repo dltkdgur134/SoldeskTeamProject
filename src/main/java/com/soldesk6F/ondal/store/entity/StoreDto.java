@@ -20,5 +20,7 @@ public class StoreDto {
     private String storeIntroduce;
     private String storeStatus;
     private String imageUrl;
+    private double avgRating;
+	private long reviewCount;
 }
 
