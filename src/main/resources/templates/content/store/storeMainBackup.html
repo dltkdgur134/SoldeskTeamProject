@@ -55,47 +55,39 @@
 		</section>
 	
 		<section class="menu-tabs" id="category-buttons">
-			<button type="button" class="tab active" data-category="전체">전체</button>
-			<th:block th:each="category : ${menuCategories}">
-				<button type="button" class="tab" th:data-category="${#strings.trim(category.categoryName)}">
-					<span th:text="${category.categoryName}">카테고리</span>
-				</button>
-			</th:block>
+			<button class="tab active" onclick="filterMenus('전체', this)">전체</button>
+			<button class="tab" onclick="filterMenus('메인', this)">메인</button>
+			<button class="tab" onclick="filterMenus('사이드', this)">사이드</button>
+			<button class="tab" onclick="filterMenus('음료', this)">음료</button>
 		</section>
 	
 		<section class="menu-list" id="menu-list">
-			<div th:each="entry : ${groupedMenus}">
-				<div class="menu-category-group">
-					<h3 class="category-title" th:text="${entry.key}">카테고리</h3>
-					<hr style="border-top: 1px solid #ccc; margin: 10px 0;">
-					<div class="menu-group-wrapper">
-						<div class="menu-card" th:each="menu : ${entry.value}"
-							th:data-id="${menu.menuId}"
-							th:data-store-id="${menu.storeId}"
-							th:data-name="${menu.menuName}"
-							th:data-description="${menu.description}"
-							th:data-price="${menu.price}"
-							th:data-image="${menu.menuImg}"
-							th:data-category="${menu.menuCategory}"
-							th:data-status="${menu.menuStatus}"
-							th:data-option1="${menu.menuOptions1GroupName + ':' + #strings.arrayJoin(menu.menuOptions1, '@@__@@')}"
-							th:data-option1-price="${#strings.arrayJoin(menu.menuOptions1Price, '@@__@@')}"
-							th:data-option2="${menu.menuOptions2GroupName + ':' + #strings.arrayJoin(menu.menuOptions2, '@@__@@')}"
-							th:data-option2-price="${#strings.arrayJoin(menu.menuOptions2Price, '@@__@@')}"
-							th:data-option3="${menu.menuOptions3GroupName + ':' + #strings.arrayJoin(menu.menuOptions3, '@@__@@')}"
-							th:data-option3-price="${#strings.arrayJoin(menu.menuOptions3Price, '@@__@@')}">
-							
-							<div class="image-wrapper">
-								<img th:src="@{${menu.menuImg}}" alt="메뉴 이미지" />
-							</div>
-							<div class="menu-info">
-								<h3 th:text="${menu.menuName}">메뉴명</h3>
-								<p th:text="${menu.description}" style="color: gray">설명</p>
-								<p th:text="${menu.price} + '원'">가격</p>
-								<span th:if="${menu.menuStatus == 'SOLD_OUT'}" class="soldout">품절</span>
-							</div>
-						</div>
-					</div>
+			<div th:class="'menu-card'" th:each="menu : ${menus}"
+				th:data-id="${menu.menuId}"
+				th:data-store-id="${menu.storeId}"
+				th:data-name="${menu.menuName}"
+				th:data-description="${menu.description}"
+				th:data-price="${menu.price}"
+				th:data-image="${menu.menuImg}"
+				th:data-category="${menu.menuCategory}"
+				th:data-status="${menu.menuStatus}"
+				
+				th:data-option1="${menu.menuOptions1GroupName + ':' + #strings.arrayJoin(menu.menuOptions1, '@@__@@')}"
+				th:data-option1-price="${#strings.arrayJoin(menu.menuOptions1Price, '@@__@@')}"
+				 
+				th:data-option2="${menu.menuOptions2GroupName + ':' + #strings.arrayJoin(menu.menuOptions2, '@@__@@')}"
+				th:data-option2-price="${#strings.arrayJoin(menu.menuOptions2Price, '@@__@@')}"
+				
+				th:data-option3="${menu.menuOptions3GroupName + ':' + #strings.arrayJoin(menu.menuOptions3, '@@__@@')}"
+				th:data-option3-price="${#strings.arrayJoin(menu.menuOptions3Price, '@@__@@')}">
+				<div class="image-wrapper">
+					<img th:src="@{${menu.menuImg}}" alt="메뉴 이미지" />
+				</div>
+				<div class="menu-info">
+					<h3 th:text="${menu.menuName}">메뉴명</h3>
+					<p th:text="${menu.description}" style="color: gray">메뉴 설명</p>
+					<p th:text="${menu.price} + '원'">가격</p>
+					<span th:if="${menu.menuStatus == 'SOLD_OUT'}" class="soldout">품절</span>
 				</div>
 			</div>
 		</section>

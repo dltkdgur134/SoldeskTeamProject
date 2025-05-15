@@ -10,6 +10,7 @@ import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.OwnerRepository;
+import com.soldesk6F.ondal.useract.review.repository.ReviewRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ public class StoreService {
 	private final StoreRepository storeRepository;
 	private final OwnerRepository ownerRepository;
 	private final StoreImgRepository storeImgRepository;
+	private final ReviewRepository reviewRepository;
 
 	public void registerStore(StoreRegisterDto dto, User user) {
 		log.info("DTO 값: {}", dto);
@@ -104,10 +106,13 @@ public class StoreService {
 		return storeRepository.findByCategory(category).stream().map(store -> {
 			String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank()) ? store.getBrandImg()
 					: "/img/store/default.png";
+			double avgRating = reviewRepository.findAverageRatingByStore(store);
+			long reviewCount = reviewRepository.countByStore(store);
 			StoreDto dto = StoreDto.builder().storeId(store.getStoreId()).storeName(store.getStoreName())
 					.category(store.getCategory()).storePhone(store.getStorePhone())
 					.storeAddress(store.getStoreAddress()).storeIntroduce(store.getStoreIntroduce())
-					.storeStatus(store.getStoreStatus().getDescription()).imageUrl(imageUrl).build();
+					.storeStatus(store.getStoreStatus().getDescription()).imageUrl(imageUrl)
+					.avgRating(avgRating).reviewCount(reviewCount).build();
 			return dto;
 		}).collect(Collectors.toList());
 	}
