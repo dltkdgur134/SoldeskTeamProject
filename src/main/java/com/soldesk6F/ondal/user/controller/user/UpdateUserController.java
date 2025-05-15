@@ -94,6 +94,7 @@ public class UpdateUserController {
 	}
 	
 	private final UserRepository userRepository;
+
 	@PostMapping("/checkUserPasswordAndGoWallet")
 	public String checkUserPasswordAndGoWallet(
 			@RequestParam(value = "currentPassword", required = false) String currentPassword,
@@ -116,9 +117,11 @@ public class UpdateUserController {
 
 		return "redirect:/myPage";
 	}
-	@PostMapping("/checkUserPasswordAndGoOndalPay")
+
+	@PostMapping("/checkUserPasswordAndTryOndalPay")
 	public String checkUserPasswordAndGoPoint(
-			@RequestParam(value = "Password", required = false) String Password,
+			@RequestParam(value = "currentPassword", required = false) String Password,
+			@RequestParam(value = "cartUUID") UUID cartUUID,
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes redirectAttributes,Model model
 			){
@@ -128,16 +131,17 @@ public class UpdateUserController {
 		if (isCorrect) {
 			UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
 	        User freshUser = userRepository.findById(userUuid)
-	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-	        
+	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));		        
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	        model.addAttribute("ondalPay", freshUser.getOndalPay());
+	        model.addAttribute("cartUUID" , cartUUID);
 	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
-			return "redirect:/ondalPay";
+			return "forward:/store/pay";
 		}
 		
 		return "redirect:/myPage";
 	}
+	
 	@PostMapping("/user/goToPoints")
 	public String withdraw(
 	        @RequestParam("Password") String Password,

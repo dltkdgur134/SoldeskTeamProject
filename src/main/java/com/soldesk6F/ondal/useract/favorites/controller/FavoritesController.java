@@ -22,7 +22,7 @@ public class FavoritesController {
 		
 		
 		
-		model.addAttribute("favoriteStores" , favoritesService.);
+		model.addAttribute("favoriteStores" , favoritesService);
 		
 		
 		
