@@ -85,16 +85,7 @@ public class FavoritesController {
 	@GetMapping("/favorites")
 	public String showFavorites(Model model) {
 		
-		
-		
-<<<<<<< HEAD
 		//model.addAttribute("favoriteStores" , favoritesService.);
-=======
-//		model.addAttribute("favoriteStores" , favoritesService.);
->>>>>>> Lee.SH
-		
-		
-		
 		
 		return "/content/favorites";
 		
