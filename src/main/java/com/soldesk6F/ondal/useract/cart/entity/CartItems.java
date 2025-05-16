@@ -12,6 +12,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.soldesk6F.ondal.menu.entity.Menu;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,12 +41,21 @@ public class CartItems {
     private UUID cartItemsId;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id", nullable = false)
+    @JoinColumn(name = "cart_id", nullable = false, columnDefinition = "BINARY(16)")
     private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
+
+    @Column(name = "menu_name")
+    private String menuName;
+
+    @Column(name = "menu_price")
+    private int menuPrice;
+
+    @Column(name = "menu_image")
+    private String menuImage;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
@@ -61,7 +72,7 @@ public class CartItems {
     private int optionTotalPrice;
 
     public int getItemTotalPrice() {
-        return (menu.getPrice() + optionTotalPrice) * quantity;
+        return (menuPrice + optionTotalPrice) * quantity;
     }
 
     @Builder
@@ -74,15 +85,15 @@ public class CartItems {
 
     public void setOptions(List<String> selectedOptions) {
         List<String> safeOptions = selectedOptions.stream()
-                .map(opt -> opt.replace("온달", ""))
+                .map(opt -> opt.replace("@@__@@", ""))
                 .collect(Collectors.toList());
-        this.options = String.join("온달", safeOptions);
+        this.options = String.join("@@__@@", safeOptions);
         calculateOptionTotalPrice(safeOptions);
     }
 
     public List<String> getOptionsAsList() {
         if (this.options == null || this.options.isBlank()) return new ArrayList<>();
-        return Arrays.stream(this.options.split("온달"))
+        return Arrays.stream(this.options.split("@@__@@"))
                 .map(String::trim)
                 .collect(Collectors.toList());
     }
@@ -92,17 +103,17 @@ public class CartItems {
         List<Integer> allOptionPrices = new ArrayList<>();
 
         if (menu.getMenuOptions1() != null) {
-            allOptionNames.addAll(Arrays.asList(menu.getMenuOptions1().split("온달")));
+            allOptionNames.addAll(Arrays.asList(menu.getMenuOptions1().split("@@__@@")));
             allOptionPrices.addAll(menu.getMenuOptions1PriceList());
         }
 
         if (menu.getMenuOptions2() != null) {
-            allOptionNames.addAll(Arrays.asList(menu.getMenuOptions2().split("온달")));
+            allOptionNames.addAll(Arrays.asList(menu.getMenuOptions2().split("@@__@@")));
             allOptionPrices.addAll(menu.getMenuOptions2PriceList());
         }
 
         if (menu.getMenuOptions3() != null) {
-            allOptionNames.addAll(Arrays.asList(menu.getMenuOptions3().split("온달")));
+            allOptionNames.addAll(Arrays.asList(menu.getMenuOptions3().split("@@__@@")));
             allOptionPrices.addAll(menu.getMenuOptions3PriceList());
         }
 
@@ -121,4 +132,13 @@ public class CartItems {
     public String getCartItemUuidAsString() {
 	    return cartItemsId != null ? cartItemsId .toString() : null;
 	}
+		
+    @OneToMany(mappedBy = "cartItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItemOption> cartItemOptions = new ArrayList<>();
+
+    public void addCartOption(CartItemOption option) {
+    	option.setCartItem(this);
+    	cartItemOptions.add(option);
+    }
+    
 }

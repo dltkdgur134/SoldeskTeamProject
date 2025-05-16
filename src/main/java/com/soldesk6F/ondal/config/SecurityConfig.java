@@ -6,33 +6,31 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.soldesk6F.ondal.user.CustomUserDetailsService;
-import com.soldesk6F.ondal.user.CustomAuthFailureHandler;
-import com.soldesk6F.ondal.user.CustomOAuth2UserService;
-import com.soldesk6F.ondal.user.Role;
+import com.soldesk6F.ondal.login.CustomAuthFailureHandler;
+import com.soldesk6F.ondal.login.CustomOAuth2UserService;
+import com.soldesk6F.ondal.login.CustomUserDetailsService;
+import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
 
+    private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
     private final CustomAuthFailureHandler customAuthFailureHandler;
-
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomUserDetailsService costomUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
+
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
-    		CustomAuthFailureHandler customAuthFailureHandler) {
-        this.costomUserDetailsService = customUserDetailsService;
+    		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
+        this.customUserDetailsService = customUserDetailsService;
         this.customAuthFailureHandler = customAuthFailureHandler;
         this.customOAuth2UserService = customOAuth2UserService;
+        this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
         
 
     }
@@ -45,7 +43,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(costomUserDetailsService)
+                .userDetailsService(customUserDetailsService)
                 .passwordEncoder(passwordEncoder())
                 .and()
                 .build();
@@ -77,8 +75,13 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     	http
+    		.csrf(csrf -> csrf
+    			.ignoringRequestMatchers("/api/**") // REST API는 CSRF 무시
+    		)
     		.authorizeHttpRequests(auth -> auth
-    			.requestMatchers("/**","/register", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll() 
+    			.requestMatchers("/**","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
+    			.requestMatchers("/api/category/**").hasAuthority("OWNER")
+    			.requestMatchers("/owner/**").hasAnyRole("OWNER", "ALL")
     			.anyRequest().authenticated() 
 				)
 			.formLogin(form -> form
@@ -92,26 +95,31 @@ public class SecurityConfig {
 				.logoutUrl("/logout")
 				.logoutSuccessUrl("/login?logout")
 				.permitAll()
-			).oauth2Login(oauth2 -> oauth2
-                    .loginPage("/login/tryOAuthLogin") // 커스텀 로그인 페이지 설정
-                    .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService) // 사용자 정보 처리
-                    )
+			)
+			.oauth2Login(oauth2 -> oauth2
+				.loginPage("/login/tryOAuthLogin")
+				.userInfoEndpoint(userInfo -> userInfo
+					.userService(customOAuth2UserService)
+				)
+				.successHandler(OAuth2LoginSuccessHandler)
+			)
+			.exceptionHandling(exception -> exception
+				.accessDeniedHandler((request, response, accessDeniedException) ->
+					response.sendRedirect("/access-denied")
+				)
 			)
 			.csrf(csrf -> csrf.disable());
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//.authorizeHttpRequests(auth -> auth // 임시 로그인 비활성화
-		//.anyRequest().permitAll() // 모든 요청 허용
-		//)
-		//.formLogin(form -> form.disable()) // 기본 로그인 페이지 비활성화
-		//.logout(logout -> logout.disable()) // 로그아웃도 비활성화
-		//.csrf(csrf -> csrf.disable()); // CSRF 비활성화
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         
         return http.build();
     }
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//.authorizeHttpRequests(auth -> auth // 임시 로그인 비활성화
+	//.anyRequest().permitAll() // 모든 요청 허용
+	//)
+	//.formLogin(form -> form.disable()) // 기본 로그인 페이지 비활성화
+	//.logout(logout -> logout.disable()) // 로그아웃도 비활성화
+	//.csrf(csrf -> csrf.disable()); // CSRF 비활성화
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
 //    @Bean
 //    public PasswordEncoder passwordEncoder() {
@@ -123,5 +131,6 @@ public class SecurityConfig {
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
     
 }

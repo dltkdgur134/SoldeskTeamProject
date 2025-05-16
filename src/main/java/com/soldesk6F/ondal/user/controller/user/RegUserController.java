@@ -29,6 +29,7 @@ public class RegUserController {
 			@RequestParam("password") String password, @RequestParam("userPhone") String userPhone,
 			@RequestParam("profileImage") MultipartFile profileImage,
 			@RequestParam(value = "socialLoginProvider", required = false) String socialLoginProvider, Model model) {
+		System.out.println("이메일: " + email);
 		if (userService.isUserIdDuplicate(userId)) {
 			model.addAttribute("error", "이미 등록된 id입니다.");
 			fillUserData(model, userId, userName, nickname, email, userPhone,
@@ -37,6 +38,8 @@ public class RegUserController {
 		}
 
 		if (userService.isEmailDuplicate(email)) {
+			System.out.println("입력 이메일: " + email);
+			System.out.println("중복 여부: " + userService.isEmailDuplicate(email));
 			model.addAttribute("error", "이미 등록된 이메일입니다.");
 			fillUserData(model, userId, userName, nickname, email, userPhone, 					socialLoginProvider);
 			return "content/register";

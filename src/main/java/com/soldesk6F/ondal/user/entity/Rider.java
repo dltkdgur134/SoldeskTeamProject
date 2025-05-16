@@ -41,9 +41,18 @@ public class Rider {
 	@Column(name = "rider_nickname" ,nullable = false , length = 30)
 	private String riderNickname;
 	
-	@Column(name = "secondary_password", nullable = false, length = 10)
+	@Column(name = "secondary_password", nullable = false, length = 255)
 	private String secondaryPassword;
 
+	@Column(name = "secondary_password_fail_count")
+	private int secondaryPasswordFailCount;
+
+	@Column(name = "last_secondary_password_fail_time")
+    private LocalDateTime lastSecondaryPasswordFailTime;
+    
+	@Column(name = "is_secondary_password_locked")
+    private boolean isSecondaryPasswordLocked;
+    
 	@Column(name = "vehicle_number", nullable = false, length = 20)
 	private String vehicleNumber;
 
@@ -63,7 +72,9 @@ public class Rider {
 	@Column(name = "hub_address_longitude", nullable = false)
 	private double hubAddressLongitude;
 	
-	
+	@Column(name = "rider_wallet",nullable = true )
+    private int riderWallet;
+
 	@CreationTimestamp
 	@Column(name = "registration_date", updatable = false)
 	private LocalDateTime registrationDate;
@@ -86,6 +97,13 @@ public class Rider {
 		public String getDescription() {
 			return description;
 		}
+		public RiderStatus next() {
+	        return switch (this) {
+	            case WAITING -> RESTING;
+	            case DELIVERING -> RESTING;
+	            case RESTING -> WAITING;
+	        };
+	    }
 	}
 
 	public enum DeliveryRange {
@@ -124,7 +142,6 @@ public class Rider {
 	public Rider(User user, String secondaryPassword, String vehicleNumber, String riderHubAddress,
 			DeliveryRange deliveryRange, String riderPhone, double hubAddressLatitude, double hubAddressLongitude,
 			RiderStatus riderStatus,String riderNickname) {
-		super();
 		this.user = user;
 		this.secondaryPassword = secondaryPassword;
 		this.vehicleNumber = vehicleNumber;

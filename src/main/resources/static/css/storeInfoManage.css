@@ -1,0 +1,274 @@
+.menu-header {
+	background: #ffc107;
+	color: white;
+	padding: 16px;
+	display: flex;
+	align-items: center;
+}
+
+.store-image {
+	width: 100px;
+	margin-right: 20px;
+	border-radius: 8px;
+}
+
+.store-manage-container {
+	max-width: 600px;
+	margin: 30px auto;
+	padding: 40px 30px;
+	background-color: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.store-info-section {
+	margin-bottom: 50px;
+}
+
+.store-info-section h3 {
+	font-size: 26px;
+	font-weight: bold;
+	margin-bottom: 30px;
+	text-align: center;
+	color: #333;
+}
+
+#store-info-form {
+	width: 100%;
+	max-width: 700px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+#store-info-form label {
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 5px;
+	text-align: left;
+}
+
+#store-info-form input,
+#store-info-form select,
+#store-info-form textarea {
+	width: 100%;
+	max-width: 500px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+#store-info-form textarea {
+	resize: vertical;
+	min-height: 100px;
+}
+
+.address-search-wrapper {
+	display: flex;
+	width: 300px;
+	gap: 8px;
+	align-items: center;
+}
+
+.address-search-wrapper input {
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.address-btn {
+	padding: 0 15px;
+	height: 40px;
+	background-color: #ffcc00;
+	border: none;
+	border-radius: 5px;
+	font-weight: bold;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background-color 0.3s ease;
+}
+
+.address-btn:hover {
+	background-color: #ffb300;
+}
+
+.holiday-wrapper {
+	display: flex;
+	align-items: flex-start; 
+	gap: 20px;
+}
+
+.holiday-wrapper > label {
+	width: 80px;
+	font-weight: bold;
+}
+
+.holiday-checkboxes {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	height: 160px;
+	padding: 15px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	background-color: #f9f9f9;
+}
+
+.holiday-checkboxes label {
+	display: flex;
+	align-items: center;
+	margin-bottom: 8px;
+	gap: 6px;
+}
+
+.save-btn {
+	margin-top: 40px;
+	width: 100%;
+	background-color: #ffcc00;
+	color: #333;
+	font-weight: bold;
+	border: none;
+	padding: 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+	background-color: #ffb300;
+}
+
+.btn-group {
+	display: flex;
+	gap: 8px;
+}
+
+.delete-btn {
+	background-color: #ff6b6b;
+}
+
+.upload-btn {
+	padding: 10px 20px;
+	background-color: #ffcc00;
+	color: #333;
+	font-weight: bold;
+	font-size: revert;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	margin: 3px;
+}
+
+.upload-btn:disabled {
+	background-color: gray;
+	cursor: not-allowed;
+}
+
+.upload-btn:disabled:hover {
+	background-color: gray;
+}
+
+.upload-btn:hover {
+	background-color: #ffb300;
+}
+
+.form-group {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	width: 100%;
+}
+
+.form-group label {
+	width: 150px;
+	font-weight: bold;
+	color: #333;
+	text-align: right;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.preview-item img {
+	max-width: 350px;
+	max-height: 350px;
+	width: auto;
+	height: auto;
+	border-radius: 8px;
+	display: block;
+	margin-top: 15px;
+}
+
+.custom-file-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	gap: 10px;
+}
+
+.custom-file-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	overflow: hidden;
+}
+
+.custom-file-left span {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 200px;
+	display: inline-block;
+}
+
+.custom-file-name-and-buttons {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+.custom-file-wrapper span {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 250px;
+	display: inline-block;
+}
+
+.custom-file-,
+.upload-btn {
+	height: 38px;
+	padding: 0 16px;
+	font-weight: bold;
+}
+
+.custom-file-btn {
+	padding: 6px 12px;
+	background-color: #e0e0e0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.2s;
+	font-size: revert;
+}
+
+.custom-file-btn:hover {
+	background-color: #ccc;
+}
+
+

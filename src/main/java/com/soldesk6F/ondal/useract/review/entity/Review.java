@@ -91,6 +91,10 @@ public class Review {
 	    return reviewId != null ? reviewId .toString() : null;
 	}
 	
-	
+	public void updateReview(double rating, String reviewTitle, String reviewContent) {
+		this.rating = rating;
+		this.reviewTitle = reviewTitle;
+		this.reviewContent= reviewContent;
+	}
 	
 }

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>길찾기 결과</title>
+<script
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
+<style>
+body {
+    font-family: sans-serif;
+    padding: 1rem;
+}
+
+#map {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 1rem;
+}
+</style>
+</head>
+<body>
+    <h1>길찾기 결과</h1>
+    <div id="map"></div>
+    <p id="summary"></p>
+
+    <script>
+        // 부모 창에서 전달받은 메시지 처리
+        window.addEventListener('message', (event) => {
+            console.log("받은 메시지:", event.data);  // 데이터 로그 추가
+            const { path, startLat, startLng, endLat, endLng, summaryText } = event.data;
+
+            // 카카오맵 API 로드 및 경로 표시
+            Kakao.maps.load(() => {
+                const map = new Kakao.maps.Map(document.getElementById('map'), {
+                    center: new Kakao.maps.LatLng(startLat, startLng),
+                    level: 5
+                });
+
+                // 경로 표시
+                const polyline = new Kakao.maps.Polyline({
+                    path: path.map(coord => new Kakao.maps.LatLng(coord[1], coord[0])),  // 경로 좌표 순서 확인
+                    strokeWeight: 5,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeStyle: 'solid'
+                });
+                polyline.setMap(map);
+
+                // 출발지 및 도착지 마커
+                const startMarker = new Kakao.maps.Marker({
+                    position: new Kakao.maps.LatLng(startLat, startLng),
+                    title: '출발지'
+                });
+                startMarker.setMap(map);
+
+                const endMarker = new Kakao.maps.Marker({
+                    position: new Kakao.maps.LatLng(endLat, endLng),
+                    title: '도착지'
+                });
+                endMarker.setMap(map);
+
+                // 경로 요약 표시
+                document.getElementById('summary').innerText = summaryText;
+            });
+        });
+    </script>
+</body>
+</html>

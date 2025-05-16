@@ -36,7 +36,7 @@ public class Cart {
 	@Id
 	@GeneratedValue
 	@UuidGenerator
-	@Column(name = "cart_id",nullable = false , unique =  true)
+	@Column(name = "cart_id",nullable = false , unique =  true ,columnDefinition = "BINARY(16)")
 	private UUID cartId;
 	
 	@OneToOne
@@ -44,7 +44,7 @@ public class Cart {
 	private User user;
 	
 	@ManyToOne
-	@JoinColumn(name = "store_id",nullable = false)
+	@JoinColumn(name = "store_id", nullable = true)
 	private Store store;
 	
 	@CreationTimestamp
@@ -60,6 +60,7 @@ public class Cart {
 		super();
 		this.user = user;
 		this.store = store;
+		this.cartItems = new ArrayList<>();
 	}
 	
 	 @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

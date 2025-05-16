@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "acloud";
+	src: url(acloud.ttf);
+}
+
+@font-face {
+	font-family: "siwol";
+	src: url('siwol.ttf');
+}
+
+@font-face {
+	font-family: "taebaek";
+	src: url('taebaek.ttf');
+}
+
+body {
+	font-family: "siwol";
+	text-align: center;
+}
+
+h2 {
+	margin-bottom: 10px;
+}
+
+.summary {
+	margin-bottom: 30px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 20px;
+}
+
+th, td {
+	border: 1px solid #ccc;
+	padding: 10px;
+	text-align: center;
+}
+
+th {
+	background-color: #f2f2f2;
+}
+
+.status-completed {
+	color: green;
+}
+
+.status-pending {
+	color: orange;
+}
+
+#salesChart {
+    width: 100%;
+    height: 400px;
+}

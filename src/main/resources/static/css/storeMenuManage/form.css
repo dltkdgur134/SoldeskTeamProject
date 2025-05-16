@@ -1,0 +1,42 @@
+.modal-form {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+
+.modal-content button {
+	cursor: pointer;
+}
+
+.modal-form button[type="submit"] {
+	background: #ffc107;
+	color: white;
+	border: none;
+	padding: 10px;
+	font-weight: bold;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select,
+.modal-content button {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	box-sizing: border-box;
+	font-size: 14px;
+	margin-top: 5px;
+}
+
+.modal-form textarea,
+.modal-form input[type="file"],
+.modal-form #option1-container,
+.modal-form button[type="button"], 
+.modal-form button[type="submit"] { 
+	grid-column: span 2;
+}
+
+

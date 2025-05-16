@@ -1,0 +1,139 @@
+body {
+	margin: 0;
+	font-family: "yisunshinM";
+}
+
+.app-container {
+	display: flex;
+	height: 100vh;
+}
+
+.topbar {
+	height: 60px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: #ffc107;
+	padding-left: 20px;
+	color: #fff;
+}
+
+.store-header {
+	display: flex;
+	margin: auto 20px;
+}
+
+.store-info {
+	margin: auto 20px;
+}
+
+.menu-btn {
+	font-size: 20px;
+	background-color: white;
+	border: 2px solid #ccc;
+	border-radius: 6px;
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+.date-container {
+	font-size: 14px;
+	margin-right: 20px;
+}
+
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: -400px;
+	width: 280px;
+	height: 100vh;
+	background-color: #1c1c1c;
+	color: white;
+	padding: 20px;
+	box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+	transition: left 0.3s ease;
+	z-index: 1000;
+}
+
+.sidebar-wrapper {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: -250px;
+  height: 100%;
+  z-index: 1000;
+  transition: left 0.3s ease;
+}
+
+.sidebar-wrapper.visible {
+  left: 0;
+}
+
+.sidebar.visible {
+	left: 0;
+}
+
+.sidebar-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: bold;
+	font-size: 18px;
+	margin-bottom: 20px;
+}
+
+.sidebar-menu {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.sidebar-menu a {
+	text-decoration: none;
+}
+
+.sidebar-menu a button {
+	text-decoration: none;
+}
+
+.sidebar-btn {
+	background-color: #2d2d2d;
+	width: 100%;
+	border: none;
+	border-radius: 6px;
+	padding: 12px;
+	color: white;
+	text-align: left;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+}
+
+.sidebar-btn2 {
+	background-color: #1c1c1c;
+	padding: 12px;
+	color: white;
+	text-align: left;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+	justify-content: space-between;
+}
+
+.sidebar-btn:hover {
+	background-color: #3c3c3c;
+}
+
+.close-btn {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+

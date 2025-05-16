@@ -49,5 +49,4 @@ public class ReviewImg {
 	    return reviewImgId != null ? reviewImgId .toString() : null;
 	}
 	
-	
 }

@@ -1,0 +1,81 @@
+#payHistoryTable {
+	width: 100% !important;
+	table-layout: fixed;
+	word-break: keep-all;
+	border-collapse: collapse;
+}
+
+#payHistoryTable th, #payHistoryTable td {
+	white-space: nowrap !important;
+	text-align: center;
+	vertical-align: middle;
+	padding: 8px 12px;
+	border: 1px solid #dee2e6;
+}
+
+.container {
+	max-width: 100% !important;
+	width: 100% !important;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.card.info-card {
+	max-width: 100% !important;
+	width: 100% !important;
+}
+
+.filter-btn-group {
+	margin-bottom: 20px;
+}
+
+.filter-btn-group button {
+	margin-right: 10px;
+}
+/* 셀렉트 박스 크기 조절 */
+select[name="refundReason"] {
+	min-width: 180px; /* 적당히 넓게 */
+	max-width: 180px;
+	padding: 4px 8px;
+	font-size: 14px;
+	height: 36px;
+}
+
+/* 환불 버튼 스타일 */
+button.refund-btn {
+	background-color: #ffcc00; /* 예: 노란색 계열 */
+	border: none;
+	color: #333;
+	padding: 6px 12px;
+	font-weight: bold;
+	cursor: pointer;
+	border-radius: 4px;
+	transition: background-color 0.3s ease;
+}
+
+button.refund-btn:hover {
+	background-color: #e6b800;
+}
+
+/* 문의하기 버튼 스타일 (기존 btn-primary 스타일 참고) */
+a.contact-btn {
+	background-color: #007bff;
+	border: none;
+	color: white;
+	padding: 6px 12px;
+	font-weight: bold;
+	border-radius: 4px;
+	text-decoration: none;
+	display: inline-block;
+}
+
+a.contact-btn:hover {
+	background-color: #0056b3;
+	text-decoration: none;
+}
+
+/* 테이블 셀 안에서 overflow 방지 */
+td {
+	overflow: visible !important;
+	white-space: nowrap;
+}
