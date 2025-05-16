@@ -16,12 +16,10 @@ public interface FavoritesRepository extends JpaRepository<Favorites, UUID> {
 	Optional<Favorites> findByUserAndStore(User user, Store store);
 	long countByStore(Store store);
 
-	
-	
+
 	List<Favorites> findByUser_UserUuid(UUID userUUID);
-	
-	
-	
-	
-	
+
+
 }
+
+
