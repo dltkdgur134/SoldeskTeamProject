@@ -34,6 +34,7 @@
 		const failReason = document.getElementById("failReason");
 		const oPay = document.getElementById("o-pay");
 		const toss = document.getElementById("toss");
+		const passCheckModalForm = document.getElementById("check-user-password-form");
 		const pays = [oPay, toss];
 
 		pays.forEach(pay => {
@@ -51,11 +52,29 @@
 		
 		if (status && (status.value === "실패" || status.textContent === "실패")) {
 		  alert(failReason.value);
-		}else{
-			alert(status.value);
-		}
+		}		
 		
+		passCheckModalForm.addEventListener("submit", function(e) {
+		  e.preventDefault();
+
+		  // reqDel
+		  const input1 = document.createElement("input");
+		  input1.type = "hidden";
+		  input1.name = "reqDel";
+		  input1.value = reqDelValue.value;
+		  this.appendChild(input1);
+
+		  // reqStore
+		  const input2 = document.createElement("input");
+		  input2.type = "hidden";
+		  input2.name = "reqStore";
+		  input2.value = reqStoreValue.value;
+		  this.appendChild(input2);
+
+		  this.submit(); // 수동 제출
+		});
 		
+	
 
 	    payBtn.addEventListener("click", function () {
 		  if(!(agreementPrivate.checked&&agreementPrivate.checked)){

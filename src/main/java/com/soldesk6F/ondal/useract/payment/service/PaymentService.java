@@ -45,6 +45,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
+import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
@@ -198,7 +199,7 @@ public class PaymentService {
 //	}
 	
 	@Transactional
-	public String tryOndalPay(UUID cartUUID) {
+	public String tryOndalPay(UUID cartUUID , String reqDel , String reqStore) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -207,7 +208,8 @@ public class PaymentService {
 
 		    if (principal instanceof CustomUserDetails userDetails) {
 		        User user = userDetails.getUser();
-			    Optional<Cart> optCart = cartRepository.findByUser(user);
+		        User nowUser = userRepository.getById(user.getUserUuid());
+			    Optional<Cart> optCart = cartRepository.findByUser(nowUser);
 			    Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
 			    int totalPrice = cart.getTotalPrice();
 			    int ondalPay = user.getOndalPay();
@@ -215,8 +217,52 @@ public class PaymentService {
 			    	return "잔액이 부족합니다\n현재 잔액:"+ondalPay+":@:실패";
 			    }else {
 			    	int nowOndalPay = ondalPay-totalPrice;
+					List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+					for (CartItems cartItem : cart.getCartItems()) {
+						OrderDetail orderDetail = new OrderDetail();
+
+						orderDetail.setMenu(cartItem.getMenu());
+						orderDetail.setPrice(cartItem.getItemTotalPrice());
+						orderDetail.setQuantity(cartItem.getQuantity());
+						orderDetail.setOptionNames(cartItem.getOptionsAsList());
+						List<Integer> ciop = new ArrayList<Integer>();
+						for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
+							ciop.add(cartItemOption.getOptionPrice());
+						}
+						orderDetail.setOptionPrices(ciop);
+						orderDetailList.add(orderDetail);
+					}
+
+					Payment payment = new Payment();
+					payment.setAmount(cart.getTotalPrice());
+					payment.setPaymentKey(null);
+					payment.setTossOrderId(cartUUID.toString());
+					payment.setUser(user);
+					payment.setApprovedAt(LocalDateTime.now());
+					payment.setRequestedAt(LocalDateTime.now());
+					payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
+					
+
+					payment.setPaymentStatus(PaymentStatus.COMPLETED);
+					Order order = Order.builder().store(cart.getStore()).user(cart.getUser())
+								.totalPrice(cart.getTotalPrice())
+								.storeRequest(reqStore)
+								.deliveryRequest(reqDel).orderDetails(orderDetailList)
+								.deliveryAddress(user.getUserSelectedAddress().getAddress())
+								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
+								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
+								.orderToOwner(OrderToOwner.PENDING).build();
+			    	payment.setOrder(order);
+					for (OrderDetail od : order.getOrderDetails()) {
+						od.setOrder(order);
+					}
+			    	payment.setPaymentMethod(Payment.PaymentMethod.ONDALPAY);
+			    	payment.setPaymentStatus(PaymentStatus.COMPLETED);
+			    	paymentRepository.save(payment);
+			    	orderRepository.save(order);
 			    	user.setOndalPay(ondalPay);
 			    	userRepository.save(user);
+			    	cartRepository.deleteById(cartUUID);
 			    	return nowOndalPay+":@:성공";
 			    }
 			    
