@@ -43,7 +43,7 @@ public class RegAddressController {
 	}
 
 	// 유저의 모든 주소 (주소 관리)
-	@GetMapping(value = "/myAddress")
+	@GetMapping("/myAddress")
 	public String goMyAddress(
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes redirectAttributes, 

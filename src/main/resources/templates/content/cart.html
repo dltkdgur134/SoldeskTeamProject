@@ -21,20 +21,21 @@
 				<img src="/img/cart/empty_cart.png" alt="텅 빈 장바구니" class="empty-cart-img">
 				<p class="empty-cart-msg">장바구니가 텅 비었어요</p>
 			</div>
+			<p th:if="${errorMessage}" th:text="${errorMessage}" class="error-msg"></p>
 			<div class="cart-wrapper">
 				<div class="carts">
 					<div class="cart-item" th:each="item : ${cartItems}"
 						th:data-id="${item.cartItemsId}" 
 						th:classappend="' cart-item-card'"
-						th:data-base-price="${item.menu.price}"
+						th:data-base-price="${item.menuPrice}"
 						th:unless="${#lists.isEmpty(cartItems)}">
 						<div class="cart-item-body">
 							<div class="cart-item-left">
-								<img th:src="@{${item.menu.menuImg}}" alt="메뉴 이미지">
+								<img th:src="@{${item.menuImage}}" alt="메뉴 이미지">
 							</div>
 							<div class="cart-item-middle">
-								<h4 th:text="${item.menu.menuName}"></h4>
-								<p class="menu-base-price" th:text="'가격: ' + ${item.menu.price} + '원'"></p>
+								<h4 th:text="${item.menuName}"></h4>
+								<p class="menu-base-price" th:text="'가격: ' + ${item.menuPrice} + '원'"></p>
 								<div class="cart-options">
 									<div class="cart-options cart-item-options">
 										<div th:each="opt : ${item.cartItemOptions}">
@@ -49,7 +50,7 @@
 							<button class="btn-change-option" th:data-id="${item.cartItemsId}">옵션 변경</button>
 							<div class="quantity-controls" 
 							     th:data-id="${item.cartItemsId}"
-							     th:data-price="${item.menu.price}" 
+							     th:data-price="${item.menuPrice}" 
 							     th:data-total-price="${item.getItemTotalPrice}">
 								<button class="btn-decrease">
 									<span th:if="${item.quantity > 1}">-</span>
@@ -64,8 +65,8 @@
 			</div>
 			<div class="order-summary" th:if="${not #lists.isEmpty(cartItems)}">
 				<p th:text="'결제금액: ' + ${totalPrice} + '원'"></p>
-				<form id="orderForm" th:action="@{/order/pay}" method="post">
-					<input type="hidden" name="cartId" th:value="${cart.cartId}" />
+				<form id="orderForm" th:action="@{/store/pay}" method="post">
+					<input type="hidden" name="cartUUID" th:value="${cart.cartId}" />
 					<button type="submit">주문하기</button>
 				</form>
 			</div>

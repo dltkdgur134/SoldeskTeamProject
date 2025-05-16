@@ -142,6 +142,14 @@ public class SecurityConfig{
         
         return http.build();
     }
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//.authorizeHttpRequests(auth -> auth // 임시 로그인 비활성화
+	//.anyRequest().permitAll() // 모든 요청 허용
+	//)
+	//.formLogin(form -> form.disable()) // 기본 로그인 페이지 비활성화
+	//.logout(logout -> logout.disable()) // 로그아웃도 비활성화
+	//.csrf(csrf -> csrf.disable()); // CSRF 비활성화
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
 //    @Bean
 //    public PasswordEncoder passwordEncoder() {

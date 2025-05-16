@@ -147,7 +147,7 @@ public class UpdateOwnerController {
 		boolean isCorrect = ownerService.checkOwnerSecondaryPassword(owner, currentSecondaryPassword);
 
 		if (isCorrect) {
-	        return "redirect:/owner/ownerWallet";
+	        return "redirect:/owner/ownerWallet	";
 	    }
 		// 실패한 경우 현재 실패 횟수 가져와서 메시지 구성
 	    int failCount = owner.getSecondaryPasswordFailCount();
@@ -159,26 +159,45 @@ public class UpdateOwnerController {
 	}
 	@PostMapping("/owner/withdraw")
 	public String withdraw(
-	        @RequestParam("withdrawAmount") int withdrawAmount,
+	        @RequestParam("amount") int amount,
 	        @RequestParam("secondaryPassword") String secondaryPassword,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
 	        RedirectAttributes redirectAttributes) {
 
 	    String userId = userDetails.getUser().getUserId();
-	    Owner owner = ownerService.getOwnerByUserId(userId);  // 라이더 정보 가져오기
+	    Owner owner = ownerService.getOwnerByUserId(userId);  // 점주 정보 가져오기
 
 	    // 출금 처리 서비스 호출
-	    String resultMessage = ownerService.processWithdrawal(owner, withdrawAmount, secondaryPassword);
+	    String resultMessage = ownerService.processWithdrawal(owner, amount, secondaryPassword);
 
 	    if (resultMessage.startsWith("출금 성공")) {
-	        redirectAttributes.addFlashAttribute("withdrawMessage", resultMessage);
+	        redirectAttributes.addFlashAttribute("success", resultMessage);
 	    } else {
-	        redirectAttributes.addFlashAttribute("withdrawError", resultMessage);
+	        redirectAttributes.addFlashAttribute("error", resultMessage);
 	    }
 
 	    return "redirect:/owner/ownerWallet";
 	}
 	
+	@PostMapping("/owner/convertToOndal")
+	public String convertOwnerToOndal(@RequestParam("amount") int amount,
+	                                  @RequestParam("secondaryPassword") String secondaryPassword,
+	                                  @AuthenticationPrincipal CustomUserDetails userDetails,
+	                                  RedirectAttributes redirectAttributes) {
+	    
+		String userId = userDetails.getUser().getUserId();
+	    Owner owner = ownerService.getOwnerByUserId(userId);  // 점주 정보 가져오기
+		
+	    String resultMessage = ownerService.convertOwnerWalletToOndalWallet(owner, amount, secondaryPassword);
 	
+	    if (resultMessage.startsWith("출금 성공")) {
+	        redirectAttributes.addFlashAttribute("success", resultMessage);
+	    } else {
+	        redirectAttributes.addFlashAttribute("error", resultMessage);
+	    }
+
+	    return "redirect:/owner/ownerWallet";
+	}
+
 	
 }

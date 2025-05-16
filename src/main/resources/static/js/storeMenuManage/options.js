@@ -95,8 +95,6 @@ export function fillEditOptions(menuDto) {
 	}
 }
 
-
-// ✅ 하위 옵션 추가 (공용)
 window.addSubOption = function (groupId, groupNum) {
 	const container = document.querySelector(`#${groupId} .option-items`);
 
@@ -112,7 +110,6 @@ window.addSubOption = function (groupId, groupNum) {
 	container.appendChild(wrapper);
 };
 
-// ✅ 옵션 그룹 제거 (공용)
 window.removeOptionGroup = function (button) {
 	const group = button.closest(".option-group");
 	const container = group.parentElement;
@@ -126,21 +123,5 @@ window.removeOptionGroup = function (button) {
 		document.getElementById("edit-add-option-btn").disabled = false;
 	}
 };
-/*
-export function removeOption(button) {
-	const group = button.closest(".option-group");
-	const container = group.parentElement;
-	group.remove();
-
-	if (container.id === "option1-container") {
-		addOptionCount.value--;
-		document.getElementById("add-option-btn").disabled = false;
-	} else if (container.id === "edit-option-container") {
-		editOptionCount.value--;
-		document.getElementById("edit-add-option-btn").disabled = false;
-	}
-}
-*/
-
 
 

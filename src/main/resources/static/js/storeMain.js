@@ -1,19 +1,46 @@
 document.addEventListener('DOMContentLoaded', function () {
-	// 메뉴 필터링
 	function filterMenus(category) {
-		const menuCards = document.querySelectorAll('.menu-card');
-		menuCards.forEach(card => {
-			const cardCategory = card.getAttribute('data-category');
-			card.style.display = (category === '전체' || cardCategory === category) ? 'block' : 'none';
+		const normalizedCategory = category.trim();
+
+		// 메뉴 그룹 전체 기준으로 숨기기 처리
+		document.querySelectorAll('.menu-category-group').forEach(group => {
+			const title = group.querySelector('.category-title')?.textContent?.trim();
+			const normalizedTitle = title?.trim();
+
+			group.style.display = (
+				normalizedCategory === '전체' || normalizedTitle === normalizedCategory
+			) ? 'block' : 'none';
 		});
+
+		// 탭 스타일 처리
 		document.querySelectorAll('.menu-tabs .tab').forEach(btn => btn.classList.remove('active'));
 	}
+	
+	function filterMenus(category, btn) {
+		const normalizedCategory = category.trim();
+		const menuCards = document.querySelectorAll('.menu-card');
+		menuCards.forEach(card => {
+			const cardCategory = card.getAttribute('data-category')?.trim();
+			card.style.display = (normalizedCategory === '전체' || cardCategory === normalizedCategory)
+				? 'flex' : 'none';
+		});
+		document.querySelectorAll('.menu-tabs .tab').forEach(b => b.classList.remove('active'));
+		btn.classList.add('active');
+	}
+
+	// ✅ 버튼에 이벤트 바인딩
+	document.querySelectorAll('.menu-tabs .tab').forEach(btn => {
+		btn.addEventListener('click', function () {
+			const category = btn.dataset.category;
+			filterMenus(category, btn); // ✅ 여기서 호출
+		});
+	});
+
 	window.filterMenus = function (category, btn) {
 		filterMenus(category);
 		btn.classList.add('active');
 	};
 
-	// 슬라이더
 	let currentSlide = 0;
 	const slidesContainer = document.getElementById('slides');
 	const slideItems = document.querySelectorAll('#slides .slide');
@@ -32,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		dot.addEventListener('click', () => showSlide(index));
 	});
 
-	// 드래그 슬라이더
 	let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = 0, animationID;
 	function getPositionX(event) {
 		return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
@@ -85,9 +111,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (movedBy > 50) currentSlide--;
 		setPositionByIndex();
 	}
-	setPositionByIndex(); // 초기 세팅
+	setPositionByIndex();
 
-	// 메뉴 모달
 	const modal = document.getElementById('menu-modal');
 	const modalMenuName = document.getElementById('menu-name');
 	const modalMenuDescription = document.getElementById('menu-description');
@@ -100,13 +125,20 @@ document.addEventListener('DOMContentLoaded', function () {
 	let basePrice = 0;
 
 	document.querySelectorAll('.menu-card').forEach(card => {
+		const status = card.getAttribute("data-status");
+
+		if (status === 'SOLD_OUT') {
+			card.classList.add("sold-out");
+			card.setAttribute("title", "품절된 메뉴입니다");
+			return;
+		}
+		
 		card.addEventListener('click', () => {
 			const name = card.getAttribute('data-name');
 			const description = card.getAttribute('data-description');
 			const price = card.getAttribute('data-price');
 			const imageUrl = card.getAttribute('data-image');
 
-			// 모달 정보 초기화
 			quantity = 1;
 			basePrice = parseInt(price);
 			quantityEl.textContent = '1';
@@ -131,11 +163,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (names.length === 0 || prices.length === 0) continue;
 
-				// 옵션 그룹 박스 생성
 				const groupBox = document.createElement("div");
 				groupBox.className = "option-group-box";
 
-				// 그룹명 제목
 				const groupTitle = document.createElement("p");
 				groupTitle.textContent = groupName;
 				groupTitle.className = "option-group-title";
@@ -297,6 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(res => res.json())
 			.then(result => {
 				alert(result.message || '장바구니에 담겼습니다.');
+				closeModal();
 			})
 			.catch(err => {
 				console.error(err);
@@ -363,12 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			optionsContainer.appendChild(noOption);
 		}
 	}
-	
-	
-	
-	
 
-	// 모달 닫기
 	function closeModal() {
 		modal.style.display = 'none';
 		document.body.style.overflow = 'auto';
@@ -376,4 +402,41 @@ document.addEventListener('DOMContentLoaded', function () {
 	closeModalTopBtn?.addEventListener('click', closeModal);
 	window.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 	window.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+	
+	const heartBtn = document.getElementById('favorite-btn');
+	if (heartBtn) {
+		heartBtn.addEventListener('click', () => {
+			const storeId = heartBtn.getAttribute('data-store-id');
+
+			fetch(`/favorites/toggle/${storeId}`, {
+				method: 'POST',
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest'
+				}
+			})
+			.then(res => res.json())
+			.then(data => {
+				if (data.status === 'added') {
+					heartBtn.classList.add('filled');
+				} else if (data.status === 'removed') {
+					heartBtn.classList.remove('filled');
+				}
+			})
+			.catch(err => {
+				console.error('찜 토글 실패', err);
+			});
+		});
+	}
+	
 });
+
+window.openStoreInfoModal = function () {
+	document.getElementById('store-info-modal').classList.remove('hidden');
+	document.body.style.overflow = 'hidden';
+}
+
+window.closeStoreInfoModal = function () {
+	document.getElementById('store-info-modal').classList.add('hidden');
+	document.body.style.overflow = 'auto';
+}
+

@@ -45,17 +45,17 @@ public class OwnerController {
         return "content/setting/operation";
     }
     
-    @GetMapping(value = "/setting/printer")
+    @GetMapping(value = "/setting/ordersetting")
     public String printerSetting() {
-        return "content/setting/printer";
+        return "content/setting/ordersetting";
     }
     
-    @GetMapping(value = "/setting/alarm")
+    @GetMapping(value = "/setting/deliverysetting")
     public String alarmSetting() {
-        return "content/setting/alarm";
+        return "content/setting/deliverysetting";
     }
     
-    @GetMapping(value = "/setting/delivery")
+    @GetMapping(value = "/setting/deliveryAgency")
     public String deliverySetting() {
         return "content/setting/deliveryAgency";
     }
