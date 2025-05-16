@@ -462,13 +462,24 @@ public class PaymentService {
 	
 	
 	@Transactional
-	public void refundTossPayment(String paymentKey, String cancelReason) {
+	public void refundTossPayment(String paymentKey, String cancelReason, UUID userUuid) {
+	    Payment payment = paymentRepository.findByPaymentKey(paymentKey)
+	        .orElseThrow(() -> new IllegalArgumentException("해당 결제 정보를 찾을 수 없습니다."));
+
+	    // 온달 지갑 환불 시 잔액 체크 (환불 요청 전)
+	    if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
+	        User user = userRepository.findByUserUuid(userUuid)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+	        int newBalance = user.getOndalWallet() - payment.getAmount();
+	        if (newBalance < 0) throw new IllegalStateException("잔액 부족하여 환불을 진행할 수 없습니다.");
+	    }
+
 	    String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
 
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.APPLICATION_JSON);
-	    String secretKey = tossSecretKey;
-	    String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+	    String encodedAuth = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
 	    headers.set("Authorization", "Basic " + encodedAuth);
 
 	    Map<String, String> body = new HashMap<>();
@@ -478,37 +489,61 @@ public class PaymentService {
 	    RestTemplate restTemplate = new RestTemplate();
 
 	    ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
 	    ObjectMapper om = new ObjectMapper();
-        om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        TossRefundResponse tossRefundResponse;
-		try {
-			tossRefundResponse = om.readValue(response.getBody(),TossRefundResponse.class);
-			switch(tossRefundResponse.getStatus()) {
-			case "COMPLETED":
-				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.COMPLETED);
-				break;
-			case "PENDING":
-				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.WAITING_FOR_REFUND);
-				break;
-			case "CANCELED":
-				paymentRepository.updatePaymentStatusWithPaymentKey(paymentKey, Payment.PaymentStatus.REFUNDED);
-			default:
-				System.out.println("여기서 걸림");
-				break;
-			}
-			
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-        
-	    
-	    
+	    om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	    try {
+	        TossRefundResponse tossRefundResponse = om.readValue(response.getBody(), TossRefundResponse.class);
+
+	        // 환불 사유 저장
+	        payment.setRefundReason(cancelReason);
+
+	        switch (tossRefundResponse.getStatus()) {
+	            case "COMPLETED":
+	                payment.setPaymentStatus(Payment.PaymentStatus.COMPLETED);
+	                break;
+
+	            case "PENDING":
+	                payment.setPaymentStatus(Payment.PaymentStatus.WAITING_FOR_REFUND);
+	                break;
+
+	            case "CANCELED":
+	                payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
+
+	                // 온달 지갑 환불 차감 처리
+	                if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
+	                    User user = userRepository.findByUserUuid(userUuid)
+	                        .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+	                    int newBalance = user.getOndalWallet() - payment.getAmount();
+	                    user.setOndalWallet(newBalance);
+	                    userRepository.save(user); // 변경 사항 저장
+	                }
+	                // 주문 결제 환불일 경우 Order의 orderToOwner 상태 변경
+	                if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ORDER_PAYMENT) {
+	                    Order order = payment.getOrder();
+	                    if (order != null) {
+	                        order.setOrderToOwner(Order.OrderToOwner.CANCELED);
+	                        orderRepository.save(order);
+	                    } else {
+	                        throw new IllegalStateException("해당 결제에 연결된 주문이 없습니다.");
+	                    }
+	                }
+	                break;
+	            default:
+	                System.out.println("알 수 없는 상태: " + tossRefundResponse.getStatus());
+	                break;
+	        }
+
+	        paymentRepository.save(payment); // 상태 및 환불 사유 저장
+
+	    } catch (JsonProcessingException e) {
+	        throw new RuntimeException("환불 응답 파싱 오류", e);
+	    }
+
 	    System.out.println("환불 응답: " + response.getBody());
-	    
-	    
-	}	
+	}
 	
 	
 	    
