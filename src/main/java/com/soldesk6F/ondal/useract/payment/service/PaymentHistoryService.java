@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.payment.dto.PaymentHistoryDTO;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
@@ -55,7 +56,10 @@ public class PaymentHistoryService {
 
 	    return paymentRepository.findFilteredHistory(UUID.fromString(userUUID), statusEnum, usageEnum, since)
 	            .stream()
-	            .map(PaymentHistoryDTO::fromEntity)
+	            .map(payment -> {
+	                OrderToOwner orderToOwner = payment.getOrder() != null ? payment.getOrder().getOrderToOwner() : null;
+	                return PaymentHistoryDTO.fromEntity(payment, orderToOwner);
+	            })
 	            .collect(Collectors.toList());
 	}
 

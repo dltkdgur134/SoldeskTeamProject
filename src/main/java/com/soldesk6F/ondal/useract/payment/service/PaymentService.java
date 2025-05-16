@@ -507,8 +507,17 @@ public class PaymentService {
 	                    user.setOndalWallet(newBalance);
 	                    userRepository.save(user); // 변경 사항 저장
 	                }
+	                // 주문 결제 환불일 경우 Order의 orderToOwner 상태 변경
+	                if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ORDER_PAYMENT) {
+	                    Order order = payment.getOrder();
+	                    if (order != null) {
+	                        order.setOrderToOwner(Order.OrderToOwner.CANCELED);
+	                        orderRepository.save(order);
+	                    } else {
+	                        throw new IllegalStateException("해당 결제에 연결된 주문이 없습니다.");
+	                    }
+	                }
 	                break;
-
 	            default:
 	                System.out.println("알 수 없는 상태: " + tossRefundResponse.getStatus());
 	                break;

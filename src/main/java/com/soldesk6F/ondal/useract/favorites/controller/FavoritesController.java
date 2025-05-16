@@ -22,11 +22,7 @@ public class FavoritesController {
 		
 		
 		
-<<<<<<< HEAD
 		//model.addAttribute("favoriteStores" , favoritesService.);
-=======
-//		model.addAttribute("favoriteStores" , favoritesService.);
->>>>>>> Lee.SH
 		
 		
 		
