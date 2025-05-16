@@ -16,9 +16,9 @@ public class FavoriteStoreDto {
 
     private String category;
 
-//    private Double avgRating;
+    private Double avgRating;
 //
-//    private Long reviewCount;
+    private Long reviewCount;
 //
 //    private String summary;
 //

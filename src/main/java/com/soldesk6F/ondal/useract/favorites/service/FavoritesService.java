@@ -1,11 +1,13 @@
 package com.soldesk6F.ondal.useract.favorites.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.useract.favorites.entity.Favorites;
 import com.soldesk6F.ondal.useract.favorites.repository.FavoritesRepository;
 
@@ -19,17 +21,24 @@ public class FavoritesService {
 	
 	
 	
-	public List<Favorites> getUserFavorites(){
-		CustomUserDetails cud;
-		if(SecurityContextHolder.getContext().getAuthentication() instanceof CustomUserDetails instanceCud) {
-			cud = instanceCud;
-		}
-//		favoritesRepository.findByUser_UserUuid(cud.getUser());
-		
-		
-		
-		return null;
-	}
+//	public List<Favorites> getUserFavorites(){
+//		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//		CustomUserDetails cud = null;
+//		if (principal instanceof CustomUserDetails instanceCud) {
+//		    cud = instanceCud;
+//		}
+//		if(cud != null) {
+//			User user = cud.getUser();
+//			List<Favorites> listFavorites = favoritesRepository.findByUser_UserUuid(user.getUserUuid());
+//			if(listFavorites!=null) {
+//			for()
+//			
+//			}
+//			}
+//		
+//		return null;
+//	}
 	
 	
 	
