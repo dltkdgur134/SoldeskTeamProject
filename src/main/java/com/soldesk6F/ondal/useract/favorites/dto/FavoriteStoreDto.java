@@ -20,11 +20,8 @@ public class FavoriteStoreDto {
 //
     private Long reviewCount;
 //
-//    private String summary;
-//
-//    private String discountText;
-//
-//    private boolean express;
+    private String MinimumPay;
+    
 }
 
 

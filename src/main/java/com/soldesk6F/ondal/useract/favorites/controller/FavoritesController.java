@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/favorites")
 public class FavoritesController {
 
 	private final FavoritesService favoritesService;
@@ -86,7 +85,13 @@ public class FavoritesController {
 	@GetMapping("/favorites")
 	public String showFavorites(Model model) {
 		
-return "/content/favorites";
+		
+		
+		
+		
+		
+		
+		return "/content/favorites";
 		
 	}
 	

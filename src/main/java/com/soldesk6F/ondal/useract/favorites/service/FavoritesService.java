@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.useract.favorites.dto.FavoriteStoreDto;
 import com.soldesk6F.ondal.useract.favorites.entity.Favorites;
 import com.soldesk6F.ondal.useract.favorites.repository.FavoritesRepository;
+import com.soldesk6F.ondal.useract.review.repository.ReviewRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class FavoritesService {
 
 	private final FavoritesRepository favoritesRepository;
+	private final ReviewRepository reviewRepository;
 	
 	
 	
@@ -32,7 +35,14 @@ public class FavoritesService {
 //			User user = cud.getUser();
 //			List<Favorites> listFavorites = favoritesRepository.findByUser_UserUuid(user.getUserUuid());
 //			if(listFavorites!=null) {
-//			for()
+//				
+//				for(Favorites favorites : listFavorites) {
+//					FavoriteStoreDto.builder().avgRating(reviewRepository.findAverageRatingByStore(favorites.getStore()))
+//					.reviewCount(reviewRepository.countByStore(favorites.getStore()))
+//					.category(favorites.getStore().getCategory())
+//					.imageUrl(favorites.get)
+//							
+//					}
 //			
 //			}
 //			}

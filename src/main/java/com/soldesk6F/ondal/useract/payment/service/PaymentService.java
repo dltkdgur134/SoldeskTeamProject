@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final AuthenticationManager authenticationManager;
+
     private final CartController cartController;
 
     private final SecurityConfig securityConfig;
@@ -91,6 +94,9 @@ public class PaymentService {
 
 	@Value("${toss.secret-key}")
     private String tossSecretKey;
+
+
+
 
  
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
@@ -397,7 +403,22 @@ public class PaymentService {
 	}
 
 	
-	
+	@Transactional
+	public void tryRefundOndalPay(String tossOrderId , String cancelReason , UUID userUUID) {
+		
+	    Optional<Payment> optPayment = paymentRepository.findByTossOrderId(tossOrderId);
+		
+		Payment payment = optPayment.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카트입니다."));
+		payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
+		Optional<User> optUser = userRepository.findById(userUUID);
+		User user = optUser.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
+		int ondalPay = user.getOndalPay();
+		int refundAmount = payment.getAmount();
+		user.setOndalPay(ondalPay+refundAmount);
+		userRepository.save(user);
+		paymentRepository.save(payment);
+		
+	}
 	
 
 	@Transactional
