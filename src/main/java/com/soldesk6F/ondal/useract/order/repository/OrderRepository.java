@@ -1,6 +1,7 @@
 // OrderRepository.java
 package com.soldesk6F.ondal.useract.order.repository;
 
+import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
@@ -17,6 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findByStore_StoreId(UUID storeId);
 	List<Order> findByUser(User user);
     List<Order> findAllByOrderToRider(OrderToRider pending);
+    long countByStore(Store store);
     
  // 반경 내 주문 조회 쿼리 추가
     @Query(value = """

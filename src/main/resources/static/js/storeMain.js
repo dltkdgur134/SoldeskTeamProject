@@ -1,12 +1,41 @@
 document.addEventListener('DOMContentLoaded', function () {
 	function filterMenus(category) {
-		const menuCards = document.querySelectorAll('.menu-card');
-		menuCards.forEach(card => {
-			const cardCategory = card.getAttribute('data-category');
-			card.style.display = (category === '전체' || cardCategory === category) ? 'flex' : 'none';
+		const normalizedCategory = category.trim();
+
+		// 메뉴 그룹 전체 기준으로 숨기기 처리
+		document.querySelectorAll('.menu-category-group').forEach(group => {
+			const title = group.querySelector('.category-title')?.textContent?.trim();
+			const normalizedTitle = title?.trim();
+
+			group.style.display = (
+				normalizedCategory === '전체' || normalizedTitle === normalizedCategory
+			) ? 'block' : 'none';
 		});
+
+		// 탭 스타일 처리
 		document.querySelectorAll('.menu-tabs .tab').forEach(btn => btn.classList.remove('active'));
 	}
+	
+	function filterMenus(category, btn) {
+		const normalizedCategory = category.trim();
+		const menuCards = document.querySelectorAll('.menu-card');
+		menuCards.forEach(card => {
+			const cardCategory = card.getAttribute('data-category')?.trim();
+			card.style.display = (normalizedCategory === '전체' || cardCategory === normalizedCategory)
+				? 'flex' : 'none';
+		});
+		document.querySelectorAll('.menu-tabs .tab').forEach(b => b.classList.remove('active'));
+		btn.classList.add('active');
+	}
+
+	// ✅ 버튼에 이벤트 바인딩
+	document.querySelectorAll('.menu-tabs .tab').forEach(btn => {
+		btn.addEventListener('click', function () {
+			const category = btn.dataset.category;
+			filterMenus(category, btn); // ✅ 여기서 호출
+		});
+	});
+
 	window.filterMenus = function (category, btn) {
 		filterMenus(category);
 		btn.classList.add('active');
@@ -298,6 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(res => res.json())
 			.then(result => {
 				alert(result.message || '장바구니에 담겼습니다.');
+				closeModal();
 			})
 			.catch(err => {
 				console.error(err);
@@ -372,4 +402,41 @@ document.addEventListener('DOMContentLoaded', function () {
 	closeModalTopBtn?.addEventListener('click', closeModal);
 	window.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 	window.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+	
+	const heartBtn = document.getElementById('favorite-btn');
+	if (heartBtn) {
+		heartBtn.addEventListener('click', () => {
+			const storeId = heartBtn.getAttribute('data-store-id');
+
+			fetch(`/favorites/toggle/${storeId}`, {
+				method: 'POST',
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest'
+				}
+			})
+			.then(res => res.json())
+			.then(data => {
+				if (data.status === 'added') {
+					heartBtn.classList.add('filled');
+				} else if (data.status === 'removed') {
+					heartBtn.classList.remove('filled');
+				}
+			})
+			.catch(err => {
+				console.error('찜 토글 실패', err);
+			});
+		});
+	}
+	
 });
+
+window.openStoreInfoModal = function () {
+	document.getElementById('store-info-modal').classList.remove('hidden');
+	document.body.style.overflow = 'hidden';
+}
+
+window.closeStoreInfoModal = function () {
+	document.getElementById('store-info-modal').classList.add('hidden');
+	document.body.style.overflow = 'auto';
+}
+

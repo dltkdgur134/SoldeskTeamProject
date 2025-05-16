@@ -71,8 +71,14 @@
 										<div class="store-row">
 											<img class="store-image" src="${store.imageUrl}" alt="${store.storeName}">
 											<div class="store-info">
-												<p class="store-name">${store.storeName}</p>
 												<p class="store-category">[${categoryMap[store.category] || store.category}]</p>
+												<p class="store-name">
+													${store.storeName}
+													<span style="font-size: 12px; color: #444; margin-left: 5px;">
+														<span style="color: gold;">🌜</span> ${store.avgRating.toFixed(1)} (${store.reviewCount})
+													</span>
+												</p>
+												<p class="store-delivery">무료배달 최소주문 10,000원 </p>
 											</div>
 										</div>
 									</a>

@@ -54,13 +54,13 @@
 }
 
 .menu-list {
-	display: block;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+	gap: 15px;
 	padding: 20px;
 }
 
 .menu-card {
-	width: 400px;
-	height: 150px;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -87,11 +87,6 @@
 .menu-card .menu-info {
 	flex: 1;
 	padding: 0;
-	flex-direction: column;
-	justify-content: center;
-	gap: 4px;
-	padding: 5px 10px 5px 0;
-	box-sizing: border-box;
 }
 
 .menu-card img {
@@ -138,12 +133,6 @@
 	margin-bottom: 30px;
 }
 
-.menu-group-wrapper {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 15px;
-}
-
 #menu-image {
 	border-radius: 5px;
 }
@@ -159,7 +148,6 @@
 .category-title {
 	font-size: 18px;
 	font-weight: bold;
-	text-align: left;
 	margin: 10px 0 0 5px;
 	color: #333;
 }

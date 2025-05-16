@@ -16,6 +16,15 @@ $('.rating span').click(function() {
 
 // 페이지 로딩 시 달점 표기
 $(function() {
+	var flashDurationInSeconds = 5;
+	var flashContainerId = 'flash-messages';
+
+	function removeFlashMessages() {
+		$('#' + flashContainerId).remove();
+	}
+	setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
+
+	// 리뷰 조회 페이지용
 	const reviewForms = document.querySelectorAll("form[id^='review-form']");
 
 	reviewForms.forEach((form) => {
@@ -36,18 +45,34 @@ $(function() {
 			});
 		}
 	});
-
+	
+	// 리뷰 수정 페이지용
+	const reviewForm = document.querySelector("form[id^='updateReviewForm']");
+	const ratingInput = reviewForm.querySelector("input[id^='rating-stars']");
+	const ratingValue = parseInt(ratingInput.value, 10);
+	if (!isNaN(ratingValue)) {
+		const stars = reviewForm.querySelectorAll(".star");
+		stars.forEach((star) => {
+			const starId = parseInt(star.id, 10);
+			if (starId <= ratingValue) {
+				star.classList.add("selected");
+			} else {
+				star.classList.remove("selected");
+			}
+		});
+	}
 });
 
 // 리뷰 작성 업로드 이미지 프리뷰
 document.getElementById('review-img').addEventListener('change', function(event) {
 	const files = event.target.files; // 선택된 파일들
 	const previewContainer = document.getElementById('image-preview-container');
+	const fileCount = document.getElementById('file-count');
 	previewContainer.innerHTML = ''; // 이전 프리뷰 삭제
 
 	// 이미지는 1장 까지만 업로드 가능
 	if (files.length > 3) {
-		previewContainer.innerHTML = '<p><i class="fa-solid fa-circle-exclamation"></i>  리뷰 이미지는 최대 1개까지 등록 가능합니다.</p>';
+		previewContainer.innerHTML = '<p><i class="fa-solid fa-circle-exclamation"></i>  리뷰 이미지는 최대 3개까지 등록 가능합니다.</p>';
 	} else if (files.length > 0 && files.length < 4) {
 		Array.from(files).forEach(file => {
 			const reader = new FileReader();
@@ -57,12 +82,21 @@ document.getElementById('review-img').addEventListener('change', function(event)
 				const img = document.createElement('img');
 				img.src = e.target.result; // 이미지 소스 설정
 				img.alt = file.name;
-				img.style = 'max-width: 100px; height: auto; margin: 5px; border: 3px solid  #667EFF; padding: 5px; border-radius: 5px;';
+				img.style = 'max-width: 150px; height: 150px; margin: 5px; border: 3px solid  #667EFF; padding: 5px; border-radius: 5px;';
 
 				// 프리뷰 컨테이너 안에 이미지 넣기
 				previewContainer.appendChild(img);
-			};
 
+				// 선택된 업로드할 이미지 개수 표기
+				fileCount.innerHTML = "(" + files.length + "/3)";
+
+				// 파일 개수가 3개면 글자색을 빨간색으로 변경
+				if (files.length == 3) {
+					fileCount.style.color = "red";
+				} else {
+					fileCount.style.color = "#667EFF";
+				}
+			};
 			reader.readAsDataURL(file); //파일을 data url로 읽어오기
 		});
 	} else {
@@ -107,47 +141,48 @@ function checkReview() {
 function deleteReview(count) {
 	const form = document.getElementById('review-form' + count);
 	const reviewId = form.reviewId;
-	
+
 	const btn = document.getElementById('delete-review-btn' + count);
 	btn.innerHTML = "<span class='spinner-border spinner-border-sm' aria-hidden='true'></span>";
 	fetch('/content/deleteReview/' + reviewId.value, {
 		method: "delete",
 		headers: {
-			'Content-Type' : 'application/json'
+			'Content-Type': 'application/json'
 		}
-	})	
-	.then(response => {
-		if (!response.ok) {
-			throw new Error('리뷰 삭제 실패 응답 상태: ' + response.status);
-		}
-		return response.json();
 	})
-	.then(data => {
-		if (data.result === 0) {
-			const container = document.getElementById('result-msg-container');
-			const statusContainer = document.getElementById('result-status');
-			
-			container.innerHTML = 
-				"<div class='alert alert-success' id='flash-messages' role='alert'>" +
-				"<i class='fa-solid fa-circle-check'></i>" +
-				"<strong>" + data.resultMsg + "</strong>" +
-				"</div>";
-			statusContainer.innerHTML = 
-				"<div class='spinner-border text-dark'' role='status'><span class='visually-hidden'>로딩중...</span></div>";
-			var flashDurationInSeconds = 2;
-			var flashContainerId = 'result-msg-container';
-			
-			function removeFlashMessages() {
-				$('#' + flashContainerId).remove();
-			} setTimeout(removeFlashMessages, flashDurationInSeconds * 500); // 요청 응답 메시지 표시
-			
-		} else {
-			alert(data.resultMsg); // 에러 메시지
-		}
-		setTimeout(function() {location.reload(); }, 1000); // 페이지 새로고침
-	})
-	.catch(error => {
-		console.error('오류 발생', error);
-		alert('삭제 중 오류가 발생했습니다.')
-	});
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('리뷰 삭제 실패 응답 상태: ' + response.status);
+			}
+			return response.json();
+		})
+		.then(data => {
+			if (data.result === 0) {
+				const container = document.getElementById('result-msg-container');
+				const statusContainer = document.getElementById('result-status');
+
+				container.innerHTML =
+					"<div class='alert alert-success' id='flash-messages' role='alert'>" +
+					"<i class='fa-solid fa-circle-check'></i>" +
+					"<strong>" + data.resultMsg + "</strong>" +
+					"</div>";
+				statusContainer.innerHTML =
+					"<div class='spinner-border text-dark'' role='status'><span class='visually-hidden'>로딩중...</span></div>";
+				var flashDurationInSeconds = 2;
+				var flashContainerId = 'result-msg-container';
+
+				function removeFlashMessages() {
+					$('#' + flashContainerId).remove();
+				} setTimeout(removeFlashMessages, flashDurationInSeconds * 500); // 요청 응답 메시지 표시
+
+			} else {
+				alert(data.resultMsg); // 에러 메시지
+			}
+			setTimeout(function() { location.reload(); }, 1000); // 페이지 새로고침
+		})
+		.catch(error => {
+			console.error('오류 발생', error);
+			alert('삭제 중 오류가 발생했습니다.')
+		});
 }
+
