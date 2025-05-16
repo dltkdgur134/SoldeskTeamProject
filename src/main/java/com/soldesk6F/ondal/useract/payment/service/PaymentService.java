@@ -502,11 +502,6 @@ public class PaymentService {
 	}
 
 	}	
-	
-	
-	
-	
-	
 	@Transactional
 	public void refundTossPayment(String paymentKey, String cancelReason, UUID userUuid) {
 	    Payment payment = paymentRepository.findByPaymentKey(paymentKey)
