@@ -86,8 +86,7 @@ public class FavoritesController {
 	@GetMapping("/favorites")
 	public String showFavorites(Model model) {
 		
-		
-		return "/content/favorites";
+return "/content/favorites";
 		
 	}
 	

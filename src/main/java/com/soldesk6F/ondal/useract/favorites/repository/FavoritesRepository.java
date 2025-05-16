@@ -17,6 +17,7 @@ public interface FavoritesRepository extends JpaRepository<Favorites, UUID> {
 
 	Optional<Favorites> findByUser_UserUuid(UUID userUUID);
 	
+
 }
 
 
