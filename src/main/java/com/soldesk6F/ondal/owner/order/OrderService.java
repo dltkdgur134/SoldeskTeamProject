@@ -157,6 +157,12 @@ public class OrderService {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
     }
+    
+    public List<UUID> findActiveOrderIdsByUser(String userUuid) {
+        return orderRepository.findActiveOrderIds(
+                 UUID.fromString(userUuid),
+                 List.of(OrderToOwner.PENDING, OrderToOwner.CONFIRMED, OrderToOwner.IN_DELIVERY));
+    }
 
     @Transactional(readOnly = true)
     public List<Order> findAllByOwner() {
@@ -167,7 +173,7 @@ public class OrderService {
         // 1) 매장 존재 확인이 필요하다면
         storeRepository.findById(storeId)
             .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
-
+        
         // 2) 실제로 주문만 조회
         return orderRepository.findByStore_StoreId(storeId);
     }

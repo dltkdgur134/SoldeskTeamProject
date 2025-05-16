@@ -56,7 +56,7 @@ public class TestOrderController {
     public String createOrder(@ModelAttribute TestOrderRequestDto requestDto,
     		@AuthenticationPrincipal CustomUserDetails principal,
     		RedirectAttributes redirectAttributes) {
-        UUID userId = principal.getUserId();
+        UUID userId = principal.getUserUuid();
         orderService.createTestOrder(requestDto, userId);
         redirectAttributes.addFlashAttribute("message", "테스트 주문이 생성되었습니다!");
         return "redirect:/testOrder";

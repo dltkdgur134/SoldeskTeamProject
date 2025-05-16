@@ -17,7 +17,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class OrderResponseDto {
-	private UUID userId;
+	private UUID userUuid;
     private UUID orderId;
     private Integer orderNumber;
     private String deliveryAddress;
@@ -75,8 +75,9 @@ public class OrderResponseDto {
         }
 
         return OrderResponseDto.builder()
-        	.userId(order.getUser() != null ? UUID.fromString(order.getUser().getUserId()) : null)
+        	.userUuid(order.getUser() != null ? order.getUser().getUserUuid() : null)
             .orderId(order.getOrderId())
+            .orderNumber(order.getOrderNumber())
             .orderToOwner(order.getOrderToOwner())
             .orderToRider(order.getOrderToRider())
             .deliveryAddress(order.getDeliveryAddress())

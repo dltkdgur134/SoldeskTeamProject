@@ -22,7 +22,7 @@
 			</div>
 			<!-- 로그인한 사람들을 위한 로고 -->
 			<div sec:authorize="isAuthenticated()"
-				th:with="role=${#authentication.principal.user.userRole.name()}" style="position: relative;">
+				th:with="role=${#authentication.principal.roleName}" style="position: relative;">
 
 				<a href="javascript:void(0);" onclick="toggleRoleLogos()" class = logo>
 				<img src="/css/imgs/Logo_ondal_Home.png" 

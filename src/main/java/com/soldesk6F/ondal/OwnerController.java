@@ -30,7 +30,7 @@ public class OwnerController {
 	    // 2) 모델에 매장 정보와 storeId 담기
 	    Store store = storeService.findStoreByStoreId(storeId);
 	    model.addAttribute("store", store);
-	    model.addAttribute("storeId", store.getStoreId().toString()); // Thymeleaf에서 data-storeid로 쓰기 위함
+	    model.addAttribute("storeId", storeId.toString()); // Thymeleaf에서 data-storeid로 쓰기 위함
 
 	    return "content/store/storeManagement";
 	}

@@ -6,8 +6,8 @@ console.log('🧪 [window.storeId]:', window.storeId);
 console.log('🧪 [document.body.dataset.storeid]:', document.body.dataset.storeid);
 
 function notifyUserOrderUpdate(order) {
-  if (!order || !order.userId) {
-    console.warn('🔕 유저 알림 보낼 수 없음: userId 없음');
+  if (!order || !order.userUuid) {
+    console.warn('🔕 유저 알림 보낼 수 없음: userUuid 없음');
     return;
   }
   stompClient.send('/app/notifyUser', {}, JSON.stringify(order));

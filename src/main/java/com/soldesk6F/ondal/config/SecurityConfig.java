@@ -3,12 +3,13 @@ package com.soldesk6F.ondal.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.soldesk6F.ondal.login.CustomAuthFailureHandler;
@@ -54,9 +55,10 @@ public class SecurityConfig{
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-    	AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        builder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
-        return builder.build();
+    	DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    	provider.setUserDetailsService(customUserDetailsService);
+        provider.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
+        return new ProviderManager(provider);
 //        return http.getSharedObject(AuthenticationManagerBuilder.class)
 //                .userDetailsService(customUserDetailsService)
 //                .passwordEncoder(passwordEncoder())
@@ -100,9 +102,11 @@ public class SecurityConfig{
     			.anyRequest().authenticated() 
 				)
 			.formLogin(form -> form
-				.loginPage("/login/tryLogin")           // 우리가 만든 로그인 페이지
-//				.loginProcessingUrl("/login")  // 로그인 form의 action 주소 (POST)
+				.loginPage("/login")           // 우리가 만든 로그인 페이지
+				.loginProcessingUrl("/tryLogin")  // 로그인 form의 action 주소 (POST)
 				.defaultSuccessUrl("/",true)        // 로그인 성공 후 이동할 주소
+				.usernameParameter("username")
+				.passwordParameter("password")
 				.failureUrl("/login?error")    // 로그인 실패 시 주소
 				.permitAll()
 			)
@@ -125,7 +129,7 @@ public class SecurityConfig{
 				)
 			)
 			.csrf(csrf -> csrf.disable());
-
+			
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//.authorizeHttpRequests(auth -> auth // 임시 로그인 비활성화
 		//.anyRequest().permitAll() // 모든 요청 허용

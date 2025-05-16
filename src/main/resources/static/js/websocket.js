@@ -1,153 +1,134 @@
-// websocket.js
+// websocket.js  (Order-centric 구독 전환)
 let stompClient = null;
-let currentOrderIds = new Set();
+const currentOrderIds = new Set();
 
+/* ─────────────────────────────── WebSocket 연결 ────────────────────────────── */
 function connectGlobalWebSocket() {
-  const userId = document.body.dataset.userid;
-  if (!userId) {
-    console.warn('❗ userId 없음, WebSocket 연결 생략');
-    return;
-  }
+  const userUuid = document.body.dataset.userid;
+  if (!userUuid) return console.warn('userId 없음, WS 미연결');
 
-  const socket = new SockJS('/stomp');
-  stompClient = Stomp.over(socket);
+  stompClient = Stomp.over(new SockJS('/stomp'));
 
-  stompClient.connect({}, frame => {
-    console.log('🌐 WebSocket connected:', frame);
+  // ① 성공 콜백
+  const onConnected = frame => {
+    console.log('🌐 connected:', frame.headers);
 
-    stompClient.subscribe('/topic/user/' + userId, message => {
-      const data = JSON.parse(message.body); // 서버에서 보낸 메시지를 JSON으로 파싱
-	  console.log("수신된 메시지:", data); // 수신된 데이터 로그
-	 
-	   // 수신된 데이터로 알림 표시
-      showOrderNotification(data);
-
-      if (data.orderId && !currentOrderIds.has(data.orderId)) {
-        subscribeOrderTopics(data.orderId);
-        currentOrderIds.add(data.orderId);
-      }
+    /* 새 주문 알림용 채널 */
+    stompClient.subscribe(`/topic/user/${userUuid}`, msg => {
+      const dto = JSON.parse(msg.body);
+      showOrderNotification(dto);
+      subscribeOrderChannels(dto.orderId);
     });
-  }, error => {
-    console.error('❌ WebSocket 연결 실패:', error);
-  });
+
+    /* 로그인 직후 서버에 “진행 중 주문 목록” 요청 */
+    fetch('/user/order/active-ids')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`); // 500 방어
+        return r.json();
+      })
+      .then(ids => ids.forEach(subscribeOrderChannels))
+      .catch(e => console.error('active-ids 가져오기 실패:', e));
+  };
+
+  // ② 실패 콜백
+  const onError = error => {
+    console.error('❌ WS 연결 실패:', error);
+  };
+
+  stompClient.connect({}, onConnected, onError);
 }
 
-// ✅ 특정 주문 채팅/상태 구독
-function subscribeOrderTopics(orderId) {
-  if (!stompClient) return;
+/* ────────── 주문별 채팅·상태 토픽 구독  ────────── */
+function subscribeOrderChannels(orderId) {
+  if (!stompClient || currentOrderIds.has(orderId)) return;
+  currentOrderIds.add(orderId);
 
-  stompClient.subscribe('/topic/chat/' + orderId, message => {
-    const chat = JSON.parse(message.body);
+  /* 상태 알림 */
+  stompClient.subscribe(`/topic/order/${orderId}`, msg => {
+    const update = JSON.parse(msg.body);
+    console.log('[order-topic]', orderId, update);
+    showOrderNotification(update);       // 토스트
+    updateStatusChart?.(update.stage);   // 선택 UI
+    moveRiderMarker?.(update.location?.lat, update.location?.lng);
+    updateCookingProgress?.(update.stage);
+    startExpectedTimeCountdown?.(
+        update.expectCookingTime, update.expectDeliveryTime);
+  });
+
+  /* 채팅 메시지 */
+  stompClient.subscribe(`/topic/chat/${orderId}`, msg => {
+    const chat = JSON.parse(msg.body);
     showChatMessage(chat);
   });
-
-  stompClient.subscribe('/topic/order/' + orderId, msg => {
-    const payload = JSON.parse(msg.body);
-    updateStatusChart(payload.stage);
-    moveRiderMarker(payload.location.lat, payload.location.lng);
-    updateCookingProgress(payload.stage);
-    startExpectedTimeCountdown(payload.expectCookingTime, payload.expectDeliveryTime);
-  });
 }
 
-// ✅ 알림 표시
-function showOrderNotification(orderDto) {
-  const status = orderDto.orderToOwner || orderDto.orderStatus || 'UNKNOWN';
-  if (!orderDto.orderId) {
-    console.warn('알림 데이터 누락:', orderDto);
-    return;
+/* ────────── 알림 토스트 & 채팅창 시스템 메시지 ────────── */
+function showOrderNotification(dto) {
+  const status = dto.orderToOwner || dto.orderStatus || 'UNKNOWN';
+  showToast(`📦 주문 #${dto.orderId} 상태: "${status}"`);
+
+  // (선택) 시스템 메시지를 채팅창에도 넣기
+  if (document.getElementById('chatMessages')) {
+    const div = document.createElement('div');
+    div.className = 'chat-message system';
+    div.innerHTML = `<em>시스템:</em> 주문 상태가 <b>${status}</b> 로 변경되었습니다.`;
+    chatMessages.append(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
-  showToast(`📦 주문 #${orderDto.orderId} 상태: "${status}"`);
 }
 
-// ✅ 채팅 표시
+/* ────────── 채팅 표시 ────────── */
 function showChatMessage(chat) {
-  const container = document.getElementById('chatMessages');
-  if (!container) return;
-
+  const box = document.getElementById('chatMessages');
+  if (!box) return;
   const el = document.createElement('div');
   el.className = 'chat-message';
-  el.innerHTML = `
-    <strong>${chat.sender}:</strong> ${chat.text}
-    <div class="timestamp small text-muted">${new Date(chat.timestamp).toLocaleTimeString()}</div>
-  `;
-  container.appendChild(el);
-  container.scrollTop = container.scrollHeight;
-
-  if (!$('#chatPanel').is(':visible')) {
-    $('#unreadBadge').text('1').show();
-  }
+  el.innerHTML =
+    `<strong>${chat.sender}:</strong> ${chat.text}
+     <div class="timestamp small text-muted">
+       ${new Date(chat.timestamp).toLocaleTimeString()}
+     </div>`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
 }
 
-// ✅ 토스트 메세지
-function showToast(message) {
-  let container = document.getElementById('toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toast-container';
-    container.style.position = 'fixed';
-    container.style.top = '10px';
-    container.style.right = '10px';
-    container.style.zIndex = 10000;
-    document.body.appendChild(container);
+/* ────────── 토스트 UI ────────── */
+function showToast(msg) {
+  let wrap = document.getElementById('toast-container');
+  if (!wrap) {
+    wrap = Object.assign(document.createElement('div'), {
+      id: 'toast-container',
+      style: 'position:fixed;top:10px;right:10px;z-index:10000'
+    });
+    document.body.append(wrap);
   }
-
-  const toast = document.createElement('div');
-  toast.className = 'toast-message';
-  toast.textContent = message;
-  Object.assign(toast.style, {
-    background: '#333', color: '#fff', padding: '10px 20px',
-    marginBottom: '10px', borderRadius: '5px', opacity: '0.9',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.3)', transition: 'opacity 0.5s ease'
+  const toast = Object.assign(document.createElement('div'), {
+    className: 'toast-message',
+    textContent: msg,
+    style: 'background:#333;color:#fff;padding:10px 20px;margin-bottom:10px;' +
+           'border-radius:5px;opacity:0.9;box-shadow:0 2px 5px rgba(0,0,0,0.3);' +
+           'transition:opacity .5s'
   });
-
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => container.removeChild(toast), 500);
-  }, 3000);
+  wrap.append(toast);
+  setTimeout(() => { toast.style.opacity = 0; setTimeout(() => toast.remove(), 500); }, 3000);
 }
 
-// ✅ 채팅 전송
+/* ────────── 채팅 전송 ────────── */
 function sendChat() {
   const input = document.getElementById('chatInput');
-  if (!input || !stompClient) return;
-
-  const text = input.value.trim();
-  if (!text) return;
-
-  const payload = {
-    orderId: Array.from(currentOrderIds)[0],  // 가장 최근 주문에 보내기
-    sender: '사용자',
-    text: text,
+  if (!input.value.trim() || !stompClient) return;
+  const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
+  stompClient.send(`/app/chat/${orderId}`, {}, JSON.stringify({
+    orderId, sender: '사용자', text: input.value.trim(),
     timestamp: new Date().toISOString()
-  };
-  stompClient.send('/app/chat/' + payload.orderId, {}, JSON.stringify(payload));
+  }));
   input.value = '';
 }
 
-// ✅ 메시지 읽음 처리
-function markMessagesAsRead() {
-  $('#unreadBadge').hide();
-}
-
-$('.chat-button').click(function () {
-  $('#chatPanel').show();
-  markMessagesAsRead();
-});
-
-// ✅ 초기화
+/* ────────── 초기화 ────────── */
 document.addEventListener('DOMContentLoaded', () => {
   connectGlobalWebSocket();
-
-  const sendBtn = document.getElementById('sendChatBtn');
-  const chatInput = document.getElementById('chatInput');
-
-  if (sendBtn && chatInput) {
-    sendBtn.addEventListener('click', sendChat);
-    chatInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') sendChat();
-    });
-  }
+  document.getElementById('sendChatBtn')?.addEventListener('click', sendChat);
+  document.getElementById('chatInput')?.addEventListener('keypress',
+    e => e.key === 'Enter' && sendChat());
 });
