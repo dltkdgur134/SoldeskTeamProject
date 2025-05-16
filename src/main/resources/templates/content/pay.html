@@ -30,9 +30,10 @@
 		const agreementPrivate = document.getElementById("term2");
 		const agreementMarketing = document.getElementById("term3");
 		const checkAll = document.getElementById("allAgree");
+		const status= document.getElementById("status");
+		const failReason = document.getElementById("failReason");
 		const oPay = document.getElementById("o-pay");
 		const toss = document.getElementById("toss");
-		
 		const pays = [oPay, toss];
 
 		pays.forEach(pay => {
@@ -47,6 +48,14 @@
 	      console.error("결제 버튼이 문서에 존재하지 않습니다.");
 	      return;
 	    }
+		
+		if (status && (status.value === "실패" || status.textContent === "실패")) {
+		  alert(failReason.value);
+		}else{
+			alert(status.value);
+		}
+		
+		
 
 	    payBtn.addEventListener("click", function () {
 		  if(!(agreementPrivate.checked&&agreementPrivate.checked)){
@@ -180,7 +189,7 @@
       <div class="col-lg-8 order-1 order-lg-0">
         <!-- 장바구니 -->
         <h5 class="section-title">담은 메뉴</h5>
-		<div id="cartItems" class="list-group mb-4" th:each="item : ${cids}">
+		<div id="cartItems" class="list-group mb-		4" th:each="item : ${cids}">
 		    <div class="list-group-item py-3 d-flex align-items-center">
 		      <img th:src="${item.menuImg}" alt="상품 이미지" class="cart-item-img me-3" />
 		      <div class="flex-grow-1">
@@ -311,7 +320,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h1 class="modal-title fs-5" id="checkUserPasswordAndGoWalletLabel">
-						비밀번호 입력</h1>
+						계정 비밀번호 입력</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"
 						aria-label="Close"></button>
 				</div>
@@ -327,8 +336,10 @@
 								name="currentPassword" id="currentPassword-input"
 								aria-describedby="basic-addon2">
 						</div>
-						<input type="hidden" value="${cartId}" name="cartUUID"/>
+						<input type="hidden" th:value="${cartId}" name="cartUUID"/>												
 					</form>
+						<input type="hidden" th:value="${status}" id = "status">
+						<input type="hidden" th:value="${failReason}" name="failReason" id = "failReason">
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-primary"

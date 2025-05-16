@@ -17,6 +17,7 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.user.service.UserService;
+import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class UpdateUserController {
 
 	private final UserService userService;
+	private final PaymentService paymentService;
 	
 	// 닉네임 중복확인
 	@PostMapping("/checkNickname") 
@@ -117,11 +119,10 @@ public class UpdateUserController {
 
 		return "redirect:/myPage";
 	}
-
-	@PostMapping("/checkUserPasswordAndTryOndalPay")
+	
+	@PostMapping("/checkUserPasswordAndGoOndalPay")
 	public String checkUserPasswordAndGoPoint(
-			@RequestParam(value = "currentPassword", required = false) String Password,
-			@RequestParam(value = "cartUUID") UUID cartUUID,
+			@RequestParam(value = "Password", required = false) String Password,
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes redirectAttributes,Model model
 			){
@@ -131,16 +132,19 @@ public class UpdateUserController {
 		if (isCorrect) {
 			UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
 	        User freshUser = userRepository.findById(userUuid)
-	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));		        
+	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+	        redirectAttributes.addFlashAttribute("success", "비밀번호 확인 성공");
 	        model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	        model.addAttribute("ondalPay", freshUser.getOndalPay());
-	        model.addAttribute("cartUUID" , cartUUID);
 	        model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
-			return "forward:/store/pay";
+			return "redirect:/ondalPay";
+		}else {
+			redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
 		}
 		
 		return "redirect:/myPage";
 	}
+
 	
 	@PostMapping("/user/goToPoints")
 	public String withdraw(

@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.controller.user.DeleteUserController;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.cart.controller.CartController;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
@@ -65,6 +67,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final CartController cartController;
+
     private final SecurityConfig securityConfig;
 
     private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
@@ -87,6 +91,7 @@ public class PaymentService {
 	@Value("${toss.secret-key}")
     private String tossSecretKey;
 
+ 
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -191,7 +196,45 @@ public class PaymentService {
 //	        return "<pre>토스 결제 승인 에러:\n" + e.getResponseBodyAsString() + "</pre>";
 //	    }
 //	}
+	
+	@Transactional
+	public String tryOndalPay(UUID cartUUID) {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+		if (auth != null && auth.isAuthenticated()) {
+		    Object principal = auth.getPrincipal();
+
+		    if (principal instanceof CustomUserDetails userDetails) {
+		        User user = userDetails.getUser();
+			    Optional<Cart> optCart = cartRepository.findByUser(user);
+			    Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
+			    int totalPrice = cart.getTotalPrice();
+			    int ondalPay = user.getOndalPay();
+			    if(totalPrice>ondalPay) {
+			    	return "잔액이 부족합니다\n현재 잔액:"+ondalPay+":@:실패";
+			    }else {
+			    	int nowOndalPay = ondalPay-totalPrice;
+			    	user.setOndalPay(ondalPay);
+			    	userRepository.save(user);
+			    	return nowOndalPay+":@:성공";
+			    }
+			    
+		        
+		        
+		    }
+		    return "유저가 비회원임:@:실패";
+		    
+		}else {
+			return "유저가 없음:@:실패";
+			
+		}
+		
+	}
+	
+	
+	
+	
 	@Transactional
 	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";
