@@ -212,7 +212,7 @@ public class PaymentService {
 			    Optional<Cart> optCart = cartRepository.findByUser(nowUser);
 			    Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
 			    int totalPrice = cart.getTotalPrice();
-			    int ondalPay = user.getOndalPay();
+			    int ondalPay = nowUser.getOndalPay();
 			    if(totalPrice>ondalPay) {
 			    	return "잔액이 부족합니다\n현재 잔액:"+ondalPay+":@:실패";
 			    }else {
@@ -260,7 +260,7 @@ public class PaymentService {
 			    	payment.setPaymentStatus(PaymentStatus.COMPLETED);
 			    	paymentRepository.save(payment);
 			    	orderRepository.save(order);
-			    	user.setOndalPay(ondalPay);
+			    	user.setOndalPay(nowOndalPay);
 			    	userRepository.save(user);
 			    	cartRepository.deleteById(cartUUID);
 			    	return nowOndalPay+":@:성공";
