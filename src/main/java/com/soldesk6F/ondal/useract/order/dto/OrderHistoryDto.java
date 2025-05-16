@@ -24,6 +24,7 @@ public class OrderHistoryDto {
         dto.setStoreName(order.getStore().getStoreName());
         dto.setStoreImageUrl(order.getStore().getBrandImg());
         dto.setOrderStatus(order.getOrderToOwner().name());
+        //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
         dto.setOrderDate(order.getOrderTime().toString());
         dto.setMenuItems(order.getOrderDetails().stream()
             .map(d -> d.getMenu().getMenuName())

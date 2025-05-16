@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soldesk6F.ondal.functions.DateFunctions;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.menu.repository.MenuRepository;
 import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
@@ -40,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class OrderService {
 
+	private DateFunctions dateFunctions;
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
@@ -181,6 +183,7 @@ public class OrderService {
         dto.setStoreName(order.getStore().getStoreName());
         dto.setStoreImageUrl(order.getStore().getBrandImg());
         dto.setOrderStatus(order.getOrderToOwner().name());
+        //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
         dto.setOrderDate(order.getOrderTime().toString());
         var menuNames = order.getOrderDetails().stream()
                              .map(d -> d.getMenu().getMenuName())

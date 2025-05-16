@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal.functions;
 
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -57,7 +59,10 @@ public class DateFunctions {
 		return years + "년 전";
 	}
 	
-	
+	public String changeDateToString(LocalDateTime date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.DD (E) hh:mm");
+		return sdf.format(date);
+	}
 	
 }
 

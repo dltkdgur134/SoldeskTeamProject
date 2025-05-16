@@ -82,3 +82,44 @@
 .order-box-footer .btn {
   font-size: 0.9em;
 }
+
+
+
+/* ver.2 */
+.history-box {
+	border:none !important;
+	box-shadow: none !important;
+}
+
+.rounded-circle {
+	height: 50px;
+	width: 50px;
+}
+
+.days-left {
+	font-size: 0.5em;
+}
+
+.write-review-btn {
+	color: black;
+	border: #6c757d solid 1px;
+}
+
+.order-date {
+	color: #8E8E8E;
+	float: left;
+}
+
+.store-name {
+	font-size: 1.5em;
+}
+
+.icon-link {
+	text-decoration: none;
+	color: black;
+}
+
+.status {
+	font-weight: bold;
+  	color: #2D7121;
+}
