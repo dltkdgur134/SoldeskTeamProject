@@ -91,6 +91,7 @@
 	box-shadow: none !important;
 }
 
+
 .rounded-circle {
 	height: 50px;
 	width: 50px;
@@ -122,4 +123,8 @@
 .status {
 	font-weight: bold;
   	color: #2D7121;
+}
+
+.card-text {
+	font-size: 1.2em;
 }

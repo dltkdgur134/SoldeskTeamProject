@@ -83,16 +83,17 @@
     <p th:if="${history == null or #lists.isEmpty(history)}" class="no-orders">
       아직 주문 내역이 없습니다.
     </p>
-
     <div th:each="order : ${history}" class="card mb-3">
       <div class="card-body row">
         <!-- 왼쪽: 매장 대표 이미지 -->
-        <div class="col">
-		    <small class="order-date" th:text="${order.orderDate}"></small> <br>
+        <div class="col d-flex justify-content-between">
+		    <small class="order-date" th:text="${order.orderDate}"></small> 
+		    <span class="status" th:text="${order.orderStatus}">배달중</span>
         </div>
         <div class="row">
 	        <div class="img-container col-md-auto ms-4">
-	          <img th:src="${order.storeImageUrl}" class="img-fluid rounded-circle" alt="매장 이미지" />
+	          <img th:src="${order.storeImageUrl}" class="img-fluid rounded-circle" alt="매장 이미지" th:if="${order.storeImageUrl != null}"/>
+	          <img th:src="@{/img/store/storeimg/default_img.jpg}" class="img-fluid rounded-circle" alt="기본 이미지" th:if="${order.storeImageUrl == null}"/>
 	        </div>
         	<div class="col-md-auto text-start align-self-center">
         		<a href="#" class="icon-link icon-link-hover">
@@ -106,8 +107,7 @@
         	</div>
         </div>
         <!-- 오른쪽: 상세 정보 -->
-        <div class="container">
-          <span class="status" th:text="${order.orderStatus}">배달중</span>
+        <div class="container text-start ms-4 my-3">
           <!-- 메뉴 항목 2개까지만, 나머지는 "외 n개" -->
           <p class="card-text">
             <span th:each="item,iterStat : ${order.menuItems}"
@@ -140,8 +140,6 @@
     </div>
   </div>
 </section>
-
-
 
 <script>
 let stompClient = null;
