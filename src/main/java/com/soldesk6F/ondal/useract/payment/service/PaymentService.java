@@ -1,9 +1,8 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -40,6 +39,7 @@ import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.controller.user.DeleteUserController;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.cart.controller.CartController;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
@@ -51,13 +51,13 @@ import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
-import com.soldesk6F.ondal.useract.payment.dto.PaymentHistoryDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.TossRefundResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
+import com.soldesk6F.ondal.useract.payment.entity.PaymentFailLog;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentFailLogRepository;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 
@@ -66,6 +66,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+
+    private final CartController cartController;
 
     private final SecurityConfig securityConfig;
 
@@ -89,6 +91,7 @@ public class PaymentService {
 	@Value("${toss.secret-key}")
     private String tossSecretKey;
 
+ 
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -193,7 +196,45 @@ public class PaymentService {
 //	        return "<pre>토스 결제 승인 에러:\n" + e.getResponseBodyAsString() + "</pre>";
 //	    }
 //	}
+	
+	@Transactional
+	public String tryOndalPay(UUID cartUUID) {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+		if (auth != null && auth.isAuthenticated()) {
+		    Object principal = auth.getPrincipal();
+
+		    if (principal instanceof CustomUserDetails userDetails) {
+		        User user = userDetails.getUser();
+			    Optional<Cart> optCart = cartRepository.findByUser(user);
+			    Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
+			    int totalPrice = cart.getTotalPrice();
+			    int ondalPay = user.getOndalPay();
+			    if(totalPrice>ondalPay) {
+			    	return "잔액이 부족합니다\n현재 잔액:"+ondalPay+":@:실패";
+			    }else {
+			    	int nowOndalPay = ondalPay-totalPrice;
+			    	user.setOndalPay(ondalPay);
+			    	userRepository.save(user);
+			    	return nowOndalPay+":@:성공";
+			    }
+			    
+		        
+		        
+		    }
+		    return "유저가 비회원임:@:실패";
+		    
+		}else {
+			return "유저가 없음:@:실패";
+			
+		}
+		
+	}	
+	
+	
+	
+	
 	@Transactional
 	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";
@@ -261,25 +302,9 @@ public class PaymentService {
 			payment.setPaymentKey(tossResponse.getPaymentKey());
 			payment.setTossOrderId(tossResponse.getOrderId());
 			payment.setUser(user);
+			payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
+			payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
 			payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
-			// 요청 시각 (OffsetDateTime, 예: 2025-05-15T01:10:16Z)
-			OffsetDateTime requestedAt = tossResponse.getRequestedAt();
-
-			// UTC 기준 시간을 서울 시간으로 변환
-			ZonedDateTime seoulRequestedAt = requestedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-
-			// 엔티티에 저장할 때 LocalDateTime으로 변환 (서울 시간 기준)
-			payment.setRequestedAt(seoulRequestedAt.toLocalDateTime());
-
-			// 승인 시각도 동일하게 처리
-			OffsetDateTime approvedAt = tossResponse.getApprovedAt();
-			if (approvedAt != null) {
-			    ZonedDateTime seoulApprovedAt = approvedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-			    payment.setApprovedAt(seoulApprovedAt.toLocalDateTime());
-			}
-
-			
-			
 			switch (tossResponse.getMethod()) {
 			case "카드":
 				payment.setPaymentMethod(PaymentMethod.CREDIT);
@@ -325,6 +350,8 @@ public class PaymentService {
 		}
 	}
 
+	
+	
 	
 
 	@Transactional
@@ -378,22 +405,8 @@ public class PaymentService {
 	                .refundReason(null)
 	                .build();
 
-	     // 요청 시각 (OffsetDateTime, 예: 2025-05-15T01:10:16Z)
-	        OffsetDateTime requestedAt = tossResponse.getRequestedAt();
-
-	        // UTC 기준 시간을 서울 시간으로 변환
-	        ZonedDateTime seoulRequestedAt = requestedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-
-	        // 엔티티에 저장할 때 LocalDateTime으로 변환 (서울 시간 기준)
-	        payment.setRequestedAt(seoulRequestedAt.toLocalDateTime());
-
-	        // 승인 시각도 동일하게 처리
-	        OffsetDateTime approvedAt = tossResponse.getApprovedAt();
-	        if (approvedAt != null) {
-	            ZonedDateTime seoulApprovedAt = approvedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-	            payment.setApprovedAt(seoulApprovedAt.toLocalDateTime());
-	        }
-
+	        payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
+	        payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
 
 	        // 결제 방식에 따라 설정
 	        switch (tossResponse.getStatus()) {
@@ -526,8 +539,7 @@ public class PaymentService {
 
 	    System.out.println("환불 응답: " + response.getBody());
 	}
-
-
-
 	
+	
+	    
 }
