@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/favorites")
 public class FavoritesController {
 
 	private final FavoritesService favoritesService;
