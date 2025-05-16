@@ -119,6 +119,40 @@ public class UpdateUserController {
 
 		return "redirect:/myPage";
 	}
+
+	@PostMapping("/checkUserPasswordAndTryOndalPay")
+	public String checkUserPasswordAndGoPoint(
+			@RequestParam(value = "currentPassword", required = false) String Password,
+			@RequestParam(value = "cartUUID") UUID cartUUID,
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			RedirectAttributes redirectAttributes,Model model
+			){
+		
+		boolean isCorrect = userService.checkPassword(userDetails, Password, redirectAttributes);
+		
+		if (isCorrect) {
+			
+			String Paystatus =  paymentService.tryOndalPay(cartUUID);
+			if(Paystatus != null) {
+				String resultAndStatus [] = Paystatus.split(":@:");
+				if(resultAndStatus[1].equals("성공")) {
+					
+					return "redirect:/";
+				}else {
+			        model.addAttribute("cartUUID" , cartUUID);
+					model.addAttribute("failReason",resultAndStatus[0]);
+					model.addAttribute("status",resultAndStatus[1]);
+					return "forward:/store/pay";
+				}
+			}
+			
+			
+		}
+        model.addAttribute("cartUUID" , cartUUID);
+        model.addAttribute("status","실패");
+        model.addAttribute("failReason","비밀번호가 틀렸습니다");
+        return "forward:/store/pay";
+	}
 	
 	@PostMapping("/checkUserPasswordAndGoOndalPay")
 	public String checkUserPasswordAndGoPoint(
@@ -144,7 +178,8 @@ public class UpdateUserController {
 		
 		return "redirect:/myPage";
 	}
-
+	
+	
 	
 	@PostMapping("/user/goToPoints")
 	public String withdraw(
