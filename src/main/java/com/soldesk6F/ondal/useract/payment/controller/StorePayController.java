@@ -93,21 +93,6 @@ public class StorePayController {
 
 	}
 	
-	@GetMapping("/refundTest")
-	public String showRefundTestResult(@RequestParam("paymentKey") String paymentKey ,@RequestParam("refundReason")String refundReason) {
-		
-		paymentService.refundTossPayment(paymentKey, refundReason);
-		
-		
-		return "/content/index";
-	}
-	
-	
-	
-	
-	
-	
-	
 	
 	private String validateCartItems(Cart cart, RedirectAttributes redirectAttributes) {
 		for (CartItems item : cart.getCartItems()) {

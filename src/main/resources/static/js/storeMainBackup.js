@@ -1,19 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-	// 메뉴 필터링
 	function filterMenus(category) {
 		const menuCards = document.querySelectorAll('.menu-card');
-
 		menuCards.forEach(card => {
 			const cardCategory = card.getAttribute('data-category');
-			if (category === '전체' || cardCategory === category) {
-				card.style.display = 'block';
-			} else {
-				card.style.display = 'none';
-			}
+			card.style.display = (category === '전체' || cardCategory === category) ? 'flex' : 'none';
 		});
-
-		const buttons = document.querySelectorAll('.menu-tabs .tab');
-		buttons.forEach(btn => btn.classList.remove('active'));
+		document.querySelectorAll('.menu-tabs .tab').forEach(btn => btn.classList.remove('active'));
 	}
 
 	window.filterMenus = function (category, btn) {
@@ -21,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		btn.classList.add('active');
 	};
 
-	// 슬라이더 세팅
 	let currentSlide = 0;
 	const slidesContainer = document.getElementById('slides');
 	const slideItems = document.querySelectorAll('#slides .slide');
@@ -30,37 +21,48 @@ document.addEventListener('DOMContentLoaded', function () {
 	const slideWidth = slideItems.length > 0 ? slideItems[0].clientWidth : 0;
 
 	function showSlide(index) {
-		if (index >= totalSlides) {
-			currentSlide = 0;
-		} else if (index < 0) {
-			currentSlide = totalSlides - 1;
-		} else {
-			currentSlide = index;
-		}
-
+		currentSlide = (index + totalSlides) % totalSlides;
 		slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-
 		dots.forEach(dot => dot.classList.remove('active'));
-		if (dots[currentSlide]) {
-			dots[currentSlide].classList.add('active');
-		}
+		if (dots[currentSlide]) dots[currentSlide].classList.add('active');
 	}
 
-	document.querySelectorAll('.dot').forEach((dot, index) => {
-		dot.addEventListener('click', () => {
-			showSlide(index);
-		});
+	dots.forEach((dot, index) => {
+		dot.addEventListener('click', () => showSlide(index));
 	});
 
-	// 슬라이드 드래그
-	let isDragging = false;
-	let startX = 0;
-	let currentTranslate = 0;
-	let prevTranslate = 0;
-	let animationID;
-	const dragThreshold = 50;
+	let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = 0, animationID;
+	function getPositionX(event) {
+		return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+	}
+	function animation() {
+		setSliderPosition();
+		if (isDragging) requestAnimationFrame(animation);
+	}
+	function setSliderPosition() {
+		slidesContainer.style.transform = `translateX(${currentTranslate}px)`;
+	}
+	function setPositionByIndex() {
+		slidesContainer.classList.add('transition');
+		currentTranslate = -currentSlide * slideWidth;
+		prevTranslate = currentTranslate;
+		slidesContainer.style.transform = `translateX(${currentTranslate}px)`;
+		dots.forEach(dot => dot.classList.remove('active'));
+		if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+	}
 
-	function touchStart(index) {
+	slideItems.forEach((slide, index) => {
+		const slideImage = slide.querySelector('img');
+		slide.addEventListener('mousedown', start(index));
+		slide.addEventListener('mouseup', end);
+		slide.addEventListener('mouseleave', () => { if (isDragging) end(); });
+		slide.addEventListener('mousemove', move);
+		slide.addEventListener('touchstart', start(index));
+		slide.addEventListener('touchend', end);
+		slide.addEventListener('touchmove', move);
+		slideImage.addEventListener('dragstart', e => e.preventDefault());
+	});
+	function start(index) {
 		return function (event) {
 			isDragging = true;
 			startX = getPositionX(event);
@@ -68,295 +70,345 @@ document.addEventListener('DOMContentLoaded', function () {
 			slidesContainer.classList.remove('transition');
 		}
 	}
-
-	function touchMove(event) {
+	function move(event) {
 		if (!isDragging) return;
 		const currentPosition = getPositionX(event);
 		currentTranslate = prevTranslate + currentPosition - startX;
 	}
-
-	function touchEnd() {
+	function end() {
 		isDragging = false;
 		cancelAnimationFrame(animationID);
-
 		const movedBy = currentTranslate - prevTranslate;
-
-		if (movedBy < -dragThreshold) {
-			currentSlide++;
-		} else if (movedBy > dragThreshold) {
-			currentSlide--;
-		}
-
-		if (currentSlide < 0) {
-			currentSlide = totalSlides - 1;
-		} else if (currentSlide >= totalSlides) {
-			currentSlide = 0;
-		}
-
+		if (movedBy < -50) currentSlide++;
+		if (movedBy > 50) currentSlide--;
 		setPositionByIndex();
 	}
+	setPositionByIndex();
 
-	function getPositionX(event) {
-		return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-	}
-
-	function animation() {
-		setSliderPosition();
-		if (isDragging) {
-			requestAnimationFrame(animation);
-		}
-	}
-
-	function setSliderPosition() {
-		slidesContainer.style.transform = `translateX(${currentTranslate}px)`;
-	}
-
-	function setPositionByIndex() {
-		slidesContainer.classList.add('transition');
-		currentTranslate = -currentSlide * slideWidth;
-		prevTranslate = currentTranslate;
-		slidesContainer.style.transform = `translateX(${currentTranslate}px)`;
-
-		dots.forEach(dot => dot.classList.remove('active'));
-		if (dots[currentSlide]) {
-			dots[currentSlide].classList.add('active');
-		}
-	}
-
-	slideItems.forEach((slide, index) => {
-		const slideImage = slide.querySelector('img');
-
-		slide.addEventListener('mousedown', touchStart(index));
-		slide.addEventListener('mouseup', touchEnd);
-		slide.addEventListener('mouseleave', () => {
-			if (isDragging) touchEnd();
-		});
-		slide.addEventListener('mousemove', touchMove);
-
-		slide.addEventListener('touchstart', touchStart(index));
-		slide.addEventListener('touchend', touchEnd);
-		slide.addEventListener('touchmove', touchMove);
-
-		slideImage.addEventListener('dragstart', (e) => e.preventDefault());
-	});
-
-	setPositionByIndex(); // 초기 슬라이드 세팅
-
-	// 메뉴 카드 클릭 시 모달 띄우기
 	const modal = document.getElementById('menu-modal');
 	const modalMenuName = document.getElementById('menu-name');
 	const modalMenuDescription = document.getElementById('menu-description');
 	const modalMenuPrice = document.getElementById('menu-price');
 	const modalMenuImage = document.getElementById('menu-image');
-	const closeModalFooterBtn = document.getElementById('close-modal-footer');
-	const closeModalTopBtn = document.getElementById('close-modal-top');
-	
-	let quantity = 1;
 	const quantityEl = document.getElementById('menu-quantity');
-	
-
-	
+	const closeModalTopBtn = document.getElementById('close-modal-top');
+	const optionsContainer = document.getElementById('menu-options');
+	let quantity = 1;
 	let basePrice = 0;
 
-	if (modal && modalMenuName && modalMenuDescription && modalMenuPrice && modalMenuImage) {
-		document.querySelectorAll('.menu-card').forEach(card => {
-			card.addEventListener('click', () => {
-				const clickedCard = event.currentTarget;
-				
-				const name = clickedCard.getAttribute('data-name');
-				const description = clickedCard.getAttribute('data-description');
-				const price = clickedCard.getAttribute('data-price');
-				const imageUrl = clickedCard.getAttribute('data-image');
-				
-				const optionsContainer = document.getElementById('menu-options');
+	document.querySelectorAll('.menu-card').forEach(card => {
+		const status = card.getAttribute("data-status");
 
-				quantity = 1;
-				quantityEl.textContent = 1;
+		if (status === 'SOLD_OUT') {
+			card.classList.add("sold-out");
+			card.setAttribute("title", "품절된 메뉴입니다");
+			return;
+		}
+		
+		card.addEventListener('click', () => {
+			const name = card.getAttribute('data-name');
+			const description = card.getAttribute('data-description');
+			const price = card.getAttribute('data-price');
+			const imageUrl = card.getAttribute('data-image');
 
-				const decreaseBtn = document.getElementById('decrease-btn');
-				const increaseBtn = document.getElementById('increase-btn');
+			quantity = 1;
+			basePrice = parseInt(price);
+			quantityEl.textContent = '1';
+			modalMenuName.textContent = name;
+			modalMenuDescription.textContent = description;
+			modalMenuPrice.textContent = price + '원';
+			modalMenuImage.src = imageUrl;
+			setupCartButton(card);
+			optionsContainer.innerHTML = '';
 
-				// 새로 바뀐 요소를 다시 참조
-				const newDecreaseBtn = decreaseBtn.cloneNode(true);
-				const newIncreaseBtn = increaseBtn.cloneNode(true);
+			let hasOption = false;
 
-				decreaseBtn.parentNode.replaceChild(newDecreaseBtn, decreaseBtn);
-				increaseBtn.parentNode.replaceChild(newIncreaseBtn, increaseBtn);
+			for (let i = 1; i <= 3; i++) {
+				const rawGroup = card.getAttribute(`data-option${i}`);
+				const rawPrices = card.getAttribute(`data-option${i}-price`);
 
-				// 이벤트 등록 (중복 방지됨)
-				newDecreaseBtn.addEventListener('click', () => {
-					if (quantity > 1) {
-						quantity--;
-						quantityEl.textContent = quantity;
-						updateTotalOptionPrice();
-					}
-				});
+				if (!rawGroup || !rawPrices) continue;
 
-				newIncreaseBtn.addEventListener('click', () => {
-					if (quantity < 99) {
-						quantity++;
-						quantityEl.textContent = quantity;
-						updateTotalOptionPrice();
-					}
-				});
-				
-				const addToCartBtn = document.getElementById('add-to-cart-btn');
-				if (addToCartBtn.dataset.listener !== 'true') {
-					addToCartBtn.addEventListener('click', () => {
-						const menuId = clickedCard.getAttribute('data-id');
-						const storeId = clickedCard.getAttribute('data-store-id');
-						const quantity = parseInt(quantityEl.textContent);
-						const selectedOptions = Array.from(document.querySelectorAll('input[name="menuOption"]:checked'))
-							.map(cb => cb.value);
-	
-						const data = {
-							menuId: menuId,
-							storeId: storeId,
-							quantity: quantity,
-							options: selectedOptions
-						};
-	
-						fetch('/cart/add', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							body: JSON.stringify(data)
-						})
-						.then(res => res.json())
-						.then(result => {
-							alert(result.message || '장바구니에 담겼습니다.');
-						})
-						.catch(error => {
-							console.error('담기 실패:', error);
-							alert('서버 오류로 장바구니에 담지 못했습니다.');
-						});
-					});
-					addToCartBtn.dataset.listener = 'true'; // 중복 방지
-				}
-				basePrice = parseInt(price);
+				const [groupName, optionRaw] = rawGroup.split(":");
+				const names = optionRaw?.split("@@__@@") || [];
+				const prices = rawPrices.split("@@__@@");
 
-				modalMenuPrice.textContent = price + '원';
-				addToCartBtn.textContent = `${basePrice.toLocaleString()}원 담기`;
+				if (names.length === 0 || prices.length === 0) continue;
 
-				const option1 = clickedCard.getAttribute('data-option1');
-				const option1Price = clickedCard.getAttribute('data-option1-price');
-				const option2 = clickedCard.getAttribute('data-option2');
-				const option2Price = clickedCard.getAttribute('data-option2-price');
-				const option3 = clickedCard.getAttribute('data-option3');
-				const option3Price = clickedCard.getAttribute('data-option3-price');
+				const groupBox = document.createElement("div");
+				groupBox.className = "option-group-box";
 
-				modalMenuName.textContent = name;
-				modalMenuDescription.textContent = description;
-				modalMenuPrice.textContent = price + '원';
-				modalMenuImage.src = imageUrl;
+				const groupTitle = document.createElement("p");
+				groupTitle.textContent = groupName;
+				groupTitle.className = "option-group-title";
+				groupBox.appendChild(groupTitle);
 
-				optionsContainer.innerHTML = '';
+				names.forEach((optName, idx) => {
+					const optPrice = prices[idx];
+					if (!optName || !optPrice || isNaN(optPrice)) return;
 
-				function createOptionCheckbox(optionName, optionPrice) {
-					if (!isValidOption(optionName, optionPrice)) return;
-					
-					const cleanName = String(optionName).replace(/[\[\]]/g, "").trim();
-					const cleanPrice = String(optionPrice).replace(/[\[\]]/g, "").trim();
+					const label = document.createElement("label");
+					label.className = "option-label";
 
-					const label = document.createElement('label');
-					const checkbox = document.createElement('input');
+					const checkbox = document.createElement("input");
 					checkbox.type = 'checkbox';
-					checkbox.name = 'menuOption';
-					checkbox.value = optionName.trim();
+					checkbox.name = `menuOption${i}`;
+					checkbox.value = optName.trim();
+					checkbox.addEventListener('change', updateTotal);
 
-					checkbox.addEventListener('change', updateTotalOptionPrice);
+					const nameSpan = document.createElement("span");
+					nameSpan.className = "option-name";
+					nameSpan.textContent = optName.trim();
+
+					const priceSpan = document.createElement("span");
+					priceSpan.className = "option-price";
+					priceSpan.textContent = `+${parseInt(optPrice).toLocaleString()}원`;
 
 					label.appendChild(checkbox);
-					label.appendChild(document.createTextNode(
-						`${cleanName} +${cleanPrice}원`));
+					label.appendChild(nameSpan);
+					label.appendChild(priceSpan);
 
-					optionsContainer.appendChild(label);
-					optionsContainer.appendChild(document.createElement('br'));
-				}
+					const itemDiv = document.createElement("div");
+					itemDiv.className = "option-item";
+					itemDiv.appendChild(label);
 
-				function updateTotalOptionPrice() {
-					const checkboxes = optionsContainer.querySelectorAll('input[name="menuOption"]:checked');
-					let optionTotal = 0;
-					checkboxes.forEach(checkbox => {
-						const label = checkbox.parentElement.textContent;
-						const priceMatch = label.match(/\+\s*([\d,]+)원/);
-						if (priceMatch) {
-							const price = parseInt(priceMatch[1].replace(',', ''));
-							optionTotal += price;
-						}
-					});
-					const total = (basePrice + optionTotal) * quantity;
-					/*document.getElementById('menu-total-price').textContent = `추가 금액: ${optionTotal.toLocaleString()}원`;*/
-					document.getElementById('add-to-cart-btn').textContent = `${total.toLocaleString()}원 담기`;
-				}
-				
-				/*updateTotalOptionPrice();*/
-				
-				function isValidOption(name, price) {
-					const trimmedName = String(name ?? "").trim();
-					let trimmedPrice = String(price ?? "").trim();
+					groupBox.appendChild(itemDiv);
+					hasOption = true;
+				});
 
-					// 대괄호 제거
-					trimmedPrice = trimmedPrice.replace(/[\[\]]/g, "");
+				optionsContainer.appendChild(groupBox);
+			}
 
-					return (
-						trimmedName !== "" &&
-						trimmedName.toLowerCase() !== "null" &&
-						trimmedName.toLowerCase() !== "undefined" &&
-						trimmedPrice !== "" &&
-						/^\d+$/.test(trimmedPrice)
-					);
-				}
-				
-				if (isValidOption(option1, option1Price)) createOptionCheckbox(option1, option1Price);
-				if (isValidOption(option2, option2Price)) createOptionCheckbox(option2, option2Price);
-				if (isValidOption(option3, option3Price)) createOptionCheckbox(option3, option3Price);
+			if (!hasOption) {
+				const p = document.createElement('p');
+				p.textContent = '선택 가능한 옵션이 없습니다.';
+				optionsContainer.appendChild(p);
+			}
 
-				if (
-					!isValidOption(option1, option1Price) &&
-					!isValidOption(option2, option2Price) &&
-					!isValidOption(option3, option3Price)
-				) {
-					const noOption = document.createElement('p');
-					noOption.textContent = '선택 가능한 옵션이 없습니다.';
-					optionsContainer.appendChild(noOption);
-				}
-				
-				modal.style.display = 'flex';
-				document.body.style.overflow = 'hidden';
-			});
+			modal.style.display = 'flex';
+			document.body.style.overflow = 'hidden';
 		});
+	});
 
-		function closeModal() {
-			modal.style.display = 'none';
-			document.body.style.overflow = 'auto';
-		}
+	function createOption(name, price) {
+		const cleanName = name.replace(/[\[\]]/g, '').trim();
+		const cleanPrice = price.replace(/[\[\]]/g, '').trim();
+		const label = document.createElement('label');
+		const checkbox = document.createElement('input');
+		checkbox.type = 'checkbox';
+		checkbox.name = 'menuOption';
+		checkbox.value = name.trim();
+		checkbox.addEventListener('change', updateTotal);
+		label.appendChild(checkbox);
+		label.append(` ${cleanName} +${cleanPrice}원`);
+		optionsContainer.appendChild(label);
+		optionsContainer.appendChild(document.createElement('br'));
+	}
 
-		if (closeModalFooterBtn) {
-			closeModalFooterBtn.addEventListener('click', (event) => {
-				event.stopPropagation();
-				closeModal();
-			});
-		}
+	function isValidOption(name, price) {
+		return name && price &&
+			name.trim().toLowerCase() !== 'null' &&
+			price.trim().match(/^\d+$/);
+	}
 
-		if (closeModalTopBtn) {
-			closeModalTopBtn.addEventListener('click', (event) => {
-				event.stopPropagation();
-				closeModal();
-			});
-		}
+	function updateTotal() {
+		const selected = document.querySelectorAll('#menu-options input[type="checkbox"]:checked');
+		let optionTotal = 0;
+		selected.forEach(cb => {
+			const itemDiv = cb.closest('.option-item');
+			const priceSpan = itemDiv?.querySelector('.option-price');
+			if (!priceSpan) return;
 
-		window.addEventListener('click', (event) => {
-			if (event.target === modal) {
-				closeModal();
+			const priceText = priceSpan.textContent.match(/\+([\d,]+)원/);
+			if (priceText) {
+				optionTotal += parseInt(priceText[1].replace(/,/g, ""));
+			}
+		});
+		const total = (basePrice + optionTotal) * quantity;
+		document.getElementById('add-to-cart-btn').textContent = `${total.toLocaleString()}원 담기`;
+	}
+
+	function setupCartButton(card) {
+		const oldBtn = document.getElementById('add-to-cart-btn');
+		const newBtn = oldBtn.cloneNode(true);
+		oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+
+		const decreaseBtn = document.getElementById('decrease-btn');
+		const increaseBtn = document.getElementById('increase-btn');
+
+		const newDecreaseBtn = decreaseBtn.cloneNode(true);
+		const newIncreaseBtn = increaseBtn.cloneNode(true);
+
+		decreaseBtn.parentNode.replaceChild(newDecreaseBtn, decreaseBtn);
+		increaseBtn.parentNode.replaceChild(newIncreaseBtn, increaseBtn);
+
+		newDecreaseBtn.addEventListener('click', () => {
+			if (quantity > 1) {
+				quantity--;
+				quantityEl.textContent = quantity;
+				updateTotal();
+			}
+		});
+		newIncreaseBtn.addEventListener('click', () => {
+			if (quantity < 99) {
+				quantity++;
+				quantityEl.textContent = quantity;
+				updateTotal();
 			}
 		});
 
-		window.addEventListener('keydown', (event) => {
-			if (event.key === "Escape") {
+		newBtn.addEventListener('click', () => {
+			const selectedOptions = Array.from(document.querySelectorAll('input[name^="menuOption"]:checked')).map(cb => {
+				const label = cb.closest('.option-label');
+				const group = cb.closest('.option-group-box')?.querySelector('.option-group-title')?.textContent?.trim();
+				const name = label.querySelector('.option-name')?.textContent?.trim() || cb.value;
+				const priceText = label.querySelector('.option-price')?.textContent || '';
+				const match = priceText.match(/[\+]?[\s]*([\d,]+)\s*원/);
+				const price = match ? parseInt(match[1].replace(/,/g, '')) : 0;
+				
+				console.log('📦 Parsed option:', {
+					groupName: group,
+					name,
+					priceRaw: priceText,
+					priceParsed: price
+				});
+
+				return {
+					groupName: group || '',
+					name,
+					price
+				};
+			});
+
+			const optionTotal = selectedOptions.reduce((sum, opt) => sum + opt.price, 0);
+
+			const unitPrice = basePrice + optionTotal;
+			const totalPrice = unitPrice * quantity;
+
+			const data = {
+				menuId: card.getAttribute('data-id'),
+				storeId: card.getAttribute('data-store-id'),
+				quantity: quantity,
+				options: selectedOptions,
+			};
+			fetch('/cart/add', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(data)
+			})
+			.then(res => res.json())
+			.then(result => {
+				alert(result.message || '장바구니에 담겼습니다.');
 				closeModal();
-			}
+			})
+			.catch(err => {
+				console.error(err);
+				alert('담기에 실패했습니다.');
+			});
+		});
+
+		updateTotal();
+		const optionsContainer = document.getElementById('menu-options');
+		optionsContainer.innerHTML = '';
+
+		const option1 = card.getAttribute('data-option1');
+		const option1Price = card.getAttribute('data-option1-price');
+		const option2 = card.getAttribute('data-option2');
+		const option2Price = card.getAttribute('data-option2-price');
+		const option3 = card.getAttribute('data-option3');
+		const option3Price = card.getAttribute('data-option3-price');
+
+		function isValidOption(name, price) {
+			const trimmedName = String(name ?? '').trim();
+			let trimmedPrice = String(price ?? '').trim();
+			trimmedPrice = trimmedPrice.replace(/[\[\]]/g, '');
+			return (
+				trimmedName !== '' &&
+				trimmedName.toLowerCase() !== 'null' &&
+				trimmedName.toLowerCase() !== 'undefined' &&
+				trimmedPrice !== '' &&
+				/^\d+$/.test(trimmedPrice)
+			);
+		}
+
+		function createOptionCheckbox(optionName, optionPrice) {
+			if (!isValidOption(optionName, optionPrice)) return;
+
+			const cleanName = String(optionName).replace(/[\[\]]/g, '').trim();
+			const cleanPrice = String(optionPrice).replace(/[\[\]]/g, '').trim();
+
+			const label = document.createElement('label');
+			const checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.name = 'menuOption';
+			checkbox.value = optionName.trim();
+
+			checkbox.addEventListener('change', updateTotal);
+
+			label.appendChild(checkbox);
+			label.appendChild(document.createTextNode(`${cleanName} +${cleanPrice}원`));
+
+			optionsContainer.appendChild(label);
+			optionsContainer.appendChild(document.createElement('br'));
+		}
+
+		if (isValidOption(option1, option1Price)) createOptionCheckbox(option1, option1Price);
+		if (isValidOption(option2, option2Price)) createOptionCheckbox(option2, option2Price);
+		if (isValidOption(option3, option3Price)) createOptionCheckbox(option3, option3Price);
+
+		if (
+			!isValidOption(option1, option1Price) &&
+			!isValidOption(option2, option2Price) &&
+			!isValidOption(option3, option3Price)
+		) {
+			const noOption = document.createElement('p');
+			noOption.textContent = '선택 가능한 옵션이 없습니다.';
+			optionsContainer.appendChild(noOption);
+		}
+	}
+
+	function closeModal() {
+		modal.style.display = 'none';
+		document.body.style.overflow = 'auto';
+	}
+	closeModalTopBtn?.addEventListener('click', closeModal);
+	window.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+	window.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+	
+	const heartBtn = document.getElementById('favorite-btn');
+	if (heartBtn) {
+		heartBtn.addEventListener('click', () => {
+			const storeId = heartBtn.getAttribute('data-store-id');
+
+			fetch(`/favorites/toggle/${storeId}`, {
+				method: 'POST',
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest'
+				}
+			})
+			.then(res => res.json())
+			.then(data => {
+				if (data.status === 'added') {
+					heartBtn.classList.add('filled');
+				} else if (data.status === 'removed') {
+					heartBtn.classList.remove('filled');
+				}
+			})
+			.catch(err => {
+				console.error('찜 토글 실패', err);
+			});
 		});
 	}
+	
 });
+
+window.openStoreInfoModal = function () {
+	document.getElementById('store-info-modal').classList.remove('hidden');
+	document.body.style.overflow = 'hidden';
+}
+
+window.closeStoreInfoModal = function () {
+	document.getElementById('store-info-modal').classList.add('hidden');
+	document.body.style.overflow = 'auto';
+}
+
