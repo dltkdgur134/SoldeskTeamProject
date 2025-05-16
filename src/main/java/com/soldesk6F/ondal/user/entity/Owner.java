@@ -49,7 +49,6 @@ public class Owner {
     @CreationTimestamp
     @Column(name = "registration_date" , updatable = false)
     private LocalDateTime registrationDate;
-
     
     
     // Owner 생성자에 owner_id와 registrationDate가 없는 이유: 이 둘은 자동으로 생성하는 값이기에 없어도 된다.

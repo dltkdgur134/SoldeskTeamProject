@@ -20,10 +20,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     // STOMP 엔드포인트 설정 (SockJS 사용)
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // /stomp 라는 엔드포인트로 WebSocket 또는 SockJS 연결
         registry.addEndpoint("/stomp")
-        .setAllowedOriginPatterns("*")
-        .withSockJS();
+                .addInterceptors(new AuthHandshakeInterceptor())
+                .setHandshakeHandler(new CustomHandshakeHandler())
+                .withSockJS();
     }
     
 }

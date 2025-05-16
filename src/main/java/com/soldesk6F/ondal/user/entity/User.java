@@ -103,7 +103,9 @@ public class User {
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
 	
-
+	@Column(name = "ondal_point",nullable = true)
+	private int ondalPoint;
+	
 	public enum UserStatus {
 		ACTIVE("정상"), // 정상 회원
 		SUSPENDED("일시 정지"), // 일시 정지
