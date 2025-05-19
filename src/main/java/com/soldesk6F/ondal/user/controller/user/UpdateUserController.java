@@ -129,6 +129,8 @@ public class UpdateUserController {
 	public String checkUserPasswordAndGoPoint(
 			@RequestParam(value = "currentPassword", required = false) String Password,
 			@RequestParam(value = "cartUUID") UUID cartUUID,
+			@RequestParam(value ="reqDel")String reqDel,
+			@RequestParam(value ="reqStore")String reqStore,			
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes redirectAttributes,Model model
 			){
@@ -137,7 +139,7 @@ public class UpdateUserController {
 		
 		if (isCorrect) {
 			
-			String Paystatus =  paymentService.tryOndalPay(cartUUID);
+			String Paystatus =  paymentService.tryOndalPay(cartUUID,reqDel,reqStore);
 			if(Paystatus != null) {
 				String resultAndStatus [] = Paystatus.split(":@:");
 				if(resultAndStatus[1].equals("성공")) {

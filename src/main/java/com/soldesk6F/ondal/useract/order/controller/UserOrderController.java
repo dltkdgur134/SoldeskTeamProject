@@ -1,7 +1,5 @@
 package com.soldesk6F.ondal.useract.order.controller;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,6 +18,7 @@ import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 public class UserOrderController {
 	
 	private final OrderService orderService;
+
 	
     /** application.properties 에 kakao.maps.app-key=YOUR_APP_KEY 로 두셨다면 */
     @Value("${kakao.maps.app-key}")
@@ -54,4 +53,5 @@ public class UserOrderController {
             return "content/orderLive";
         }
     }
+    
 }

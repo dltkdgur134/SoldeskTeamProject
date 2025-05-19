@@ -86,9 +86,8 @@ public class FavoritesController {
 	public String showFavorites(Model model) {
 		
 		
-
-		//model.addAttribute("favoriteStores" , favoritesService.);
-
+		
+		
 		
 		
 		
