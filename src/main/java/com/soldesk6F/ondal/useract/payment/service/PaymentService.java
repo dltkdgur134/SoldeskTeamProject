@@ -402,25 +402,6 @@ public class PaymentService {
 		}
 	}
 
-	
-	@Transactional
-	public void tryRefundOndalPay(String tossOrderId , String cancelReason , UUID userUUID) {
-		
-	    Optional<Payment> optPayment = paymentRepository.findByTossOrderId(tossOrderId);
-		
-		Payment payment = optPayment.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카트입니다."));
-		payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
-		Optional<User> optUser = userRepository.findById(userUUID);
-		User user = optUser.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
-		int ondalPay = user.getOndalPay();
-		int refundAmount = payment.getAmount();
-		user.setOndalPay(ondalPay+refundAmount);
-		userRepository.save(user);
-		paymentRepository.save(payment);
-		
-	}
-	
-
 	@Transactional
 	public void confirmOndalWalletCharge(String paymentKey, String orderId, int amount, UUID userUUID) {
 	    String url = "https://api.tosspayments.com/v1/payments/confirm";

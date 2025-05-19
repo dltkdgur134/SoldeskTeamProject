@@ -38,7 +38,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID>{
 		                                  @Param("since") LocalDateTime since);
 
 	Optional<Payment> findByPaymentKey(String paymentKey);
-	Optional<Payment> findByTossOrderId(String tossOrderId);
 
 	@Modifying
 	@Query("UPDATE Payment p SET p.paymentStatus = :status WHERE p.tossOrderId = :tossOrderId")
