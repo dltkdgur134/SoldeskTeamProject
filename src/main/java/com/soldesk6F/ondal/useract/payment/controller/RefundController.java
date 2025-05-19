@@ -21,24 +21,36 @@ public class RefundController {
 	private final PaymentService paymentService;
 
 	@PostMapping("/refund")
-	public String refundPayment(@RequestParam("paymentKey") String paymentKey,
-	                            @RequestParam("refundReason") String cancelReason,
+	public String refundPayment(@RequestParam("refundReason") String cancelReason,
+	                            @RequestParam("paymentMethod") String paymentMethod,
+	                            @RequestParam(value = "paymentKey", required = false) String paymentKey,
+	                            @RequestParam(value = "tossOrderId", required = false) String tossOrderId,
 	                            @AuthenticationPrincipal CustomUserDetails userDetails,
 	                            RedirectAttributes redirectAttributes) {
 	    try {
-	        // 로그인된 사용자 UUID 추출
-	        String userUUIDString = userDetails.getUser().getUserUuidAsString();
-	        UUID userUUID = UUID.fromString(userUUIDString);
+	        UUID userUUID = UUID.fromString(userDetails.getUser().getUserUuidAsString());
 
-	        // 환불 처리 (서비스에 userUuid 전달)
-	        paymentService.refundTossPayment(paymentKey, cancelReason, userUUID);
+	        if ("CASH".equalsIgnoreCase(paymentMethod) ||"CREDIT".equalsIgnoreCase(paymentMethod) ) {
+	            if (paymentKey == null) {
+	                throw new IllegalArgumentException("토스 결재 환불 실패");
+	            }
+	            paymentService.refundTossPayment(paymentKey, cancelReason, userUUID);
+
+	        } else if ("ONDALPAY".equalsIgnoreCase(paymentMethod)) {
+	            if (tossOrderId == null) {
+	                throw new IllegalArgumentException("토스 결재 환불 실패");
+	            }
+	            paymentService.tryRefundOndalPay(tossOrderId, cancelReason, userUUID);
+
+	        }
+
 	        redirectAttributes.addFlashAttribute("success", "환불 성공");
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("error", "환불 실패: " + e.getMessage());
 	    }
 
-	    return "redirect:/userPayHistory"; // 환불 완료 후 이동할 페이지
+	    return "redirect:/userPayHistory";
 	}
 
 }

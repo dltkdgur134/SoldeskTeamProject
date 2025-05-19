@@ -39,6 +39,7 @@
 	</div>
 	<div class="card info-card p-4">
 		<form th:action="@{/user/buyOndalPay}" method="post">
+			<input type="hidden" name="toss_order_id" id="toss_order_id" />
 			<div class="d-flex justify-content-center flex-wrap">
 
 				<div class="mt-4">
@@ -78,7 +79,7 @@
 					type="password" class="form-control" id="Password" name="Password" />
 			</div>
 			<div class="mt-4">
-				<button type="submit" class="btn btn-warning mt-3">O Pay 충전</button>
+				<button id="submitBtn" type="submit" class="btn btn-warning mt-3">O Pay 충전</button>
 			</div>
 		</form>
 	</div>
@@ -93,5 +94,12 @@
       label.querySelector('input').checked = true;
     });
   });
+</script>
+<script>
+document.getElementById('formId').addEventListener('submit', function(event) {
+	  const tossOrderId = crypto.randomUUID();
+	  const requestedAt = new Date().toISOString();
+	  document.getElementById('toss_order_id').value = tossOrderId;
+	});
 </script>
 </html>

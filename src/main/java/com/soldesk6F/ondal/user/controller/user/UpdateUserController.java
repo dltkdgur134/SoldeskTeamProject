@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal.user.controller.user;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +19,7 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.user.service.UserService;
+import com.soldesk6F.ondal.useract.payment.dto.OndalPayChargeRequest;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -208,20 +211,35 @@ public class UpdateUserController {
 	
 	
 	@PostMapping("/user/buyOndalPay")
-	public String buyOndalPay(@RequestParam("amount") int amount,
-			@RequestParam("Password") String Password,
-	                          @AuthenticationPrincipal CustomUserDetails userDetails,
-	                          RedirectAttributes redirectAttributes) {
-		boolean isCorrect = userService.checkPassword(userDetails, Password, redirectAttributes);
-		if(isCorrect) {
-				userService.convertOndalWalletToPay(userDetails, amount);
-				redirectAttributes.addFlashAttribute("success", amount + "원이 O Pay로 충전되었습니다.");
-		}else {
-			
-			redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
-		}
+	public String buyOndalPay(
+	        @RequestParam("amount") int amount,
+	        @RequestParam("Password") String password,
+	        @RequestParam("toss_order_id") String tossOrderId,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        RedirectAttributes redirectAttributes) {
 
-	    return "redirect:/ondalPay"; // 충전 결과를 보여줄 페이지로 이동
+	    boolean isCorrect = userService.checkPassword(userDetails, password, redirectAttributes);
+	    if (!isCorrect) {
+	        redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
+	        return "redirect:/ondalPay";
+	    }
+
+	    try {
+	        OndalPayChargeRequest chargeRequest = new OndalPayChargeRequest();
+	        chargeRequest.setAmount(amount);
+	        chargeRequest.setTossOrderId(tossOrderId);
+	        // 기본값 paymentMethod, paymentUsageType, paymentStatus는 DTO 내부에서 설정됨
+
+
+	        // 컨트롤러에서 LocalDateTime으로 변환해서 서비스에 전달
+	        userService.chargeOndalWallet(chargeRequest, userDetails.getUser().getUserUuid());
+
+	        redirectAttributes.addFlashAttribute("success", amount + "원이 O Pay로 충전되었습니다.");
+	    } catch (Exception e) {
+	        redirectAttributes.addFlashAttribute("error", "충전 중 오류가 발생했습니다: " + e.getMessage());
+	    }
+
+	    return "redirect:/ondalPay";
 	}
 }
 

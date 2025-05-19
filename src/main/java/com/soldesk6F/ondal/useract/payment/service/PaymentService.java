@@ -539,6 +539,44 @@ public class PaymentService {
 
 	    System.out.println("환불 응답: " + response.getBody());
 	}
+
+	@Transactional
+	public void tryRefundOndalPay(String tossOrderId, String cancelReason, UUID userUUID) {
+	    // 1. 결제 정보 조회
+	    Payment payment = paymentRepository.findByTossOrderId(tossOrderId)
+	        .orElseThrow(() -> new IllegalArgumentException("해당 tossOrderId의 결제 내역을 찾을 수 없습니다."));
+
+	    // 2. 결제 유효성 검사
+	    if (!payment.getUser().getUserUuid().equals(userUUID)) {
+	        throw new SecurityException("본인의 결제 내역만 환불할 수 있습니다.");
+	    }
+
+	    if (payment.getPaymentStatus() == PaymentStatus.REFUNDED) {
+	        throw new IllegalStateException("이미 환불된 결제입니다.");
+	    }
+
+	    if (payment.getPaymentMethod() != PaymentMethod.ONDALPAY) {
+	        throw new IllegalStateException("온달페이 결제만 환불 가능합니다.");
+	    }
+
+	    // 3. 유저 정보 및 환불 금액 확보
+	    User user = payment.getUser();
+	    int refundAmount = payment.getAmount(); // 원 단위 금액
+
+	    // 4. 유저 지갑에 금액 복구
+	    user.setOndalPay(user.getOndalPay() + refundAmount);
+	    
+	    userRepository.save(user);
+
+	    // 5. 결제 상태 업데이트
+	    payment.setPaymentStatus(PaymentStatus.REFUNDED);
+	    payment.setRefundReason(cancelReason);
+	    payment.setApprovedAt(LocalDateTime.now());
+	    
+	    paymentRepository.save(payment);
+
+	}
+
 	
 	
 	    
