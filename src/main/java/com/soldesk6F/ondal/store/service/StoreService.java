@@ -89,7 +89,7 @@ public class StoreService {
 				.owner(owner).businessNum(dto.getBusinessNum()).storeName(dto.getStoreName())
 				.category(dto.getCategory()).storePhone(dto.getStorePhone()).storeAddress(dto.getStoreAddress())
 				.storeLatitude(dto.getLatitude()).storeLongitude(dto.getLongitude()).storeLocation(location)
-				.storeStatus(Store.StoreStatus.CLOSED).brandImg(brandImgPath)
+				.storeStatus(Store.StoreStatus.PENDING_APPROVAL).brandImg(brandImgPath)
 				.foodOrigin("").build();
 
 		storeRepository.save(store);
