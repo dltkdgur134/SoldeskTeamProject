@@ -271,12 +271,9 @@ public class OrderService {
         LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
 		for (OrderDetail orderDetails : order.getOrderDetails()) {
 			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
-			String menuName = orderDetails.getMenu().getMenuName();
-			int price = orderDetails.getPrice();
-			int quantity = orderDetails.getQuantity();
-			menuDetails.put("menuName", menuName);
-			menuDetails.put("price", price);
-			menuDetails.put("quantity", quantity);
+			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
+			menuDetails.put("price", orderDetails.getPrice());
+			menuDetails.put("quantity", orderDetails.getQuantity());
 			menuItems.add(menuDetails);
 		}
 		dto.setMenuItems(menuItems);
