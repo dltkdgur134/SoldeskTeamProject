@@ -40,26 +40,62 @@ document.addEventListener('DOMContentLoaded', function () {
 		filterMenus(category);
 		btn.classList.add('active');
 	};
-
-	let currentSlide = 0;
+	
+	let currentSlide = 1;
 	const slidesContainer = document.getElementById('slides');
-	const slideItems = document.querySelectorAll('#slides .slide');
+	let slideItems = document.querySelectorAll('#slides .slide');
+
+	const firstClone = slideItems[0].cloneNode(true);
+	const lastClone = slideItems[slideItems.length - 1].cloneNode(true);
+	firstClone.id = 'first-clone';
+	lastClone.id = 'last-clone';
+
+	slidesContainer.appendChild(firstClone); // 마지막에 첫 복제
+	slidesContainer.insertBefore(lastClone, slideItems[0]); // 처음에 마지막 복제
+
+	// 다시 슬라이드 목록 갱신
+	slideItems = document.querySelectorAll('#slides .slide');
+
 	const dots = document.querySelectorAll('.dot');
+	const slideWidth = slideItems[0].clientWidth;
 	const totalSlides = slideItems.length;
-	const slideWidth = slideItems.length > 0 ? slideItems[0].clientWidth : 0;
+
+	slidesContainer.style.transform = `translateX(-${slideWidth * currentSlide}px)`;
 
 	function showSlide(index) {
-		currentSlide = (index + totalSlides) % totalSlides;
-		slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+		currentSlide = index + 1; // index는 0부터 시작, 실제로는 +1 위치
+		slidesContainer.classList.add('transition');
+		slidesContainer.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+		updateDots();
+	}
+
+	function updateDots() {
 		dots.forEach(dot => dot.classList.remove('active'));
-		if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+		const dotIndex = currentSlide - 1;
+		if (dots[dotIndex]) dots[dotIndex].classList.add('active');
 	}
 
 	dots.forEach((dot, index) => {
 		dot.addEventListener('click', () => showSlide(index));
 	});
 
-	let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = 0, animationID;
+	slidesContainer.addEventListener('transitionend', () => {
+		if (slideItems[currentSlide].id === 'first-clone') {
+			slidesContainer.classList.remove('transition');
+			currentSlide = 1;
+			slidesContainer.style.transform = `translateX(-${slideWidth * currentSlide}px)`;
+		}
+		if (slideItems[currentSlide].id === 'last-clone') {
+			slidesContainer.classList.remove('transition');
+			currentSlide = slideItems.length - 2;
+			slidesContainer.style.transform = `translateX(-${slideWidth * currentSlide}px)`;
+		}
+		updateDots();
+	});
+
+	// 드래그 기능 그대로 유지
+	let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = -slideWidth * currentSlide, animationID;
+
 	function getPositionX(event) {
 		return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
 	}
@@ -75,8 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		currentTranslate = -currentSlide * slideWidth;
 		prevTranslate = currentTranslate;
 		slidesContainer.style.transform = `translateX(${currentTranslate}px)`;
-		dots.forEach(dot => dot.classList.remove('active'));
-		if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+		updateDots();
 	}
 
 	slideItems.forEach((slide, index) => {
@@ -88,21 +123,24 @@ document.addEventListener('DOMContentLoaded', function () {
 		slide.addEventListener('touchstart', start(index));
 		slide.addEventListener('touchend', end);
 		slide.addEventListener('touchmove', move);
-		slideImage.addEventListener('dragstart', e => e.preventDefault());
+		slideImage?.addEventListener('dragstart', e => e.preventDefault());
 	});
+
 	function start(index) {
 		return function (event) {
 			isDragging = true;
 			startX = getPositionX(event);
 			animationID = requestAnimationFrame(animation);
 			slidesContainer.classList.remove('transition');
-		}
+		};
 	}
+
 	function move(event) {
 		if (!isDragging) return;
 		const currentPosition = getPositionX(event);
 		currentTranslate = prevTranslate + currentPosition - startX;
 	}
+
 	function end() {
 		isDragging = false;
 		cancelAnimationFrame(animationID);
@@ -111,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (movedBy > 50) currentSlide--;
 		setPositionByIndex();
 	}
+
 	setPositionByIndex();
 
 	const modal = document.getElementById('menu-modal');
