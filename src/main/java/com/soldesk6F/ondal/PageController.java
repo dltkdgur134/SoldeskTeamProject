@@ -53,12 +53,12 @@ public class PageController {
 
     @GetMapping("/orderHistory")
     public String orderHistory(
-            @AuthenticationPrincipal CustomUserDetails cud,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
     	
         // cud가 null이었으니, @AuthenticationPrincipal을 붙여서 바인딩
     	
-        String userId = cud.getUser().getUserId();
+        String userId = userDetails.getUser().getUserId();
         List<OrderHistoryDto> history = orderService.getOrderHistoryByUser(userId);
         model.addAttribute("history", history);
         return "content/orderHistory";

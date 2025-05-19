@@ -64,5 +64,12 @@ public class DateFunctions {
 		return sdf.format(date);
 	}
 	
+	public Long getDaysLeftForReview(LocalDateTime createdDateTime) {		
+		LocalDate createdDate = createdDateTime.toLocalDate();
+		LocalDate now = LocalDate.now();
+		long daysBetween = ChronoUnit.DAYS.between(createdDate, now);
+		return 14 - daysBetween;
+	}
+	
 }
 

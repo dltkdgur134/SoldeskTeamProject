@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+import com.soldesk6F.ondal.useract.order.dto.OrderInfoDetailDto;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 
 @Controller
@@ -40,7 +41,8 @@ public class UserOrderController {
 
         if (status == OrderToRider.COMPLETED) {
             // 2) 완료된 주문 → orderInfo 페이지
-            OrderHistoryDto dto = orderService.getOrderHistoryDto(orderId);
+            //OrderHistoryDto dto = orderService.getOrderHistoryDto(orderId);
+        	OrderInfoDetailDto dto = orderService.getOrderInfoDetailDto(orderId);
             model.addAttribute("order", dto);
             return "content/orderInfo";
         } else {

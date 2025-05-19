@@ -14,61 +14,6 @@
 </head>
 <body>
 <h1>유저 주문 내역</h1>
-
-<!--  <section layout:fragment="content">
-  <h1>유저 주문 내역</h1>
-	<div class="container text-center">
-		<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
-			<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
-		</div>
-		<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
-			<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
-		</div>
-	</div>
-  <div class="order-history">
-    <p th:if="${history == null or #lists.isEmpty(history)}" class="no-orders">
-      아직 주문 내역이 없습니다.
-    </p>
-
-    <div th:each="order : ${history}" class="order-box">
-      <div class="order-box-content">
-        왼쪽: 매장 대표 이미지
-        <div class="store-image">
-          <img th:src="${order.storeImageUrl}" alt="매장 이미지" />
-        </div>
-        오른쪽: 상세 정보
-        <div class="order-details">
-          <span class="status" th:text="${order.orderStatus}">배달중</span>
-          <h3 class="store-name" th:text="${order.storeName}">가게 이름</h3>
-          메뉴 항목 2개까지만, 나머지는 "외 n개"
-          <p class="menu-summary">
-            <span th:each="item,iterStat : ${order.menuItems}"
-                  th:if="${iterStat.index < 2}"
-                  th:text="${iterStat.index == 0 ? item : ', ' + item}">
-              메뉴1, 메뉴2
-            </span>
-            <span th:if="${order.menuItems.size() > 2}"
-                  th:text="'외 ' + (${order.menuItems.size()} - 2) + '개'">
-              외 n개
-            </span>
-          </p>
-        </div>
-      </div>
-
-      하단: 상세 정보 보기 버튼
-      <div class="order-box-footer">
-        <a th:href="@{'/user/order/' + ${order.orderId}}"
-           class="btn btn-outline-primary">
-          상세 정보 보기
-        </a>
-        <a th:href="@{'/writeReview/' + ${order.orderId}}" class="btn btn-outline-secondary">
-        	리뷰 작성
-        </a>
-      </div>
-    </div>
-  </div>
-</section> -->
-
 <section layout:fragment="content">
   <h1>유저 주문 내역</h1>
 	<div class="container text-center">
@@ -84,10 +29,15 @@
       아직 주문 내역이 없습니다.
     </p>
     <div th:each="order : ${history}" class="card mb-3">
-      <div class="card-body row">
+      <div class="card-body row" >
         <!-- 왼쪽: 매장 대표 이미지 -->
         <div class="col d-flex justify-content-between">
-		    <small class="order-date" th:text="${order.orderDate}"></small> 
+		    <!-- <small class="order-date" th:text="${order.orderDate}"></small> --> 
+		    <small class="order-date" th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"
+		    th:if="${#temporals.year(order.orderDate) != #dates.year(#dates.createNow())}"></small>
+		    <small class="order-date" th:text="${#temporals.format(order.orderDate, 'MM월 dd일 HH:mm')}"
+		    th:if="${#temporals.year(order.orderDate) == #dates.year(#dates.createNow())}"></small>
+		    <small class="order-date"></small>
 		    <span class="status" th:text="${order.orderStatus}">배달중</span>
         </div>
         <div class="row">
@@ -96,7 +46,7 @@
 	          <img th:src="@{/img/store/storeimg/default_img.jpg}" class="img-fluid rounded-circle" alt="기본 이미지" th:if="${order.storeImageUrl == null}"/>
 	        </div>
         	<div class="col-md-auto text-start align-self-center">
-        		<a href="#" class="icon-link icon-link-hover">
+        		<a th:href="@{/store/view/{storeId}(storeId=${order.storeId})}" class="icon-link icon-link-hover">
 			        <strong class="store-name" th:text="${order.storeName}">가게 이름</strong>
 					<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
 						class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
@@ -122,21 +72,27 @@
           </p>
         </div>
       </div>
-
       <!-- 하단: 상세 정보 보기 버튼 -->
       <div class="container d-flex justify-content-center mb-4">
         <a th:href="@{'/user/order/' + ${order.orderId}}"
-           class="btn btn-outline-primary me-4">
+           class="btn btn-outline-primary go-order-details-btn">
           상세 정보 보기
         </a>
-        <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" class="btn btn-outline-secondary position-relative write-review-btn">
+       </div>
+        <!-- <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
+        	class="btn btn-outline-secondary position-relative write-review-btn" th:if="${#strings.equals(order.orderStatus, 'COMPLETED')}"> -->
+        <div class="container d-flex justify-content-center mb-4">
+        <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
+        	class="btn btn-outline-secondary position-relative write-review-btn"
+        	th:if="${#strings.equals(order.orderStatus, 'COMPLETED') && order.daysLeftForReview > 0}">
         	리뷰 작성
         	 <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-dark days-left">
-    			<strong th:text="D-1"></strong>
+    			<strong th:text="${'D-' + order.daysLeftForReview}"></strong>
     			<span class="visually-hidden">리뷰 작성 가능 일수</span>
   			</span>
         </a>
       </div>
+      
     </div>
   </div>
 </section>

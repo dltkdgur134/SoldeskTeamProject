@@ -98,12 +98,19 @@
 }
 
 .days-left {
-	font-size: 0.5em;
+	font-size: 0.6em;
 }
 
+/* 버튼 */
+
 .write-review-btn {
+	width: 50%;
 	color: black;
 	border: #6c757d solid 1px;
+}
+
+.go-order-details-btn {
+	width: 50%;
 }
 
 .order-date {
@@ -127,4 +134,9 @@
 
 .card-text {
 	font-size: 1.2em;
+}
+
+/* 주문 상세 페이지 */
+.order-basic-detail {
+	color: #8E8E8E;
 }
