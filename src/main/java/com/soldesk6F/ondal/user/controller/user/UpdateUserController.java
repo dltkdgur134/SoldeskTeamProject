@@ -214,7 +214,7 @@ public class UpdateUserController {
 	
 	@PostMapping("/user/buyOndalPay")
 	public String buyOndalPay(
-	        @RequestParam("amount") int amount,
+			@RequestParam(value = "amount", required = false) Integer amount,
 	        @RequestParam("Password") String password,
 	        @RequestParam("toss_order_id") String tossOrderId,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -225,6 +225,11 @@ public class UpdateUserController {
 	        redirectAttributes.addFlashAttribute("error", "비밀번호가 틀렸습니다.");
 	        return "redirect:/ondalPay";
 	    }
+	    if (amount == null) {
+            redirectAttributes.addFlashAttribute("error", "충전 금액을 입력해주세요.");
+            return "redirect:/ondalPay";
+        }
+
 
 	    try {
 	        OndalPayChargeRequest chargeRequest = new OndalPayChargeRequest();
@@ -232,7 +237,7 @@ public class UpdateUserController {
 	        chargeRequest.setTossOrderId(tossOrderId);
 	        // 기본값 paymentMethod, paymentUsageType, paymentStatus는 DTO 내부에서 설정됨
 
-
+	        
 	        // 컨트롤러에서 LocalDateTime으로 변환해서 서비스에 전달
 	        userService.chargeOndalWallet(chargeRequest, userDetails.getUser().getUserUuid());
 

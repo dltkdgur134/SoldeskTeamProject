@@ -79,9 +79,45 @@
 					type="password" class="form-control" id="Password" name="Password" />
 			</div>
 			<div class="mt-4">
-				<button id="submitBtn" type="submit" class="btn btn-warning mt-3">O Pay 충전</button>
+				<button id="submitBtn" type="submit" class="btn btn-primary">O Pay 충전</button>
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+				data-bs-target="#payHistoryModal">결제 내역</button>
 			</div>
 		</form>
+	</div>
+	<div class="modal fade" id="payHistoryModal"
+		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="payHistoryModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="payHistoryModalLabel">
+						비밀번호 입력</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/checkUserPasswordAndGoPayHistory}" method="post"
+						name="checkUserPasswordAndGoPayHistoryForm" autocomplete="off"
+						class="needs-validation" id="check-user-password-form" novalidate>
+
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2"> <i
+								class="fa-solid fa-id-card"></i>
+							</span> <input type="password" class="form-control" placeholder="비밀번호"
+								name="currentPassword" id="currentPassword-input"
+								aria-describedby="basic-addon2">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary"
+						form="check-user-password-form" id="check-user-password-btn">확인</button>
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
