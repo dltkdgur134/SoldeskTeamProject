@@ -1,9 +1,8 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -20,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,24 +40,26 @@ import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.controller.user.DeleteUserController;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.cart.controller.CartController;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
+import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
-import com.soldesk6F.ondal.useract.payment.dto.PaymentHistoryDTO;
 import com.soldesk6F.ondal.useract.payment.dto.TossPaymentResponse;
 import com.soldesk6F.ondal.useract.payment.dto.TossRefundResponse;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
+import com.soldesk6F.ondal.useract.payment.entity.PaymentFailLog;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentFailLogRepository;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 
@@ -66,6 +68,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+
+    private final AuthenticationManager authenticationManager;
+
+    private final CartController cartController;
 
     private final SecurityConfig securityConfig;
 
@@ -89,6 +95,10 @@ public class PaymentService {
 	@Value("${toss.secret-key}")
     private String tossSecretKey;
 
+
+
+
+ 
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -193,7 +203,90 @@ public class PaymentService {
 //	        return "<pre>토스 결제 승인 에러:\n" + e.getResponseBodyAsString() + "</pre>";
 //	    }
 //	}
+	
+	@Transactional
+	public String tryOndalPay(UUID cartUUID , String reqDel , String reqStore) {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+		if (auth != null && auth.isAuthenticated()) {
+		    Object principal = auth.getPrincipal();
+
+		    if (principal instanceof CustomUserDetails userDetails) {
+		        User user = userDetails.getUser();
+		        User nowUser = userRepository.getById(user.getUserUuid());
+			    Optional<Cart> optCart = cartRepository.findByUser(nowUser);
+			    Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
+			    int totalPrice = cart.getTotalPrice();
+			    int ondalPay = nowUser.getOndalPay();
+			    if(totalPrice>ondalPay) {
+			    	return "잔액이 부족합니다\n현재 잔액:"+ondalPay+":@:실패";
+			    }else {
+			    	int nowOndalPay = ondalPay-totalPrice;
+					List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+					for (CartItems cartItem : cart.getCartItems()) {
+						OrderDetail orderDetail = new OrderDetail();
+
+						orderDetail.setMenu(cartItem.getMenu());
+						orderDetail.setPrice(cartItem.getItemTotalPrice());
+						orderDetail.setQuantity(cartItem.getQuantity());
+						orderDetail.setOptionNames(cartItem.getOptionsAsList());
+						List<Integer> ciop = new ArrayList<Integer>();
+						for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
+							ciop.add(cartItemOption.getOptionPrice());
+						}
+						orderDetail.setOptionPrices(ciop);
+						orderDetailList.add(orderDetail);
+					}
+
+					Payment payment = new Payment();
+					payment.setAmount(cart.getTotalPrice());
+					payment.setPaymentKey(null);
+					payment.setTossOrderId(cartUUID.toString());
+					payment.setUser(user);
+					payment.setApprovedAt(LocalDateTime.now());
+					payment.setRequestedAt(LocalDateTime.now());
+					payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
+					
+
+					payment.setPaymentStatus(PaymentStatus.COMPLETED);
+					Order order = Order.builder().store(cart.getStore()).user(cart.getUser())
+								.totalPrice(cart.getTotalPrice())
+								.storeRequest(reqStore)
+								.deliveryRequest(reqDel).orderDetails(orderDetailList)
+								.deliveryAddress(user.getUserSelectedAddress().getAddress())
+								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
+								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
+								.orderToOwner(OrderToOwner.PENDING).build();
+			    	payment.setOrder(order);
+					for (OrderDetail od : order.getOrderDetails()) {
+						od.setOrder(order);
+					}
+			    	payment.setPaymentMethod(Payment.PaymentMethod.ONDALPAY);
+			    	payment.setPaymentStatus(PaymentStatus.COMPLETED);
+			    	paymentRepository.save(payment);
+			    	orderRepository.save(order);
+			    	user.setOndalPay(nowOndalPay);
+			    	userRepository.save(user);
+			    	cartRepository.deleteById(cartUUID);
+			    	return nowOndalPay+":@:성공";
+			    }
+			    
+		        
+		        
+		    }
+		    return "유저가 비회원임:@:실패";
+		    
+		}else {
+			return "유저가 없음:@:실패";
+			
+		}
+		
+	}	
+	
+	
+	
+	
 	@Transactional
 	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";
@@ -261,25 +354,9 @@ public class PaymentService {
 			payment.setPaymentKey(tossResponse.getPaymentKey());
 			payment.setTossOrderId(tossResponse.getOrderId());
 			payment.setUser(user);
+			payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
+			payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
 			payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
-			// 요청 시각 (OffsetDateTime, 예: 2025-05-15T01:10:16Z)
-			OffsetDateTime requestedAt = tossResponse.getRequestedAt();
-
-			// UTC 기준 시간을 서울 시간으로 변환
-			ZonedDateTime seoulRequestedAt = requestedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-
-			// 엔티티에 저장할 때 LocalDateTime으로 변환 (서울 시간 기준)
-			payment.setRequestedAt(seoulRequestedAt.toLocalDateTime());
-
-			// 승인 시각도 동일하게 처리
-			OffsetDateTime approvedAt = tossResponse.getApprovedAt();
-			if (approvedAt != null) {
-			    ZonedDateTime seoulApprovedAt = approvedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-			    payment.setApprovedAt(seoulApprovedAt.toLocalDateTime());
-			}
-
-			
-			
 			switch (tossResponse.getMethod()) {
 			case "카드":
 				payment.setPaymentMethod(PaymentMethod.CREDIT);
@@ -325,6 +402,23 @@ public class PaymentService {
 		}
 	}
 
+	
+	@Transactional
+	public void tryRefundOndalPay(String tossOrderId , String cancelReason , UUID userUUID) {
+		
+	    Optional<Payment> optPayment = paymentRepository.findByTossOrderId(tossOrderId);
+		
+		Payment payment = optPayment.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카트입니다."));
+		payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
+		Optional<User> optUser = userRepository.findById(userUUID);
+		User user = optUser.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
+		int ondalPay = user.getOndalPay();
+		int refundAmount = payment.getAmount();
+		user.setOndalPay(ondalPay+refundAmount);
+		userRepository.save(user);
+		paymentRepository.save(payment);
+		
+	}
 	
 
 	@Transactional
@@ -378,22 +472,8 @@ public class PaymentService {
 	                .refundReason(null)
 	                .build();
 
-	     // 요청 시각 (OffsetDateTime, 예: 2025-05-15T01:10:16Z)
-	        OffsetDateTime requestedAt = tossResponse.getRequestedAt();
-
-	        // UTC 기준 시간을 서울 시간으로 변환
-	        ZonedDateTime seoulRequestedAt = requestedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-
-	        // 엔티티에 저장할 때 LocalDateTime으로 변환 (서울 시간 기준)
-	        payment.setRequestedAt(seoulRequestedAt.toLocalDateTime());
-
-	        // 승인 시각도 동일하게 처리
-	        OffsetDateTime approvedAt = tossResponse.getApprovedAt();
-	        if (approvedAt != null) {
-	            ZonedDateTime seoulApprovedAt = approvedAt.atZoneSameInstant(ZoneId.of("Asia/Seoul"));
-	            payment.setApprovedAt(seoulApprovedAt.toLocalDateTime());
-	        }
-
+	        payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
+	        payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
 
 	        // 결제 방식에 따라 설정
 	        switch (tossResponse.getStatus()) {
@@ -443,11 +523,6 @@ public class PaymentService {
 	}
 
 	}	
-	
-	
-	
-	
-	
 	@Transactional
 	public void refundTossPayment(String paymentKey, String cancelReason, UUID userUuid) {
 	    Payment payment = paymentRepository.findByPaymentKey(paymentKey)
@@ -507,8 +582,17 @@ public class PaymentService {
 	                    user.setOndalWallet(newBalance);
 	                    userRepository.save(user); // 변경 사항 저장
 	                }
+	                // 주문 결제 환불일 경우 Order의 orderToOwner 상태 변경
+	                if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ORDER_PAYMENT) {
+	                    Order order = payment.getOrder();
+	                    if (order != null) {
+	                        order.setOrderToOwner(Order.OrderToOwner.CANCELED);
+	                        orderRepository.save(order);
+	                    } else {
+	                        throw new IllegalStateException("해당 결제에 연결된 주문이 없습니다.");
+	                    }
+	                }
 	                break;
-
 	            default:
 	                System.out.println("알 수 없는 상태: " + tossRefundResponse.getStatus());
 	                break;
@@ -522,8 +606,7 @@ public class PaymentService {
 
 	    System.out.println("환불 응답: " + response.getBody());
 	}
-
-
-
 	
+	
+	    
 }

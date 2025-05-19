@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
@@ -19,7 +20,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 	List<Order> findByUser(User user);
     List<Order> findAllByOrderToRider(OrderToRider pending);
     long countByStore(Store store);
-    
  // 반경 내 주문 조회 쿼리 추가
     @Query(value = """
     	    SELECT o.* 

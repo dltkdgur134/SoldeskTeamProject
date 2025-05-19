@@ -1,6 +1,7 @@
 package com.soldesk6F.ondal.useract.favorites.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.favorites.dto.FavoriteStoreDto;
 import com.soldesk6F.ondal.useract.favorites.entity.Favorites;
 import com.soldesk6F.ondal.useract.favorites.repository.FavoritesRepository;
 import com.soldesk6F.ondal.useract.favorites.service.FavoritesService;
@@ -85,7 +87,11 @@ public class FavoritesController {
 	@GetMapping("/favorites")
 	public String showFavorites(Model model) {
 		
-		//model.addAttribute("favoriteStores" , favoritesService.);
+		
+		List<FavoriteStoreDto> fsdList = favoritesService.getUserFavorites();
+		model.addAttribute("favorites",fsdList);
+		
+		
 		
 		return "/content/favorites";
 		
