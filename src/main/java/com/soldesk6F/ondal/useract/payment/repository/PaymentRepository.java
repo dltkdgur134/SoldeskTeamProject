@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 
 
@@ -38,5 +39,5 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID>{
 		                                  @Param("since") LocalDateTime since);
 
 	Optional<Payment> findByPaymentKey(String paymentKey);
-	
+	Optional<Payment> findByOrder(Order order);
 }

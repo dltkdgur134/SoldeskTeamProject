@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,9 @@ import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
+import com.soldesk6F.ondal.useract.payment.entity.Payment;
+import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
+import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
 
@@ -51,6 +55,7 @@ public class OrderService {
     private final SimpMessagingTemplate messagingTemplate;
     private final UserRepository userRepository;
     private final RegAddressRepository regAddressRepository;
+    private final PaymentRepository paymentRepository;
     
 
     public Order saveOrder(OrderRequestDto requestDto) {
@@ -259,25 +264,51 @@ public class OrderService {
         Order order = orderRepository.findById(OrderUuid)
             .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
         // 간단히 toDto 매퍼 호출
-        return OrderInfoDetailDto.from(order);
+        OrderInfoDetailDto orderInfoDetailDto = toOrderInfoDetailsDto(order);
+        return orderInfoDetailDto;
     }
-
+    
     private OrderInfoDetailDto toOrderInfoDetailsDto(Order order) {
         var dto = new OrderInfoDetailDto();
         dto.setOrderId(order.getOrderId());
-        dto.setStoreId(order.getStore().getStoreId());
-        dto.setStoreName(order.getStore().getStoreName());
-        dto.setStoreImageUrl(order.getStore().getBrandImg());
-        LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
+		dto.setStoreId(order.getStore().getStoreId());
+		dto.setStoreName(order.getStore().getStoreName());
+		dto.setStoreImageUrl(order.getStore().getBrandImg());
+		dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
+		dto.setOrderDate(order.getOrderTime());
+		LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
+		int menuTotalPrice = 0;
 		for (OrderDetail orderDetails : order.getOrderDetails()) {
 			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
 			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
+			menuDetails.put("menuPrice", orderDetails.getMenu().getPrice());
 			menuDetails.put("price", orderDetails.getPrice());
 			menuDetails.put("quantity", orderDetails.getQuantity());
+			
+			HashMap<String, Integer> options = new HashMap<String, Integer>();
+			
+			for (int i = 0; i < orderDetails.getOptionNames().size(); i++) {
+				options.put(orderDetails.getOptionNames().get(i), orderDetails.getOptionPrices().get(i));
+			}
+			menuDetails.put("options", options);
+			
 			menuItems.add(menuDetails);
+			menuTotalPrice += orderDetails.getPrice();
 		}
 		dto.setMenuItems(menuItems);
-        return dto;
+		dto.setTotalPrice(order.getTotalPrice());
+		dto.setDeliveryFee(order.getDeliveryFee());
+		dto.setMenuTotalPrice(menuTotalPrice);
+		
+		Optional<Payment> payment = paymentRepository.findByOrder(order);
+		if (payment.isEmpty() || payment.get() == null) {
+			dto.setPaymentMethod("정보 조회 불가");
+		} else {
+			dto.setPaymentMethod(payment.get().getPaymentMethod().getDescription());
+		}
+		dto.setPhoneNum(order.getUser().getUserPhone());
+		dto.setDeliveryAddress(order.getDeliveryAddress());
+		return dto;
     }
     
     

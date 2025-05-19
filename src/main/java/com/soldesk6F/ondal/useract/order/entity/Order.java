@@ -135,7 +135,6 @@ public class Order {
     @JsonIgnoreProperties("order")
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
-
     public enum OrderToOwner {
         PENDING("주문 요청 중"), 
         CONFIRMED("주문 확인 완료"),
