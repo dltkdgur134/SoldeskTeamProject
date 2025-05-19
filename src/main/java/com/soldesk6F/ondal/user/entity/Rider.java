@@ -52,7 +52,7 @@ public class Rider {
     
 	@Column(name = "is_secondary_password_locked")
     private boolean isSecondaryPasswordLocked;
-    
+
 	@Column(name = "vehicle_number", nullable = false, length = 20)
 	private String vehicleNumber;
 
@@ -71,10 +71,10 @@ public class Rider {
 
 	@Column(name = "hub_address_longitude", nullable = false)
 	private double hubAddressLongitude;
-	
-	@Column(name = "rider_wallet",nullable = true )
-    private int riderWallet;
 
+	@Column(name = "rider_wallet",nullable = true )
+	private int riderWallet;
+	
 	@CreationTimestamp
 	@Column(name = "registration_date", updatable = false)
 	private LocalDateTime registrationDate;

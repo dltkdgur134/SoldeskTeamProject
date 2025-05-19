@@ -31,14 +31,6 @@ public class PassCheckController {
 			
 		}
 			return "redirect:/oauth/passCheck?userId=" + userId;
-		
-		
-		
 	}	
-	
-	
-	
-	
-	
 	
 }

@@ -54,7 +54,7 @@
                     <td th:text="${payment.paymentStatus}">COMPLETED</td>
                     <td th:text="${payment.paymentUsageType != null ? payment.paymentUsageType.description : '-'}">온달 지갑 충전</td>
     				<td>
-  						<span th:if="${payment.refundReason != null}" th:text="${payment.refundReason}"></span>
+  					<span th:if="${payment.refundReason != null}" th:text="${payment.refundReason}"></span>
 					
   					<div th:if="${payment.refundReason == null and payment.paymentStatus.name() == 'COMPLETED'}" >
 				    <div th:switch="${payment.paymentUsageType.name()}">
@@ -74,20 +74,41 @@
 				      </form>
 				      
 				      <!-- 주문 결제일 때 -->
-				      <div th:case="'ORDER_PAYMENT'">
-				        <a th:href="@{/contact}" class="contact-btn">문의하기</a>
-				      </div>
-				    </div>
-				  </div>
-				</td>
-                </tr>
-                <tr th:if="${payHistoryList.empty}">
-                    <td colspan="8">결제 내역이 없습니다.</td>
-                </tr>
-            </tbody>
+          <div th:case="'ORDER_PAYMENT'">
+            <div th:if="${payment.orderToOwner.name() == 'PENDING'}">
+              <!-- orderToOwner가 PENDING이면 환불 버튼 -->
+              <form th:action="@{/user/refund}" method="post" style="display:inline;">
+                <input type="hidden" name="paymentKey" th:value="${payment.paymentKey}" />
+                <input type="hidden" name="paymentMethod" th:value="${payment.paymentMethod.name()}" />
+                <input type="hidden" name="toss_order_id" id="toss_order_id" />
+                <select name="refundReason" required>
+                  <option value="">-- 환불 사유 선택 --</option>
+                  <option value="사용자 요청">사용자 요청</option>
+                  <option value="오류 결제">오류 결제</option>
+                  <option value="이중 결제">이중 결제</option>
+                  <option value="서비스 불만족">서비스 불만족</option>
+                  <option value="기타">기타</option>
+                </select>
+                <button type="submit" class="refund-btn">환불</button>
+              </form>
+            </div>
+            <div th:if="${payment.orderToOwner.name() != 'PENDING'}">
+              <!-- orderToOwner가 PENDING이 아니면 문의하기 버튼 -->
+              <a th:href="@{/faqs}" class="contact-btn">문의하기</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr th:if="${payHistoryList.empty}">
+    <td colspan="8">결제 내역이 없습니다.</td>
+  </tr>
+</tbody>
         </table>
         <div style="margin-top: 10px; font-size: 14px; color: #555;">
-  		주문 결제는 즉시 환불이 불가하여 문의 부탁드립니다.
+  		주문 결제는 주문 수락 후 즉시 환불이 불가하여 문의 부탁드립니다.
 		</div>
     </div>
    <script th:inline="javascript">

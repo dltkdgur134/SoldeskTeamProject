@@ -59,6 +59,42 @@
 					class="fa-solid fa-bars"></i>
 				</a>
 			</div>
+			<!-- 로그인한 사람들을 위한 로고 -->
+			<div sec:authorize="isAuthenticated()"
+				th:with="role=${#authentication.principal.roleName}" style="position: relative;">
+
+				<a href="javascript:void(0);" onclick="toggleRoleLogos()" class = logo>
+				<img src="/css/imgs/Logo_ondal_Home.png" 
+					class="img-fluid me-2" width="50" height="50">
+				</a>
+				<!-- 기본 로고: USER, RIDER, OWNER, ALL 역할에서 보이게 -->
+				<a href="/" class = "logo role-logo-hidden"
+					th:if="${role == 'USER' or role == 'RIDER' or role == 'OWNER' or role == 'ALL'}">
+					<img src="/css/imgs/Logo_ondal.png" 
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+
+				<!-- RIDER 로고: RIDER, ALL 역할에서 보이게 -->
+				<a href="/rider/home" class = "logo role-logo-hidden"
+				th:if="${role == 'RIDER' or role == 'ALL'}">
+					<img src="/css/imgs/Logo_rider.png" 
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+				<!-- RIDER 로고: OWNER, ALL 역할에서 보이게 --> 
+				<a href="/owner/home" class = "logo role-logo-hidden"
+				 th:if="${role == 'OWNER' or role == 'ALL'}"> 
+					<img src="/css/imgs/Logo_owner.png" 
+					class="img-fluid me-2" width="40" height="40">
+				</a>
+
+			</div>
+			<h1 class="display-5">
+				<b class="highlight-title">온</b>라인 배<b class="highlight-title">달</b>
+			</h1>
+			<a class="btn btn-primary btn-lg" data-bs-toggle="offcanvas"
+				href="#menu-list" role="button" aria-controls="menu-list"> <i
+				class="fa-solid fa-bars"></i>
+			</a>
 		</div>
 	</nav>
 
