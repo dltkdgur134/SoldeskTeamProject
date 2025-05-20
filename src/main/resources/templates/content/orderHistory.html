@@ -75,8 +75,12 @@
       <!-- 하단: 상세 정보 보기 버튼 -->
       <div class="container d-flex justify-content-center mb-4">
         <a th:href="@{'/user/order/' + ${order.orderId}}"
-           class="btn btn-outline-primary go-order-details-btn">
+           class="btn btn-outline-primary go-order-details-btn" th:if="${#strings.equals(order.orderStatus, 'COMPLETED')}">
           상세 정보 보기
+        </a>
+         <a th:href="@{'/user/order/' + ${order.orderId}}"
+           class="btn btn-outline-primary go-order-details-btn" th:unless="${#strings.equals(order.orderStatus, 'COMPLETED')}">
+          실시간 주문 현황
         </a>
        </div>
         <!-- <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 

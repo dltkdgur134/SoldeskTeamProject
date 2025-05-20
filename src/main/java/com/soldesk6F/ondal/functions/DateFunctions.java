@@ -68,7 +68,7 @@ public class DateFunctions {
 		LocalDate createdDate = createdDateTime.toLocalDate();
 		LocalDate now = LocalDate.now();
 		long daysBetween = ChronoUnit.DAYS.between(createdDate, now);
-		return 30 - daysBetween;
+		return 14 - daysBetween;
 	}
 	
 }
