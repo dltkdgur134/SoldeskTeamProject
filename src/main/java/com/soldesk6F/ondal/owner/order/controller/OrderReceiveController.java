@@ -20,6 +20,8 @@ public class OrderReceiveController {
     /**
      * 사용자 결제 완료 -> 주문 생성 -> 업주 페이지에 실시간 알림
      */
+    
+    // onwer가 조리 완료시 실행 메소드
     @PostMapping("/order/complete")
     public String completeOrder(OrderRequestDto dto) {
         // 1) DB에 주문 정보 저장 (MyBatis 사용 예시)

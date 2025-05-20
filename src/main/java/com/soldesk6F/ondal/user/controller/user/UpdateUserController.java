@@ -127,39 +127,38 @@ public class UpdateUserController {
 
 	@PostMapping("/checkUserPasswordAndTryOndalPay")
 	public String checkUserPasswordAndGoPoint(
-			@RequestParam(value = "currentPassword", required = false) String Password,
-			@RequestParam(value = "cartUUID") UUID cartUUID,
-			@RequestParam(value ="reqDel")String reqDel,
-			@RequestParam(value ="reqStore")String reqStore,			
-			@AuthenticationPrincipal CustomUserDetails userDetails,
-			RedirectAttributes redirectAttributes,Model model
-			){
-		
-		boolean isCorrect = userService.checkPassword(userDetails, Password, redirectAttributes);
-		
-		if (isCorrect) {
-			
-			String Paystatus =  paymentService.tryOndalPay(cartUUID,reqDel,reqStore);
-			if(Paystatus != null) {
-				String resultAndStatus [] = Paystatus.split(":@:");
-				if(resultAndStatus[1].equals("성공")) {
-					
-					return "redirect:/";
-				}else {
-			        model.addAttribute("cartUUID" , cartUUID);
-					model.addAttribute("failReason",resultAndStatus[0]);
-					model.addAttribute("status",resultAndStatus[1]);
-					return "forward:/store/pay";
-				}
-			}
-			
-			
-		}
-        model.addAttribute("cartUUID" , cartUUID);
-        model.addAttribute("status","실패");
-        model.addAttribute("failReason","비밀번호가 틀렸습니다");
-        return "forward:/store/pay";
+	        @RequestParam(value = "currentPassword", required = false) String Password,
+	        @RequestParam(value = "cartUUID") UUID cartUUID,
+	        @RequestParam(value = "reqDel") String reqDel,
+	        @RequestParam(value = "reqStore") String reqStore,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        RedirectAttributes redirectAttributes,
+	        Model model) {
+
+	    boolean isCorrect = userService.checkPassword(userDetails, Password, redirectAttributes);
+
+	    if (isCorrect) {
+	        String Paystatus = paymentService.tryOndalPay(cartUUID, reqDel, reqStore);
+	        if (Paystatus != null) {
+	            String[] resultAndStatus = Paystatus.split(":@:");
+	            if (resultAndStatus.length == 3 && "성공".equals(resultAndStatus[2])) {
+	                String orderId = resultAndStatus[1];
+	                return "redirect:/userOrderLive/" + orderId;
+	            } else {
+	                model.addAttribute("cartUUID", cartUUID);
+	                model.addAttribute("failReason", resultAndStatus[0]);
+	                model.addAttribute("status", resultAndStatus.length > 2 ? resultAndStatus[2] : "실패");
+	                return "forward:/store/pay";
+	            }
+	        }
+	    }
+
+	    model.addAttribute("cartUUID", cartUUID);
+	    model.addAttribute("status", "실패");
+	    model.addAttribute("failReason", "비밀번호가 틀렸습니다");
+	    return "forward:/store/pay";
 	}
+
 	
 	@PostMapping("/checkUserPasswordAndGoOndalPay")
 	public String checkUserPasswordAndGoPoint(

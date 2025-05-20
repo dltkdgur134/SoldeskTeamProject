@@ -561,7 +561,7 @@ function updateOrderStatus(orderId, url) {
        });
    }
 
-   // 주문 거부
+// 주문 거부
 function rejectOrder(orderId) {
     $.ajax({
         url: '/owner/order/reject',

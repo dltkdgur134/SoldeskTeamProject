@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.menu.repository.MenuRepository;
 import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
@@ -28,8 +29,11 @@ import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
-import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
+import com.soldesk6F.ondal.useract.payment.entity.Payment;
+import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
+import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
+import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
 
@@ -40,14 +44,36 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class OrderService {
+	 private final UserRepository userRepository;
+	    private final StoreRepository storeRepository;
+	    private final OrderRepository orderRepository;
+	    private final MenuRepository menuRepository;
+	    private final PaymentRepository paymentRepository;
+	    private final SimpMessagingTemplate messagingTemplate;
+	    private final RegAddressRepository regAddressRepository;
 
-    private final StoreRepository storeRepository;
-    private final OrderRepository orderRepository;
-    private final MenuRepository menuRepository;
-    private final SimpMessagingTemplate messagingTemplate;
-    private final UserRepository userRepository;
-    private final RegAddressRepository regAddressRepository;
-    
+	    private final PaymentService paymentService;  // 이걸 @Lazy 처리 필요
+
+	    @Autowired
+	    public OrderService(
+	        UserRepository userRepository,
+	        StoreRepository storeRepository,
+	        OrderRepository orderRepository,
+	        MenuRepository menuRepository,
+	        PaymentRepository paymentRepository,
+	        @Lazy PaymentService paymentService,
+	        SimpMessagingTemplate messagingTemplate,
+	        RegAddressRepository regAddressRepository) {
+
+	        this.userRepository = userRepository;
+	        this.storeRepository = storeRepository;
+	        this.orderRepository = orderRepository;
+	        this.menuRepository = menuRepository;
+	        this.paymentRepository = paymentRepository;
+	        this.paymentService = paymentService;
+	        this.messagingTemplate = messagingTemplate;
+	        this.regAddressRepository = regAddressRepository;
+	    }
 
     public Order saveOrder(OrderRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
@@ -84,10 +110,35 @@ public class OrderService {
         order.setOrderToRider(OrderToRider.CONFIRMED);
         order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
         order.setCookingStartTime(LocalDateTime.now());
+        Order savedOrder = orderRepository.save(order);
+        messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
 
-        return orderRepository.save(order);
+        return savedOrder;
     }
+    @Transactional
+    public Order rejectOrderAndRefund(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 주문을 찾을 수 없습니다."));
 
+        // 주문 상태 변경
+        order.setOrderToOwner(Order.OrderToOwner.CANCELED);
+        orderRepository.save(order);
+
+        Payment payment = paymentRepository.findByOrder_OrderId(orderId)
+        	    .orElseThrow(() -> new IllegalStateException("주문에 결제 정보가 없습니다."));
+
+        // 결제 타입별 환불 처리
+        if (payment.getPaymentMethod() == PaymentMethod.CASH 
+        	|| payment.getPaymentMethod() == PaymentMethod.CREDIT) {
+            paymentService.refundTossPayment(payment.getPaymentKey(), "주문 거부에 따른 환불", order.getUser().getUserUuid());
+        } else if (payment.getPaymentMethod() == PaymentMethod.ONDALPAY) {
+            paymentService.tryRefundOndalPay(payment.getTossOrderId(), "주문 거부에 따른 환불", order.getUser().getUserUuid());
+        } else {
+            throw new IllegalStateException("지원하지 않는 결제 방식입니다.");
+        }
+
+        return order;
+    }
     public Order extendCookingTime(UUID orderId, int addMinutes) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문 없음"));
@@ -132,10 +183,9 @@ public class OrderService {
         order.setOrderToOwner(orderToOwner);
         Order savedOrder = orderRepository.save(order);
 
+        OrderResponseDto orderDto = convertToDto(savedOrder);
         if (savedOrder.getUser() != null) {
         	String destination = "/topic/user/" + savedOrder.getUser().getUserUuidAsString();
-            OrderResponseDto orderDto = convertToDto(savedOrder);
-        	
             System.out.println("발행 경로: " + destination);
             System.out.println("발행 메시지: " + orderDto);
             
@@ -144,7 +194,6 @@ public class OrderService {
 
         if (savedOrder.getRider() != null) {
             String destination = "/topic/rider/" + savedOrder.getRider().getRiderUuidAsString();
-            OrderResponseDto orderDto = convertToDto(savedOrder);
             System.out.println("발행 경로: " + destination);
             System.out.println("발행 메시지: " + orderDto);
             messagingTemplate.convertAndSend(destination, orderDto);

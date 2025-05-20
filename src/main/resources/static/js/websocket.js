@@ -48,8 +48,8 @@ function subscribeOrderChannels(orderId) {
     const update = JSON.parse(msg.body);
     console.log('[order-topic]', orderId, update);
     showOrderNotification(update);       // 토스트
-    updateStatusChart?.(update.stage);   // 선택 UI
-    moveRiderMarker?.(update.location?.lat, update.location?.lng);
+    //updateStatusChart?.(update.stage);   // 선택 UI
+    //moveRiderMarker?.(update.location?.lat, update.location?.lng);
     updateCookingProgress?.(update.stage);
     startExpectedTimeCountdown?.(
         update.expectCookingTime, update.expectDeliveryTime);

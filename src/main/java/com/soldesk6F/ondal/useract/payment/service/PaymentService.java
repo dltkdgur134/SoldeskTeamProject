@@ -1,7 +1,6 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +45,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
-import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
+import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
@@ -59,7 +58,6 @@ import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
-import com.soldesk6F.ondal.useract.payment.entity.PaymentFailLog;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentFailLogRepository;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 
@@ -269,7 +267,12 @@ public class PaymentService {
 			    	user.setOndalPay(nowOndalPay);
 			    	userRepository.save(user);
 			    	cartRepository.deleteById(cartUUID);
-			    	return nowOndalPay+":@:성공";
+			    	OrderResponseDto orderResponseDto = OrderResponseDto.from(order);
+			    	UUID storeId = cart.getStore().getStoreId(); // 또는 적절한 store UUID 참조
+
+			    	// WebSocket 전송
+			    	simpMessagingTemplate.convertAndSend("/topic/store/" + storeId, orderResponseDto);
+			    	return nowOndalPay + ":@:" + order.getOrderId() + ":@:성공";
 			    }
 			    
 		        

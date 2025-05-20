@@ -3,6 +3,7 @@ package com.soldesk6F.ondal.owner.order.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -86,9 +87,20 @@ public class OwnerOrderController {
     }
 
     @PostMapping("/reject")
-    public ResponseEntity<Order> rejectOrder(@RequestParam("orderId") UUID orderId) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
-        return ResponseEntity.ok(updatedOrder);
+    public ResponseEntity<?> rejectOrder(@RequestBody Map<String, UUID> payload) {
+        try {
+            UUID orderId = payload.get("orderId");
+            if (orderId == null) {
+                return ResponseEntity.badRequest().body("orderId is missing or null");
+            }
+
+            orderService.rejectOrderAndRefund(orderId);
+            Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
+            return ResponseEntity.ok(convertToDto(updatedOrder));
+        } catch (Exception e) {
+            e.printStackTrace(); // 🔍 콘솔에 에러 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("/cancel")

@@ -1,7 +1,6 @@
-// orderLive.js
+// HTML data- 속성에서 변수 읽기
 let orderStompClient = null;
-let orderId = document.body.dataset.orderid; // ✅ 주문 상세 페이지에 data-orderid 주입된다고 가정
-
+console.log('orderId check:', orderId);
 function connectOrderWebSocket() {
   if (!orderId) {
     console.warn('❗ orderId 없음, 주문 채팅 및 상태 업데이트 생략');
@@ -14,14 +13,28 @@ function connectOrderWebSocket() {
   orderStompClient.connect({}, frame => {
     console.log('🌐 주문별 WebSocket 연결 성공:', frame);
 
-    orderStompClient.subscribe('/topic/chat/' + orderId, onChatMessage);
+	orderStompClient.subscribe('/topic/chat/' + orderId, message => {
+	  console.log('채팅 메시지 도착:', message);
+	  onChatMessage(message);
+	});
     orderStompClient.subscribe('/topic/order/' + orderId, message => {
+	  console.log('주문 상태 메시지 도착:', message);
       const payload = JSON.parse(message.body);
-      updateStatusChart(payload.stage);
-      moveRiderMarker(payload.location.lat, payload.location.lng);
+      //updateStatusChart(payload.stage);
       updateCookingProgress(payload.stage);
       startExpectedTimeCountdown(payload.expectCookingTime, payload.expectDeliveryTime);
     });
+	console.log('현재 orderId:', orderId);
+	console.log('현재 userUuid:', userUuid);
+    if (userUuid) {
+      orderStompClient.subscribe('/topic/user/' + userUuid, message => {
+        const payload = JSON.parse(message.body);
+        if (payload.orderToOwner === 'CANCELED') {
+          alert('⚠️ 가게에서 주문을 거부했습니다.');
+          updateCookingProgress('REJECTED');
+        }
+      });
+    }
   }, error => {
     console.error('❌ 주문별 WebSocket 연결 실패:', error);
   });
@@ -66,16 +79,49 @@ function updateCookingProgress(stage) {
   if (!bar) return;
 
   switch (stage) {
-    case 'PENDING': setProgress(bar, 0, '접수 대기', 'bg-secondary'); break;
-    case 'COOKING': setProgress(bar, 50, '조리중', 'bg-info'); break;
-    case 'COOKING_COMPLETED': setProgress(bar, 100, '조리완료', 'bg-success'); break;
-    case 'IN_DELIVERY': setProgress(bar, 50, '배달중', 'bg-warning'); break;
+    case 'PENDING':
+      setProgress(bar, 0, '접수 대기', 'bg-secondary');
+      break;
+    case 'COOKING':
+      setProgress(bar, 50, '조리중', 'bg-info');
+      break;
+    case 'COOKING_COMPLETED':
+      setProgress(bar, 75, '조리완료', 'bg-success');
+      break;
+    case 'IN_DELIVERY':
+      setProgress(bar, 90, '배달중', 'bg-warning');
+      break;
     case 'DELIVERED':
-    case 'COMPLETED': setProgress(bar, 100, '배달완료', 'bg-primary'); break;
-    default: console.warn('❓ Unknown stage:', stage);
+    case 'COMPLETED':
+      setProgress(bar, 100, '배달완료', 'bg-primary');
+      break;
+	case 'REJECTED': 
+	  setProgress(bar, 100, '주문 거부됨', 'bg-danger'); 
+	  alert('해당 주문은 가게에서 거부되었습니다.');
+	  disableOrderUI();
+	  break;  
+    default:
+      console.warn('❓ Unknown stage:', stage);
   }
 }
+//주문 거부시 활성 함수
+function disableOrderUI() {
+  // 채팅 입력창, 버튼 비활성화
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendChatBtn');
+  if (input) input.disabled = true;
+  if (sendBtn) sendBtn.disabled = true;
 
+  // 예상 시간 제거
+  const display = document.getElementById('expectedTimeDisplay');
+  if (display) display.textContent = '주문이 거부되었습니다';
+
+  // 타이머 정지
+  if (expectedTimerInterval) {
+    clearInterval(expectedTimerInterval);
+    expectedTimerInterval = null;
+  }
+}
 function setProgress(elem, percent, text, colorClass) {
   elem.style.width = percent + '%';
   elem.className = 'progress-bar progress-bar-striped progress-bar-animated ' + colorClass;
@@ -87,8 +133,9 @@ let totalExpectedSeconds = 0;
 let expectedTimerInterval = null;
 
 function startExpectedTimeCountdown(expectCookingTime, expectDeliveryTime) {
-  if (!expectCookingTime || !expectDeliveryTime) {
-    document.getElementById('expectedTimeDisplay').textContent = '--분';
+  const display = document.getElementById('expectedTimeDisplay');
+  if (!expectCookingTime || !expectDeliveryTime || !display) {
+    display.textContent = '--분';
     return;
   }
 
@@ -103,7 +150,7 @@ function startExpectedTimeCountdown(expectCookingTime, expectDeliveryTime) {
     totalExpectedSeconds -= 60;
     if (totalExpectedSeconds <= 0) {
       clearInterval(expectedTimerInterval);
-      document.getElementById('expectedTimeDisplay').textContent = '도착 임박!';
+      display.textContent = '도착 임박!';
       return;
     }
     updateExpectedTimeUI();
@@ -132,8 +179,9 @@ window.addEventListener('load', () => {
     });
   }
 
-  const currentStage = /*[[${currentStage}]]*/ 'PENDING';
-  initChart(currentStage); // 차트 초기화
-  kakao.maps.load(initMap); // 지도 초기화
-  updateCookingProgress(currentStage); // ProgressBar 초기화
+
+  initChart(currentStage);
+  kakao.maps.load(initMap);
+  updateCookingProgress(currentStage);
+  startExpectedTimeCountdown(expectCookingTime, expectDeliveryTime);
 });
