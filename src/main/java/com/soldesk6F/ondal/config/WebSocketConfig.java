@@ -3,6 +3,7 @@ package com.soldesk6F.ondal.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -23,6 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // /stomp 라는 엔드포인트로 WebSocket 또는 SockJS 연결
         registry.addEndpoint("/stomp")
         .setAllowedOriginPatterns("*")
+        .addInterceptors(new HttpSessionHandshakeInterceptor())
         .withSockJS();
     }
     

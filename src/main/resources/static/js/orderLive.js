@@ -1,6 +1,6 @@
 let statusChart, map, marker;
-const userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest';
 const stages = ['접수됨','조리중','배달중','배송완료'];
+let orderId;
 // HTML 인라인 스크립트로부터 넘어온 전역 orderId 사용
 // => 이제 에디터에도 빨간줄 안 뜹니다!
 console.log('Order ID:', orderId);
@@ -95,6 +95,8 @@ function sendChat() {
     text,
     timestamp: new Date().toISOString()
   };
+  console.log("📤 전송 경로: /app/chat/" + orderId);
+  console.log("📤 전송 데이터:", JSON.stringify(payload));
   stompClient.send('/app/chat/' + orderId, {}, JSON.stringify(payload));
   input.value = '';
 }
@@ -127,7 +129,23 @@ $('.chat-button').click(function () {
  * 4) 페이지 로드 시 초기화
  *--------------------------------------------------*/
 window.addEventListener('load', () => {
-  connectChat();
+	
+	const orderIdInput = document.getElementById("orderIdInput");
+	orderId = orderIdInput.value;
+	
+	console.log("📦 orderIdInput DOM:", orderIdInput);
+
+	orderId = orderIdInput?.value;
+	console.log("📦 orderId 값:", orderId);
+
+	const btn = document.getElementById('sendChatBtn');
+	console.log("📦 sendChatBtn 존재 여부:", btn);
+
+	const chatInput = document.getElementById('chatInput');
+	console.log("📦 chatInput 존재 여부:", chatInput);
+	
+	connectChat();
+  	console.log("js테스트 : " ,orderId);
 
   // 전송 버튼 & 엔터키 바인딩
   document.getElementById('sendChatBtn')

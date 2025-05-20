@@ -16,9 +16,10 @@
   <script
     th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}">
   </script>
-
+  <script th:inline="javascript">
+    let userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest';
+  </script>
   <!-- 페이지 전용 JS -->
-  <script th:src="@{/js/orderLive.js}" defer></script>
 </head>
 <body>
 <section layout:fragment="content">
@@ -129,6 +130,8 @@
 			 	 
 	//incrementProgress(); // 반복 시작	 
 </script>
+  <script th:src="@{/js/orderLive.js}"></script>
+  <input type="hidden" value="${orderId}" id ="orderIdInput">
 </section>
 </body>
 </html>

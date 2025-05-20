@@ -257,7 +257,7 @@ public class PaymentService {
 								.totalPrice(cart.getTotalPrice())
 								.storeRequest(reqStore)
 								.deliveryRequest(reqDel).orderDetails(orderDetailList)
-								.deliveryAddress(user.getUserSelectedAddress().getAddress()+user.getUserSelectedAddress().getDetailAddress())
+								.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 								.orderToOwner(OrderToOwner.PENDING).build();
@@ -381,7 +381,7 @@ public class PaymentService {
 						.totalPrice(tossResponse.getTotalAmount())
 						.storeRequest(tossResponse.getMetadata().getReqStore())
 						.deliveryRequest(tossResponse.getMetadata().getReqDel()).orderDetails(orderDetailList)
-						.deliveryAddress(user.getUserSelectedAddress().getAddress()+user.getUserSelectedAddress().getDetailAddress())
+						.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 						.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 						.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 						.orderToOwner(OrderToOwner.PENDING).build();

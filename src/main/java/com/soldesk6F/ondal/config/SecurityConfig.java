@@ -77,6 +77,7 @@ public class SecurityConfig{
     	http
     		.csrf(csrf -> csrf
     			.ignoringRequestMatchers("/api/**") // REST API는 CSRF 무시
+    			.ignoringRequestMatchers("/stomp/**")
     		)
     		.authorizeHttpRequests(auth -> auth
     			.requestMatchers("/**","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()

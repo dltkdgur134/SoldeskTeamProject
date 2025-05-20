@@ -351,6 +351,7 @@ function updateOrderStatus(orderId, url) {
                showNewOrderPopup(orderData);
            });
            if (currentOrderId) {
+				alert('오더아이디 어디선가');
 		   		stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
 		   }
        });

@@ -254,14 +254,14 @@ public class OrderService {
         return order.getOrderToRider();
     }
 
-//    @Transactional(readOnly = true)
-//    public OrderHistoryDto getOrderHistoryDto(String orderId) {
-//    	UUID uuid = UUID.fromString(orderId);
-//        Order order = orderRepository.findById(uuid)
-//            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
-//        // 간단히 toDto 매퍼 호출
-//        return OrderHistoryDto.from(order);
-//    }
+    @Transactional(readOnly = true)
+    public OrderHistoryDto getOrderHistoryDto(String orderId) {
+    	UUID uuid = UUID.fromString(orderId);
+        Order order = orderRepository.findById(uuid)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
+        // 간단히 toDto 매퍼 호출
+        return OrderHistoryDto.from(order);
+    }
     
     @Transactional(readOnly = true)
     public OrderInfoDetailDto getOrderInfoDetailDto(String orderId) {
