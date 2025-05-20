@@ -2,83 +2,164 @@
 
 /* 컨테이너: 한 줄에 최대 3개씩 배치 */
 .order-history {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-top: 20px;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 16px;
+	margin-top: 20px;
 }
 
 /* 주문 없을 때 */
 .no-orders {
-  grid-column: 1 / -1; /* 한 줄 전체 차지 */
-  text-align: center;
-  color: #666;
-  font-size: 1.1rem;
+	grid-column: 1/-1; /* 한 줄 전체 차지 */
+	text-align: center;
+	color: #666;
+	font-size: 1.1rem;
 }
 
 /* 카드 박스 */
 .order-box {
-  position: relative;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  aspect-ratio: 3 / 2;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+	position: relative;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	overflow: hidden;
+	aspect-ratio: 3/2;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* 이미지 + 텍스트 영역 */
 .order-box-content {
-  flex: 1;
-  display: flex;
-  gap: 16px;
-  padding: 16px;
-  box-sizing: border-box;
+	flex: 1;
+	display: flex;
+	gap: 16px;
+	padding: 16px;
+	box-sizing: border-box;
 }
 
 /* 왼쪽 이미지 (40% 너비) */
 .store-image img {
-  width: 40%;
-  height: auto;
-  object-fit: cover;
-  border-radius: 4px;
+	width: 40%;
+	height: auto;
+	object-fit: cover;
+	border-radius: 4px;
 }
 
 /* 오른쪽 텍스트 (60% 너비) */
 .order-details {
-  width: 60%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+	width: 60%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .order-details .status {
-  font-weight: bold;
-  color: #2D7121;
-  margin-bottom: 4px;
+	font-weight: bold;
+	color: #2D7121;
+	margin-bottom: 4px;
 }
 
 .order-details .store-name {
-  font-size: 1.1em;
-  margin-bottom: 8px;
+	font-size: 1.1em;
+	margin-bottom: 8px;
 }
 
 .order-details .menu-summary {
-  color: #555;
-  margin-bottom: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	color: #555;
+	margin-bottom: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 /* 하단 버튼 영역 */
 .order-box-footer {
-  padding: 0 16px 16px;
-  text-align: right;
+	padding: 0 16px 16px;
+	text-align: right;
 }
 
 .order-box-footer .btn {
-  font-size: 0.9em;
+	font-size: 0.9em;
+}
+
+/* ver.2 */
+.history-box {
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.rounded-circle {
+	height: 50px;
+	width: 50px;
+}
+
+.days-left {
+	font-size: 0.6em;
+}
+
+/* 버튼 */
+.write-review-btn {
+	width: 50%;
+	color: black;
+	border: #6c757d solid 1px;
+}
+
+.go-order-details-btn {
+	width: 50%;
+}
+
+.order-date {
+	color: #8E8E8E;
+	float: left;
+}
+
+.store-name {
+	font-size: 1.5em;
+}
+
+.icon-link {
+	text-decoration: none;
+	color: black;
+}
+
+.status {
+	font-weight: bold;
+	color: #2D7121;
+}
+
+.card-text {
+	font-size: 1.2em;
+}
+
+/* 주문 상세 페이지 */
+.order-basic-detail {
+	color: #8E8E8E;
+}
+
+
+
+.scrollspy-navbar {
+	transition: top 0.3s ease-in-out;
+	position: fixed;
+	top: -100px; /* 해당 부분까지 스크롤 할때까지 숨김 */
+	left: 0;
+	width: 100%;
+	z-index: 1030;
+	background-color: white !important;
+}
+
+.scrollspy-navbar.visible {
+	top: 0; /* 0으로 이동해서 보여주기 */
+	background-color: white !important;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.order-detail-sublabel {
+	color: #8E8E8E; 
+	font-size: 10pt;
+}
+
+.order-detail-text {
+	color: #8E8E8E;
 }

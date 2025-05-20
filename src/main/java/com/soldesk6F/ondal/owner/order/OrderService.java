@@ -3,15 +3,20 @@ package com.soldesk6F.ondal.owner.order;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+
+import com.soldesk6F.ondal.functions.DateFunctions;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.menu.repository.MenuRepository;
 import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
@@ -21,6 +26,7 @@ import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+import com.soldesk6F.ondal.useract.order.dto.OrderInfoDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto.OrderDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
@@ -51,6 +57,7 @@ public class OrderService {
 	    private final PaymentRepository paymentRepository;
 	    private final SimpMessagingTemplate messagingTemplate;
 	    private final RegAddressRepository regAddressRepository;
+	    private final DateFunctions dateFunctions;
 
 	    private final PaymentService paymentService;  // 이걸 @Lazy 처리 필요
 
@@ -63,8 +70,11 @@ public class OrderService {
 	        PaymentRepository paymentRepository,
 	        @Lazy PaymentService paymentService,
 	        SimpMessagingTemplate messagingTemplate,
-	        RegAddressRepository regAddressRepository) {
+	        RegAddressRepository regAddressRepository,
+	        DateFunctions dateFunctions) {
 
+	    	
+	    	
 	        this.userRepository = userRepository;
 	        this.storeRepository = storeRepository;
 	        this.orderRepository = orderRepository;
@@ -73,6 +83,7 @@ public class OrderService {
 	        this.paymentService = paymentService;
 	        this.messagingTemplate = messagingTemplate;
 	        this.regAddressRepository = regAddressRepository;
+	        this.dateFunctions = dateFunctions;
 	    }
 
     public Order saveOrder(OrderRequestDto requestDto) {
@@ -227,23 +238,43 @@ public class OrderService {
         return orderRepository.findByStore_StoreId(storeId);
     }
     
+//    @Transactional(readOnly = true)
+//    public List<OrderHistoryDto> getOrderHistoryByUser(String userId) {
+//        var user = userRepository.findByUserId(userId)
+//            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자: " + userId));
+//        var orders = orderRepository.findByUser(user);
+//        return orders.stream()
+//                     .map(this::toHistoryDto)
+//                     .collect(Collectors.toList());
+//    }
+    
     @Transactional(readOnly = true)
     public List<OrderHistoryDto> getOrderHistoryByUser(String userId) {
         var user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자: " + userId));
         var orders = orderRepository.findByUser(user);
-        return orders.stream()
-                     .map(this::toHistoryDto)
-                     .collect(Collectors.toList());
+        List<OrderHistoryDto> orderHistoryDto = orders.stream()
+        		.map(this::toHistoryDto)
+        		.collect(Collectors.toList());
+        orderHistoryDto.forEach(dto -> {
+        	long daysLeft = dateFunctions.getDaysLeftForReview(dto.getOrderDate());
+        	dto.setDaysLeftForReview(daysLeft);
+        });
+        orderHistoryDto.sort((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()));
+        return orderHistoryDto;
     }
+    
 
     private OrderHistoryDto toHistoryDto(Order order) {
         var dto = new OrderHistoryDto();
         dto.setOrderId(order.getOrderId());
+        dto.setStoreId(order.getStore().getStoreId());
         dto.setStoreName(order.getStore().getStoreName());
         dto.setStoreImageUrl(order.getStore().getBrandImg());
         dto.setOrderStatus(order.getOrderToOwner().name());
-        dto.setOrderDate(order.getOrderTime().toString());
+        //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
+        //dto.setOrderDate(order.getOrderTime().toString());
+        dto.setOrderDate(order.getOrderTime());
         var menuNames = order.getOrderDetails().stream()
                              .map(d -> d.getMenu().getMenuName())
                              .collect(Collectors.toList());
@@ -289,7 +320,62 @@ public class OrderService {
         // 간단히 toDto 매퍼 호출
         return OrderHistoryDto.from(order);
     }
-
+    
+    @Transactional(readOnly = true)
+    public OrderInfoDetailDto getOrderInfoDetailDto(String orderId) {
+    	UUID OrderUuid = UUID.fromString(orderId);
+        Order order = orderRepository.findById(OrderUuid)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
+        // 간단히 toDto 매퍼 호출
+        OrderInfoDetailDto orderInfoDetailDto = toOrderInfoDetailsDto(order);
+        return orderInfoDetailDto;
+    }
+    
+    private OrderInfoDetailDto toOrderInfoDetailsDto(Order order) {
+        var dto = new OrderInfoDetailDto();
+        dto.setOrderId(order.getOrderId());
+		dto.setStoreId(order.getStore().getStoreId());
+		dto.setStoreName(order.getStore().getStoreName());
+		dto.setStoreImageUrl(order.getStore().getBrandImg());
+		dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
+		dto.setOrderDate(order.getOrderTime());
+		LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
+		int menuTotalPrice = 0;
+		for (OrderDetail orderDetails : order.getOrderDetails()) {
+			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
+			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
+			menuDetails.put("menuPrice", orderDetails.getMenu().getPrice());
+			menuDetails.put("price", orderDetails.getPrice());
+			menuDetails.put("quantity", orderDetails.getQuantity());
+			
+			// 옵션 이름 , 가격을 HashMap에 담아서 해당하는 메뉴에 추가
+			HashMap<String, Integer> options = new HashMap<String, Integer>();
+			
+			for (int i = 0; i < orderDetails.getOptionNames().size(); i++) {
+				options.put(orderDetails.getOptionNames().get(i), orderDetails.getOptionPrices().get(i));
+			}
+			menuDetails.put("options", options);
+			
+			menuItems.add(menuDetails);
+			menuTotalPrice += orderDetails.getPrice();
+		}
+		dto.setMenuItems(menuItems);
+		dto.setTotalPrice(order.getTotalPrice());
+		dto.setDeliveryFee(order.getDeliveryFee());
+		dto.setMenuTotalPrice(menuTotalPrice);
+		
+		Optional<Payment> payment = paymentRepository.findByOrder(order);
+		if (payment.isEmpty() || payment.get() == null) {
+			dto.setPaymentMethod("정보 조회 불가");
+		} else {
+			dto.setPaymentMethod(payment.get().getPaymentMethod().getDescription());
+		}
+		dto.setPhoneNum(order.getUser().getUserPhone());
+		dto.setDeliveryAddress(order.getDeliveryAddress());
+		return dto;
+    }
+    
+    
     @Transactional(readOnly = true)
     public OrderLiveDto getOrderLiveDto(String orderId) {
         UUID uuid = UUID.fromString(orderId);

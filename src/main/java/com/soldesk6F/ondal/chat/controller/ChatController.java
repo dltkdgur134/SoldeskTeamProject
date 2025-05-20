@@ -6,6 +6,11 @@ import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
+
+import java.security.Principal;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,8 +24,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChatController {
 
+    private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
     private final SimpMessagingTemplate messagingTemplate;
     private final OrderService          orderService;
+
+    public ChatController(SimpMessagingTemplate messagingTemplate,
+    		OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler,
+    		OrderService orderService) {
+		this.orderService = orderService;
+		this.messagingTemplate = messagingTemplate;
+		this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
+
+}
 
     /**
      * 주문 채팅 엔드포인트
@@ -60,5 +75,4 @@ public class ChatController {
         if (riderUuid != null) {
             messagingTemplate.convertAndSendToUser(riderUuid.toString(), "/queue/chat", message);
         }
-    }
-}
+}}

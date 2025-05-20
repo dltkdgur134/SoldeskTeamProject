@@ -230,9 +230,12 @@ public class PaymentService {
 						orderDetail.setQuantity(cartItem.getQuantity());
 						orderDetail.setOptionNames(cartItem.getOptionsAsList());
 						List<Integer> ciop = new ArrayList<Integer>();
+						List<String> cion = new ArrayList<String>();
 						for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
 							ciop.add(cartItemOption.getOptionPrice());
+							cion.add(cartItemOption.getOptionName());
 						}
+						orderDetail.setOptionNames(cion);
 						orderDetail.setOptionPrices(ciop);
 						orderDetailList.add(orderDetail);
 					}
@@ -252,7 +255,7 @@ public class PaymentService {
 								.totalPrice(cart.getTotalPrice())
 								.storeRequest(reqStore)
 								.deliveryRequest(reqDel).orderDetails(orderDetailList)
-								.deliveryAddress(user.getUserSelectedAddress().getAddress())
+								.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 								.orderToOwner(OrderToOwner.PENDING).build();
@@ -260,6 +263,7 @@ public class PaymentService {
 					for (OrderDetail od : order.getOrderDetails()) {
 						od.setOrder(order);
 					}
+				
 			    	payment.setPaymentMethod(Payment.PaymentMethod.ONDALPAY);
 			    	payment.setPaymentStatus(PaymentStatus.COMPLETED);
 			    	paymentRepository.save(payment);
@@ -345,9 +349,13 @@ public class PaymentService {
 				orderDetail.setQuantity(cartItem.getQuantity());
 				orderDetail.setOptionNames(cartItem.getOptionsAsList());
 				List<Integer> ciop = new ArrayList<Integer>();
+				List<String> cion = new ArrayList<String>();
+				
 				for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
 					ciop.add(cartItemOption.getOptionPrice());
+					cion.add(cartItemOption.getOptionName());
 				}
+				orderDetail.setOptionNames(cion);
 				orderDetail.setOptionPrices(ciop);
 				orderDetailList.add(orderDetail);
 			}
@@ -376,7 +384,7 @@ public class PaymentService {
 						.totalPrice(tossResponse.getTotalAmount())
 						.storeRequest(tossResponse.getMetadata().getReqStore())
 						.deliveryRequest(tossResponse.getMetadata().getReqDel()).orderDetails(orderDetailList)
-						.deliveryAddress(user.getUserSelectedAddress().getAddress())
+						.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 						.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 						.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 						.orderToOwner(OrderToOwner.PENDING).build();
