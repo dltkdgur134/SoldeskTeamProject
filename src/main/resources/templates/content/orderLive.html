@@ -1,65 +1,78 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
       layout:decorate="~{layouts/Layouts}">
-
 <head>
   <title>배송 진행 화면</title>
 
   <!-- CSS -->
   <link th:href="@{/css/orderLive.css}" rel="stylesheet"/>
-  <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
-
+	<link th:href="@{/css/custom.css}" rel="stylesheet"/>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Kakao Map (autoload=false로 로드) -->
-  <script th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}"></script>
-<script th:inline="javascript">
-  const orderId = /*[[${order.orderId}]]*/ 'defaultOrderId';
-  const userUuid = /*[[${userUuid}]]*/ 'defaultUserUuid';
-</script>
+  <!-- Kakao Map (autoload=false 로 나중에 로딩) -->
+  <script
+    th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}">
+  </script>
+  <script th:inline="javascript">
+    let userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest';
+  </script>
   <!-- 페이지 전용 JS -->
-  <script th:src="@{/js/orderLive.js}" defer></script>
 </head>
-
 <body>
 <section layout:fragment="content">
-  <div id="orderStatusDisplay" class="mt-3 text-danger"
-       th:if="${order.orderToOwner.name() == 'CANCELED'}">
-    <h4>🚫 이 주문은 가게에서 거절되었습니다. 다른 가게를 이용해주세요.</h4>
-  </div>
-
-  <h1>실시간 배송 진행</h1>
-
+  <h1 class="d-flex justify-content-center my-2">실시간 배송 진행</h1>
   <div class="live-container">
     <!-- 왼쪽 메인 영역 -->
     <div class="main-panel">
+      <!-- 1) 진행 상태 차트 -->
+      <div class="status-chart">
+        <!-- <canvas id="statusChart"></canvas> -->
+        <!-- <img th:src="@{/css/imgs/rider_delivery.gif}" style="width: 100px" /> -->
+      	<div class="container">
+    		<div class="progress-container">
+        		<!-- <div class="progress">
+            		<div class="progress-bar bg-primary" id="progressBar" style="width: 0%;"></div>
+        		</div> -->
+        		<div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+  					<div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%" id="progressBar"></div>
+				</div>	
+        		
+        		
+        		<div class="step-label" data-step="1" style="left: 0%;">주문 요청 중</div>
+        		<div class="step" data-step="1" style="left: 0%;"></div>
+        		<div class="step-timestamp" th:if="${currentStage[0].timestamp != null}" th:text="${#temporals.format(currentStage[0].timestamp, 'HH:mm')}"></div>
 
-      <!-- ✅ 조리/배달 진행 상태 ProgressBar -->
-      <div id="cookingProgressSection" class="mt-4">
-        <label class="fw-bold">조리 및 배달 진행 상황</label>
-        <div class="progress" style="height: 28px; margin-top: 10px;">
-          <div id="cookingProgressBar"
-               class="progress-bar bg-secondary progress-bar-striped progress-bar-animated"
-               role="progressbar"
-               style="width: 0%;"
-               aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-            접수 대기
-          </div>
-        </div>
+        		<div class="step-label" data-step="2" style="left: 33.33%;">조리 중</div>
+        		<div class="step" data-step="2" style="left: 33.33%;"></div>
+        		<div class="step-timestamp" th:if="${currentStage[1].timestamp != null}" th:text="${#temporals.format(currentStage[1].timestamp, 'HH:mm')}"></div>
+
+        		<div class="step-label" data-step="3" style="left: 66.66%;">배달 중</div>
+        		<div class="step" data-step="3" style="left: 66.66%;"></div>
+        		<div class="step-timestamp" th:if="${currentStage[2].timestamp != null}" th:text="${#temporals.format(currentStage[2].timestamp, 'HH:mm')}"></div>
+
+        		<div class="step-label" data-step="4" style="left: 100%;">주문 완료</div>
+        		<div class="step" data-step="4" style="left: 100%;"></div>
+        		<div class="step-timestamp" th:if="${currentStage[3].timestamp != null}" th:text="${#temporals.format(currentStage[3].timestamp, 'HH:mm')}"></div>
+    		</div>
+    		<th:block>
+    			<input type="range" class="form-range mt-4" min="1" max="4" step="1" id="stepSlider" oninput="updateProgress(this.value)" th:if="${currentStage[0].timestamp != null}" value="1">
+    			<input type="range" class="form-range mt-4" min="1" max="4" step="1" id="stepSlider" oninput="updateProgress(this.value)" th:if="${currentStage[1].timestamp != null}" value="2">
+    			<input type="range" class="form-range mt-4" min="1" max="4" step="1" id="stepSlider" oninput="updateProgress(this.value)" th:if="${currentStage[2].timestamp != null}" value="3">
+    			<input type="range" class="form-range mt-4" min="1" max="4" step="1" id="stepSlider" oninput="updateProgress(this.value)" th:if="${currentStage[3].timestamp != null}" value="4">
+    		</th:block>
+    		<!-- <input type="range" class="form-range mt-4" min="1" max="4" step="1" id="stepSlider" oninput="updateProgress(this.value)" hidden="true"> -->
+		</div>
       </div>
-
-      <!-- ✅ 예상 남은 시간 영역 -->
-      <div id="expectedTimeSection" class="mt-4">
-        <h5>남은 예상 시간</h5>
-        <div class="text-center">
-          <div id="expectedTimeArea">
-            <h5 id="expectedTimeDisplay" class="text-primary">--분</h5>
-          </div>
-        </div>
+      <!-- 2) 지도 -->
+      <!-- <div id="map" class="map-area"></div> -->
+      <div class="container d-flex justify-content-center">
+      	<div>조리 예정 시간</div>
+      	<strong th:text="${#temporals.format(order.expectCookingTime, 'mm') + ' 분'}"></strong>
       </div>
     </div>
+
     <!-- 오른쪽 채팅 패널 -->
     <div id="chatPanel" class="chat-panel">
       <h3>실시간 채팅</h3>
@@ -67,17 +80,57 @@
       <div class="chat-input">
         <input type="text" id="chatInput" placeholder="메시지를 입력하세요…" />
         <button id="sendChatBtn">
-          전송 <span id="unreadBadge" class="badge bg-danger" style="display: none;">1</span>
+        	전송
+        	<span id="unreadBadge" style="display:none; color:red; font-weight:bold;">1</span>
         </button>
       </div>
     </div>
   </div>
-
-  <!-- JS에서 사용할 currentStage 변수 주입 -->
   <script>
-    const currentStage = /*[[${order.orderToOwner}]]*/ 'PENDING';
-  </script>
-</section>
+  function updateProgress(step) {
+		const progressBar = document.getElementById('progressBar');
+		const steps = document.querySelectorAll('.step');
+		const labels = document.querySelectorAll('.step-label');
 
+		// 상태바 넓이 계산
+		const progressPercent = ((step - 1) / (steps.length - 1)) * 100;
+		progressBar.style.width = `${progressPercent}%`;
+
+		// 현재 단계 및 레이블 스타일링
+		steps.forEach(el => {
+		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
+		     if (currentStep <= step) {
+		         el.classList.add('active');
+		     } else {
+		         el.classList.remove('active');
+		     }
+		 });
+
+		 labels.forEach(el => {
+		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
+		     if (currentStep <= step) {
+		         el.classList.add('active');
+		     } else {
+		         el.classList.remove('active');
+		     }
+		 });
+	}
+
+	function incrementProgress() {
+	 	  if (count < 4) { // 4단계 까지만
+	 	    count++;
+	 	    updateProgress(count);
+	 	    setTimeout(incrementProgress, 5000); // 5초마다 호출
+	 	  }
+	 }
+	// 처음 화면 진입 시 단계는 1로 고정
+	let count = 0;
+	updateProgress(1);
+			 	 
+	//incrementProgress(); // 반복 시작	 
+  </script>
+  <script th:src="@{/js/orderLive.js}"></script>
+  <input type="hidden" value="${orderId}" id ="orderIdInput">
+</section>
 </body>
 </html>

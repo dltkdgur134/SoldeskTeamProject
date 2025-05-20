@@ -431,7 +431,12 @@ function updateOrderStatus(orderId, url) {
                showNewOrderPopup(orderData);
            });
            if (currentOrderId) {
+<<<<<<< HEAD
 		   		stompClient.subscribe('/user/queue/chat', onChatMessage);
+=======
+				alert('오더아이디 어디선가');
+		   		stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+>>>>>>> ab0f096472d342fae1598e2acaf32819e15bf449
 		   }
        });
    }

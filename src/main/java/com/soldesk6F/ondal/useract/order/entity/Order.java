@@ -51,7 +51,7 @@ public class Order {
     @Column(name = "order_number", length = 3)
     private Integer orderNumber;
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_uuid", nullable = true)
     @JsonIgnoreProperties({"orders"})
     private User user;
@@ -59,12 +59,12 @@ public class Order {
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     @JsonIgnoreProperties({"orders", "owner"})
     private Store store;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "rider_id")
     private Rider rider;
 
@@ -138,12 +138,11 @@ public class Order {
     @JsonIgnoreProperties("order")
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
-
     public enum OrderToOwner {
         PENDING("주문 요청 중"), 
         CONFIRMED("주문 확인 완료"),
         IN_DELIVERY("배달 중"), 
-        COMPLETED("주문 및 결재 완료"), 
+        COMPLETED("주문 완료"), 
         CANCELED("주문 취소");
     	private final String description;
     	OrderToOwner(String description) {
@@ -187,7 +186,7 @@ public class Order {
 		}
     }
     @Builder
-    public Order(User user, Integer orderNumber, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
+    public Order(User user, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
                  LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
                  LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress,
                  Double deliveryAddressLatitude, Double deliveryAddressLongitude, int deliveryFee,
@@ -196,7 +195,6 @@ public class Order {
                  List<OrderDetail> orderDetails) {
 
         this.user = user;
-        this.orderNumber = orderNumber;
         this.guestId = guestId;
         this.store = store;
         this.rider = rider;
