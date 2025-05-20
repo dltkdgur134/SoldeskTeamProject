@@ -74,7 +74,8 @@ function sendChatMessage() {
 }
 
 // ✅ 조리/배달 ProgressBar
-function updateCookingProgress(stage) {
+window.updateCookingProgress = function(stage) {
+	console.log('현재 단계:', stage);
   const bar = document.getElementById('cookingProgressBar');
   if (!bar) return;
 
@@ -180,8 +181,6 @@ window.addEventListener('load', () => {
   }
 
 
-  initChart(currentStage);
-  kakao.maps.load(initMap);
   updateCookingProgress(currentStage);
   startExpectedTimeCountdown(expectCookingTime, expectDeliveryTime);
 });

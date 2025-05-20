@@ -75,8 +75,9 @@
 
   <!-- JS에서 사용할 currentStage 변수 주입 -->
   <script>
-    const currentStage = /*[[${order.orderToOwner}]]*/ 'PENDING';
+    const currentStage = /*[[${order.orderToRider}]]*/ 'PENDING';
   </script>
+  <input type="hidden" value="${orderId}" id ="orderIdInput">
 </section>
 
 </body>

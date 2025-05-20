@@ -72,9 +72,6 @@ public class OrderService {
 	        SimpMessagingTemplate messagingTemplate,
 	        RegAddressRepository regAddressRepository,
 	        DateFunctions dateFunctions) {
-
-	    	
-	    	
 	        this.userRepository = userRepository;
 	        this.storeRepository = storeRepository;
 	        this.orderRepository = orderRepository;
