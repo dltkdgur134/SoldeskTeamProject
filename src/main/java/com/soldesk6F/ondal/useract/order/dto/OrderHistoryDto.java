@@ -16,7 +16,8 @@ public class OrderHistoryDto {
     private String storeName;
     private String storeImageUrl;
     private String orderStatus;
-    private List<String> menuItems;
+    //private List<String> menuItems;
+    private HashMap<String, Integer> menuItems;
     private String menuName;
     private int menuQuantity;
     //private String orderDate;      // ISO 문자열 또는 포맷팅된 날짜

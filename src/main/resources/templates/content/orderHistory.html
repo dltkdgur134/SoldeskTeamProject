@@ -59,8 +59,8 @@
         <!-- 오른쪽: 상세 정보 -->
         <div class="container text-start ms-4 my-3">
           <!-- 메뉴 항목 2개까지만, 나머지는 "외 n개" -->
-          <p class="card-text">
-            <span th:each="item,iterStat : ${order.menuItems}"
+          <p class="card-text" th:each="item : ${order.menuItems}">
+            <!-- <span th:each="item,iterStat : ${order.menuItems}"
                   th:if="${iterStat.index < 2}"
                   th:text="${iterStat.index == 0 ? item : ', ' + item}">
               메뉴1, 메뉴2
@@ -68,12 +68,14 @@
             <span th:if="${order.menuItems.size() > 2}"
                   th:text="'외 ' + (${order.menuItems.size()} - 2) + '개'">
               외 n개
-            </span>
+            </span> -->
+            <span><strong th:text="${item.key}"></strong></span>
+            <span><small class="menu-item-quantity" th:text="${item.value + ' 개'}"></small></span>
           </p>
         </div>
       </div>
       <!-- 하단: 상세 정보 보기 버튼 -->
-      <div class="container d-flex justify-content-center mb-4">
+      <div class="container d-flex justify-content-center mb-4" th:unless="${#strings.equals(order.orderStatus, 'CANCELED')}">
         <a th:href="@{'/user/order/' + ${order.orderId}}"
            class="btn btn-outline-primary go-order-details-btn" th:if="${#strings.equals(order.orderStatus, 'COMPLETED')}">
           상세 정보 보기
@@ -82,6 +84,9 @@
            class="btn btn-outline-primary go-order-details-btn" th:unless="${#strings.equals(order.orderStatus, 'COMPLETED')}">
           실시간 주문 현황
         </a>
+       </div>
+       <div class="container d-flex justify-content-center mb-4" th:if="${#strings.equals(order.orderStatus, 'CANCELED')}">
+       		<strong class="order-canceled">주문 취소됨</strong>
        </div>
         <!-- <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
         	class="btn btn-outline-secondary position-relative write-review-btn" th:if="${#strings.equals(order.orderStatus, 'COMPLETED')}"> -->

@@ -211,10 +211,16 @@ public class OrderService {
         //dto.setOrderDate(order.getOrderTime().toString());
         dto.setOrderDate(order.getOrderTime());
         dto.setTotalPrice(order.getTotalPrice());
-        var menuNames = order.getOrderDetails().stream()
-                             .map(d -> d.getMenu().getMenuName())
-                             .collect(Collectors.toList());
-        dto.setMenuItems(menuNames);
+//        var menuNames = order.getOrderDetails().stream()
+//                             .map(d -> d.getMenu().getMenuName())
+//                             .collect(Collectors.toList());
+//        dto.setMenuItems(menuNames);
+        var menuItems = new HashMap<String, Integer>();
+        for (int i = 0; i < order.getOrderDetails().size(); i++) {
+        	menuItems.put(order.getOrderDetails().get(i).getMenu().getMenuName(), 
+        			order.getOrderDetails().get(i).getQuantity());
+        }
+        dto.setMenuItems(menuItems);
         return dto;
     }
     private OrderResponseDto convertToDto(Order order) {
@@ -321,6 +327,8 @@ public class OrderService {
         var dto = new OrderLiveDto();
         dto.setOrderId(order.getOrderId().toString());
         dto.setOrderStatus(order.getOrderToRider());
+        // 추가
+        dto.setExpectCookingTime(order.getExpectCookingTime());
 
         var timeline = new ArrayList<StatusTimeline>();
         // 시간 필드들이 있다고 가정

@@ -82,7 +82,7 @@
 .order-box-footer .btn {
 	font-size: 0.9em;
 }
-
+/* ------------------------------------------------------------------ */
 /* ver.2 */
 .history-box {
 	border: none !important;
@@ -96,6 +96,15 @@
 
 .days-left {
 	font-size: 0.6em;
+}
+
+.menu-item-quantity {
+	font-size: 10pt;
+	color: #8E8E8e;
+}
+
+.order-canceled {
+	color: red;
 }
 
 /* 버튼 */

@@ -143,3 +143,6 @@ window.addEventListener('load', () => {
   initChart(currentStage);
   kakao.maps.load(initMap);
 });
+
+
+
