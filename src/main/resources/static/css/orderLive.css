@@ -107,7 +107,7 @@
 	position: absolute;
 	top: -40px;
 	transform: translateX(-50%);
-	font-size: 14px;
+	font-size: 1rem;
 	font-weight: normal;
 	color: gray;
 	white-space: nowrap;
