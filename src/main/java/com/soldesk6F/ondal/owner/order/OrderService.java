@@ -210,6 +210,7 @@ public class OrderService {
         //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
         //dto.setOrderDate(order.getOrderTime().toString());
         dto.setOrderDate(order.getOrderTime());
+        dto.setTotalPrice(order.getTotalPrice());
         var menuNames = order.getOrderDetails().stream()
                              .map(d -> d.getMenu().getMenuName())
                              .collect(Collectors.toList());

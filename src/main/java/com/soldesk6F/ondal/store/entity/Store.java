@@ -52,7 +52,7 @@ public class Store {
 	@Column(name = "store_id" , updatable = false, nullable = false,unique = true)
 	private UUID storeId;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "owner_id" , nullable = false)
 	@JsonIgnoreProperties({"user"})
 	private Owner owner;

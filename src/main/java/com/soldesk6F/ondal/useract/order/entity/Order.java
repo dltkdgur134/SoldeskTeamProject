@@ -48,7 +48,7 @@ public class Order {
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_uuid", nullable = true)
     @JsonIgnoreProperties({"orders"})
     private User user;
@@ -56,12 +56,12 @@ public class Order {
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     @JsonIgnoreProperties({"orders", "owner"})
     private Store store;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "rider_id")
     private Rider rider;
 
