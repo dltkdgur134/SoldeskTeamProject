@@ -1,4 +1,4 @@
-let stompClient, statusChart, map, marker;
+let statusChart, map, marker;
 const userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest';
 const stages = ['접수됨','조리중','배달중','배송완료'];
 // HTML 인라인 스크립트로부터 넘어온 전역 orderId 사용
