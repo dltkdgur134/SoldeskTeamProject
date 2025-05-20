@@ -44,6 +44,7 @@ public class OwnerController {
 	    session.setAttribute("storeId", storeId); // ✅ 세션에 저장
 	    Store store = storeService.findStoreByStoreId(storeId);
 	    model.addAttribute("store", store);
+	    
 
 	    return "content/store/storeManagement";
 	}
