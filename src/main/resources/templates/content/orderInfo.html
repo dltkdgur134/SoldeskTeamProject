@@ -9,23 +9,6 @@
 	<link th:fragment="css" th:href="@{/css/orderHistory.css}" rel="stylesheet"/>
   	<!-- Chart.js -->
   	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<style type="text/css">
-		.scrollspy-navbar {
-    		transition: top 0.3s ease-in-out;
-    		position: fixed;
-    		top: -100px; /* 해당 부분까지 스크롤 할때까지 숨김 */
-    		left: 0;
-    		width: 100%; 
-    		z-index: 1030;
-    		background-color: white !important;
-		}
-
-		.scrollspy-navbar.visible {
-   		 	top: 0; /* 0으로 이동해서 보여주기 */
-    		background-color: white !important; 
-    		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  
-		}
-	</style>
 </head>
 <body>
 <section layout:fragment="content">
@@ -69,21 +52,23 @@
 			<div class="tab-content">
 				<h5 class="my-2">주문 메뉴</h5>
 				<div class="card p-4">
-					<div th:each="item : ${order.menuItems}">
-						<div><strong th:text="${item.menuName}"></strong></div>
-						<div>
-							<span><small th:text="${item.menuName}" style="color: gray;"></small></span>
-							<span><small th:text="'-' + ${item.menuPrice} + ' 원'" style="color:gray;"></small></span>
-						</div>
-						<div th:each="option : ${item.options}">
-							<small th:text="${option.key}" style="color: gray;"></small>
-							<small th:text="${' - ' + option.value + ' 원'}" style="color: gray;"></small>
-						</div>
-						<div>
-							<span><strong th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + ' 원'}"></strong></span> 
-							<span><small th:text="${item.quantity + '개'}"></small></span> 
-						</div>
-					</div>
+						<ul class="list-group list-group-flush" th:each="item : ${order.menuItems}">
+							<li class="list-group-item">
+								<div><strong th:text="${item.menuName}"></strong></div>
+								<div>
+									<span><small class="order-detail-small-text" th:text="${item.menuName}"></small></span>
+									<span><small class="order-detail-small-text" th:text="'-' + ${item.menuPrice} + ' 원'"></small></span>
+								</div>
+								<div th:each="option : ${item.options}">
+									<small class="order-detail-text" th:text="${option.key	}" ></small>
+									<small class="order-detail-text" th:text="${' - ' + option.value + ' 원'}"></small>
+								</div>
+								<div>
+									<span><strong class="order-detail-label" th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + ' 원'}"></strong></span> 
+									<span><small class="order-detail-text" th:text="${item.quantity + '개'}"></small></span> 
+								</div>
+							</li>
+						</ul>
 				</div>
 			</div>
 		</div>
@@ -107,13 +92,13 @@
 						<span><strong th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA') + ' 원'}"></strong></span>
 					</div>
 					<div class="container d-flex justify-content-between">
-						<span><strong style="color:gray; font-size:10pt;">메뉴 금액</strong></span>
-						<span><strong style="color:gray; font-size:10pt;" th:text="${#numbers.formatInteger(order.menuTotalPrice, 3, 'COMMA') + ' 원'}"></strong></span>
+						<span><strong class="order-detail-sublabel">메뉴 금액</strong></span>
+						<span><small class="order-detail-text" th:text="${#numbers.formatInteger(order.menuTotalPrice, 3, 'COMMA') + ' 원'}"></small></span>
 					</div>
 					<div class="container d-flex justify-content-between">
-						<span><strong style="color:gray; font-size:10pt;">배달팁</strong></span>
-						<span th:if="${order.deliveryFee > 0}"><strong style="color:gray; font-size:10pt;" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></strong></span>
-						<span th:if="${order.deliveryFee == 0}"><strong style="color:gray; font-size:10pt;" th:text="${order.deliveryFee + '원'}"></strong></span>
+						<span><strong class="order-detail-sublabel">배달팁</strong></span>
+						<span th:if="${order.deliveryFee > 0}"><small class="order-detail-text" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
+						<span th:if="${order.deliveryFee == 0}"><small class="order-detail-text" th:text="${order.deliveryFee + ' 원'}"></small></span>
 					</div>
 				</div>
 			</div>
@@ -126,14 +111,14 @@
 						<strong>전화번호</strong>
 					</div>
 					<div>
-						<small th:text="${order.phoneNum}" style="color: gray;"></small>
+						<small class="order-detail-text" th:text="${order.phoneNum}"></small>
 					</div>
 					<hr>
 					<div>
 						<strong>배달 주소</strong>
 					</div>
 					<div>
-						<small th:text="${order.deliveryAddress}" style="color: gray;"></small>
+						<small class="order-detail-text" th:text="${order.deliveryAddress}"></small>
 					</div>
 				</div>
 			</div>

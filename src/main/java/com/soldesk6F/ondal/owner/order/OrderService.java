@@ -33,11 +33,9 @@ import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
-import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
-import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
 
@@ -285,6 +283,7 @@ public class OrderService {
 			menuDetails.put("price", orderDetails.getPrice());
 			menuDetails.put("quantity", orderDetails.getQuantity());
 			
+			// 옵션 이름 , 가격을 HashMap에 담아서 해당하는 메뉴에 추가
 			HashMap<String, Integer> options = new HashMap<String, Integer>();
 			
 			for (int i = 0; i < orderDetails.getOptionNames().size(); i++) {
