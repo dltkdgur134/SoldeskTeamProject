@@ -332,13 +332,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				const priceText = label.querySelector('.option-price')?.textContent || '';
 				const match = priceText.match(/[\+]?[\s]*([\d,]+)\s*원/);
 				const price = match ? parseInt(match[1].replace(/,/g, '')) : 0;
-				
-				console.log('📦 Parsed option:', {
-					groupName: group,
-					name,
-					priceRaw: priceText,
-					priceParsed: price
-				});
 
 				return {
 					groupName: group || '',
@@ -348,30 +341,22 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			const optionTotal = selectedOptions.reduce((sum, opt) => sum + opt.price, 0);
-
 			const unitPrice = basePrice + optionTotal;
 			const totalPrice = unitPrice * quantity;
 
 			const data = {
 				menuId: card.getAttribute('data-id'),
 				storeId: card.getAttribute('data-store-id'),
-				quantity: quantity,
+				menuName: card.getAttribute('data-name'),
+				menuImage: card.getAttribute('data-image'),
+				price: basePrice,
+				quantity,
 				options: selectedOptions,
 			};
-			fetch('/cart/add', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data)
-			})
-			.then(res => res.json())
-			.then(result => {
-				alert(result.message || '장바구니에 담겼습니다.');
-				closeModal();
-			})
-			.catch(err => {
-				console.error(err);
-				alert('담기에 실패했습니다.');
-			});
+
+			saveToLocalStorage(data); // ✅ 여기에 저장
+			alert("장바구니에 담았습니다.");
+			closeModal();
 		});
 
 		updateTotal();

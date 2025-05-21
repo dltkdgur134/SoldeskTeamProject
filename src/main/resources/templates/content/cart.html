@@ -13,62 +13,23 @@
 <body>
 	<div layout:fragment="content">
 		<div class="cart-container">
-			<h2 th:if="${not #lists.isEmpty(cartItems)}">
-				<span th:text="${cart.store.storeName}"></span>
-			</h2>
+			<h2 id="store-name">가게 이름</h2>
 			
-			<div class="cart-empty" th:if="${#lists.isEmpty(cartItems)}">
+			<div class="cart-empty" id="empty-cart" style="display: none;">
 				<img src="/img/cart/empty_cart.png" alt="텅 빈 장바구니" class="empty-cart-img">
 				<p class="empty-cart-msg">장바구니가 텅 비었어요</p>
 			</div>
 			<p th:if="${errorMessage}" th:text="${errorMessage}" class="error-msg"></p>
 			<div class="cart-wrapper">
 				<div class="carts">
-					<div class="cart-item" th:each="item : ${cartItems}"
-						th:data-id="${item.cartItemsId}" 
-						th:classappend="' cart-item-card'"
-						th:data-base-price="${item.menuPrice}"
-						th:unless="${#lists.isEmpty(cartItems)}">
-						<div class="cart-item-body">
-							<div class="cart-item-left">
-								<img th:src="@{${item.menuImage}}" alt="메뉴 이미지">
-							</div>
-							<div class="cart-item-middle">
-								<h4 th:text="${item.menuName}"></h4>
-								<p class="menu-base-price" th:text="'가격: ' + ${item.menuPrice} + '원'"></p>
-								<div class="cart-options">
-									<div class="cart-options cart-item-options">
-										<div th:each="opt : ${item.cartItemOptions}">
-											<span th:text="${opt.groupName} + ' : ' + ${opt.optionName} + ' ( ' + ${#numbers.formatInteger(opt.optionPrice, 3, 'COMMA')} + '원)'"></span><br />
-										</div>
-									</div>
-								</div>
-								<p class="itemTotalPrice" th:text="'가격: ' + ${item.getItemTotalPrice} + '원'"></p>
-							</div>
-						</div>
-						<div class="cart-item-footer">
-							<button class="btn-change-option" th:data-id="${item.cartItemsId}">옵션 변경</button>
-							<div class="quantity-controls" 
-							     th:data-id="${item.cartItemsId}"
-							     th:data-price="${item.menuPrice}" 
-							     th:data-total-price="${item.getItemTotalPrice}">
-								<button class="btn-decrease">
-									<span th:if="${item.quantity > 1}">-</span>
-									<span th:if="${item.quantity == 1}">🗑</span>
-								</button>
-								<span class="qty-num" th:text="${item.quantity}"></span>
-								<button class="btn-increase">+</button>
-							</div>
-						</div>
+					<div class="carts" id="cart-items-container">
+						<!-- 여기에 JS가 cart 항목을 동적으로 추가 -->
 					</div>
 				</div>
 			</div>
-			<div class="order-summary" th:if="${not #lists.isEmpty(cartItems)}">
+			<div class="order-summary" id="order-summary" style="display: none;">
 				<p th:text="'결제금액: ' + ${totalPrice} + '원'"></p>
-				<form id="orderForm" th:action="@{/store/pay}" method="post">
-					<input type="hidden" name="cartUUID" th:value="${cart.cartId}" />
-					<button type="submit">주문하기</button>
-				</form>
+				<button onclick="goToOrderPage()">주문하기</button>
 			</div>
 			<div id="optionModal" class="modal" style="display: none;">
 				<div id="option-modal-overlay" class="modal-overlay"></div>
@@ -87,6 +48,8 @@
 	</div>
 	<div layout:fragment="js">
 		<script th:src="@{/js/index.js}"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+		<script th:src="@{/js/cartStorage.js}"></script>
 		<script th:src="@{/js/cart.js}"></script>
 		<script th:src="@{/js/cartOptionModal.js}"></script>
 	</div>
