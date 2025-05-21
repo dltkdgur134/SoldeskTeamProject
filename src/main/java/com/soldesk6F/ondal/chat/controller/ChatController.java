@@ -39,4 +39,6 @@ public class ChatController {
     	System.out.println("✅ 메시지 내용: " + message.getText());
         messagingTemplate.convertAndSend("/topic/chat/" + orderId, message);
     }
+    
+    
 }

@@ -46,14 +46,17 @@ public class UserOrderController {
             return "content/orderInfo";
         } else {
             // 3) 진행중 주문 → orderLive 페이지
-            OrderLiveDto live = orderService.getOrderLiveDto(orderId);
-            model.addAttribute("orderId", orderId);
-            model.addAttribute("order", live);
-            model.addAttribute("currentStage", live.getTimeline());
-            model.addAttribute("initialLat", live.getLat());
-            model.addAttribute("initialLng", live.getLng());
-            model.addAttribute("kakaoAppKey", kakaoAppKey);
-            return "content/orderLive";
+//            OrderLiveDto live = orderService.toOrderLiveDto(orderId);
+//            model.addAttribute("orderId", orderId);
+//            model.addAttribute("order", live);
+//            model.addAttribute("currentStage", live.getTimeline());
+//            model.addAttribute("initialLat", live.getLat());
+//            model.addAttribute("initialLng", live.getLng());
+//            model.addAttribute("kakaoAppKey", kakaoAppKey);
+//            return "content/orderLive";
+        	OrderLiveDto dto = orderService.toOrderLiveDto(orderId);
+        	model.addAttribute("order", dto);
+        	return "content/orderLive";
         }
     }
     
