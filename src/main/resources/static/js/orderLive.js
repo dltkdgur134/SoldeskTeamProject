@@ -30,7 +30,6 @@ function connectOrderWebSocket() {
       orderStompClient.subscribe('/topic/user/' + userUuid, message => {
         const payload = JSON.parse(message.body);
         if (payload.orderToOwner === 'CANCELED') {
-          alert('⚠️ 가게에서 주문을 거부했습니다.');
           updateCookingProgress('REJECTED');
         }
       });
