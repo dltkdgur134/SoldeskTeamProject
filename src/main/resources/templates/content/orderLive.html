@@ -130,7 +130,7 @@
 	//incrementProgress(); // 반복 시작	 
   </script>
   <script th:src="@{/js/orderLive.js}"></script>
-  <input type="hidden" value="${orderId}" id ="orderIdInput">
+  <input type="hidden" th:value="${orderId}" id ="orderIdInput">
 </section>
 </body>
 </html>

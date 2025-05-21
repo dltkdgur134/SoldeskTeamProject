@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +17,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.owner.order.OrderService;
+import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.user.service.UserService;
+import com.soldesk6F.ondal.useract.order.dto.OrderInfoDetailDto;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 import com.soldesk6F.ondal.useract.payment.dto.OndalPayChargeRequest;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 
@@ -30,6 +35,9 @@ public class UpdateUserController {
 
 	private final UserService userService;
 	private final PaymentService paymentService;
+	private final OrderService orderService;
+    @Value("${kakao.maps.app-key}")
+    private String kakaoAppKey;
 	
 	// 닉네임 중복확인
 	@PostMapping("/checkNickname") 
@@ -143,7 +151,11 @@ public class UpdateUserController {
 	            String[] resultAndStatus = Paystatus.split(":@:");
 	            if (resultAndStatus.length == 3 && "성공".equals(resultAndStatus[2])) {
 	                String orderId = resultAndStatus[1];
-	                return "redirect:/userOrderLive/" + orderId;
+	                
+	               
+	              
+	                    return "redirect:/user/order/"+orderId;
+	                
 	            } else {
 	                model.addAttribute("cartUUID", cartUUID);
 	                model.addAttribute("failReason", resultAndStatus[0]);

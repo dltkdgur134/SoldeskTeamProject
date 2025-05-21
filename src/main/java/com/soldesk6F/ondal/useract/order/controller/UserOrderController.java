@@ -36,7 +36,7 @@ public class UserOrderController {
             Model model
     ) {
         // 1) 사용자 주문 정보 로드 (권한 체크 포함)
-        OrderToRider status = orderService.	getOrderToRider(orderId);
+        OrderToRider status = orderService.getOrderToRider(orderId);
 
         if (status == OrderToRider.COMPLETED) {
             // 2) 완료된 주문 → orderInfo 페이지

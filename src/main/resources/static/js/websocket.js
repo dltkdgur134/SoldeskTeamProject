@@ -1,12 +1,11 @@
 // websocket.js  (Order-centric 구독 전환)
 let stompClient = null;
-const currentOrderIds = new Set();
 
 /* ─────────────────────────────── WebSocket 연결 ────────────────────────────── */
-function connectGlobalWebSocket() {
+function connectGlobalWebSocket(onConnectCallback) {
   const userUuid = document.body.dataset.userid;
   if (!userUuid) return console.warn('userId 없음, WS 미연결');
-
+	alert("커넥트");
   stompClient = Stomp.over(new SockJS('/stomp'));
 
   // ① 성공 콜백
@@ -14,20 +13,20 @@ function connectGlobalWebSocket() {
     console.log('🌐 connected:', frame.headers);
 
     /* 새 주문 알림용 채널 */
-    stompClient.subscribe(`/topic/user/${userUuid}`, msg => {
+    stompClient.subscribe('/topic/user/'+orderId, msg => {
       const dto = JSON.parse(msg.body);
       showOrderNotification(dto);
       subscribeOrderChannels(dto.orderId);
     });
-
+	if (onConnectCallback) onConnectCallback();
     /* 로그인 직후 서버에 “진행 중 주문 목록” 요청 */
-    fetch('/user/order/active-ids')
+/*    fetch('/user/order/active-ids')
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`); // 500 방어
         return r.json();
       })
       .then(ids => ids.forEach(subscribeOrderChannels))
-      .catch(e => console.error('active-ids 가져오기 실패:', e));
+      .catch(e => console.error('active-ids 가져오기 실패:', e));*/ //변경자 : 곽준영
   };
 
   // ② 실패 콜백
@@ -40,16 +39,15 @@ function connectGlobalWebSocket() {
 
 /* ────────── 주문별 채팅·상태 토픽 구독  ────────── */
 function subscribeOrderChannels(orderId) {
-  if (!stompClient || currentOrderIds.has(orderId)) return;
-  currentOrderIds.add(orderId);
-
+  alert("리턴전");
+  if (!stompClient) return;
   /* 상태 알림 */
-  stompClient.subscribe(`/topic/order/${orderId}`, msg => {
+  alert("리턴후");
+  stompClient.subscribe(`/topic/user/${orderId}`, msg => {
     const update = JSON.parse(msg.body);
     console.log('[order-topic]', orderId, update);
-    showOrderNotification(update);       // 토스트
-    //updateStatusChart?.(update.stage);   // 선택 UI
-    //moveRiderMarker?.(update.location?.lat, update.location?.lng);
+    showOrderNotification(update);     
+
     updateCookingProgress?.(update.stage);
     startExpectedTimeCountdown?.(
         update.expectCookingTime, update.expectDeliveryTime);
@@ -60,6 +58,7 @@ function subscribeOrderChannels(orderId) {
     const chat = JSON.parse(msg.body);
     showChatMessage(chat);
   });
+  alert("접근함1");
 }
 
 /* ────────── 알림 토스트 & 채팅창 시스템 메시지 ────────── */
@@ -117,7 +116,6 @@ function showToast(msg) {
 function sendChat() {
   const input = document.getElementById('chatInput');
   if (!input.value.trim() || !stompClient) return;
-  const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
   stompClient.send(`/app/chat/${orderId}`, {}, JSON.stringify({
     orderId, sender: '사용자', text: input.value.trim(),
     timestamp: new Date().toISOString()
@@ -126,9 +124,9 @@ function sendChat() {
 }
 
 /* ────────── 초기화 ────────── */
-document.addEventListener('DOMContentLoaded', () => {
+/*document.addEventListener('DOMContentLoaded', () => {
   connectGlobalWebSocket();
   document.getElementById('sendChatBtn')?.addEventListener('click', sendChat);
   document.getElementById('chatInput')?.addEventListener('keypress',
     e => e.key === 'Enter' && sendChat());
-});
+});*/
