@@ -119,7 +119,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			}
 			
 			});
-		return new CustomUserDetails(user,user.getUserRole());
+		return new CustomUserDetails(user);
 			
 			
 

@@ -48,7 +48,10 @@ public class Order {
     @Column(name = "order_id", updatable = false, nullable = false, unique = true)
     private UUID orderId;
 
-    @ManyToOne
+    @Column(name = "order_number", length = 3)
+    private Integer orderNumber;
+    
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_uuid", nullable = true)
     @JsonIgnoreProperties({"orders"})
     private User user;
@@ -56,12 +59,12 @@ public class Order {
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     @JsonIgnoreProperties({"orders", "owner"})
     private Store store;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "rider_id")
     private Rider rider;
 
@@ -135,12 +138,11 @@ public class Order {
     @JsonIgnoreProperties("order")
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
-
     public enum OrderToOwner {
         PENDING("주문 요청 중"), 
         CONFIRMED("주문 확인 완료"),
         IN_DELIVERY("배달 중"), 
-        COMPLETED("주문 및 결재 완료"), 
+        COMPLETED("주문 완료"), 
         CANCELED("주문 취소");
     	private final String description;
     	OrderToOwner(String description) {
@@ -292,5 +294,3 @@ public class Order {
             .plusSeconds(realDeliveryTime.getSecond());
     }
 }
-
-

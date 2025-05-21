@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal.useract.order.service;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,15 @@ public class CreateOrderService {
     public Order createOrder(Order order) {
         order.calculateDeliveryFee();  // 배달료 계산
         order.updateTotalPrice();  // 총 가격 업데이트
+        
+        LocalDate today = LocalDate.now();
+        
+        Integer maxTodayOrderNumber = orderRepository.findMaxOrderNumberForToday(today);
 
+        int nextOrderNumber = (maxTodayOrderNumber != null && maxTodayOrderNumber < 999)
+            ? maxTodayOrderNumber + 1
+            : 1;
+        
         // Builder 패턴을 사용해 Order 객체를 생성
         Order newOrder = Order.builder()
                 .user(order.getUser())  // User 설정

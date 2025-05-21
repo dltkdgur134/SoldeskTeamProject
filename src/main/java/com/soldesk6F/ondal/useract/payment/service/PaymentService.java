@@ -1,7 +1,6 @@
 package com.soldesk6F.ondal.useract.payment.service;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +45,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
-import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
+import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
@@ -59,7 +58,6 @@ import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
-import com.soldesk6F.ondal.useract.payment.entity.PaymentFailLog;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentFailLogRepository;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 
@@ -232,9 +230,12 @@ public class PaymentService {
 						orderDetail.setQuantity(cartItem.getQuantity());
 						orderDetail.setOptionNames(cartItem.getOptionsAsList());
 						List<Integer> ciop = new ArrayList<Integer>();
+						List<String> cion = new ArrayList<String>();
 						for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
 							ciop.add(cartItemOption.getOptionPrice());
+							cion.add(cartItemOption.getOptionName());
 						}
+						orderDetail.setOptionNames(cion);
 						orderDetail.setOptionPrices(ciop);
 						orderDetailList.add(orderDetail);
 					}
@@ -254,7 +255,7 @@ public class PaymentService {
 								.totalPrice(cart.getTotalPrice())
 								.storeRequest(reqStore)
 								.deliveryRequest(reqDel).orderDetails(orderDetailList)
-								.deliveryAddress(user.getUserSelectedAddress().getAddress())
+								.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 								.orderToOwner(OrderToOwner.PENDING).build();
@@ -262,6 +263,7 @@ public class PaymentService {
 					for (OrderDetail od : order.getOrderDetails()) {
 						od.setOrder(order);
 					}
+				
 			    	payment.setPaymentMethod(Payment.PaymentMethod.ONDALPAY);
 			    	payment.setPaymentStatus(PaymentStatus.COMPLETED);
 			    	paymentRepository.save(payment);
@@ -269,7 +271,12 @@ public class PaymentService {
 			    	user.setOndalPay(nowOndalPay);
 			    	userRepository.save(user);
 			    	cartRepository.deleteById(cartUUID);
-			    	return nowOndalPay+":@:성공";
+			    	OrderResponseDto orderResponseDto = OrderResponseDto.from(order);
+			    	UUID storeId = cart.getStore().getStoreId(); // 또는 적절한 store UUID 참조
+
+			    	// WebSocket 전송
+			    	simpMessagingTemplate.convertAndSend("/topic/store/" + storeId, orderResponseDto);
+			    	return nowOndalPay + ":@:" + order.getOrderId() + ":@:성공";
 			    }
 			    
 		        
@@ -342,9 +349,13 @@ public class PaymentService {
 				orderDetail.setQuantity(cartItem.getQuantity());
 				orderDetail.setOptionNames(cartItem.getOptionsAsList());
 				List<Integer> ciop = new ArrayList<Integer>();
+				List<String> cion = new ArrayList<String>();
+				
 				for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
 					ciop.add(cartItemOption.getOptionPrice());
+					cion.add(cartItemOption.getOptionName());
 				}
+				orderDetail.setOptionNames(cion);
 				orderDetail.setOptionPrices(ciop);
 				orderDetailList.add(orderDetail);
 			}
@@ -373,7 +384,7 @@ public class PaymentService {
 						.totalPrice(tossResponse.getTotalAmount())
 						.storeRequest(tossResponse.getMetadata().getReqStore())
 						.deliveryRequest(tossResponse.getMetadata().getReqDel()).orderDetails(orderDetailList)
-						.deliveryAddress(user.getUserSelectedAddress().getAddress())
+						.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 						.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 						.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 						.orderToOwner(OrderToOwner.PENDING).build();
@@ -401,25 +412,6 @@ public class PaymentService {
 			return false;
 		}
 	}
-
-	
-	@Transactional
-	public void tryRefundOndalPay(String tossOrderId , String cancelReason , UUID userUUID) {
-		
-	    Optional<Payment> optPayment = paymentRepository.findByTossOrderId(tossOrderId);
-		
-		Payment payment = optPayment.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카트입니다."));
-		payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
-		Optional<User> optUser = userRepository.findById(userUUID);
-		User user = optUser.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
-		int ondalPay = user.getOndalPay();
-		int refundAmount = payment.getAmount();
-		user.setOndalPay(ondalPay+refundAmount);
-		userRepository.save(user);
-		paymentRepository.save(payment);
-		
-	}
-	
 
 	@Transactional
 	public void confirmOndalWalletCharge(String paymentKey, String orderId, int amount, UUID userUUID) {
@@ -606,6 +598,44 @@ public class PaymentService {
 
 	    System.out.println("환불 응답: " + response.getBody());
 	}
+
+	@Transactional
+	public void tryRefundOndalPay(String tossOrderId, String cancelReason, UUID userUUID) {
+	    // 1. 결제 정보 조회
+	    Payment payment = paymentRepository.findByTossOrderId(tossOrderId)
+	        .orElseThrow(() -> new IllegalArgumentException("해당 tossOrderId의 결제 내역을 찾을 수 없습니다."));
+
+	    // 2. 결제 유효성 검사
+	    if (!payment.getUser().getUserUuid().equals(userUUID)) {
+	        throw new SecurityException("본인의 결제 내역만 환불할 수 있습니다.");
+	    }
+
+	    if (payment.getPaymentStatus() == PaymentStatus.REFUNDED) {
+	        throw new IllegalStateException("이미 환불된 결제입니다.");
+	    }
+
+	    if (payment.getPaymentMethod() != PaymentMethod.ONDALPAY) {
+	        throw new IllegalStateException("온달페이 결제만 환불 가능합니다.");
+	    }
+
+	    // 3. 유저 정보 및 환불 금액 확보
+	    User user = payment.getUser();
+	    int refundAmount = payment.getAmount(); // 원 단위 금액
+
+	    // 4. 유저 지갑에 금액 복구
+	    user.setOndalPay(user.getOndalPay() + refundAmount);
+	    
+	    userRepository.save(user);
+
+	    // 5. 결제 상태 업데이트
+	    payment.setPaymentStatus(PaymentStatus.REFUNDED);
+	    payment.setRefundReason(cancelReason);
+	    payment.setApprovedAt(LocalDateTime.now());
+	    
+	    paymentRepository.save(payment);
+
+	}
+
 	
 	
 	    

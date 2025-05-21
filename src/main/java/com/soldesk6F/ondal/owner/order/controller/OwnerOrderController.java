@@ -3,10 +3,14 @@ package com.soldesk6F.ondal.owner.order.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import com.soldesk6F.ondal.owner.order.OrderService;
+import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.useract.order.dto.AcceptOrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.ExtendTimeRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
@@ -29,6 +33,7 @@ import java.util.stream.Collectors;
 public class OwnerOrderController {
 
     private final OrderService orderService;
+    private final StoreService storeService;
 
     @PostMapping("/accept")
     public ResponseEntity<OrderResponseDto> acceptOrder(@RequestBody AcceptOrderRequestDto request, HttpSession session) {
@@ -82,9 +87,20 @@ public class OwnerOrderController {
     }
 
     @PostMapping("/reject")
-    public ResponseEntity<Order> rejectOrder(@RequestParam("orderId") UUID orderId) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
-        return ResponseEntity.ok(updatedOrder);
+    public ResponseEntity<?> rejectOrder(@RequestBody Map<String, UUID> payload) {
+        try {
+            UUID orderId = payload.get("orderId");
+            if (orderId == null) {
+                return ResponseEntity.badRequest().body("orderId is missing or null");
+            }
+
+            orderService.rejectOrderAndRefund(orderId);
+            Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
+            return ResponseEntity.ok(convertToDto(updatedOrder));
+        } catch (Exception e) {
+            e.printStackTrace(); // 🔍 콘솔에 에러 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping("/cancel")
@@ -101,17 +117,21 @@ public class OwnerOrderController {
     
     // 주문 전체 목록, 특정 상태 목록 등 조회용 API
     @GetMapping("/list")
-    public ResponseEntity<List<OrderResponseDto>> getOrderList(HttpSession session) {
-        UUID storeId = (UUID) session.getAttribute("storeId");
-        if (storeId == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
+    public ResponseEntity<List<OrderResponseDto>> getOrderList(@RequestParam("storeId") UUID storeId) {
+    	System.out.println("📥 storeId param = " + storeId);
         List<Order> orders = orderService.getOrdersByStore(storeId);
         List<OrderResponseDto> dtoList = orders.stream()
             .map(OrderResponseDto::from)
             .collect(Collectors.toList());
         return ResponseEntity.ok(dtoList);
+    }
+    
+    @GetMapping("/store-management/{storeId}")
+    public String storeManagement(@PathVariable UUID storeId, Model model) {
+        Store store = storeService.findStoreByStoreId(storeId);
+        model.addAttribute("store", store);
+        model.addAttribute("storeId", store.getStoreId()); // ✅ 꼭 추가!
+        return "content/store/storeManagement";
     }
     
     

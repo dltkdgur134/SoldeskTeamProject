@@ -3,14 +3,20 @@ package com.soldesk6F.ondal.owner.order;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soldesk6F.ondal.functions.DateFunctions;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.menu.repository.MenuRepository;
 import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
@@ -20,6 +26,7 @@ import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+import com.soldesk6F.ondal.useract.order.dto.OrderInfoDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto.OrderDetailDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
@@ -28,25 +35,56 @@ import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
-import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
+import com.soldesk6F.ondal.useract.payment.entity.Payment;
+import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
+import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
+import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class OrderService {
+	 private final UserRepository userRepository;
+	    private final StoreRepository storeRepository;
+	    private final OrderRepository orderRepository;
+	    private final MenuRepository menuRepository;
+	    private final PaymentRepository paymentRepository;
+	    private final SimpMessagingTemplate messagingTemplate;
+	    private final RegAddressRepository regAddressRepository;
+	    private final DateFunctions dateFunctions;
 
-    private final StoreRepository storeRepository;
-    private final OrderRepository orderRepository;
-    private final MenuRepository menuRepository;
-    private final SimpMessagingTemplate messagingTemplate;
-    private final UserRepository userRepository;
-    private final RegAddressRepository regAddressRepository;
-    
+	    private final PaymentService paymentService;  // 이걸 @Lazy 처리 필요
+
+	    @Autowired
+	    public OrderService(
+	        UserRepository userRepository,
+	        StoreRepository storeRepository,
+	        OrderRepository orderRepository,
+	        MenuRepository menuRepository,
+	        PaymentRepository paymentRepository,
+	        @Lazy PaymentService paymentService,
+	        SimpMessagingTemplate messagingTemplate,
+	        RegAddressRepository regAddressRepository,
+	        DateFunctions dateFunctions) {
+
+	    	
+	    	
+	        this.userRepository = userRepository;
+	        this.storeRepository = storeRepository;
+	        this.orderRepository = orderRepository;
+	        this.menuRepository = menuRepository;
+	        this.paymentRepository = paymentRepository;
+	        this.paymentService = paymentService;
+	        this.messagingTemplate = messagingTemplate;
+	        this.regAddressRepository = regAddressRepository;
+	        this.dateFunctions = dateFunctions;
+	    }
 
     public Order saveOrder(OrderRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
@@ -80,12 +118,38 @@ public class OrderService {
             .orElseThrow(() -> new RuntimeException("주문 없음"));
 
         order.setOrderToOwner(OrderToOwner.CONFIRMED);
+        order.setOrderToRider(OrderToRider.CONFIRMED);
         order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
         order.setCookingStartTime(LocalDateTime.now());
+        Order savedOrder = orderRepository.save(order);
+        messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
 
-        return orderRepository.save(order);
+        return savedOrder;
     }
+    @Transactional
+    public Order rejectOrderAndRefund(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 주문을 찾을 수 없습니다."));
 
+        // 주문 상태 변경
+        order.setOrderToOwner(Order.OrderToOwner.CANCELED);
+        orderRepository.save(order);
+
+        Payment payment = paymentRepository.findByOrder_OrderId(orderId)
+        	    .orElseThrow(() -> new IllegalStateException("주문에 결제 정보가 없습니다."));
+
+        // 결제 타입별 환불 처리
+        if (payment.getPaymentMethod() == PaymentMethod.CASH 
+        	|| payment.getPaymentMethod() == PaymentMethod.CREDIT) {
+            paymentService.refundTossPayment(payment.getPaymentKey(), "주문 거부에 따른 환불", order.getUser().getUserUuid());
+        } else if (payment.getPaymentMethod() == PaymentMethod.ONDALPAY) {
+            paymentService.tryRefundOndalPay(payment.getTossOrderId(), "주문 거부에 따른 환불", order.getUser().getUserUuid());
+        } else {
+            throw new IllegalStateException("지원하지 않는 결제 방식입니다.");
+        }
+
+        return order;
+    }
     public Order extendCookingTime(UUID orderId, int addMinutes) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문 없음"));
@@ -130,10 +194,9 @@ public class OrderService {
         order.setOrderToOwner(orderToOwner);
         Order savedOrder = orderRepository.save(order);
 
+        OrderResponseDto orderDto = convertToDto(savedOrder);
         if (savedOrder.getUser() != null) {
         	String destination = "/topic/user/" + savedOrder.getUser().getUserUuidAsString();
-            OrderResponseDto orderDto = convertToDto(savedOrder);
-        	
             System.out.println("발행 경로: " + destination);
             System.out.println("발행 메시지: " + orderDto);
             
@@ -142,7 +205,6 @@ public class OrderService {
 
         if (savedOrder.getRider() != null) {
             String destination = "/topic/rider/" + savedOrder.getRider().getRiderUuidAsString();
-            OrderResponseDto orderDto = convertToDto(savedOrder);
             System.out.println("발행 경로: " + destination);
             System.out.println("발행 메시지: " + orderDto);
             messagingTemplate.convertAndSend(destination, orderDto);
@@ -155,6 +217,12 @@ public class OrderService {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
     }
+    
+    public List<UUID> findActiveOrderIdsByUser(String userUuid) {
+        return orderRepository.findActiveOrderIds(
+                 UUID.fromString(userUuid),
+                 List.of(OrderToOwner.PENDING, OrderToOwner.CONFIRMED, OrderToOwner.IN_DELIVERY));
+    }
 
     @Transactional(readOnly = true)
     public List<Order> findAllByOwner() {
@@ -162,30 +230,62 @@ public class OrderService {
     }
     
     public List<Order> getOrdersByStore(UUID storeId) {
+        // 1) 매장 존재 확인이 필요하다면
+        storeRepository.findById(storeId)
+            .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
+        
+        // 2) 실제로 주문만 조회
         return orderRepository.findByStore_StoreId(storeId);
     }
+    
+//    @Transactional(readOnly = true)
+//    public List<OrderHistoryDto> getOrderHistoryByUser(String userId) {
+//        var user = userRepository.findByUserId(userId)
+//            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자: " + userId));
+//        var orders = orderRepository.findByUser(user);
+//        return orders.stream()
+//                     .map(this::toHistoryDto)
+//                     .collect(Collectors.toList());
+//    }
     
     @Transactional(readOnly = true)
     public List<OrderHistoryDto> getOrderHistoryByUser(String userId) {
         var user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자: " + userId));
         var orders = orderRepository.findByUser(user);
-        return orders.stream()
-                     .map(this::toHistoryDto)
-                     .collect(Collectors.toList());
+        List<OrderHistoryDto> orderHistoryDto = orders.stream()
+        		.map(this::toHistoryDto)
+        		.collect(Collectors.toList());
+        orderHistoryDto.forEach(dto -> {
+        	long daysLeft = dateFunctions.getDaysLeftForReview(dto.getOrderDate());
+        	dto.setDaysLeftForReview(daysLeft);
+        });
+        orderHistoryDto.sort((o1, o2) -> o2.getOrderDate().compareTo(o1.getOrderDate()));
+        return orderHistoryDto;
     }
+    
 
     private OrderHistoryDto toHistoryDto(Order order) {
         var dto = new OrderHistoryDto();
         dto.setOrderId(order.getOrderId());
+        dto.setStoreId(order.getStore().getStoreId());
         dto.setStoreName(order.getStore().getStoreName());
         dto.setStoreImageUrl(order.getStore().getBrandImg());
         dto.setOrderStatus(order.getOrderToOwner().name());
-        dto.setOrderDate(order.getOrderTime().toString());
-        var menuNames = order.getOrderDetails().stream()
-                             .map(d -> d.getMenu().getMenuName())
-                             .collect(Collectors.toList());
-        dto.setMenuItems(menuNames);
+        //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
+        //dto.setOrderDate(order.getOrderTime().toString());
+        dto.setOrderDate(order.getOrderTime());
+        dto.setTotalPrice(order.getTotalPrice());
+//        var menuNames = order.getOrderDetails().stream()
+//                             .map(d -> d.getMenu().getMenuName())
+//                             .collect(Collectors.toList());
+//        dto.setMenuItems(menuNames);
+        var menuItems = new HashMap<String, Integer>();
+        for (int i = 0; i < order.getOrderDetails().size(); i++) {
+        	menuItems.put(order.getOrderDetails().get(i).getMenu().getMenuName(), 
+        			order.getOrderDetails().get(i).getQuantity());
+        }
+        dto.setMenuItems(menuItems);
         return dto;
     }
     private OrderResponseDto convertToDto(Order order) {
@@ -219,15 +319,70 @@ public class OrderService {
         return order.getOrderToRider();
     }
 
+//    @Transactional(readOnly = true)
+//    public OrderHistoryDto getOrderHistoryDto(String orderId) {
+//    	UUID uuid = UUID.fromString(orderId);
+//        Order order = orderRepository.findById(uuid)
+//            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
+//        // 간단히 toDto 매퍼 호출
+//        return OrderHistoryDto.from(order);
+//    }
+    
     @Transactional(readOnly = true)
-    public OrderHistoryDto getOrderHistoryDto(String orderId) {
-    	UUID uuid = UUID.fromString(orderId);
-        Order order = orderRepository.findById(uuid)
+    public OrderInfoDetailDto getOrderInfoDetailDto(String orderId) {
+    	UUID OrderUuid = UUID.fromString(orderId);
+        Order order = orderRepository.findById(OrderUuid)
             .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
         // 간단히 toDto 매퍼 호출
-        return OrderHistoryDto.from(order);
+        OrderInfoDetailDto orderInfoDetailDto = toOrderInfoDetailsDto(order);
+        return orderInfoDetailDto;
     }
-
+    
+    private OrderInfoDetailDto toOrderInfoDetailsDto(Order order) {
+        var dto = new OrderInfoDetailDto();
+        dto.setOrderId(order.getOrderId());
+		dto.setStoreId(order.getStore().getStoreId());
+		dto.setStoreName(order.getStore().getStoreName());
+		dto.setStoreImageUrl(order.getStore().getBrandImg());
+		dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
+		dto.setOrderDate(order.getOrderTime());
+		LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
+		int menuTotalPrice = 0;
+		for (OrderDetail orderDetails : order.getOrderDetails()) {
+			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
+			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
+			menuDetails.put("menuPrice", orderDetails.getMenu().getPrice());
+			menuDetails.put("price", orderDetails.getPrice());
+			menuDetails.put("quantity", orderDetails.getQuantity());
+			
+			// 옵션 이름 , 가격을 HashMap에 담아서 해당하는 메뉴에 추가
+			HashMap<String, Integer> options = new HashMap<String, Integer>();
+			
+			for (int i = 0; i < orderDetails.getOptionNames().size(); i++) {
+				options.put(orderDetails.getOptionNames().get(i), orderDetails.getOptionPrices().get(i));
+			}
+			menuDetails.put("options", options);
+			
+			menuItems.add(menuDetails);
+			menuTotalPrice += orderDetails.getPrice();
+		}
+		dto.setMenuItems(menuItems);
+		dto.setTotalPrice(order.getTotalPrice());
+		dto.setDeliveryFee(order.getDeliveryFee());
+		dto.setMenuTotalPrice(menuTotalPrice);
+		
+		Optional<Payment> payment = paymentRepository.findByOrder(order);
+		if (payment.isEmpty() || payment.get() == null) {
+			dto.setPaymentMethod("정보 조회 불가");
+		} else {
+			dto.setPaymentMethod(payment.get().getPaymentMethod().getDescription());
+		}
+		dto.setPhoneNum(order.getUser().getUserPhone());
+		dto.setDeliveryAddress(order.getDeliveryAddress());
+		return dto;
+    }
+    
+    
     @Transactional(readOnly = true)
     public OrderLiveDto getOrderLiveDto(String orderId) {
         UUID uuid = UUID.fromString(orderId);
@@ -237,6 +392,8 @@ public class OrderService {
         var dto = new OrderLiveDto();
         dto.setOrderId(order.getOrderId().toString());
         dto.setOrderStatus(order.getOrderToRider());
+        // 추가
+        dto.setExpectCookingTime(order.getExpectCookingTime());
 
         var timeline = new ArrayList<StatusTimeline>();
         // 시간 필드들이 있다고 가정
@@ -246,7 +403,7 @@ public class OrderService {
         timeline.add(new StatusTimeline("IN_DELIVERY",         order.getDeliveryStartTime()));
         timeline.add(new StatusTimeline("COMPLETED",           order.getDeliveryCompleteTime()));
         dto.setTimeline(timeline);
-
+        
         // 2) 가게 위치 (라이더 대신)
         Store store = order.getStore();
         dto.setLat(store.getStoreLatitude());   // 또는 store.getHubAddressLatitude()
@@ -286,8 +443,12 @@ public class OrderService {
         detail.setPrice(menu.getPrice());
 
         order.addOrderDetail(detail); // 핵심! totalPrice 자동 계산됨
-
+        
         orderRepository.save(order);
+     // WebSocket으로 신규 주문 알림 발행
+        OrderResponseDto dtoForSocket = OrderResponseDto.from(order);
+        messagingTemplate.convertAndSend("/topic/store/" + store.getStoreId(), dtoForSocket);
+
     }
 
     

@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
@@ -14,6 +15,8 @@ import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.PaymentHistoryDTO;
 import com.soldesk6F.ondal.useract.payment.service.PaymentHistoryService;
 
@@ -53,12 +56,12 @@ public class PageController {
 
     @GetMapping("/orderHistory")
     public String orderHistory(
-            @AuthenticationPrincipal CustomUserDetails cud,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
     	
         // cud가 null이었으니, @AuthenticationPrincipal을 붙여서 바인딩
     	
-        String userId = cud.getUser().getUserId();
+        String userId = userDetails.getUser().getUserId();
         List<OrderHistoryDto> history = orderService.getOrderHistoryByUser(userId);
         model.addAttribute("history", history);
         return "content/orderHistory";
@@ -129,5 +132,28 @@ public class PageController {
 	    return "content/user/userPayHistory";  // JSP나 Thymeleaf 뷰 이름
 	}
 
+	private final OrderRepository orderRepository;
+	
+	@GetMapping("/userOrderLive/{orderId}")
+	public String goUserOrderLive(
+	        @PathVariable("orderId") UUID orderId,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        Model model) {
+
+	    UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
+	    User freshUser = userRepository.findById(userUuid).orElseThrow();
+
+	    Order order = orderRepository.findById(orderId)
+	            .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다"));
+
+	    model.addAttribute("user", freshUser);
+	    model.addAttribute("userUuid", userDetails.getUser().getUserUuidAsString());
+	    model.addAttribute("order", order); // 특정 주문 정보도 전달
+
+	    return "content/orderLive";
+	}
+
+	
+	
 	
 }

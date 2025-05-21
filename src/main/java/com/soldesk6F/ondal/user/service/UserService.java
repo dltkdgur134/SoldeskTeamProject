@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,21 +20,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.login.CustomUserDetailsService;
+import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.entity.User.UserStatus;
-import com.soldesk6F.ondal.user.entity.Owner;
-import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.repository.OwnerRepository;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
-
-import lombok.RequiredArgsConstructor;
-
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
+import com.soldesk6F.ondal.useract.payment.dto.OndalPayChargeRequest;
+import com.soldesk6F.ondal.useract.payment.entity.Payment;
+import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +41,10 @@ public class UserService {
 
 	private final UserRepository userRepository;
 	private final OwnerRepository ownerRepository;
-	private final RiderRepository riderRepository;
+	private final CartRepository cartRepository;
+	private final PaymentRepository paymentRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
 	private final CustomUserDetailsService customUserDetailsService;
-	private final CartRepository cartRepository;
 
 	@Value("${upload.path}")
 	private String uploadDir;
@@ -390,19 +390,28 @@ public class UserService {
 	}
 
 	@Transactional
-	public void convertOndalWalletToPay(CustomUserDetails userDetails, int amount) {
-		String userUUIDString = userDetails.getUser().getUserUuidAsString();
-		UUID userUuid = UUID.fromString(userUUIDString);
-		User user = userRepository.findById(userUuid)
-				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+	public void chargeOndalWallet(OndalPayChargeRequest request, UUID userUuid) {
+	    User user = userRepository.findById(userUuid)
+	        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-		if (user.getOndalWallet() < amount) {
-			throw new IllegalArgumentException("온달 지갑 잔액이 부족합니다.");
-		}
-		user.setOndalWallet(user.getOndalWallet() - amount);
-		user.setOndalPay(user.getOndalPay() + amount);
+	    Payment payment = Payment.builder()
+	        .user(user)
+	        .order(null)
+	        .paymentKey(null)  // 컨트롤러에서 안 주면 null 처리
+	        .tossOrderId(request.getTossOrderId())
+	        .paymentMethod(request.getPaymentMethod())
+	        .amount(request.getAmount())
+	        .paymentUsageType(request.getPaymentUsageType())
+	        .paymentStatus(request.getPaymentStatus())
+	        .refundReason(null)
+	        .build();
+	    LocalDateTime now = LocalDateTime.now();
+	    payment.setRequestedAt(now);
+	    payment.setApprovedAt(now);
+	    paymentRepository.save(payment);
 
-		userRepository.save(user);
+	    user.setOndalWallet(user.getOndalWallet() + request.getAmount());
+	    userRepository.save(user);
 	}
 
 

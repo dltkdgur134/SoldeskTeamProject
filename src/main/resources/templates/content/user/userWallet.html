@@ -56,7 +56,7 @@
 				</div>
 			</div>
 		</div>
-		<!--결제 내역 모달 -->
+		<!--모달 -->
 		<div class="modal fade" id="payHistoryModal"
 		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
 		aria-labelledby="payHistoryModalLabel" aria-hidden="true">
@@ -93,9 +93,6 @@
 	</div>
 		<!-- 구매 폼 -->
 		<form th:action="@{/user/goToPoints}" method="post" id="goToPoints">
-			<div class="mb-3">
-				<div class="form-text text-danger">온달 지갑을 충전하세요!</div>
-			</div>
 			<div class="mb-3">
 				<label for="Password" class="form-label">비밀번호</label> <input
 					type="password" class="form-control" id="Password" name="Password">

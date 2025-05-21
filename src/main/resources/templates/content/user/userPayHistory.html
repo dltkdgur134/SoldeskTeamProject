@@ -79,6 +79,8 @@
               <!-- orderToOwner가 PENDING이면 환불 버튼 -->
               <form th:action="@{/user/refund}" method="post" style="display:inline;">
                 <input type="hidden" name="paymentKey" th:value="${payment.paymentKey}" />
+                <input type="hidden" name="paymentMethod" th:value="${payment.paymentMethod.name()}" />
+                <input type="hidden" name="tossOrderId" id="toss_order_id" th:value="${payment.tossOrderId}" />
                 <select name="refundReason" required>
                   <option value="">-- 환불 사유 선택 --</option>
                   <option value="사용자 요청">사용자 요청</option>

@@ -3,11 +3,13 @@ package com.soldesk6F.ondal.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.soldesk6F.ondal.login.CustomAuthFailureHandler;
@@ -15,8 +17,11 @@ import com.soldesk6F.ondal.login.CustomOAuth2UserService;
 import com.soldesk6F.ondal.login.CustomUserDetailsService;
 import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig{
 
     private final OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler;
@@ -25,28 +30,40 @@ public class SecurityConfig{
     private final CustomUserDetailsService customUserDetailsService;
 
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
-    		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
-        this.customUserDetailsService = customUserDetailsService;
-        this.customAuthFailureHandler = customAuthFailureHandler;
-        this.customOAuth2UserService = customOAuth2UserService;
-        this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
-        
-
-    }
+//    public SecurityConfig(CustomUserDetailsService customUserDetailsService ,CustomOAuth2UserService customOAuth2UserService, 
+//    		CustomAuthFailureHandler customAuthFailureHandler ,OAuth2LoginSuccessHandler OAuth2LoginSuccessHandler) {
+//        this.customUserDetailsService = customUserDetailsService;
+//        this.customAuthFailureHandler = customAuthFailureHandler;
+//        this.customOAuth2UserService = customOAuth2UserService;
+//        this.OAuth2LoginSuccessHandler = OAuth2LoginSuccessHandler;
+//        
+//
+//    }
 
 //    @Bean
 //    public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder();
 //    }
+    
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder())
-                .and()
-                .build();
+    	DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    	provider.setUserDetailsService(customUserDetailsService);
+        provider.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
+        return new ProviderManager(provider);
+//        return http.getSharedObject(AuthenticationManagerBuilder.class)
+//                .userDetailsService(customUserDetailsService)
+//                .passwordEncoder(passwordEncoder())
+//                .and()
+//                .build();
     }
 
 //    @Bean
@@ -77,6 +94,7 @@ public class SecurityConfig{
     	http
     		.csrf(csrf -> csrf
     			.ignoringRequestMatchers("/api/**") // REST API는 CSRF 무시
+    			.ignoringRequestMatchers("/stomp/**")
     		)
     		.authorizeHttpRequests(auth -> auth
     			.requestMatchers("/**","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
@@ -85,9 +103,11 @@ public class SecurityConfig{
     			.anyRequest().authenticated() 
 				)
 			.formLogin(form -> form
-				.loginPage("/login/tryLogin")           // 우리가 만든 로그인 페이지
-//				.loginProcessingUrl("/login")  // 로그인 form의 action 주소 (POST)
+				.loginPage("/login")           // 우리가 만든 로그인 페이지
+				.loginProcessingUrl("/tryLogin")  // 로그인 form의 action 주소 (POST)
 				.defaultSuccessUrl("/",true)        // 로그인 성공 후 이동할 주소
+				.usernameParameter("username")
+				.passwordParameter("password")
 				.failureUrl("/login?error")    // 로그인 실패 시 주소
 				.permitAll()
 			)
@@ -96,6 +116,7 @@ public class SecurityConfig{
 				.logoutSuccessUrl("/login?logout")
 				.permitAll()
 			)
+            .userDetailsService(customUserDetailsService)
 			.oauth2Login(oauth2 -> oauth2
 				.loginPage("/login/tryOAuthLogin")
 				.userInfoEndpoint(userInfo -> userInfo
@@ -109,6 +130,16 @@ public class SecurityConfig{
 				)
 			)
 			.csrf(csrf -> csrf.disable());
+			
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//.authorizeHttpRequests(auth -> auth // 임시 로그인 비활성화
+		//.anyRequest().permitAll() // 모든 요청 허용
+		//)
+		//.formLogin(form -> form.disable()) // 기본 로그인 페이지 비활성화
+		//.logout(logout -> logout.disable()) // 로그아웃도 비활성화
+		//.csrf(csrf -> csrf.disable()); // CSRF 비활성화
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         
         return http.build();
     }
