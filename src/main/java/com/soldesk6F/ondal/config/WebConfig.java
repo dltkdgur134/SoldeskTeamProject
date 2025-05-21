@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -29,6 +30,13 @@ public class WebConfig implements WebMvcConfigurer{
 	                .allowedHeaders("Authorization", "Content-Type") // 허용할 헤더
 	                .allowCredentials(true); // 쿠키를 포함한 요청을 허용
 	    }
+	 
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new AdminLoginInterceptor())
+			.addPathPatterns("/admin/**")
+			.excludePathPatterns("/admin/login", "/admin/login/**", "/css/**", "/js/**", "/images/**");
+	}
 }
 
 

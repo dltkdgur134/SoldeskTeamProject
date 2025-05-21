@@ -135,6 +135,7 @@ public class Store {
 
     public enum StoreStatus {
     	PENDING_APPROVAL("승인대기중"),
+		PENDING_REFUSES("승인거부"),
         OPEN("영업중"),
         CLOSED("영업종료"),
         SUSPENDED("일시정지"),

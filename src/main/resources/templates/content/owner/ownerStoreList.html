@@ -9,22 +9,22 @@
 	<link th:fragment="css" th:href="@{/css/ownerStoreList.css}" rel="stylesheet" />
 	<script th:src="@{/js/hideLogo.js}"></script>
 <meta charset="UTF-8">
-<title>오우너 점포 리스트</title>
+<title>오너 점포 리스트</title>
 </head>
 	<div layout:fragment="content">
 		<h2 class="text-center">내 점포</h2>
 		<div id="gallery-area">
 			<div th:each="store : ${myStores}" class="store-row">
 				<a th:href="@{store-management/{id}(id=${store.storeId})}" class="store-row2">
-				    <img class="store-image"
+					<img class="store-image"
      				th:src="${store.brandImg != null ? store.brandImg : '/img/store/default.png'}"
      				th:alt="${store.storeName}" />
-				    <div class="store-info">
-				        <p class="store-name" th:text="${store.storeName}">점포명</p>
-				        <p class="store-category" th:text="${store.category}">카테고리</p>
-				        <p class="store-category" th:text="${store.storeAddress}">주소</p>
-				        <p class="store-category" th:text="${store.storeStatus?.description}">상태</p>
-				    </div>
+					<div class="store-info">
+						<p class="store-name" th:text="${store.storeName}">점포명</p>
+						<p class="store-category category-text" th:text="${store.category}">카테고리</p>
+						<p class="store-category" th:text="${store.storeAddress}">주소</p>
+						<p class="store-category" th:text="${store.storeStatus?.description}" style="color: red">상태</p>
+					</div>
 				</a>
 			</div>
 		</div>
@@ -32,9 +32,35 @@
 			<a href="/owner/store/submit" class="storeReg-btn">점포 추가 입점</a>
 		</div>
 	</div>
-	<div layout:fragment="js" th:if="${errorMessage != null}">
+	<div layout:fragment="js">
+		<script th:if="${errorMessage != null}" th:inline="javascript">
+			alert("[[${errorMessage}]]");
+		</script>
 		<script th:inline="javascript">
 			alert("[[${errorMessage}]]");
+		</script>
+		<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const categoryMap = {
+				fastfood: "패스트푸드",
+				cn: "중식",
+				kr: "한식",
+				bunsik: "분식",
+				chicken: "치킨",
+				pizza: "피자",
+				jjimtang: "찜·탕",
+				roast: "구이",
+				jp: "일식",
+				caffe: "카페"
+			};
+
+			document.querySelectorAll('.category-text').forEach(el => {
+				const code = el.textContent.trim();
+				if (categoryMap[code]) {
+					el.textContent = categoryMap[code];
+				}
+			});
+		});
 		</script>
 	</div>
 </html>

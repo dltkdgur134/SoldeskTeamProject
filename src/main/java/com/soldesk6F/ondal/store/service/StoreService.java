@@ -111,7 +111,7 @@ public class StoreService {
 			StoreDto dto = StoreDto.builder().storeId(store.getStoreId()).storeName(store.getStoreName())
 					.category(store.getCategory()).storePhone(store.getStorePhone())
 					.storeAddress(store.getStoreAddress()).storeIntroduce(store.getStoreIntroduce())
-					.storeStatus(store.getStoreStatus().getDescription()).imageUrl(imageUrl)
+					.storeStatus(store.getStoreStatus().name()).imageUrl(imageUrl)
 					.avgRating(avgRating).reviewCount(reviewCount).build();
 			return dto;
 		}).collect(Collectors.toList());

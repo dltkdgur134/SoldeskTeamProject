@@ -13,24 +13,24 @@ public class AdminController {
 		return "content/admin/adminpage";
 	}
 	
-    @GetMapping(value = "/setting/operation")
+    @GetMapping(value = "/setting/usersetting")
     public String operationSetting() {
-        return "content/setting/operation";
+        return "content/admin/usersetting";
     }
     
-    @GetMapping(value = "/setting/ordersetting")
+    @GetMapping(value = "/setting/storeapproval")
     public String printerSetting() {
-        return "content/setting/ordersetting";
+        return "content/admin/storeApproval";
     }
     
-    @GetMapping(value = "/setting/deliverysetting")
+    @GetMapping(value = "/setting/ownerRiderapproval")
     public String alarmSetting() {
-        return "content/setting/deliverysetting";
+        return "content/admin/ownerRiderApproval";
     }
     
-    @GetMapping(value = "/setting/deliveryAgency")
+    @GetMapping(value = "/setting/customerService")
     public String deliverySetting() {
-        return "content/setting/deliveryAgency";
+        return "content/admin/customerService";
     }
 	
 }
