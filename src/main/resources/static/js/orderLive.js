@@ -5,39 +5,6 @@ let orderId = document.getElementById('orderIdInput').value;
 // => 이제 에디터에도 빨간줄 안 뜹니다!
 console.log('Order ID:', orderId);
 
-function initChart(currentStage) {
-  const ctx = document.getElementById('statusChart').getContext('2d');
-  const data = stages.map((s, i) => currentStage >= i ? 1 : 0);
-  statusChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: stages,
-      datasets: [{
-        data,
-        backgroundColor: stages.map((_, i) =>
-          i === currentStage ? '#2D7121':'#ddd'
-        ),
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      scales: {
-        x: { display: false },
-        y: {
-          ticks: { font: { size: 14 } }
-        }
-      },
-      plugins: { legend: { display: false } }
-    }
-  });
-}
-
-function initMap() {
-  const container = document.getElementById('map');
-  const center = new kakao.maps.LatLng( /* 위도,경도 */ );
-  const options = { center, level: 3 };
-  new kakao.maps.Map(container, options);
-}
 
 /**---------------------------------------------------
  * 1) WebSocket 연결 & 채팅/상태 업데이트 구독
@@ -66,7 +33,12 @@ function connectChat() {
  * 2) 채팅 수신 핸들러
  *--------------------------------------------------*/
 function onChatMessage(message) {
-  const { sender, text, timestamp } = JSON.parse(message.body);
+  //const { senderName, text, timestamp } = JSON.parse(message.body);
+  console.log('Raw message:', message);
+    console.log('Raw message.body:', message.body);
+    const data = JSON.parse(message.body);
+    console.log('Parsed data:', data);
+    const { senderName, text, timestamp } = data;
   const container = document.getElementById('chatMessages');
   if (!container) {
       console.error("chatMessages element not found!");
@@ -75,7 +47,7 @@ function onChatMessage(message) {
   const el = document.createElement('div');
   el.className = 'chat-message';
   el.innerHTML = `
-    <strong class="sender">${sender}:</strong>
+    <strong class="sender">${senderName}:</strong>
     <span class="text">${text}</span>
     <div class="timestamp text-muted small">
       ${new Date(timestamp).toLocaleTimeString()}
@@ -95,7 +67,8 @@ function sendChat() {
 
   const payload = {
     orderId,
-    sender: '사용자',            // 또는 사용자 이름/ID
+    //sender: '사용자',            // 또는 사용자 이름/ID
+	senderName: userId,
     text,
     timestamp: new Date().toISOString()
   };
@@ -146,8 +119,8 @@ window.addEventListener('load', () => {
 	  }
 
 
-	  initChart(currentStage);
-	  kakao.maps.load(initMap);
+	  /*initChart(currentStage);
+	  kakao.maps.load(initMap);*/
 	  updateCookingProgress(currentStage);
 	  startExpectedTimeCountdown(expectCookingTime, expectDeliveryTime);
 });
@@ -179,9 +152,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	    });
 
 	  // 1) 초기 상태(예: 서버에서 내려주는 currentStage 변수로)
-	  const currentStage = /*[[${currentStage}]]*/ 1;
-	  initChart(currentStage);
-	  kakao.maps.load(initMap);
+	  /*const currentStage = [[${currentStage}]] 1;*/
+	  const currentStage = document.getElementById('slider-step').value;
+	  /*initChart(currentStage);
+	  kakao.maps.load(initMap);*/
 	
 });
 
@@ -228,7 +202,7 @@ function connectOrderWebSocket() {
 }
 
 // ✅ 채팅 수신
-function onChatMessage(message) {
+/*function onChatMessage(message) {
   const { sender, text, timestamp } = JSON.parse(message.body);
   const container = document.getElementById('chatMessages');
   if (!container) return;
@@ -237,6 +211,23 @@ function onChatMessage(message) {
   el.className = 'chat-message';
   el.innerHTML = `
     <strong>${sender}:</strong>
+    <span>${text}</span>
+    <div class="timestamp text-muted small">${new Date(timestamp).toLocaleTimeString()}</div>
+  `;
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}*/
+
+
+/*function onChatMessage(message) {
+  const { senderName, text, timestamp } = JSON.parse(message.body);
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  const el = document.createElement('div');
+  el.className = 'chat-message';
+  el.innerHTML = `
+    <strong>${senderName}:</strong>
     <span>${text}</span>
     <div class="timestamp text-muted small">${new Date(timestamp).toLocaleTimeString()}</div>
   `;
@@ -252,7 +243,7 @@ function sendChatMessage() {
 
   const payload = {
     orderId: orderId,
-    sender: '사용자',
+    senderName: userId,
     text: text,
     timestamp: new Date().toISOString()
   };
@@ -261,7 +252,7 @@ function sendChatMessage() {
 }
 
 // ✅ 조리/배달 ProgressBar
-/*function updateCookingProgress(stage) {
+function updateCookingProgress(stage) {
   const bar = document.getElementById('cookingProgressBar');
   if (!bar) return;
 
@@ -290,7 +281,7 @@ function sendChatMessage() {
     default:
       console.warn('❓ Unknown stage:', stage);
   }
-}*/
+}
 //////////////////
 function updateCookingProgress(stage) {
   const bar = document.getElementById('cookingProgressBar');
@@ -389,7 +380,7 @@ function updateExpectedTimeUI() {
 
   display.textContent = remainingMinutes <= 1 ? '도착 임박!' : `남은 시간: ${remainingMinutes}분`;
 }
-
+*/
 
 
 

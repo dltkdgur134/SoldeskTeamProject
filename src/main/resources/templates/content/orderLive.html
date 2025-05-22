@@ -15,14 +15,16 @@
   <script
     th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}">
   </script>
-  <script th:inline="javascript">
-    let userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest';
+   <script th:inline="javascript">
+    let userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest'; 
   </script>
   <!-- 페이지 전용 JS -->
 </head>
 <body>
 <section layout:fragment="content">
+  <input type="hidden" value="${orderId}" id ="orderIdInput">
   <h1 class="d-flex justify-content-center my-2">실시간 배송 진행</h1>
+  <strong th:text="${#authentication.principal.user.userId}"></strong>
   <div class="live-container">
     <!-- 왼쪽 메인 영역 -->
     <div class="main-panel">
@@ -214,6 +216,8 @@
     </div>
   </div>
   <script>
+  
+  
   function updateProgress(step) {
 		const progressBar = document.getElementById('progressBar');
 		const steps = document.querySelectorAll('.step');
@@ -270,7 +274,9 @@
 		    if (mutation.type === "childList") {
 		    	const msg = document.getElementById("chatMessages").innerText;
 		      //alert("자식 노드가 추가되거나 제거됐습니다.");
-		      alert(msg);
+		      //alert(msg);
+		      //updateProgress(2);
+		      console.log(msg);
 		    } else if (mutation.type === "attributes") {
 		      alert(`${mutation.attributeName} 특성이 변경됐습니다.`);
 		    }
@@ -284,7 +290,7 @@
 	//incrementProgress(); // 반복 시작	 
   </script>
   <script th:src="@{/js/orderLive.js}"></script>
-  <input type="hidden" value="${orderId}" id ="orderIdInput">
+  
 </section>
 </body>
 </html>

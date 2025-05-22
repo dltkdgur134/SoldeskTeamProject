@@ -17,7 +17,6 @@ import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
-import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 
 import jakarta.servlet.http.HttpSession;
 

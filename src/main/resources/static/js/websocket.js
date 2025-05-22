@@ -84,7 +84,7 @@ function showChatMessage(chat) {
   const el = document.createElement('div');
   el.className = 'chat-message';
   el.innerHTML =
-    `<strong>${chat.sender}:</strong> ${chat.text}
+    `<strong>${chat.senderName}:</strong> ${chat.text}
      <div class="timestamp small text-muted">
        ${new Date(chat.timestamp).toLocaleTimeString()}
      </div>`;
@@ -119,7 +119,7 @@ function sendChat() {
   if (!input.value.trim() || !stompClient) return;
   const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
   stompClient.send(`/app/chat/${orderId}`, {}, JSON.stringify({
-    orderId, sender: '사용자', text: input.value.trim(),
+    orderId, senderName: userId, text: input.value.trim(),
     timestamp: new Date().toISOString()
   }));
   input.value = '';

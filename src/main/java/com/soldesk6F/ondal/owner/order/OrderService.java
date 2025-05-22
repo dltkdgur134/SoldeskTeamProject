@@ -278,13 +278,12 @@ public class OrderService {
         	dto.setOrderStatus("CONFIRMED");
         } else if (order.getOrderToOwner() == OrderToOwner.IN_DELIVERY) {
         	dto.setOrderStatus("IN_DELIVERY");
-        } else if (order.getOrderToRider() == OrderToRider.COMPLETED) {
+        } 
+        if (order.getOrderToRider() == OrderToRider.COMPLETED) {
         	dto.setOrderStatus("COMPLETED");
         } else if (order.getOrderToOwner() == OrderToOwner.CANCELED) {
         	dto.setOrderStatus("CANCELED");
-        } else {
-        	dto.setOrderStatus("NULL");
-        }
+        } 
         
         //dto.setOrderStatus(order.getOrderToOwner().name());
         //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());

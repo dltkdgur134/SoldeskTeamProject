@@ -432,7 +432,11 @@ function updateOrderStatus(orderId, url) {
            });
            if (currentOrderId) {
 				alert('오더아이디 어디선가');
-		   		stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+		   		//stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+				stompClient.subscribe('/topic/chat/' + currentOrderId, message => {
+					console.log('채팅 메시지 도착:', message);
+					onChatMessage(message);
+				})
 		   }
        });
    }
@@ -441,16 +445,32 @@ function updateOrderStatus(orderId, url) {
 	  console.log('🥡 onChatMessage 호출됨:', message);
 	  const payload = JSON.parse(message.body);
 	  console.log('🥡 메시지 페이로드:', payload);
-	  const { sender, text, timestamp } = payload;
-	  const $msg = $(`
+	  const { senderName, text, timestamp } = payload;
+	  /*const $msg = $(`
 	    <div class="chat-message">
-	      <span class="sender">${sender}:</span>
+	      <span class="sender">${senderName}:</span>
 	      <span class="text">${text}</span>
 	      <div class="timestamp text-muted small">${new Date(timestamp).toLocaleTimeString()}</div>
 	    </div>
 	  `);
 	  $('#chatMessages').append($msg);
-	  $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);
+	  $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);*/
+	  const container = document.getElementById('chatMessages');
+	    if (!container) {
+	        console.error("chatMessages element not found!");
+	        return;
+	    }
+	    const el = document.createElement('div');
+	    el.className = 'chat-message';
+	    el.innerHTML = `
+	      <strong class="sender">${senderName}:</strong>
+	      <span class="text">${text}</span>
+	      <div class="timestamp text-muted small">
+	        ${new Date(timestamp).toLocaleTimeString()}
+	      </div>
+	    `;
+	    container.append(el);
+	    container.scrollTop = container.scrollHeight;
 	}
 	
 	// 채팅 보내기
@@ -460,7 +480,7 @@ function updateOrderStatus(orderId, url) {
 	  const payload = {
 	    storeId,
 	    orderId: currentOrderId,
-	    sender: '사장님',
+	    senderName: '사장님',
 	    text,
 	    timestamp: new Date().toISOString()
 	  };

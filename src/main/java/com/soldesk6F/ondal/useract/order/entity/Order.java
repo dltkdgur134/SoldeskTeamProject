@@ -51,7 +51,7 @@ public class Order {
     @Column(name = "order_number", length = 3)
     private Integer orderNumber;
     
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_uuid", nullable = true)
     @JsonIgnoreProperties({"orders"})
     private User user;
@@ -59,12 +59,12 @@ public class Order {
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     @JsonIgnoreProperties({"orders", "owner"})
     private Store store;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "rider_id")
     private Rider rider;
 
@@ -122,7 +122,11 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(name = "order_to_rider", nullable = false)
     private OrderToRider orderToRider;
-
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_to_user", nullable = false)
+    private OrderToUser orderToUser;
+    
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
 
@@ -185,13 +189,31 @@ public class Order {
 			return description;
 		}
     }
+    
+    public enum OrderToUser {
+        PENDING("주문 요청 중"), 
+        CONFIRMED("주문 확인 완료"),
+        COOKING("조리중"),
+        DELIVERING("배달중"),
+        COMPLETED("주문 완료"), 
+        CANCELED("주문 취소");
+    	private final String description;
+    	OrderToUser(String description) {
+			this.description = description;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+    }
+    
     @Builder
     public Order(User user, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
                  LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
                  LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress,
                  Double deliveryAddressLatitude, Double deliveryAddressLongitude, int deliveryFee,
                  String storeRequest, String deliveryRequest, OrderToOwner orderToOwner, CancledWhy cancledWhy,
-                 OrderToRider orderToRider, int totalPrice, String orderAdditional1, String orderAdditional2,
+                 OrderToRider orderToRider,OrderToUser orderToUser, int totalPrice, String orderAdditional1, String orderAdditional2,
                  List<OrderDetail> orderDetails) {
 
         this.user = user;
@@ -213,6 +235,7 @@ public class Order {
         this.orderToOwner = orderToOwner;
         this.cancledWhy = cancledWhy;
         this.orderToRider = orderToRider;
+        this.orderToUser = orderToUser;
         this.totalPrice = totalPrice;
         this.orderAdditional1 = orderAdditional1;
         this.orderAdditional2 = orderAdditional2;
