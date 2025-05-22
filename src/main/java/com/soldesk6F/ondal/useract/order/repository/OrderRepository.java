@@ -6,7 +6,6 @@ import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
-import com.soldesk6F.ondal.useract.order.entity.OrderStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

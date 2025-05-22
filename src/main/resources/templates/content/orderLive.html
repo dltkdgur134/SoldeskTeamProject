@@ -1,84 +1,296 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
       layout:decorate="~{layouts/Layouts}">
-
 <head>
   <title>배송 진행 화면</title>
 
   <!-- CSS -->
   <link th:href="@{/css/orderLive.css}" rel="stylesheet"/>
-  <link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
-
+	<link th:href="@{/css/custom.css}" rel="stylesheet"/>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Kakao Map (autoload=false로 로드) -->
-  <script th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}"></script>
-<script th:inline="javascript">
-  const orderId = /*[[${order.orderId}]]*/ 'defaultOrderId';
-  const userUuid = /*[[${userUuid}]]*/ 'defaultUserUuid';
-</script>
+  <!-- Kakao Map (autoload=false 로 나중에 로딩) -->
+  <script
+    th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}">
+  </script>
+   <script th:inline="javascript">
+    let userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest'; 
+  </script>
   <!-- 페이지 전용 JS -->
-  <script th:src="@{/js/orderLive.js}" defer></script>
 </head>
-
 <body>
 <section layout:fragment="content">
-  <div id="orderStatusDisplay" class="mt-3 text-danger"
-       th:if="${order.orderToOwner.name() == 'CANCELED'}">
-    <h4>🚫 이 주문은 가게에서 거절되었습니다. 다른 가게를 이용해주세요.</h4>
-  </div>
-
-  <h1>실시간 배송 진행</h1>
-
+  <input type="hidden" value="${orderId}" id ="orderIdInput">
+  <h1 class="d-flex justify-content-center my-2">실시간 배송 진행</h1>
+  <strong th:text="${#authentication.principal.user.userId}"></strong>
   <div class="live-container">
     <!-- 왼쪽 메인 영역 -->
     <div class="main-panel">
-
-      <!-- ✅ 조리/배달 진행 상태 ProgressBar -->
-      <div id="cookingProgressSection" class="mt-4">
-        <label class="fw-bold">조리 및 배달 진행 상황</label>
-        <div class="progress" style="height: 28px; margin-top: 10px;">
-          <div id="cookingProgressBar"
-               class="progress-bar bg-secondary progress-bar-striped progress-bar-animated"
-               role="progressbar"
-               style="width: 0%;"
-               aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-            접수 대기
-          </div>
-        </div>
+      <!-- 1) 진행 상태 차트 -->
+      <div class="status-chart text-center" th:if="${order.currentStatus == 0}">
+      	<strong>주문 수락을 기다리고 있습니다.</strong> <br>
+      	<div class="spinner-border text-warning" role="status">
+ 		 	<span class="visually-hidden">로딩중...</span>
+		</div>
       </div>
+      
+      <div class="status-chart" th:if="${order.currentStatus > 0}">
+      	<div class="container-lg">
+    		<div class="progress-container">
+        		<div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+  					<div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%" id="progressBar"></div>
+				</div>	
+        		
+        		<div class="step-label" data-step="1" style="left: 0%;">주문 수락</div>
+        		<div class="step" data-step="1" style="left: 0%;"></div>
+        		<div class="step-timestamp" data-step="1" style="left: 0%;" th:if="${order.timeline[0].timestamp != null}" th:text="${#temporals.format(order.timeline[0].timestamp, 'HH:mm')}"></div>
+        		
+        		<div class="step-label" data-step="2" style="left: 33.33%;">조리 중</div>
+        		<div class="step" data-step="2" style="left: 33.33%;"></div>
+        		<div class="step-timestamp" data-step="2" style="left: 33.33%;" th:if="${order.timeline[1].timestamp != null}" th:text="${#temporals.format(order.timeline[1].timestamp, 'HH:mm')}"></div>
 
-      <!-- ✅ 예상 남은 시간 영역 -->
-      <div id="expectedTimeSection" class="mt-4">
-        <h5>남은 예상 시간</h5>
-        <div class="text-center">
-          <div id="expectedTimeArea">
-            <h5 id="expectedTimeDisplay" class="text-primary">--분</h5>
-          </div>
-        </div>
+        		<div class="step-label" data-step="3" style="left: 66.66%;">배달 중</div>
+        		<div class="step" data-step="3" style="left: 66.66%;"></div>
+        		<div class="step-timestamp" data-step="3" style="left: 66.66%;" th:if="${order.timeline[2].timestamp != null}" th:text="${#temporals.format(order.timeline[2].timestamp, 'HH:mm')}"></div>
+
+        		<div class="step-label" data-step="4" style="left: 100%;">배달 완료</div>
+        		<div class="step" data-step="4" style="left: 100%;"></div>
+        		<div class="step-timestamp" data-step="4" style="left: 100%;" th:if="${order.timeline[3].timestamp != null}" th:text="${#temporals.format(order.timeline[3].timestamp, 'HH:mm')}"></div>
+
+    		</div>
+    		<th:block>
+    			<input class="mt-4" id="slider-step" onchange="updateProgress(this.value)" th:value="${order.currentStatus}" />
+    			<strong id="123"></strong>
+    		</th:block>
+		</div>
       </div>
-    </div>
+      
+      <div class="card text-start p-4 mx-auto my-4 mb-4 w-50 d-flex justify-content-center">
+		<div class="order-basic-detail">
+				주문일시 
+			<small th:text="${#temporals.format(order.orderDate, 'yyyy년 MM월 dd일 a hh시 mm분')}"></small>
+		</div>
+		<div class="order-basic-detail">
+			주문번호 <small th:text="${order.orderId}"></small>
+		</div>
+		<hr>
+		<div>
+			<img th:src="${order.storeImageUrl}"
+				class="img-fluid rounded-circle" alt="매장 이미지"
+				th:if="${order.storeImageUrl != null}" /> 
+			<img th:src="@{/img/store/storeimg/default_img.jpg}"
+				class="img-fluid rounded-circle" alt="기본 이미지"
+				th:if="${order.storeImageUrl == null}" /> 
+			<a th:href="@{/store/view/{storeId}(storeId=${order.storeId})}"
+				class="icon-link icon-link-hover ms-2"> 
+				<strong class="store-name" th:text="${order.storeName}">가게 이름</strong> 
+				<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+					class="bi bi-chevron-right" viewBox="0 0 16 16"
+					aria-hidden="true">
+					<path fill-rule="evenodd"
+						d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6
+						6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
+				</svg>
+			</a>
+		</div>
+	  </div>
+      
+      <div class="accordion mx-auto w-50" id="order-detail-accordion">
+      	<div class="accordion-item">
+      		<h2 class="accordion-header">
+      			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        			주문 메뉴
+      			</button>
+    		</h2>
+    		<div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#order-detail-accordion">
+      			<div class="accordion-body">
+        			<ul class="list-group list-group-flush"
+					th:each="item : ${order.menuItems}">
+						<li class="list-group-item">
+							<div>
+								<strong th:text="${item.menuName}"></strong>
+							</div>
+							<div>
+								<span>
+									<small class="order-detail-small-text" th:text="${item.menuName}"></small>
+								</span> 
+								<span>
+									<small class="order-detail-small-text" th:text="'-' + ${item.menuPrice} + ' 원'"></small>
+								</span>
+							</div>
+							<div th:each="option : ${item.options}">
+								<small class="order-detail-text" th:text="${option.key	}"></small>
+								<small class="order-detail-text" th:text="${' - ' + option.value + ' 원'}"></small>
+							</div>
+							<div>
+								<span>
+									<strong class="order-detail-label" th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + ' 원'}"></strong>
+								</span>
+								<span>
+									<small class="order-detail-text" th:text="${item.quantity + '개'}"></small>
+								</span>
+							</div>
+						</li>
+					</ul>
+      			</div>
+    		</div>
+      	</div>
+      	<div class="accordion-item">
+      		<h2 class="accordion-header">
+      			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+        			배달 정보
+      			</button>
+    		</h2>
+    		<div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#order-detail-accordion">
+      			<div class="accordion-body">
+        			<div>
+						<strong>전화번호</strong>
+					</div>
+					<div>
+						<small class="order-detail-text" 
+							th:text="${#strings.substring(order.phoneNum, 0, 3) + '-' 
+							+ #strings.substring(order.phoneNum, 3, 7) + '-' + #strings.substring(order.phoneNum, 7, 11)}">
+						</small>
+					</div>
+					<hr>
+					<div>
+						<strong>배달 주소</strong>
+					</div>
+					<div>
+						<small class="order-detail-text"
+							th:text="${order.deliveryAddress}"></small>
+					</div>
+      			</div>
+    		</div>
+      	</div>
+      	<div class="accordion-item">
+      		<h2 class="accordion-header">
+      			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+        			결제 정보
+      			</button>
+    		</h2>
+    		<div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#order-detail-accordion">
+      			<div class="accordion-body">
+					<div class="container d-flex justify-content-between">
+						<span><strong>결제 방법</strong></span>
+						<span><strong th:text="${order.paymentMethod}"></strong></span>
+					</div>
+					<hr>
+					<div class="container d-flex justify-content-between">
+						<span><strong>결제 금액</strong></span>
+						<span><strong th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA') + ' 원'}"></strong></span>
+					</div>
+					<div class="container d-flex justify-content-between">
+						<span><strong class="order-detail-sublabel">메뉴 금액</strong></span>
+						<span><small class="order-detail-text" th:text="${#numbers.formatInteger(order.menuTotalPrice, 3, 'COMMA') + ' 원'}"></small></span>
+					</div>
+					<div class="container d-flex justify-content-between">
+						<span><strong class="order-detail-sublabel">배달팁</strong></span>
+						<span th:if="${order.deliveryFee > 0}"><small class="order-detail-text" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
+						<span th:if="${order.deliveryFee == 0}"><small class="order-detail-text" th:text="${order.deliveryFee + ' 원'}"></small></span>
+					</div>
+      			</div>
+    		</div>
+      	</div>
+      </div>
+      
+      
+      
+      
+      
+	</div>
+
     <!-- 오른쪽 채팅 패널 -->
-    <div id="chatPanel" class="chat-panel">
+    <div id="chatPanel" class="text-center chat-panel">
       <h3>실시간 채팅</h3>
       <div id="chatMessages" class="chat-messages"></div>
       <div class="chat-input">
         <input type="text" id="chatInput" placeholder="메시지를 입력하세요…" />
         <button id="sendChatBtn">
-          전송 <span id="unreadBadge" class="badge bg-danger" style="display: none;">1</span>
+        	전송
+        	<span id="unreadBadge" style="display:none; color:red; font-weight:bold;">1</span>
         </button>
       </div>
     </div>
   </div>
-
-  <!-- JS에서 사용할 currentStage 변수 주입 -->
   <script>
-    const currentStage = /*[[${order.orderToRider}]]*/ 'PENDING';
-  </script>
-  <input type="hidden" value="${orderId}" id ="orderIdInput">
-</section>
+  
+  
+  function updateProgress(step) {
+		const progressBar = document.getElementById('progressBar');
+		const steps = document.querySelectorAll('.step');
+		const labels = document.querySelectorAll('.step-label');
 
+		// 상태바 넓이 계산
+		const progressPercent = ((step - 1) / (steps.length - 1)) * 100;
+		progressBar.style.width = `${progressPercent}%`;
+
+		// 현재 단계 및 레이블 스타일링
+		steps.forEach(el => {
+		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
+		     if (currentStep <= step) {
+		         el.classList.add('active');
+		     } else {
+		         el.classList.remove('active');
+		     }
+		 });
+
+		 labels.forEach(el => {
+		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
+		     if (currentStep <= step) {
+		         el.classList.add('active');
+		     } else {
+		         el.classList.remove('active');
+		     }
+		 });
+		 if (step == 4) {
+			window.location.href = "/orderHistory"
+		}
+	} 
+ 
+  
+	function incrementProgress() {
+	 	  if (count < 5) { // 4단계 까지만
+	 	    updateProgress(count);
+	 	    document.getElementById('slider-step').value = count;
+	 	    count++;
+	 	    setTimeout(incrementProgress, 5000); // 5초마다 호출
+	 	  }
+	 }
+	// 처음 화면 진입 시 단계는 1로 고정
+	let count = document.getElementById('slider-step').value;
+	//let status = document.getElementById('stepSlider').value;
+	updateProgress(count);
+			 	 
+	//incrementProgress();
+	
+	const targetNode = document.getElementById("chatMessages");
+
+	const config = { attributes: true, childList: true, subtree: true };
+	const callback = (mutationList, observer) => {
+		  for (const mutation of mutationList) {
+		    if (mutation.type === "childList") {
+		    	const msg = document.getElementById("chatMessages").innerText;
+		      //alert("자식 노드가 추가되거나 제거됐습니다.");
+		      //alert(msg);
+		      //updateProgress(2);
+		      console.log(msg);
+		    } else if (mutation.type === "attributes") {
+		      alert(`${mutation.attributeName} 특성이 변경됐습니다.`);
+		    }
+		  }
+		};
+	const observer = new MutationObserver(callback);
+	observer.observe(targetNode, config);
+	
+	
+	//observer.disconnect();
+	//incrementProgress(); // 반복 시작	 
+  </script>
+  <script th:src="@{/js/orderLive.js}"></script>
+  
+</section>
 </body>
 </html>

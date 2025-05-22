@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+import com.soldesk6F.ondal.useract.order.dto.OrderInfoDetailDto;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 
 @Controller
@@ -39,18 +40,23 @@ public class UserOrderController {
 
         if (status == OrderToRider.COMPLETED) {
             // 2) 완료된 주문 → orderInfo 페이지
-            OrderHistoryDto dto = orderService.getOrderHistoryDto(orderId);
+//            OrderHistoryDto dto = orderService.getOrderHistoryDto(orderId);
+        	OrderInfoDetailDto dto = orderService.getOrderInfoDetailDto(orderId);
             model.addAttribute("order", dto);
             return "content/orderInfo";
         } else {
             // 3) 진행중 주문 → orderLive 페이지
-            OrderLiveDto live = orderService.getOrderLiveDto(orderId);
-            model.addAttribute("orderId", orderId);
-            model.addAttribute("currentStage", live.getTimeline());
-            model.addAttribute("initialLat", live.getLat());
-            model.addAttribute("initialLng", live.getLng());
-            model.addAttribute("kakaoAppKey", kakaoAppKey);
-            return "content/orderLive";
+//            OrderLiveDto live = orderService.toOrderLiveDto(orderId);
+//            model.addAttribute("orderId", orderId);
+//            model.addAttribute("order", live);
+//            model.addAttribute("currentStage", live.getTimeline());
+//            model.addAttribute("initialLat", live.getLat());
+//            model.addAttribute("initialLng", live.getLng());
+//            model.addAttribute("kakaoAppKey", kakaoAppKey);
+//            return "content/orderLive";
+        	OrderLiveDto dto = orderService.toOrderLiveDto(orderId);
+        	model.addAttribute("order", dto);
+        	return "content/orderLive";
         }
     }
     

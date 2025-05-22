@@ -32,7 +32,6 @@ public class CreateOrderService {
         // Builder 패턴을 사용해 Order 객체를 생성
         Order newOrder = Order.builder()
                 .user(order.getUser())  // User 설정
-                .orderNumber(nextOrderNumber)
                 .guestId(order.getGuestId())  // guestId 설정
                 .store(order.getStore())  // Store 설정
                 .rider(order.getRider())  // Rider 설정
