@@ -16,7 +16,6 @@ function connectGlobalWebSocket(onConnectCallback) {
     stompClient.subscribe('/topic/user/'+orderId, msg => {
       const dto = JSON.parse(msg.body);
       showOrderNotification(dto);
-      subscribeOrderChannels(dto.orderId);
     });
 	if (onConnectCallback) onConnectCallback();
     /* 로그인 직후 서버에 “진행 중 주문 목록” 요청 */
@@ -39,18 +38,14 @@ function connectGlobalWebSocket(onConnectCallback) {
 
 /* ────────── 주문별 채팅·상태 토픽 구독  ────────── */
 function subscribeOrderChannels(orderId) {
-  alert("리턴전");
   if (!stompClient) return;
   /* 상태 알림 */
-  alert("리턴후");
-  stompClient.subscribe(`/topic/user/${orderId}`, msg => {
+  stompClient.subscribe(`/topic/order/${orderId}`, msg => {
     const update = JSON.parse(msg.body);
+	alert("구독자체는해음");
     console.log('[order-topic]', orderId, update);
     showOrderNotification(update);     
-
-    updateCookingProgress?.(update.stage);
-    startExpectedTimeCountdown?.(
-        update.expectCookingTime, update.expectDeliveryTime);
+	updateCookingProgress(update.stage);
   });
 
   /* 채팅 메시지 */
@@ -62,15 +57,17 @@ function subscribeOrderChannels(orderId) {
 }
 
 /* ────────── 알림 토스트 & 채팅창 시스템 메시지 ────────── */
-function showOrderNotification(dto) {
-  const status = dto.orderToOwner || dto.orderStatus || 'UNKNOWN';
-  showToast(`📦 주문 #${dto.orderId} 상태: "${status}"`);
-
+function showOrderNotification(message) {
+  const payload = JSON.parse(message.body);
+   if (payload.orderToOwner === 'CANCELED') {
+     alert('⚠️ 가게에서 주문을 거부했습니다.');
+     updateCookingProgress('REJECTED');
+   }
   // (선택) 시스템 메시지를 채팅창에도 넣기
   if (document.getElementById('chatMessages')) {
     const div = document.createElement('div');
     div.className = 'chat-message system';
-    div.innerHTML = `<em>시스템:</em> 주문 상태가 <b>${status}</b> 로 변경되었습니다.`;
+    div.innerHTML = `<em>시스템:</em> 주문 상태가 <b>${payload.orderToOwner}</b> 로 변경되었습니다.`;
     chatMessages.append(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
