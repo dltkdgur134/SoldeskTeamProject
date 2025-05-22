@@ -201,6 +201,57 @@ function connectOrderWebSocket() {
   });
 }
 
+function disableOrderUI() {
+  // 채팅 입력창, 버튼 비활성화
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendChatBtn');
+  if (input) input.disabled = true;
+  if (sendBtn) sendBtn.disabled = true;
+
+  // 예상 시간 제거
+  const display = document.getElementById('expectedTimeDisplay');
+  if (display) display.textContent = '주문이 거부되었습니다';
+
+  // 타이머 정지
+  if (expectedTimerInterval) {
+    clearInterval(expectedTimerInterval);
+    expectedTimerInterval = null;
+  }
+}
+
+function updateCookingProgress(stage) {
+  const bar = document.getElementById('cookingProgressBar');
+  if (!bar) return;
+
+  switch (stage) {
+    case 'PENDING':
+      setProgress(bar, 0, '접수 대기', 'bg-secondary');
+      break;
+    case 'COOKING':
+      setProgress(bar, 50, '조리중', 'bg-info');
+      break;
+    case 'COOKING_COMPLETED':
+      setProgress(bar, 75, '조리완료', 'bg-success');
+      break;
+    case 'IN_DELIVERY':
+      setProgress(bar, 90, '배달중', 'bg-warning');
+      break;
+    case 'DELIVERED':
+    case 'COMPLETED':
+      setProgress(bar, 100, '배달완료', 'bg-primary');
+      break;
+	case 'REJECTED': 
+	  setProgress(bar, 100, '주문 거부됨', 'bg-danger'); 
+	  alert('해당 주문은 가게에서 거부되었습니다.');
+	  disableOrderUI();
+	  break;  
+    default:
+      console.warn('❓ Unknown stage:', stage);
+  }
+}
+
+
+
 // ✅ 채팅 수신
 /*function onChatMessage(message) {
   const { sender, text, timestamp } = JSON.parse(message.body);
@@ -252,36 +303,7 @@ function sendChatMessage() {
 }
 
 // ✅ 조리/배달 ProgressBar
-function updateCookingProgress(stage) {
-  const bar = document.getElementById('cookingProgressBar');
-  if (!bar) return;
 
-  switch (stage) {
-    case 'PENDING':
-      setProgress(bar, 0, '접수 대기', 'bg-secondary');
-      break;
-    case 'COOKING':
-      setProgress(bar, 50, '조리중', 'bg-info');
-      break;
-    case 'COOKING_COMPLETED':
-      setProgress(bar, 75, '조리완료', 'bg-success');
-      break;
-    case 'IN_DELIVERY':
-      setProgress(bar, 90, '배달중', 'bg-warning');
-      break;
-    case 'DELIVERED':
-    case 'COMPLETED':
-      setProgress(bar, 100, '배달완료', 'bg-primary');
-      break;
-	case 'REJECTED': 
-	  setProgress(bar, 100, '주문 거부됨', 'bg-danger'); 
-	  alert('해당 주문은 가게에서 거부되었습니다.');
-	  disableOrderUI();
-	  break;  
-    default:
-      console.warn('❓ Unknown stage:', stage);
-  }
-}
 //////////////////
 function updateCookingProgress(stage) {
   const bar = document.getElementById('cookingProgressBar');
@@ -321,23 +343,7 @@ function updateCookingProgress(stage) {
 
 
 //주문 거부시 활성 함수
-function disableOrderUI() {
-  // 채팅 입력창, 버튼 비활성화
-  const input = document.getElementById('chatInput');
-  const sendBtn = document.getElementById('sendChatBtn');
-  if (input) input.disabled = true;
-  if (sendBtn) sendBtn.disabled = true;
 
-  // 예상 시간 제거
-  const display = document.getElementById('expectedTimeDisplay');
-  if (display) display.textContent = '주문이 거부되었습니다';
-
-  // 타이머 정지
-  if (expectedTimerInterval) {
-    clearInterval(expectedTimerInterval);
-    expectedTimerInterval = null;
-  }
-}
 function setProgress(elem, percent, text, colorClass) {
   elem.style.width = percent + '%';
   elem.className = 'progress-bar progress-bar-striped progress-bar-animated ' + colorClass;
