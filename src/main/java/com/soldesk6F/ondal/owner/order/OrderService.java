@@ -72,9 +72,6 @@ public class OrderService {
 	        SimpMessagingTemplate messagingTemplate,
 	        RegAddressRepository regAddressRepository,
 	        DateFunctions dateFunctions) {
-
-	    	
-	    	
 	        this.userRepository = userRepository;
 	        this.storeRepository = storeRepository;
 	        this.orderRepository = orderRepository;
@@ -133,7 +130,6 @@ public class OrderService {
 
         // 주문 상태 변경
         order.setOrderToOwner(Order.OrderToOwner.CANCELED);
-        orderRepository.save(order);
 
         Payment payment = paymentRepository.findByOrder_OrderId(orderId)
         	    .orElseThrow(() -> new IllegalStateException("주문에 결제 정보가 없습니다."));
@@ -147,8 +143,9 @@ public class OrderService {
         } else {
             throw new IllegalStateException("지원하지 않는 결제 방식입니다.");
         }
-
-        return order;
+        Order savedOrder = orderRepository.save(order);
+        messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
+        return savedOrder;
     }
     public Order extendCookingTime(UUID orderId, int addMinutes) {
         Order order = orderRepository.findById(orderId)

@@ -50,9 +50,13 @@ function subscribeOrderChannels(orderId) {
     showOrderNotification(update);       // 토스트
     //updateStatusChart?.(update.stage);   // 선택 UI
     //moveRiderMarker?.(update.location?.lat, update.location?.lng);
-    updateCookingProgress?.(update.stage);
-    startExpectedTimeCountdown?.(
-        update.expectCookingTime, update.expectDeliveryTime);
+	if (window.hasOwnProperty('updateCookingProgress') &&
+	     typeof window.updateCookingProgress === 'function') {
+	   window.updateCookingProgress(update.stage);
+	 }
+	 if (typeof window.startExpectedTimeCountdown === 'function') {
+	   window.startExpectedTimeCountdown(update.expectCookingTime, update.expectDeliveryTime);
+	 }
   });
 
   /* 채팅 메시지 */

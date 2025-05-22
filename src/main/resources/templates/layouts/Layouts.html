@@ -22,12 +22,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <!-- <th:block layout:fragment="css"></th:block> -->
 	<script th:inline="javascript">
 	/*<![CDATA[*/
-	const userId = /*[[${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userId : ''}]]*/ '';
+	const userId = /*[[${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}]]*/ '';
 	/*]]>*/
 	</script>
     <th:block layout:fragment="css"></th:block>
 </head>
-<body th:data-userid="${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userId : ''}">
+<body th:data-userid="${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}">
 	<div th:replace="~{fragments/header::header}"></div>
 	
 	<div layout:fragment="content" class="content"></div>
