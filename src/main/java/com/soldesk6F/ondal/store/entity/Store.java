@@ -52,7 +52,7 @@ public class Store {
 	@Column(name = "store_id" , updatable = false, nullable = false,unique = true)
 	private UUID storeId;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "owner_id" , nullable = false)
 	@JsonIgnoreProperties({"user"})
 	private Owner owner;
@@ -135,7 +135,7 @@ public class Store {
 
     public enum StoreStatus {
     	PENDING_APPROVAL("승인대기중"),
-    	PENDING_REFUSES("승인거절"),
+    	PENDING_REFUSES("승인거부"),
         OPEN("영업중"),
         CLOSED("영업종료"),
         SUSPENDED("일시정지"),

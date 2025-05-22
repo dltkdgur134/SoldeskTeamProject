@@ -462,28 +462,28 @@ public class OrderService {
 //        timeline.add(new StatusTimeline("배달 중",     4,   order.getDeliveryStartTime()));		
 //        timeline.add(new StatusTimeline("배달 완료",    5,  order.getDeliveryCompleteTime()));
     	
-    	timeline.add(new StatusTimeline("주문 수락", 1, order.getCookingStartTime()));
-    	if (order.getRealCookingTime() != null) {
-    		LocalDateTime cookingEndTime = dateFunctions.addTime(order.getCookingStartTime(), order.getRealCookingTime());
-    		timeline.add(new StatusTimeline("조리 중", 2, cookingEndTime));
-    	} else {
-    		timeline.add(new StatusTimeline("조리 중", 2, order.getCookingEndTime()));
-    	}
-    	LocalDateTime orderDateTime = order.getOrderTime();
-    	LocalDateTime cookingStartTime = dateFunctions.addTime(orderDateTime, order.getExpectCookingTime());
+//    	timeline.add(new StatusTimeline("주문 수락", 1, order.getCookingStartTime()));
+//    	if (order.getRealCookingTime() != null) {
+//    		LocalDateTime cookingEndTime = dateFunctions.addTime(order.getCookingStartTime(), order.getRealCookingTime());
+//    		timeline.add(new StatusTimeline("조리 중", 2, cookingEndTime));
+//    	} else {
+//    		timeline.add(new StatusTimeline("조리 중", 2, order.getCookingEndTime()));
+//    	}
+//    	LocalDateTime orderDateTime = order.getOrderTime();
+//    	LocalDateTime cookingStartTime = dateFunctions.addTime(orderDateTime, order.getExpectCookingTime());
+//    	
+//    	LocalTime expectedTime = LocalTime.of(0, 30);
+//    	LocalDateTime expectedCompleteTime = dateFunctions.addTime(cookingStartTime, expectedTime);
+//    	if (order.getOrderToOwner() == OrderToOwner.IN_DELIVERY) {
+//    		timeline.add(new StatusTimeline("배달 중", 3, expectedCompleteTime));
+//    	} else {
+//    		timeline.add(new StatusTimeline("배달 중", 3, null));
+//    	}
+//    	//timeline.add(new StatusTimeline("배달 중", 3, order.getDeliveryStartTime()));
+//    	timeline.add(new StatusTimeline("배달 완료", 4, order.getDeliveryCompleteTime()));
     	
-    	LocalTime expectedTime = LocalTime.of(0, 30);
-    	LocalDateTime expectedCompleteTime = dateFunctions.addTime(cookingStartTime, expectedTime);
-    	if (order.getOrderToOwner() == OrderToOwner.IN_DELIVERY) {
-    		timeline.add(new StatusTimeline("배달 중", 3, expectedCompleteTime));
-    	} else {
-    		timeline.add(new StatusTimeline("배달 중", 3, null));
-    	}
-    	//timeline.add(new StatusTimeline("배달 중", 3, order.getDeliveryStartTime()));
-    	timeline.add(new StatusTimeline("배달 완료", 4, order.getDeliveryCompleteTime()));
     	
-    	
-    	dto.setExpectDeliveryTime(expectedTime);
+    	//dto.setExpectDeliveryTime(expectedTime);
     	
         dto.setTimeline(timeline);
     	

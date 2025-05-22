@@ -74,6 +74,10 @@ public class DateFunctions {
 	}
 	
 	public LocalDateTime addTime(LocalDateTime startTime, LocalTime addTime) {
+		if (startTime == null || addTime == null) {
+	        throw new IllegalArgumentException("Base time or additional time cannot be null");
+	    }
+		
 		Duration duration = Duration.between(LocalTime.MIN, addTime);
 		return startTime.plus(duration);
 		

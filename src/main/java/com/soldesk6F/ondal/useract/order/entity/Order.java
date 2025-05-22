@@ -124,7 +124,7 @@ public class Order {
     private OrderToRider orderToRider;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_to_user", nullable = false)
+    @Column(name = "order_to_user", nullable = true)
     private OrderToUser orderToUser;
     
     @Column(name = "total_price", nullable = false)
