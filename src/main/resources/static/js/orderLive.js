@@ -186,12 +186,11 @@ function connectOrderWebSocket() {
       startExpectedTimeCountdown(payload.expectCookingTime, payload.expectDeliveryTime);
     });
 	console.log('현재 orderId:', orderId);
-	console.log('현재 userUuid:', userUuid);
-    if (userUuid) {
-      orderStompClient.subscribe('/topic/user/' + userUuid, message => {
+	console.log('현재 userUuid:', userId);
+    if (userId) {
+      orderStompClient.subscribe('/topic/user/' + userId, message => {
         const payload = JSON.parse(message.body);
         if (payload.orderToOwner === 'CANCELED') {
-          alert('⚠️ 가게에서 주문을 거부했습니다.');
           updateCookingProgress('REJECTED');
         }
       });
@@ -229,16 +228,17 @@ function updateCookingProgress(stage) {
       break;
     case 'COOKING':
       setProgress(bar, 50, '조리중', 'bg-info');
+	  
       break;
-    case 'COOKING_COMPLETED':
-      setProgress(bar, 75, '조리완료', 'bg-success');
-      break;
+    
     case 'IN_DELIVERY':
       setProgress(bar, 90, '배달중', 'bg-warning');
+	  
       break;
     case 'DELIVERED':
     case 'COMPLETED':
       setProgress(bar, 100, '배달완료', 'bg-primary');
+	  
       break;
 	case 'REJECTED': 
 	  setProgress(bar, 100, '주문 거부됨', 'bg-danger'); 
