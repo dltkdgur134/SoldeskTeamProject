@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/update.css}" rel="stylesheet" />
+	<link th:href="@{/css/review.css}" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+	<script th:src="@{/js/initialize.js}"></script>
+	<script th:src="@{/js/review.js}" defer></script>
+</head>
+<body>
+	<div layout:fragment="content" class="container py-5">
+		<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+			<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+		<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+			<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+		<div id="result-msg-container">
+			
+		</div>
+		<div class="container d-flex justify-content-center my-3" id="result-status"></div>
+		<div class="card info-card p-4 text-center" th:if="${reviewList == null}">
+			<h4 class="card-title">
+				작성한 리뷰가 없습니다!
+			</h4>
+			<div class="container d-flex justify-content-center">
+				<button type="button" class="btn btn-secondary btn-lg" id="back-btn" 
+					onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	
+			</div>
+		</div>
+		<div class="card info-card p-4" th:if="${reviewList != null}">
+			<h4 class="card-title">
+				리뷰 관리
+			</h4>
+			<div class="review-header">
+				내가 쓴 총 리뷰 <span th:text="${#lists.size(reviewList)}"></span> 개 
+			</div>
+			<div class="review-header-footer">
+				리뷰 수정   <span><i class="fa-solid fa-circle-question" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="리뷰 수정은 작성 후 3일 이내에만 가능합니다."></i></span>
+			</div>
+			<div class="card-body">
+				<th:block th:each="review : ${reviewList}">
+					<form th:id="review-form + ${reviewStat.count}" th:name="reviewForm + ${reviewStat.count}" action="" method="POST">
+						<div class="card mb-2">
+							<div class="card-header review-header">
+								<div class="container d-flex justify-content-between align-items-center headers">
+									<a class="icon-link icon-link-hover" th:href="@{/store/view/{storeId}(storeId=${review.store.storeId})}">
+										<strong th:text="${review.store.storeName}"></strong> 
+										<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" 
+											class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
+  											<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6
+  												6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+										</svg>
+									</a>
+									<strong class="order-time" th:text="${orderDaysPassed[review.reviewId]}"></strong>
+								</div>
+								<div class="container d-flex justify-content-between align-items-center headers">
+									<div class="my-rating">
+		  								<span id="5" class="star fa-solid fa-moon me-1"></span>
+		  								<span id="4" class="star fa-solid fa-moon me-1"></span>
+		  								<span id="3" class="star fa-solid fa-moon me-1"></span>
+		  								<span id="2" class="star fa-solid fa-moon me-1"></span>
+		  								<span id="1" class="star fa-solid fa-moon me-1"></span>
+									</div>
+									<input name="rating" class="form-control" th:id="rating-stars + ${reviewStat.count}" 
+										type="text" th:value="${review.rating}" hidden="true"/>
+									<div class="d-flex justify-content-end">
+									<span class="badge rounded-pill text-bg-primary me-2 d-flex justify-content-center align-items-center" th:if="${reviewDaysPassed[review.reviewId] < 4}">
+										<a class="update-review-btn" 
+											th:id="update-review-btn + ${reviewStat.count}"
+											th:href="@{/goUpdateReview/{reviewId}(reviewId=${review.reviewId})}">
+											수정
+										</a>
+									</span>
+									<span class="badge rounded-pill text-bg-secondary">
+										<button type="button" class="delete-review-btn" 
+											th:id="delete-review-btn + ${reviewStat.count}"
+											th:onclick="deleteReview([[${reviewStat.count}]])">
+											삭제
+										</button>
+									</span>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+				  				<input class="form-control" type="text" name="reviewId" th:id="'review-id' + ${reviewStat.count}" 
+				  						hidden="true" th:value="${review.reviewId}">
+				  				<p class="card-text">
+					    			<strong th:text="${review.reviewTitle} "></strong>
+				    				<br>
+					    			<small th:text=${review.reviewContent}></small>
+				    				<br>
+					    			<th:block th:each="reviewImg : ${reviewImgMap[review.reviewId]}"> 
+					    				<a href="#" role="button" data-bs-toggle="modal" th:attr="data-bs-target=${'#imageModal' + reviewStat.count}"><img 
+					    				class="img-thumbnail review-img-preview" th:src="${'/img/review/'+ reviewImg.reviewImg}"/></a> 
+					    			</th:block>
+				    				<br>
+				    				<th:block th:each="orderDetails : ${review.order.orderDetails}">
+				    					<span class="badge menu-badge mt-2">
+				    						<strong th:text="${orderDetails.menu.menuName}"></strong>
+				    					</span>
+				    				</th:block>
+				    			</p>
+				    			<hr>
+				  				<div class="modal fade" th:id="'imageModal' + ${reviewStat.count}" tabindex="-1" aria-labelledby="reviewImgModalLabel" aria-hidden="true">
+    								<div class="modal-dialog modal-dialog-centered modal-lg">
+        								<div class="modal-content">
+           	 								<div class="modal-body p-0">
+           	 									<div class="position-relative">
+                    								<button type="button" class="btn-close position-absolute rounded-circle" data-bs-dismiss="modal" aria-label="Close"></button>
+	                							<div th:id="'reviewImgCarousel' + ${reviewStat.count}" class="carousel slide">
+	                    							<div class="carousel-indicators">
+	                        							<th:block th:each="reviewImg, reviewImgStat : ${reviewImgMap[review.reviewId]}">
+	                           								<button type="button"
+	        													th:data-bs-target="'#reviewImgCarousel' + ${reviewStat.count}"
+	        													th:data-bs-slide-to="${reviewImgStat.index}"
+	        													th:classappend="${reviewImgStat.index == 0 ? 'active' : ''}"
+	        													th:aria-current="${reviewImgStat.index == 0 ? 'true' : null}"
+	        													th:aria-label="|Slide ${reviewImgStat.index + 1}|"></button>
+	                        							</th:block>
+	                    							</div>
+	                    							<div class="carousel-inner">
+	                        							<th:block th:each="reviewImg, reviewImgStat : ${reviewImgMap[review.reviewId]}">
+	                            							<div class="carousel-item" th:classappend="${reviewImgStat.index == 0 ? 'active' : ''}">
+	                                							<img th:src="${'/img/review/' + reviewImg.reviewImg}" class="review-carousel-img" alt="...">
+	                                							<div class="carousel-caption d-none d-md-block">
+	                                   								<h5 th:text="${review.reviewTitle}"></h5>
+	                                    							<p th:text="${review.reviewContent}"></p>
+	                                							</div>
+	                            							</div>
+	                        							</th:block>
+	                    							</div>
+	                    							<button class="carousel-control-prev" type="button"
+	                            						th:data-bs-target="'#reviewImgCarousel' + ${reviewStat.count}" data-bs-slide="prev">
+	                        							<span class="carousel-control-prev-icon rounded-circle" aria-hidden="true"></span>
+	                       				 				<span class="visually-hidden">이전</span>
+	                    							</button>
+	                    							<button class="carousel-control-next" type="button"
+	                            						th:data-bs-target="'#reviewImgCarousel' + ${reviewStat.count}" data-bs-slide="next">
+	                        							<span class="carousel-control-next-icon rounded-circle" aria-hidden="true"></span>
+	                        							<span class="visually-hidden">다음</span>
+	                    							</button>
+	                							</div>
+	                							</div>
+            								</div>
+        								</div>
+    								</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</th:block>
+				<div class="container d-flex justify-content-center">
+					<button type="button" class="btn btn-secondary btn-lg" id="back-btn" 
+						onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	
+				</div>
+			</div>
+		</div> 
+	</div>
+</body>
+</html>

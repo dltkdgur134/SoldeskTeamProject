@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+<meta charset="UTF-8">
+<title>온달</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet">
+<link th:fragment="css" th:href="@{/css/rider/RiderCustom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/rider/riderManagement.css}" rel="stylesheet" />
+<script
+	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+</head>
+<div layout:fragment="content" class="container py-5">
+    <h2>라이더 정산 현황</h2>
+
+    <div class="summary">
+        <p><strong>총 매출:</strong> <span th:text="${riderManagement.totalSales}">0</span> 원</p>
+        <p><strong>총 부가세:</strong> <span th:text="${riderManagement.totalVat}">0</span> 원</p>
+        <p><strong>총 수익(라이더 지갑):</strong> <span th:text="${rider.riderWallet} + '원'"></span></p>
+    </div>
+    <div class="mt-4">
+        <a href="/rider/riderChart" class="btn btn-primary">라이더 매출 차트 보기</a>
+    </div>
+
+    <h3>배달 매출 내역</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>가게 이름</th>
+                <th>금액</th>
+                <th>부가세</th>
+                <th>날짜</th>
+                <th>상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="sale : ${riderManagement.salesList}">
+                <td th:text="${sale.storeName}">가게명</td>
+                <td th:text="${sale.price}">0</td>
+                <td th:text="${sale.vat}">0</td>
+                <td th:text="${sale.date}">YYYY-MM-DD</td>
+                <td th:text="${sale.status}"
+                    th:classappend="${sale.status == 'COMPLETED'} ? 'status-completed' : 'status-pending'">
+                    상태
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</html>

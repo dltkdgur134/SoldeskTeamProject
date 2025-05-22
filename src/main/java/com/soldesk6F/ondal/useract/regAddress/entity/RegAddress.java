@@ -11,6 +11,7 @@ import com.soldesk6F.ondal.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -57,27 +58,37 @@ public class RegAddress {
 	@UpdateTimestamp
 	@Column(name = "updated_date", nullable = false)
 	private LocalDateTime updatedDate;
+	
+	@Column(name = "is_user_selected_address", nullable = false)
+	private boolean isUserSelectedAddress;
 
+	
 	@Builder
-	public RegAddress(User user, String address,String detailAddress, double userAddressLatitude, double userAddressLongitude) {
-		super();
+	public RegAddress(String address,String detailAddress, double userAddressLatitude, 
+			double userAddressLongitude, boolean isUserSelectedAddress, User user) {
 		this.user = user;
+		this.address = address;
+		this.detailAddress = detailAddress;
+		this.userAddressLatitude = userAddressLatitude;
+		this.userAddressLongitude = userAddressLongitude;
+		this.isUserSelectedAddress = isUserSelectedAddress;
+	}
+	
+	public void updateRegAddress(String address, String detailAddress, double userAddressLatitude, 
+			double userAddressLongitude) {
 		this.address = address;
 		this.detailAddress = detailAddress;
 		this.userAddressLatitude = userAddressLatitude;
 		this.userAddressLongitude = userAddressLongitude;
 	}
 	
+	public RegAddress updateDefaultAddress(boolean isUserSelectedAddress) {
+		this.isUserSelectedAddress = isUserSelectedAddress;
+		return this;
+	}
 	
-	
-	public String getUserUuidAsString() {
+	public String getRegAddressUuidAsString() {
 	    return regAddressId != null ? regAddressId .toString() : null;
 	}
-
-
-
-
-	
-	
 	
 }
