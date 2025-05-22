@@ -187,8 +187,8 @@ function connectOrderWebSocket() {
     });
 	console.log('현재 orderId:', orderId);
 	console.log('현재 userUuid:', userUuid);
-    if (userUuid) {
-      orderStompClient.subscribe('/topic/user/' + userUuid, message => {
+    if (userId) {
+      orderStompClient.subscribe('/topic/user/' + userId, message => {
         const payload = JSON.parse(message.body);
         if (payload.orderToOwner === 'CANCELED') {
           alert('⚠️ 가게에서 주문을 거부했습니다.');
