@@ -33,10 +33,7 @@
 		</div>
 	</div>
 	<div layout:fragment="js">
-		<script th:if="${errorMessage != null}" th:inline="javascript">
-			alert("[[${errorMessage}]]");
-		</script>
-		<script th:inline="javascript">
+		<script th:if="${errorMessage}" th:inline="javascript">
 			alert("[[${errorMessage}]]");
 		</script>
 		<script>

@@ -75,9 +75,7 @@ public class UserService {
 
 			String fileName = "default.png";
 			String extension = "png";
-//	        String filePath = uploadDir + File.separator + fileName;
 
-//	        String webPath = "/img/userProfiles/" + fileName;
 			String webPath = fileName;
 
 			if (profileImage != null && !profileImage.isEmpty()) {
@@ -93,8 +91,6 @@ public class UserService {
 
 				File saveFile = new File(saveFolder, fileName);
 				profileImage.transferTo(saveFile);
-//	            filePath = uploadDir + File.separator + fileName;
-//	            webPath = "/img/userProfiles/" + fileName;
 				webPath = fileName;
 			}
 
@@ -102,8 +98,6 @@ public class UserService {
 
 			User user = User.builder().userId(userId).userName(userName).nickName(nickname).email(email)
 					.password(encryptedPassword).userPhone(userPhone).userSelectedAddress(userSelectedAddress)
-//	                .userProfile(filePath)
-//	                .userProfile(fileName)
 					.userProfile(webPath).socialLoginProvider(socialLoginProvider).build();
 
 			userRepository.save(user);
