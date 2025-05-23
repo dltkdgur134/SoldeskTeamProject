@@ -172,8 +172,6 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
         order.setOrderToOwner(OrderToOwner.IN_DELIVERY); // 확인 필요!
-        order.setOrderToRider(OrderToRider.DISPATCHED);
-        order.setOrderToUser(OrderToUser.DELIVERING);
         Order savedOrder = orderRepository.save(order);
         messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
         return savedOrder;

@@ -23,6 +23,7 @@ import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.service.RiderService;
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -92,7 +93,7 @@ public class DeliveryController {
 	        orderStatusDto.setOrderId(orderId);
 	        orderStatusDto.setCurrentStatus(4); // "배달 중" 단계
 	        orderStatusDto.setTimestamp(LocalDateTime.now().toString());
-	        orderStatusDto.setOrderStatus("배달 중");
+	        orderStatusDto.setOrderToUser(OrderToUser.DELIVERING);
 
 	        messagingTemplate.convertAndSend("/topic/order/" + orderId.toString(), orderStatusDto);
 	    
@@ -137,7 +138,7 @@ public class DeliveryController {
         orderStatusDto.setOrderId(orderId);
         orderStatusDto.setCurrentStatus(5); // "배달 완료" 단계
         orderStatusDto.setTimestamp(LocalDateTime.now().toString());
-        orderStatusDto.setOrderStatus("배달 완료");
+        orderStatusDto.setOrderToUser(OrderToUser.COMPLETED);
 
         messagingTemplate.convertAndSend("/topic/order/" + orderId.toString(), orderStatusDto);
 	    return "redirect:/rider/home";

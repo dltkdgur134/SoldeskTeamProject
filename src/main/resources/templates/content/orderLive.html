@@ -29,14 +29,6 @@
   <div class="live-container">
     <!-- 왼쪽 메인 영역 -->
     <div class="main-panel">
-      <!-- 1) 진행 상태 차트 -->
-      <div class="status-chart text-center">
-      	<strong>주문 수락을 기다리고 있습니다.</strong> <br>
-      	<div class="spinner-border text-warning" role="status">
- 		 	<span class="visually-hidden">로딩중...</span>
-		</div>
-      </div>
-      
       <div class="status-chart" th:if="${order.currentStatus > 0}">
       	<div class="container-lg">
     		<div class="progress-container">
