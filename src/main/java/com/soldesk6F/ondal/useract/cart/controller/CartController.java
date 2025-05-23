@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.menu.entity.Menu;
@@ -28,14 +29,13 @@ import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.service.UserService;
-import com.soldesk6F.ondal.useract.cart.dto.CartAddRequestDto;
+import com.soldesk6F.ondal.useract.cart.dto.CartInitRequestDto;
 import com.soldesk6F.ondal.useract.cart.dto.CartItemOptionSaveDto;
 import com.soldesk6F.ondal.useract.cart.dto.CartOptionDto;
-import com.soldesk6F.ondal.useract.cart.dto.CartUpdateRequestDto;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
-import com.soldesk6F.ondal.useract.cart.repository.CartItemRepository;
+import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.service.CartItemService;
 import com.soldesk6F.ondal.useract.cart.service.CartService;
 
@@ -48,7 +48,7 @@ public class CartController {
 
 	private final CartService cartService;
 	private final CartItemService cartItemService;
-	private final CartItemRepository cartItemRepository;
+	private final CartItemsRepository cartItemsRepository;
 	private final UserService userService;
 	private final MenuService menuService;
 	private final StoreService storeService;
@@ -67,47 +67,6 @@ public class CartController {
 
 		return "content/cart";
 	}
-	
-	@PostMapping("/add")
-	@ResponseBody
-	public ResponseEntity<?> addToCart(@RequestBody CartAddRequestDto dto,
-	                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
-		User user = userService.findUserByUuid(userDetails.getUser().getUserUuid())
-			.orElseThrow(() -> new IllegalStateException("유저 없음"));
-
-		Menu menu = menuService.findById(dto.getMenuId()); // 예외처리 필요
-		Store store = storeService.findById(dto.getStoreId()); // 예외처리 필요
-
-		Cart cart = cartService.getCartByUserAndStore(user, store); // 자동 생성 포함
-
-		cartItemService.addItemToCart(cart, menu, store, dto.getQuantity(), dto.getOptions());
-		
-
-		return ResponseEntity.ok(Map.of("message", "장바구니에 담았습니다!"));
-	}
-	
-	@PostMapping("/api/cart/update-quantity")
-	@ResponseBody
-	public Map<String, Object> updateQuantity(@RequestBody CartUpdateRequestDto dto,
-			 								@AuthenticationPrincipal CustomUserDetails userDetails) {
-		User user = userService.findUserByUuid(userDetails.getUser().getUserUuid())
-			.orElseThrow(() -> new IllegalStateException("User not found"));
-
-		cartService.updateQuantity(dto.getCartItemUuid(), dto.getQuantity());
-		int itemTotal = cartService.getUpdatedTotal(dto.getCartItemUuid());
-		int cartTotal = cartService.getCartTotalPriceForUser(user);
-
-		return Map.of(
-			"totalPrice", itemTotal, "cartTotalPrice", cartTotal
-		);
-	}
-
-	@PostMapping("/api/cart/delete")
-	@ResponseBody
-	public void deleteItem(@RequestBody Map<String, String> body) {
-		UUID uuid = UUID.fromString(body.get("cartItemUuid"));
-		cartService.deleteItem(uuid);
-	}
 
 	@GetMapping("/api/cart/total-price")
 	@ResponseBody
@@ -122,7 +81,7 @@ public class CartController {
 	@GetMapping("/api/cart-item/options")
 	@ResponseBody
 	public List<CartOptionDto> getMenuOptions(@RequestParam("uuid") UUID cartItemUuid) {
-		CartItems cartItem = cartItemRepository.findById(cartItemUuid)
+		CartItems cartItem = cartItemsRepository.findById(cartItemUuid)
 			.orElseThrow(() -> new IllegalArgumentException("장바구니 항목 없음"));
 
 		Menu menu = cartItem.getMenu();
@@ -168,7 +127,7 @@ public class CartController {
 	@PostMapping("/api/cart-item/save-options")
 	@ResponseBody
 	public ResponseEntity<Map<String, String>> saveCartItemOptions(@RequestBody CartItemOptionSaveDto dto) {
-		CartItems cartItem = cartItemRepository.findById(dto.getCartItemUuid())
+		CartItems cartItem = cartItemsRepository.findById(dto.getCartItemUuid())
 			.orElseThrow(() -> new IllegalArgumentException("장바구니 항목을 찾을 수 없습니다."));
 
 		cartItemService.updateOptions(cartItem, dto.getOptions());
@@ -181,5 +140,25 @@ public class CartController {
 			.body(response);
 	}
 	
+	@PostMapping("/api/init")
+	@ResponseBody
+	public ResponseEntity<Map<String, String>> initCart(
+		@RequestBody CartInitRequestDto dto
+	) {
+		// 1. 사용자 조회
+		User user = userService.findUserByUuid(dto.getUserUUID())
+			.orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+
+		// 2. storeId는 items의 첫 항목에서 가져옴
+		if (dto.getItems().isEmpty()) throw new IllegalArgumentException("아이템 없음");
+
+		UUID storeId = dto.getItems().get(0).getStoreId();
+		Store store = storeService.findById(storeId);
+
+		// 3. 장바구니 생성
+		Cart cart = cartService.createCart(user, store, dto.getItems());
+
+		return ResponseEntity.ok(Map.of("cartId", cart.getCartId().toString()));
+	}
 	
 }

@@ -143,30 +143,48 @@ document.getElementById('clear-cart-btn')?.addEventListener('click', () => {
 
 function goToOrderPage() {
 	const cartData = getFromLocalStorage(); // localStorage에서 가져오기
-
 	if (!cartData || cartData.length === 0) {
 		alert("장바구니가 비어있습니다.");
 		return;
 	}
-
-	fetch('/api/order', {
-		method: 'POST',
+	
+	/*const userUUID = document.body.dataset.useruuid;*/
+	const userUUID = document.getElementById('user-uuid')?.value;
+	console.log("✅ userUUID:", userUUID);
+	
+	const validItems = cartData.items.map(item => ({
+		menuId: item.menuId,
+		storeId: item.storeId,
+		quantity: item.quantity,
+		options: (item.options || []).filter(opt => opt.selected).map(opt => ({
+			groupName: opt.groupName,
+			name: opt.name,
+			price: opt.price
+		}))
+	}));
+	
+	fetch("/cart/api/init", {
+		method: "POST",
 		headers: {
-			'Content-Type': 'application/json'
+			"Content-Type": "application/json"
 		},
-		body: JSON.stringify(cartData)
+		body: JSON.stringify({
+			userUUID,
+			items: validItems
+			/*items: getFromLocalStorage(userUUID).items*/
+		})
 	})
 	.then(res => {
-		if (!res.ok) throw new Error("서버 오류: 주문 실패");
+		if (!res.ok) throw new Error("서버 오류: 장바구니 초기화 실패");
 		return res.json();
 	})
-	.then(result => {
-		alert("주문이 성공적으로 접수되었습니다.");
-		clearCart(); // ✅ localStorage 초기화
-		window.location.href = "/mypage/orders"; // ✅ 주문 내역으로 이동
+	.then(data => {
+		localStorage.removeItem(`cart-${userUUID}`);				// 기존 cart 삭제
+		localStorage.setItem("pending-cart-id", data.cartId);		// 결제대기 cartId 저장
+		window.location.href = `/order/pay?cartId=${data.cartId}`;	// 결제페이지 이동
 	})
 	.catch(err => {
-		console.error("❌ 주문 실패:", err);
-		alert("주문 처리 중 오류가 발생했습니다.");
+		console.error("❌ 장바구니 저장 실패:", err);
+		alert("주문 처리 중 문제가 발생했습니다.");
 	});
 }

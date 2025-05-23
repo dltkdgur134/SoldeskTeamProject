@@ -1,17 +1,24 @@
 package com.soldesk6F.ondal.useract.cart.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soldesk6F.ondal.menu.entity.Menu;
+import com.soldesk6F.ondal.menu.service.MenuService;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.useract.cart.dto.CartAddRequestDto;
+import com.soldesk6F.ondal.useract.cart.dto.CartOptionDto;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
-import com.soldesk6F.ondal.useract.cart.repository.CartItemRepository;
+import com.soldesk6F.ondal.useract.cart.entity.CartStatus;
+import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,8 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CartService {
 	
+	private final MenuService menuService;
 	private final CartRepository cartRepository;
-	private final CartItemRepository cartItemRepository;
+	private final CartItemsRepository cartItemsRepository;
 	
 	public Cart getCartByUser(User user) {
 		Optional<Cart> existingCart = cartRepository.findByUser(user);
@@ -37,46 +45,8 @@ public class CartService {
 		return cartRepository.save(newCart);
 	}
 	
-	public Cart getCartByUserAndStore(User user, Store incomingStore) {
-		Optional<Cart> existingCartOpt = cartRepository.findByUser(user);
-
-		if (existingCartOpt.isPresent()) {
-			Cart existingCart = existingCartOpt.get();
-
-			// 🔥 다른 가게라면 장바구니 초기화
-			if (existingCart.getStore() != null && !existingCart.getStore().getStoreId().equals(incomingStore.getStoreId())) {
-				existingCart.getCartItems().clear(); // 연결된 아이템 삭제
-				existingCart.setStore(incomingStore);
-				return cartRepository.save(existingCart);
-			}
-
-			// 장바구니에 store 없던 경우
-			if (existingCart.getStore() == null) {
-				existingCart.setStore(incomingStore);
-				return cartRepository.save(existingCart);
-			}
-
-			return existingCart;
-		}
-
-		// 처음 생성
-		Cart newCart = Cart.builder()
-			.user(user)
-			.store(incomingStore)
-			.build();
-
-		return cartRepository.save(newCart);
-	}
-	
-	@Transactional
-	public void updateQuantity(UUID cartItemUuid, int quantity) {
-		CartItems item = cartItemRepository.findById(cartItemUuid)
-			.orElseThrow(() -> new IllegalArgumentException("CartItem not found"));
-		item.setQuantity(quantity);
-	}
-	
 	public int getUpdatedTotal(UUID cartItemUuid) {
-		CartItems item = cartItemRepository.findById(cartItemUuid)
+		CartItems item = cartItemsRepository.findById(cartItemUuid)
 			.orElseThrow(() -> new IllegalArgumentException("CartItem not found"));
 		
 		int menuPrice = item.getMenu().getPrice();
@@ -102,16 +72,43 @@ public class CartService {
 			.sum();
 	}
 	
-	@Transactional
-	public void deleteItem(UUID cartItemsId) {
-		if (!cartItemRepository.existsById(cartItemsId)) {
-			throw new IllegalArgumentException("해당 항목이 존재하지 않습니다: " + cartItemsId);
-		}cartItemRepository.deleteById(cartItemsId);
-	}
-	
 	public Cart findById(UUID cartId) {
 		return cartRepository.findById(cartId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 장바구니가 존재하지 않습니다: " + cartId));
+	}
+	
+	@Transactional
+	public Cart createCart(User user, Store store, List<CartAddRequestDto> itemsDto) {
+		// 기존 Cart가 있는지 확인
+		Optional<Cart> optionalCart = cartRepository.findByUserAndStore(user, store);
+
+		Cart cart = optionalCart.orElseGet(() -> {
+			return Cart.builder()
+				.user(user)
+				.store(store)
+				.status(CartStatus.PENDING)
+				.build();
+		});
+
+		// 기존 항목 삭제 (필요 시)
+		cart.getCartItems().clear(); // 이 줄이 중요함 (중복 방지)
+		cartItemsRepository.deleteAllByCart(cart); // DB에서도 삭제
+
+		// 새 항목 추가
+		for (CartAddRequestDto itemDto : itemsDto) {
+			Menu menu = menuService.findById(itemDto.getMenuId());
+			CartItems item = new CartItems(cart, menu, itemDto.getQuantity(), new ArrayList<>());
+
+			for (CartOptionDto opt : itemDto.getOptions()) {
+				if (!opt.isSelected()) continue;
+				CartItemOption option = new CartItemOption(
+					item, opt.getGroupName(), opt.getName(), opt.getPrice());
+				item.getCartItemOptions().add(option);
+			}
+			cart.getCartItems().add(item);
+		}
+
+		return cart;
 	}
 	
 }
