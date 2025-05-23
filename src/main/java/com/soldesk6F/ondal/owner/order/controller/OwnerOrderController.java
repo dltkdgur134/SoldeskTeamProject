@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.service.StoreService;
+import com.soldesk6F.ondal.user.dto.rider.OrderStatusDto;
 import com.soldesk6F.ondal.useract.order.dto.AcceptOrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.ExtendTimeRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
@@ -20,6 +22,7 @@ import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,7 @@ public class OwnerOrderController {
 
     private final OrderService orderService;
     private final StoreService storeService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/accept")
     public ResponseEntity<OrderResponseDto> acceptOrder(@RequestBody AcceptOrderRequestDto request, HttpSession session) {

@@ -48,6 +48,11 @@ function subscribeOrderChannels(orderId) {
     const update = JSON.parse(msg.body);
     console.log('[order-topic]', orderId, update);
     showOrderNotification(update);       // 토스트
+	if (typeof update.currentStatus === 'number') {
+	    if (typeof window.updateProgress === 'function') {
+	      window.updateProgress(update.currentStatus);
+	    }
+	  }
     //updateStatusChart?.(update.stage);   // 선택 UI
     //moveRiderMarker?.(update.location?.lat, update.location?.lng);
 	if (window.hasOwnProperty('updateCookingProgress') &&
@@ -57,6 +62,9 @@ function subscribeOrderChannels(orderId) {
 	 if (typeof window.startExpectedTimeCountdown === 'function') {
 	   window.startExpectedTimeCountdown(update.expectCookingTime, update.expectDeliveryTime);
 	 }
+	 
+	 
+	 
   });
 
   /* 채팅 메시지 */

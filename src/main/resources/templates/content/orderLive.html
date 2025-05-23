@@ -5,7 +5,9 @@
       layout:decorate="~{layouts/Layouts}">
 <head>
   <title>배송 진행 화면</title>
-
+<script>
+  const currentOrderId = /*[[${order.orderId}]]*/ 'fallback-order-id';
+</script>
   <!-- CSS -->
   <link th:href="@{/css/orderLive.css}" rel="stylesheet"/>
 	<link th:href="@{/css/custom.css}" rel="stylesheet"/>
@@ -29,7 +31,7 @@
     <!-- 왼쪽 메인 영역 -->
     <div class="main-panel">
       <!-- 1) 진행 상태 차트 -->
-      <div class="status-chart text-center" th:if="${order.currentStatus == 0}">
+      <div class="status-chart text-center">
       	<strong>주문 수락을 기다리고 있습니다.</strong> <br>
       	<div class="spinner-border text-warning" role="status">
  		 	<span class="visually-hidden">로딩중...</span>
@@ -45,19 +47,19 @@
         		
         		<div class="step-label" data-step="1" style="left: 0%;">주문 수락</div>
         		<div class="step" data-step="1" style="left: 0%;"></div>
-        		<div class="step-timestamp" data-step="1" style="left: 0%;" th:if="${order.timeline[0].timestamp != null}" th:text="${#temporals.format(order.timeline[0].timestamp, 'HH:mm')}"></div>
+        		<!-- <div class="step-timestamp" data-step="1" style="left: 0%;" th:if="${order.timeline[0].timestamp != null}" th:text="${#temporals.format(order.timeline[0].timestamp, 'HH:mm')}"></div> -->
         		
         		<div class="step-label" data-step="2" style="left: 33.33%;">조리 중</div>
         		<div class="step" data-step="2" style="left: 33.33%;"></div>
-        		<div class="step-timestamp" data-step="2" style="left: 33.33%;" th:if="${order.timeline[1].timestamp != null}" th:text="${#temporals.format(order.timeline[1].timestamp, 'HH:mm')}"></div>
+        		<!-- <div class="step-timestamp" data-step="2" style="left: 33.33%;" th:if="${order.timeline[1].timestamp != null}" th:text="${#temporals.format(order.timeline[1].timestamp, 'HH:mm')}"></div> -->
 
         		<div class="step-label" data-step="3" style="left: 66.66%;">배달 중</div>
         		<div class="step" data-step="3" style="left: 66.66%;"></div>
-        		<div class="step-timestamp" data-step="3" style="left: 66.66%;" th:if="${order.timeline[2].timestamp != null}" th:text="${#temporals.format(order.timeline[2].timestamp, 'HH:mm')}"></div>
+        		<!-- <div class="step-timestamp" data-step="3" style="left: 66.66%;" th:if="${order.timeline[2].timestamp != null}" th:text="${#temporals.format(order.timeline[2].timestamp, 'HH:mm')}"></div> -->
 
         		<div class="step-label" data-step="4" style="left: 100%;">배달 완료</div>
         		<div class="step" data-step="4" style="left: 100%;"></div>
-        		<div class="step-timestamp" data-step="4" style="left: 100%;" th:if="${order.timeline[3].timestamp != null}" th:text="${#temporals.format(order.timeline[3].timestamp, 'HH:mm')}"></div>
+        		<!-- <div class="step-timestamp" data-step="4" style="left: 100%;" th:if="${order.timeline[3].timestamp != null}" th:text="${#temporals.format(order.timeline[3].timestamp, 'HH:mm')}"></div> -->
 
     		</div>
     		<th:block>
@@ -290,7 +292,6 @@
 	//incrementProgress(); // 반복 시작	 
   </script>
   <script th:src="@{/js/orderLive.js}"></script>
-  
 </section>
 </body>
 </html>

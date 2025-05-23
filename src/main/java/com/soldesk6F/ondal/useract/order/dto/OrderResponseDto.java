@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class OrderResponseDto {
     private LocalDateTime cookingStartTime;
     private LocalTime expectCookingTime;
 
+    private OrderToUser orderToUser;
     private OrderToOwner orderToOwner;
     private OrderToRider orderToRider;
 
@@ -77,6 +79,7 @@ public class OrderResponseDto {
         return OrderResponseDto.builder()
         	.userUuid(order.getUser() != null ? order.getUser().getUserUuid() : null)
             .orderId(order.getOrderId())
+            .orderToUser(order.getOrderToUser())
             .orderToOwner(order.getOrderToOwner())
             .orderToRider(order.getOrderToRider())
             .deliveryAddress(order.getDeliveryAddress())

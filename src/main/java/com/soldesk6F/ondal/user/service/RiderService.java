@@ -218,7 +218,7 @@ public class RiderService {
 		return riderRepository.save(rider);
 	}
 
-	// OrderToRider 변경 및 배달료 riderWallet에 입금 (OrderToRider = COMPLETED)
+	// OrderToRider , OrderToUser 변경 및 배달료 riderWallet에 입금 (OrderToRider = COMPLETED)
 	@Transactional
 	public void completeOrderAndRewardRider(UUID orderId) {
 	    // 1. Order 정보 가져오기
@@ -249,6 +249,7 @@ public class RiderService {
 
 	    order.setRealDeliveryTime(realDeliveryTime);
 	    order.setOrderToRider(Order.OrderToRider.COMPLETED);
+	    order.setOrderToUser(Order.OrderToUser.COMPLETED);
 	    orderRepository.save(order);
 
 	    // 4. 배달료 및 수수료 계산
