@@ -126,11 +126,12 @@ public class UpdateUserController {
 	}
 
 	@PostMapping("/checkUserPasswordAndTryOndalPay")
-	public String checkUserPasswordAndGoPoint(
+	public String checkUserPasswordAndTryOndalPay(
 	        @RequestParam(value = "currentPassword", required = false) String Password,
 	        @RequestParam(value = "cartUUID") UUID cartUUID,
 	        @RequestParam(value = "reqDel") String reqDel,
 	        @RequestParam(value = "reqStore") String reqStore,
+	        @RequestParam(value = "totalPrice") int totalPrice,
 	        @AuthenticationPrincipal CustomUserDetails userDetails,
 	        RedirectAttributes redirectAttributes,
 	        Model model) {
@@ -138,7 +139,7 @@ public class UpdateUserController {
 	    boolean isCorrect = userService.checkPassword(userDetails, Password, redirectAttributes);
 
 	    if (isCorrect) {
-	        String Paystatus = paymentService.tryOndalPay(cartUUID, reqDel, reqStore);
+	        String Paystatus = paymentService.tryOndalPay(cartUUID, reqDel, reqStore,totalPrice);
 	        if (Paystatus != null) {
 	            String[] resultAndStatus = Paystatus.split(":@:");
 	            if (resultAndStatus.length == 3 && "성공".equals(resultAndStatus[2])) {

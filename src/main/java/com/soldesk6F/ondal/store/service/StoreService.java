@@ -51,7 +51,7 @@ public class StoreService {
 		log.info("가게 이름: {}", dto.getStoreName());
 		log.info("전화번호: {}", dto.getStorePhone());
 		log.info("첨부파일: {}", dto.getBrandImg() != null ? dto.getBrandImg().getOriginalFilename() : "null");
-
+		log.info("배달료 : {}",dto.getDeliveryFee());
 		UUID userUuid = user.getUserUuid();
 		Owner owner = ownerRepository.findByUser_UserUuid(userUuid)
 				.orElseThrow(() -> new IllegalStateException("해당 아이디로 등록된 점주 정보가 없습니다."));
@@ -90,7 +90,7 @@ public class StoreService {
 				.category(dto.getCategory()).storePhone(dto.getStorePhone()).storeAddress(dto.getStoreAddress())
 				.storeLatitude(dto.getLatitude()).storeLongitude(dto.getLongitude()).storeLocation(location)
 				.storeStatus(Store.StoreStatus.PENDING_APPROVAL).brandImg(brandImgPath)
-				.foodOrigin("").build();
+				.foodOrigin("").deliveryFee(dto.getDeliveryFee()).build();
 
 		storeRepository.save(store);
 	}
@@ -150,7 +150,7 @@ public class StoreService {
 	public void updateStoreInfo(UUID storeId, String loginUserId, String storeName, String storePhone,
 			String storeAddress, String category, String storeStatus, String storeIntroduce, LocalTime openingTime,
 			LocalTime closingTime, String holiday, Store.DeliveryRange deliveryRange, String storeEvent,
-			String foodOrigin, Double latitude, Double longitude) {
+			String foodOrigin, Double latitude, Double longitude,int deliveryFee) {
 
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
@@ -173,6 +173,7 @@ public class StoreService {
 		store.setFoodOrigin(foodOrigin);
 		store.setStoreLatitude(latitude);
 		store.setStoreLongitude(longitude);
+		store.setDeliveryFee(deliveryFee);
 
 		storeRepository.save(store);
 	}

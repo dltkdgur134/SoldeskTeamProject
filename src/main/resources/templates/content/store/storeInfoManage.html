@@ -15,7 +15,7 @@
 <body th:data-store-id="${store.storeId}">
 	<div layout:fragment="content">
 		<header class="menu-header">
-			<img th:src="${store.brandImg != null} ? @{${store.brandImg}} : @{/img/default-store.png}" class="store-image" alt="가게 이미지" />
+			<img th:src="${store.brandImg != null} ? @{${store.brandImg}} : @{/img/store/default.png}" class="store-image" alt="가게 이미지" />
 			<h2 th:text="${store.storeName} + ' 점포 설정'">가게 정보 관리</h2>
 		</header>
 		
@@ -138,6 +138,12 @@
 						<label>식자재 원산지 표기</label>
 						<textarea name="foodOrigin" rows="3" placeholder="식자재 원산지를 입력하세요." th:text="${store.foodOrigin}"></textarea>
 					</div>
+					<div class="form-group">
+						<label>배달료</label>
+						<input type="text" name="deliveryFee" th:value="${store.deliveryFee}" required />
+					</div>
+					
+					
 					<button type="submit" class="save-btn">정보 저장</button>
 				</form>
 			</section>
