@@ -48,6 +48,7 @@ import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
@@ -258,6 +259,7 @@ public class PaymentService {
 								.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
+								.orderToUser(OrderToUser.PENDING)
 								.orderToOwner(OrderToOwner.PENDING).build();
 			    	payment.setOrder(order);
 					for (OrderDetail od : order.getOrderDetails()) {

@@ -32,7 +32,7 @@ public class OrderResponseDto {
     private OrderToUser orderToUser;
     private OrderToOwner orderToOwner;
     private OrderToRider orderToRider;
-
+    
     private List<OrderDetailDto> orderDetails;
 
     // ✅ 추가 필드 (프론트에서 팝업 요약용)
@@ -82,6 +82,7 @@ public class OrderResponseDto {
             .orderToUser(order.getOrderToUser())
             .orderToOwner(order.getOrderToOwner())
             .orderToRider(order.getOrderToRider())
+            .orderToUser(order.getOrderToUser())
             .deliveryAddress(order.getDeliveryAddress())
             .storeRequest(order.getStoreRequest())
             .deliveryRequest(order.getDeliveryRequest())

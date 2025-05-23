@@ -9,7 +9,7 @@ console.log('Order ID:', orderId);
 /**---------------------------------------------------
  * 1) WebSocket 연결 & 채팅/상태 업데이트 구독
  *--------------------------------------------------*/
-function connectChat() {
+/*function connectChat() {
   const socket = new SockJS('/stomp');
   stompClient = Stomp.over(socket);
   stompClient.connect({}, frame => {
@@ -27,7 +27,7 @@ function connectChat() {
   }, error => {
     console.error('WebSocket 연결 실패:', error);
   });
-}
+}*/
 
 /**---------------------------------------------------
  * 2) 채팅 수신 핸들러
@@ -38,7 +38,7 @@ function onChatMessage(message) {
     console.log('Raw message.body:', message.body);
     const data = JSON.parse(message.body);
     console.log('Parsed data:', data);
-    const { senderName, text, timestamp } = data;
+    const { senderName, senderType, text, timestamp } = data;
   const container = document.getElementById('chatMessages');
   if (!container) {
       console.error("chatMessages element not found!");
@@ -48,6 +48,7 @@ function onChatMessage(message) {
   el.className = 'chat-message';
   el.innerHTML = `
     <strong class="sender">${senderName}:</strong>
+	<strong class="sender-type>${senderType}</strong>
     <span class="text">${text}</span>
     <div class="timestamp text-muted small">
       ${new Date(timestamp).toLocaleTimeString()}
@@ -62,6 +63,7 @@ function onChatMessage(message) {
  *--------------------------------------------------*/
 function sendChat() {
   const input = document.getElementById('chatInput');
+  let orderId = document.getElementById('orderIdInput').value;
   const text = input.value.trim();
   if (!text || !stompClient) return;
 
@@ -106,7 +108,7 @@ $('.chat-button').click(function () {
  * 4) 페이지 로드 시 초기화
  *--------------------------------------------------*/
 window.addEventListener('load', () => {
-	connectOrderWebSocket();
+	//connectOrderWebSocket();
 
 	  const sendBtn = document.getElementById('sendChatBtn');
 	  const chatInput = document.getElementById('chatInput');
@@ -140,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		const chatInput = document.getElementById('chatInput');
 		console.log("📦 chatInput 존재 여부:", chatInput);
 		
-		connectChat();
+		//connectChat();
 	  	console.log("js테스트 : " ,orderId);
 
 	  // 전송 버튼 & 엔터키 바인딩
@@ -181,6 +183,7 @@ function connectOrderWebSocket() {
     orderStompClient.subscribe('/topic/order/' + orderId, message => {
 	  console.log('주문 상태 메시지 도착:', message);
       const payload = JSON.parse(message.body);
+	  alert(payload.stage);
       //updateStatusChart(payload.stage);
       updateCookingProgress(payload.stage);
       startExpectedTimeCountdown(payload.expectCookingTime, payload.expectDeliveryTime);
@@ -191,8 +194,8 @@ function connectOrderWebSocket() {
       orderStompClient.subscribe('/topic/user/' + userId, message => {
         const payload = JSON.parse(message.body);
         if (payload.orderToOwner === 'CANCELED') {
-          updateCookingProgress('REJECTED');
-        }
+          window.location.href = "/orderHistory";
+        } 
       });
     }
   }, error => {
@@ -224,22 +227,19 @@ function updateCookingProgress(stage) {
 
   switch (stage) {
     case 'PENDING':
-      setProgress(bar, 0, '접수 대기', 'bg-secondary');
-      break;
-    case 'COOKING':
-      setProgress(bar, 50, '조리중', 'bg-info');
-	  
-      break;
-    
-    case 'IN_DELIVERY':
-      setProgress(bar, 90, '배달중', 'bg-warning');
-	  
-      break;
-    case 'DELIVERED':
+		break;
+	case 'CONFIRMED':
+	  	updateProgress(1);
+      	break;
     case 'COMPLETED':
-      setProgress(bar, 100, '배달완료', 'bg-primary');
-	  
-      break;
+		updateProgress(2);
+      	break;
+    case 'IN_DELIVERY':
+		updateProgress(3);
+		break;
+    case 'COMPLETED':
+		updateProgress(4);
+      	break;
 	case 'REJECTED': 
 	  setProgress(bar, 100, '주문 거부됨', 'bg-danger'); 
 	  alert('해당 주문은 가게에서 거부되었습니다.');
@@ -390,4 +390,72 @@ function updateExpectedTimeUI() {
 
 
 
+function updateProgress(step) {
+		const progressBar = document.getElementById('progressBar');
+		const steps = document.querySelectorAll('.step');
+		const labels = document.querySelectorAll('.step-label');
 
+		// 상태바 넓이 계산
+		const progressPercent = ((step - 1) / (steps.length - 1)) * 100;
+		progressBar.style.width = `${progressPercent}%`;
+
+		// 현재 단계 및 레이블 스타일링
+		steps.forEach(el => {
+		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
+		     if (currentStep <= step) {
+		         el.classList.add('active');
+		     } else {
+		         el.classList.remove('active');
+		     }
+		 });
+
+		 labels.forEach(el => {
+		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
+		     if (currentStep <= step) {
+		         el.classList.add('active');
+		     } else {
+		         el.classList.remove('active');
+		     }
+		 });
+		 if (step == 5) {
+			window.location.href = "/orderHistory"
+		}
+	} 
+	
+	function incrementProgress() {
+		 	  if (count < 5) { // 4단계 까지만
+		 	    updateProgress(count);
+		 	    document.getElementById('slider-step').value = count;
+		 	    count++;
+		 	    setTimeout(incrementProgress, 5000); // 5초마다 호출
+		 	  }
+		 }
+		// 처음 화면 진입 시 단계는 1로 고정
+		let count = document.getElementById('slider-step').value;
+		//let status = document.getElementById('stepSlider').value;
+		updateProgress(count);
+				 	 
+		//incrementProgress();
+		
+		const targetNode = document.getElementById("chatMessages");
+
+		const config = { attributes: true, childList: true, subtree: true };
+		const callback = (mutationList, observer) => {
+			  for (const mutation of mutationList) {
+			    if (mutation.type === "childList") {
+			    	const msg = document.getElementById("chatMessages").innerText;
+			      //alert("자식 노드가 추가되거나 제거됐습니다.");
+			      //alert(msg);
+			      //updateProgress(2);
+			      console.log(msg);
+			    } else if (mutation.type === "attributes") {
+			      alert(`${mutation.attributeName} 특성이 변경됐습니다.`);
+			    }
+			  }
+			};
+		const observer = new MutationObserver(callback);
+		observer.observe(targetNode, config);
+		
+		
+		//observer.disconnect();
+		//incrementProgress(); // 반복 시작	 

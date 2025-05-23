@@ -34,6 +34,7 @@ import com.soldesk6F.ondal.useract.order.dto.TestOrderRequestDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.entity.Payment;
@@ -95,6 +96,7 @@ public class OrderService {
                 .orderAdditional1(requestDto.getOrderAdditional1())
                 .orderAdditional2(requestDto.getOrderAdditional2())
                 .orderToOwner(OrderToOwner.PENDING)
+                .orderToUser(OrderToUser.PENDING)
                 .build();
 
         if (requestDto.getOrderDetails() != null) {
@@ -116,6 +118,7 @@ public class OrderService {
 
         order.setOrderToOwner(OrderToOwner.CONFIRMED);
         order.setOrderToRider(OrderToRider.CONFIRMED);
+        order.setOrderToUser(OrderToUser.COOKING);
         order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
         order.setCookingStartTime(LocalDateTime.now());
         Order savedOrder = orderRepository.save(order);
@@ -130,6 +133,7 @@ public class OrderService {
 
         // 주문 상태 변경
         order.setOrderToOwner(Order.OrderToOwner.CANCELED);
+        order.setOrderToUser(OrderToUser.CANCELED);
 
         Payment payment = paymentRepository.findByOrder_OrderId(orderId)
         	    .orElseThrow(() -> new IllegalStateException("주문에 결제 정보가 없습니다."));
@@ -161,15 +165,18 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
-
+    
     // 조리 완료
     @Transactional
     public Order completeOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
-
-        order.setOrderToOwner(OrderToOwner.IN_DELIVERY);
-        return orderRepository.save(order);
+        order.setOrderToOwner(OrderToOwner.IN_DELIVERY); // 확인 필요!
+        order.setOrderToRider(OrderToRider.DISPATCHED);
+        order.setOrderToUser(OrderToUser.DELIVERING);
+        Order savedOrder = orderRepository.save(order);
+        messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
+        return savedOrder;
     }
 
     // 시간 추가 (임시: 별도 필드 없으므로 로그만 출력)
@@ -184,11 +191,12 @@ public class OrderService {
     }
     
     @Transactional
-    public Order updateOrderStatus(UUID orderId, OrderToOwner orderToOwner) {
+    public Order updateOrderStatus(UUID orderId, OrderToOwner orderToOwner, OrderToUser orderToUser) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
 
         order.setOrderToOwner(orderToOwner);
+        order.setOrderToUser(orderToUser);
         Order savedOrder = orderRepository.save(order);
 
         OrderResponseDto orderDto = convertToDto(savedOrder);
@@ -234,16 +242,6 @@ public class OrderService {
         // 2) 실제로 주문만 조회
         return orderRepository.findByStore_StoreId(storeId);
     }
-    
-//    @Transactional(readOnly = true)
-//    public List<OrderHistoryDto> getOrderHistoryByUser(String userId) {
-//        var user = userRepository.findByUserId(userId)
-//            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자: " + userId));
-//        var orders = orderRepository.findByUser(user);
-//        return orders.stream()
-//                     .map(this::toHistoryDto)
-//                     .collect(Collectors.toList());
-//    }
     
     @Transactional(readOnly = true)
     public List<OrderHistoryDto> getOrderHistoryByUser(String userId) {
@@ -330,15 +328,6 @@ public class OrderService {
         return order.getOrderToRider();
     }
 
-//    @Transactional(readOnly = true)
-//    public OrderHistoryDto getOrderHistoryDto(String orderId) {
-//    	UUID uuid = UUID.fromString(orderId);
-//        Order order = orderRepository.findById(uuid)
-//            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId"));
-//        // 간단히 toDto 매퍼 호출
-//        return OrderHistoryDto.from(order);
-//    }
-    
     @Transactional(readOnly = true)
     public OrderInfoDetailDto getOrderInfoDetailDto(String orderId) {
     	UUID OrderUuid = UUID.fromString(orderId);
@@ -401,8 +390,6 @@ public class OrderService {
     			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 orderId : " + orderId));
     	Store store = order.getStore();
     	
-    	
-    	
     	OrderLiveDto dto = new OrderLiveDto();
     	dto.setOrderId(orderId);
     	dto.setStoreId(store.getStoreId());
@@ -448,6 +435,7 @@ public class OrderService {
 		
 		dto.setDeliveryStatus(order.getOrderToRider());
 		dto.setCookingStatus(order.getOrderToOwner());
+		dto.setOrderStatus(order.getOrderToUser());
     	
     	ArrayList<StatusTimeline> timeline = new ArrayList<StatusTimeline>();
     	
@@ -486,8 +474,8 @@ public class OrderService {
     	//dto.setExpectDeliveryTime(expectedTime);
     	
         dto.setTimeline(timeline);
-    	
-        dto.setCurrentStatus(getCurrentStatus(order.getOrderToOwner(), order.getOrderToRider()));
+    	int status = getCurrentStatus(order.getOrderToUser());
+        dto.setCurrentStatus(status);
    
         
     	dto.setLat(store.getStoreLatitude());   // 또는 store.getHubAddressLatitude()
@@ -497,26 +485,24 @@ public class OrderService {
     	return dto;
     }
     
-    // 현재 진행 상태를 숫자로 반환 (단순 표기용) 
-    private int getCurrentStatus(OrderToOwner oto, OrderToRider otr) {
-    	if (oto == OrderToOwner.CONFIRMED) {
-    		return 1;
-    	} else if (oto == OrderToOwner.COMPLETED) {
-    		return 2;
-    	}
-    	
-    	if (oto == OrderToOwner.IN_DELIVERY && otr == OrderToRider.ON_DELIVERY) {
-    		return 3;
-    	} 
-    	
-    	if (otr == OrderToRider.COMPLETED) {
-    		return 4;
-    	}
-    	
-    	return 0;
+    private int getCurrentStatus(OrderToUser otu) {
+    	switch (otu) {
+		case PENDING:
+			return 1;
+		case CONFIRMED:
+			return 2;
+		case COOKING:
+			return 3;
+		case DELIVERING:
+			return 4;
+		case COMPLETED:
+			return 5;
+		case CANCELED:
+			return 0;
+		default:
+			return 0;
+		}
     }
-    
-    
     
 //    @Transactional(readOnly = true)
 //    public OrderLiveDto getOrderLiveDto(String orderId) {

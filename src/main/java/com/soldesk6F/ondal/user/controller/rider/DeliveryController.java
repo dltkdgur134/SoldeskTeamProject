@@ -90,7 +90,7 @@ public class DeliveryController {
 	        messagingTemplate.convertAndSend("/topic/chat/" + orderId.toString(), message);
 	        OrderStatusDto orderStatusDto = new OrderStatusDto();
 	        orderStatusDto.setOrderId(orderId);
-	        orderStatusDto.setCurrentStatus(3); // "배달 중" 단계
+	        orderStatusDto.setCurrentStatus(4); // "배달 중" 단계
 	        orderStatusDto.setTimestamp(LocalDateTime.now().toString());
 	        orderStatusDto.setOrderStatus("배달 중");
 
@@ -135,7 +135,7 @@ public class DeliveryController {
 	    messagingTemplate.convertAndSend("/topic/chat/" + orderId.toString(), message);
 	    OrderStatusDto orderStatusDto = new OrderStatusDto();
         orderStatusDto.setOrderId(orderId);
-        orderStatusDto.setCurrentStatus(4); // "배달 완료" 단계
+        orderStatusDto.setCurrentStatus(5); // "배달 완료" 단계
         orderStatusDto.setTimestamp(LocalDateTime.now().toString());
         orderStatusDto.setOrderStatus("배달 완료");
 

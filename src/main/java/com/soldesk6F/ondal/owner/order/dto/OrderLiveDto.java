@@ -43,6 +43,6 @@ public class OrderLiveDto {
     private LocalTime expectCookingTime; 
     private LocalTime expectDeliveryTime;
     private int currentStatus;
-    private OrderToUser orderToUser;
+    private OrderToUser orderStatus;
     // + getters / setters
 }

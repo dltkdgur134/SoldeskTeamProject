@@ -62,8 +62,22 @@ function subscribeOrderChannels(orderId) {
 	 if (typeof window.startExpectedTimeCountdown === 'function') {
 	   window.startExpectedTimeCountdown(update.expectCookingTime, update.expectDeliveryTime);
 	 }
-	 
-	 
+	 //alert(update.orderToUser);
+	 /*if(update.orderToUser === 'CONFIRMED') {
+		updateProgress(2);
+	 }*/
+	 switch(update.orderToUser) {
+		case 'CONFIRMED':
+			updateProgress(2);
+			break;
+		case 'COOKING':
+			updateProgress(3);
+			break;
+		case 'CANCELED':
+			window.location.href="/orderHistory";
+		default:
+			break;
+	 }
 	 
   });
 
@@ -76,7 +90,8 @@ function subscribeOrderChannels(orderId) {
 
 /* ────────── 알림 토스트 & 채팅창 시스템 메시지 ────────── */
 function showOrderNotification(dto) {
-  const status = dto.orderToOwner || dto.orderStatus || 'UNKNOWN';
+  //const status = dto.orderToOwner || dto.orderStatus || 'UNKNOWN';
+  const status = dto.orderToUser || 'UNKNOWN';
   showToast(`📦 주문 #${dto.orderId} 상태: "${status}"`);
 
   // (선택) 시스템 메시지를 채팅창에도 넣기
@@ -96,7 +111,7 @@ function showChatMessage(chat) {
   const el = document.createElement('div');
   el.className = 'chat-message';
   el.innerHTML =
-    `<strong>${chat.senderName}:</strong> ${chat.text}
+    `<strong>${chat.senderType}:</strong> ${chat.text}
      <div class="timestamp small text-muted">
        ${new Date(chat.timestamp).toLocaleTimeString()}
      </div>`;
@@ -131,7 +146,7 @@ function sendChat() {
   if (!input.value.trim() || !stompClient) return;
   const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
   stompClient.send(`/app/chat/${orderId}`, {}, JSON.stringify({
-    orderId, senderName: userId, text: input.value.trim(),
+    orderId, senderType:'손님', senderName: userId, text: input.value.trim(),
     timestamp: new Date().toISOString()
   }));
   input.value = '';
