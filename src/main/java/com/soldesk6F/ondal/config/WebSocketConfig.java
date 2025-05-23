@@ -25,7 +25,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // /stomp 라는 엔드포인트로 WebSocket 또는 SockJS 연결
         registry.addEndpoint("/stomp")
         .setAllowedOriginPatterns("*")
-        .addInterceptors(new HttpSessionHandshakeInterceptor())
+        .setHandshakeHandler(new CustomHandshakeHandler())
+        .addInterceptors(new HttpSessionHandshakeInterceptor(), new AuthHandshakeInterceptor())
         .withSockJS();
     }
 

@@ -216,7 +216,7 @@ document.addEventListener("click", async (e) => {
 			const order = await orderResponse.json();
 			/*aa8f8d7334d919ea0276dfc23dd37cc5*/
 			/*6a82e6474b08332bbf4be73f53d5c0bb*/
-			const REST_API_KEY = 'aa8f8d7334d919ea0276dfc23dd37cc5	';
+			const REST_API_KEY = 'aa8f8d7334d919ea0276dfc23dd37cc5';
 			const url = 'https://apis-navi.kakaomobility.com/v1/directions';
 
 
@@ -333,7 +333,7 @@ document.addEventListener("click", async (e) => {
 			</style>
 			/*e5d3b43b5ba403cc978d5770a28e29af*/
 			/*a82eb7e13124954eb1c020ac4cece497*/
-            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
+            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a82eb7e13124954eb1c020ac4cece497"></script>
           </head>
           <body>
             <div id="map"></div>

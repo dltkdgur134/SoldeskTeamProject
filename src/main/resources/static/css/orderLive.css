@@ -4,6 +4,7 @@
 .live-container {
 	display: flex;
 	height: calc(100vh - 300px); /* header 높이만큼 빼주세요 */
+	margin-bottom: 300px;
 }
 
 /* 왼쪽 메인 패널 */
@@ -134,4 +135,18 @@
 	font-weight: normal;
 	color: gray;
 	white-space: nowrap;
+}
+
+.rounded-circle {
+	height: 50px;
+	width: 50px;
+}
+
+.store-name {
+	font-size: 1.5em;
+}
+
+.icon-link {
+	text-decoration: none;
+	color: black;
 }

@@ -229,10 +229,6 @@ function createOrderListItem(order) {
         startCountdown(timerContainer[0], order.cookingStartTime, order.expectCookingTime);
     }
 
-    else if (status === 'IN_DELIVERY') {
-        const startBtn = $('<button>').addClass('startDeliveryBtn').data('orderid', order.orderId).text('배달시작');
-        buttonWrap.append(startBtn);
-    }
 
     li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
         .append(orderText, buttonWrap);
@@ -323,17 +319,24 @@ function startTimer(elemId, minutes) {
 
     updateCircle();
 }
-
+let currentChatSubscription = null;
 // 특정 주문 상세 불러오기
 function loadOrderDetail(orderId) {
     console.log('▶▶▶ loadOrderDetail 시작:', orderId);
     currentOrderId = orderId;
     $('#chatMessages').empty();
 
+	if (currentChatSubscription) {
+		currentChatSubscription.unsubscribe();
+		console.log('✖ 이전 구독 해제됨');
+	}
+	
     // — 기존에 있던 채팅 재구독 로직
     if (stompClient) {
         // (선택) 이전 구독 토픽 해제 로직이 필요하면 여기서 처리
-        stompClient.subscribe('/user/queue/chat', onChatMessage);
+        //stompClient.subscribe('/user/queue/chat', onChatMessage);
+		//stompClient.subscribe('/topic/chat/' + orderId, onChatMessage);
+		currentChatSubscription = stompClient.subscribe('/topic/chat/' + orderId, onChatMessage);
     }
 
     // — AJAX 로 상세 정보 가져오기
@@ -431,9 +434,18 @@ function updateOrderStatus(orderId, url) {
                showNewOrderPopup(orderData);
            });
            if (currentOrderId) {
+<<<<<<< HEAD
 		   		stompClient.subscribe('/user/queue/chat', onChatMessage);
 				alert('오더아이디 어디선가');
 		   		stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+=======
+				alert('오더아이디 어디선가');
+		   		//stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+				stompClient.subscribe('/topic/chat/' + currentOrderId, message => {
+					console.log('채팅 메시지 도착:', message);
+					onChatMessage(message);
+				})
+>>>>>>> bbc7eb4f7a5eb57cc485b05fd933bb852133cfdc
 		   }
        });
    }
@@ -442,26 +454,43 @@ function updateOrderStatus(orderId, url) {
 	  console.log('🥡 onChatMessage 호출됨:', message);
 	  const payload = JSON.parse(message.body);
 	  console.log('🥡 메시지 페이로드:', payload);
-	  const { sender, text, timestamp } = payload;
-	  const $msg = $(`
+	  const { senderName, senderType, text, timestamp } = payload;
+	  /*const $msg = $(`
 	    <div class="chat-message">
-	      <span class="sender">${sender}:</span>
+	      <span class="sender">${senderName}:</span>
 	      <span class="text">${text}</span>
 	      <div class="timestamp text-muted small">${new Date(timestamp).toLocaleTimeString()}</div>
 	    </div>
 	  `);
 	  $('#chatMessages').append($msg);
-	  $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);
+	  $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);*/
+	  const container = document.getElementById('chatMessages');
+	    if (!container) {
+	        console.error("chatMessages element not found!");
+	        return;
+	    }
+	    const el = document.createElement('div');
+	    el.className = 'chat-message';
+	    el.innerHTML = `
+	      <strong class="sender">${senderType}:</strong>
+	      <span class="text">${text}</span>
+	      <div class="timestamp text-muted small">
+	        ${new Date(timestamp).toLocaleTimeString()}
+	      </div>
+	    `;
+	    container.append(el);
+	    container.scrollTop = container.scrollHeight;
 	}
 	
-	// 채팅 보내기
+	//  보내기
 	function sendChat() {
 	  const text = $('#chatInput').val().trim();
 	  if (!text || !currentOrderId) return;
 	  const payload = {
 	    storeId,
 	    orderId: currentOrderId,
-	    sender: '사장님',
+	    senderName: '사장님',
+		senderType: '사장님',
 	    text,
 	    timestamp: new Date().toISOString()
 	  };
@@ -554,7 +583,18 @@ function updateOrderStatus(orderId, url) {
        });
    }
    
+   
+   
+   
    function removeOrderFromList(orderId) {
+       $('#deliveringOrderList li').each(function () {
+           const currentId = $(this).data('orderid');
+           if (currentId === orderId) {
+               $(this).remove();
+           }
+       });
+   }
+   function removeDeliveringOrderList(orderId) {
        $('#newOrderList li, #processingOrderList li').each(function () {
            const currentId = $(this).data('orderid');
            if (currentId === orderId) {
