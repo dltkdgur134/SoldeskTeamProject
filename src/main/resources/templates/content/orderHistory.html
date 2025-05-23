@@ -38,7 +38,8 @@
 		    <small class="order-date" th:text="${#temporals.format(order.orderDate, 'MM월 dd일 HH:mm')}"
 		    th:if="${#temporals.year(order.orderDate) == #dates.year(#dates.createNow())}"></small>
 		    <small class="order-date"></small>
-		    <span class="status" th:text="${order.orderStatus}">배달중</span>
+		    <!-- <span class="status" th:text="${order.orderStatus}">배달중</span> -->
+		    <span class="status" th:text="${order.orderToUser}"></span>
         </div>
         <div class="row">
 	        <div class="img-container col-md-auto ms-4">
@@ -75,17 +76,17 @@
         </div>
       </div>
       <!-- 하단: 상세 정보 보기 버튼 -->
-      <div class="container d-flex justify-content-center mb-4" th:unless="${#strings.equals(order.orderStatus, 'CANCELED')}">
+      <div class="container d-flex justify-content-center mb-4" th:unless="${#strings.equals(order.orderToUser, 'CANCELED')}">
         <a th:href="@{'/user/order/' + ${order.orderId}}"
-           class="btn btn-outline-primary go-order-details-btn" th:if="${#strings.equals(order.orderStatus, 'COMPLETED')}">
+           class="btn btn-outline-primary go-order-details-btn" th:if="${#strings.equals(order.orderToUser, 'COMPLETED')}">
           상세 정보 보기
         </a>
          <a th:href="@{'/user/order/' + ${order.orderId}}"
-           class="btn btn-outline-primary go-order-details-btn" th:unless="${#strings.equals(order.orderStatus, 'COMPLETED')}">
+           class="btn btn-outline-primary go-order-details-btn" th:unless="${#strings.equals(order.orderToUser, 'COMPLETED')}">
           실시간 주문 현황
         </a>
        </div>
-       <div class="container d-flex justify-content-center mb-4" th:if="${#strings.equals(order.orderStatus, 'CANCELED')}">
+       <div class="container d-flex justify-content-center mb-4" th:if="${#strings.equals(order.orderToUser, 'CANCELED')}">
        		<strong class="order-canceled">주문 취소됨</strong>
        </div>
         <!-- <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
@@ -93,7 +94,7 @@
         <div class="container d-flex justify-content-center mb-4">
         <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
         	class="btn btn-outline-secondary position-relative write-review-btn"
-        	th:if="${#strings.equals(order.orderStatus, 'COMPLETED') && order.daysLeftForReview > 0}">
+        	th:if="${#strings.equals(order.orderToUser, 'COMPLETED') && order.daysLeftForReview > 0}">
         	리뷰 작성
         	 <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-dark days-left">
     			<strong th:text="${'D-' + order.daysLeftForReview}"></strong>

@@ -59,6 +59,7 @@ public class OrderService {
 	    private final SimpMessagingTemplate messagingTemplate;
 	    private final RegAddressRepository regAddressRepository;
 	    private final DateFunctions dateFunctions;
+	    
 
 	    private final PaymentService paymentService;  // 이걸 @Lazy 처리 필요
 
@@ -115,7 +116,23 @@ public class OrderService {
     public Order acceptOrder(UUID orderId, int completionTime) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문 없음"));
-
+        
+        Store store = order.getStore(); 
+        
+        if (order.getOrderTime().getDayOfMonth() == LocalDateTime.now().getDayOfMonth()) {
+        	if (store.getOrderCount() == 0) {
+            	store.setOrderCount(1);
+            	order.setOrderNumber(1);
+            } else {
+            	int currentOrderCount = store.getOrderCount() + 1;
+            	store.setOrderCount(currentOrderCount);
+            	order.setOrderNumber(currentOrderCount);
+            }
+        } else {
+        	store.setOrderCount(1);
+        	order.setOrderNumber(1);
+        }
+        
         order.setOrderToOwner(OrderToOwner.CONFIRMED);
         order.setOrderToRider(OrderToRider.CONFIRMED);
         order.setOrderToUser(OrderToUser.COOKING);
@@ -278,15 +295,11 @@ public class OrderService {
         	dto.setOrderStatus("CANCELED");
         } 
         
-        //dto.setOrderStatus(order.getOrderToOwner().name());
-        //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
-        //dto.setOrderDate(order.getOrderTime().toString());
+        dto.setOrderToUser(order.getOrderToUser());
+        
+        
         dto.setOrderDate(order.getOrderTime());
         dto.setTotalPrice(order.getTotalPrice());
-//        var menuNames = order.getOrderDetails().stream()
-//                             .map(d -> d.getMenu().getMenuName())
-//                             .collect(Collectors.toList());
-//        dto.setMenuItems(menuNames);
         var menuItems = new HashMap<String, Integer>();
         for (int i = 0; i < order.getOrderDetails().size(); i++) {
         	menuItems.put(order.getOrderDetails().get(i).getMenu().getMenuName(), 
@@ -501,35 +514,6 @@ public class OrderService {
 			return 0;
 		}
     }
-    
-//    @Transactional(readOnly = true)
-//    public OrderLiveDto getOrderLiveDto(String orderId) {
-//        UUID uuid = UUID.fromString(orderId);
-//        var order = orderRepository.findById(uuid)
-//            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId: " + orderId));
-//
-//        var dto = new OrderLiveDto();
-//        dto.setOrderId(order.getOrderId().toString());
-//        dto.setOrderStatus(order.getOrderToRider());
-//        // 추가
-//        dto.setExpectCookingTime(order.getExpectCookingTime());
-//
-//        var timeline = new ArrayList<StatusTimeline>();
-//        // 시간 필드들이 있다고 가정
-//        timeline.add(new StatusTimeline("PENDING",             order.getOrderTime()));
-//        timeline.add(new StatusTimeline("CONFIRMED",           order.getCookingStartTime()));
-//        timeline.add(new StatusTimeline("COOKING_COMPLETED",   order.getCookingEndTime()));
-//        timeline.add(new StatusTimeline("IN_DELIVERY",         order.getDeliveryStartTime()));
-//        timeline.add(new StatusTimeline("COMPLETED",           order.getDeliveryCompleteTime()));
-//        dto.setTimeline(timeline);
-//        
-//        // 2) 가게 위치 (라이더 대신)
-//        Store store = order.getStore();
-//        dto.setLat(store.getStoreLatitude());   // 또는 store.getHubAddressLatitude()
-//        dto.setLng(store.getStoreLongitude());  // 또는 store.getHubAddressLongitude()
-//
-//        return dto;
-//    }
     
     @Transactional
     public void createTestOrder(TestOrderRequestDto dto, UUID userId) {

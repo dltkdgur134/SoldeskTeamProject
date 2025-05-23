@@ -40,7 +40,7 @@ function subscribeOrderChannels(paramOrderId) {
 	stompClient.subscribe(`/topic/order/${paramOrderId}`, msg => {
 		const update = JSON.parse(msg.body);
 		if (update.orderId === orderId) {
-			alert("subscribeOrderChannels 살아있음");
+			console.log("subscribeOrderChannels 살아있음");
 			console.log('[order-topic]', paramOrderId, update);
 			showOrderNotification(update);       // 토스트
 			if (typeof update.currentStatus === 'number') {
@@ -57,10 +57,6 @@ function subscribeOrderChannels(paramOrderId) {
 			if (typeof window.startExpectedTimeCountdown === 'function') {
 				window.startExpectedTimeCountdown(update.expectCookingTime, update.expectDeliveryTime);
 			}
-			//alert(update.orderToUser);
-			/*if(update.orderToUser === 'CONFIRMED') {
-			   updateProgress(2);
-			}*/
 			switch (update.orderToUser) {
 				case 'CONFIRMED':
 					updateProgress(2);
@@ -74,7 +70,7 @@ function subscribeOrderChannels(paramOrderId) {
 					break;
 			}
 		} else {
-			alert("걸러진 주문");
+			console.log("걸러진 주문");
 		}
 
 	});
@@ -85,7 +81,7 @@ function subscribeOrderChannels(paramOrderId) {
 		if (chat.orderId === orderId) {
 			showChatMessage(chat);
 		} else {
-			alert("테스트:걸러진 주문");
+			console.log("테스트:걸러진 주문");
 		}
 	});
 }
@@ -146,7 +142,8 @@ function showToast(msg) {
 function sendChat() {
 	const input = document.getElementById('chatInput');
 	if (!input.value.trim() || !stompClient) return;
-	const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
+	//const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
+	//const orderId = document.getElementById('orderIdInput').value;
 	stompClient.send(`/app/chat/${orderId}`, {}, JSON.stringify({
 		orderId, senderType: '손님', senderName: userId, text: input.value.trim(),
 		timestamp: new Date().toISOString()
