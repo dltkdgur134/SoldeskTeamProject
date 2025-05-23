@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 
 import lombok.Data;
 
@@ -42,5 +43,6 @@ public class OrderLiveDto {
     private LocalTime expectCookingTime; 
     private LocalTime expectDeliveryTime;
     private int currentStatus;
+    private OrderToUser orderStatus;
     // + getters / setters
 }

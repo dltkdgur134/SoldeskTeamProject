@@ -17,6 +17,7 @@ import com.soldesk6F.ondal.useract.order.dto.OrderRequestDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -72,13 +73,25 @@ public class OwnerOrderController {
         return ResponseEntity.ok(time);
     }
     
+//    @PostMapping("/complete")
+//    public ResponseEntity<OrderResponseDto> completeOrder(@RequestBody Map<String, String> payload) {
+//        UUID orderId = UUID.fromString(payload.get("orderId"));
+//        Order updated = orderService.completeOrder(orderId);
+//        return ResponseEntity.ok(OrderResponseDto.from(updated));
+//    }
+    
     @PostMapping("/complete")
-    public ResponseEntity<OrderResponseDto> completeOrder(@RequestBody Map<String, String> payload) {
-        UUID orderId = UUID.fromString(payload.get("orderId"));
+    public ResponseEntity<?> completeOrder(@RequestBody Map<String, UUID> payload) {
+//        UUID orderId = UUID.fromString(payload.get("orderId"));
+    	UUID orderId = payload.get("orderId");
+    	if (orderId == null) {
+            return ResponseEntity.badRequest().body("orderId is missing or null");
+        }
         Order updated = orderService.completeOrder(orderId);
         return ResponseEntity.ok(OrderResponseDto.from(updated));
     }
-
+    
+    
     @PostMapping("/extendTime")
     public ResponseEntity<OrderResponseDto> extendTime(@RequestBody ExtendTimeRequestDto request) {
     	Order updated = orderService.extendCookingTime(request.getOrderId(), request.getMinutes());
@@ -94,7 +107,7 @@ public class OwnerOrderController {
             }
 
             orderService.rejectOrderAndRefund(orderId);
-            Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
+            Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED, OrderToUser.CANCELED);
             return ResponseEntity.ok(convertToDto(updatedOrder));
         } catch (Exception e) {
             e.printStackTrace(); // 🔍 콘솔에 에러 출력
@@ -104,7 +117,7 @@ public class OwnerOrderController {
 
     @PostMapping("/cancel")
     public ResponseEntity<Order> cancelOrder(@RequestParam("orderId") UUID orderId) {
-        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED);
+        Order updatedOrder = orderService.updateOrderStatus(orderId, OrderToOwner.CANCELED, OrderToUser.CANCELED);
         return ResponseEntity.ok(updatedOrder);
     }
     

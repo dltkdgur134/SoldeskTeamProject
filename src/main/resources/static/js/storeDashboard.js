@@ -323,17 +323,24 @@ function startTimer(elemId, minutes) {
 
     updateCircle();
 }
-
+let currentChatSubscription = null;
 // 특정 주문 상세 불러오기
 function loadOrderDetail(orderId) {
     console.log('▶▶▶ loadOrderDetail 시작:', orderId);
     currentOrderId = orderId;
     $('#chatMessages').empty();
 
+	if (currentChatSubscription) {
+		currentChatSubscription.unsubscribe();
+		console.log('✖ 이전 구독 해제됨');
+	}
+	
     // — 기존에 있던 채팅 재구독 로직
     if (stompClient) {
         // (선택) 이전 구독 토픽 해제 로직이 필요하면 여기서 처리
-        stompClient.subscribe('/user/queue/chat', onChatMessage);
+        //stompClient.subscribe('/user/queue/chat', onChatMessage);
+		//stompClient.subscribe('/topic/chat/' + orderId, onChatMessage);
+		currentChatSubscription = stompClient.subscribe('/topic/chat/' + orderId, onChatMessage);
     }
 
     // — AJAX 로 상세 정보 가져오기
@@ -445,7 +452,7 @@ function updateOrderStatus(orderId, url) {
 	  console.log('🥡 onChatMessage 호출됨:', message);
 	  const payload = JSON.parse(message.body);
 	  console.log('🥡 메시지 페이로드:', payload);
-	  const { senderName, text, timestamp } = payload;
+	  const { senderName, senderType, text, timestamp } = payload;
 	  /*const $msg = $(`
 	    <div class="chat-message">
 	      <span class="sender">${senderName}:</span>
@@ -463,7 +470,7 @@ function updateOrderStatus(orderId, url) {
 	    const el = document.createElement('div');
 	    el.className = 'chat-message';
 	    el.innerHTML = `
-	      <strong class="sender">${senderName}:</strong>
+	      <strong class="sender">${senderType}:</strong>
 	      <span class="text">${text}</span>
 	      <div class="timestamp text-muted small">
 	        ${new Date(timestamp).toLocaleTimeString()}
@@ -473,7 +480,7 @@ function updateOrderStatus(orderId, url) {
 	    container.scrollTop = container.scrollHeight;
 	}
 	
-	// 채팅 보내기
+	//  보내기
 	function sendChat() {
 	  const text = $('#chatInput').val().trim();
 	  if (!text || !currentOrderId) return;
@@ -481,6 +488,7 @@ function updateOrderStatus(orderId, url) {
 	    storeId,
 	    orderId: currentOrderId,
 	    senderName: '사장님',
+		senderType: '사장님',
 	    text,
 	    timestamp: new Date().toISOString()
 	  };

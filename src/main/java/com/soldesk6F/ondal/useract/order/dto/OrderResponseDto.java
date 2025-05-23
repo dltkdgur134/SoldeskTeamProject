@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 
 import lombok.Builder;
@@ -28,9 +29,10 @@ public class OrderResponseDto {
     private LocalDateTime cookingStartTime;
     private LocalTime expectCookingTime;
 
+    private OrderToUser orderToUser;
     private OrderToOwner orderToOwner;
     private OrderToRider orderToRider;
-
+    
     private List<OrderDetailDto> orderDetails;
 
     // ✅ 추가 필드 (프론트에서 팝업 요약용)
@@ -79,6 +81,7 @@ public class OrderResponseDto {
             .orderId(order.getOrderId())
             .orderToOwner(order.getOrderToOwner())
             .orderToRider(order.getOrderToRider())
+            .orderToUser(order.getOrderToUser())
             .deliveryAddress(order.getDeliveryAddress())
             .storeRequest(order.getStoreRequest())
             .deliveryRequest(order.getDeliveryRequest())

@@ -22,9 +22,8 @@
 </head>
 <body>
 <section layout:fragment="content">
-  <input type="hidden" value="${orderId}" id ="orderIdInput">
+  <input th:value="${orderId}" id ="orderIdInput" hidden="true">
   <h1 class="d-flex justify-content-center my-2">실시간 배송 진행</h1>
-  <strong th:text="${#authentication.principal.user.userId}"></strong>
   <div class="live-container">
     <!-- 왼쪽 메인 영역 -->
     <div class="main-panel">
@@ -43,26 +42,28 @@
   					<div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%" id="progressBar"></div>
 				</div>	
         		
-        		<div class="step-label" data-step="1" style="left: 0%;">주문 수락</div>
+        		<div class="step-label" data-step="1" style="left: 0%;">주문 요청 중</div>
         		<div class="step" data-step="1" style="left: 0%;"></div>
-        		<div class="step-timestamp" data-step="1" style="left: 0%;" th:if="${order.timeline[0].timestamp != null}" th:text="${#temporals.format(order.timeline[0].timestamp, 'HH:mm')}"></div>
+        		<!-- <div class="step-timestamp" data-step="1" style="left: 0%;" th:if="${order.timeline[0].timestamp != null}" th:text="${#temporals.format(order.timeline[0].timestamp, 'HH:mm')}"></div> -->
         		
-        		<div class="step-label" data-step="2" style="left: 33.33%;">조리 중</div>
-        		<div class="step" data-step="2" style="left: 33.33%;"></div>
-        		<div class="step-timestamp" data-step="2" style="left: 33.33%;" th:if="${order.timeline[1].timestamp != null}" th:text="${#temporals.format(order.timeline[1].timestamp, 'HH:mm')}"></div>
+        		<div class="step-label" data-step="2" style="left: 25%;">주문 확인 완료</div>
+        		<div class="step" data-step="2" style="left: 25%;"></div>
+        		<!-- <div class="step-timestamp" data-step="2" style="left: 33.33%;" th:if="${order.timeline[1].timestamp != null}" th:text="${#temporals.format(order.timeline[1].timestamp, 'HH:mm')}"></div> -->
 
-        		<div class="step-label" data-step="3" style="left: 66.66%;">배달 중</div>
-        		<div class="step" data-step="3" style="left: 66.66%;"></div>
-        		<div class="step-timestamp" data-step="3" style="left: 66.66%;" th:if="${order.timeline[2].timestamp != null}" th:text="${#temporals.format(order.timeline[2].timestamp, 'HH:mm')}"></div>
+        		<div class="step-label" data-step="3" style="left: 50%;">조리 중</div>
+        		<div class="step" data-step="3" style="left: 50%;"></div>
+        		<!-- <div class="step-timestamp" data-step="3" style="left: 66.66%;" th:if="${order.timeline[2].timestamp != null}" th:text="${#temporals.format(order.timeline[2].timestamp, 'HH:mm')}"></div> -->
 
-        		<div class="step-label" data-step="4" style="left: 100%;">배달 완료</div>
-        		<div class="step" data-step="4" style="left: 100%;"></div>
-        		<div class="step-timestamp" data-step="4" style="left: 100%;" th:if="${order.timeline[3].timestamp != null}" th:text="${#temporals.format(order.timeline[3].timestamp, 'HH:mm')}"></div>
+				<div class="step-label" data-step="4" style="left: 75%;">배달 중</div>
+        		<div class="step" data-step="4" style="left: 75%;"></div>
+
+        		<div class="step-label" data-step="5" style="left: 100%;">배달 완료</div>
+        		<div class="step" data-step="5" style="left: 100%;"></div>
+        		<!-- <div class="step-timestamp" data-step="4" style="left: 100%;" th:if="${order.timeline[3].timestamp != null}" th:text="${#temporals.format(order.timeline[3].timestamp, 'HH:mm')}"></div> -->
 
     		</div>
     		<th:block>
-    			<input class="mt-4" id="slider-step" onchange="updateProgress(this.value)" th:value="${order.currentStatus}" />
-    			<strong id="123"></strong>
+    			<input class="mt-4" id="slider-step" onchange="updateProgress(this.value)" th:value="${order.currentStatus}" hidden="true"/>
     		</th:block>
 		</div>
       </div>
@@ -195,11 +196,6 @@
     		</div>
       	</div>
       </div>
-      
-      
-      
-      
-      
 	</div>
 
     <!-- 오른쪽 채팅 패널 -->
@@ -215,82 +211,7 @@
       </div>
     </div>
   </div>
-  <script>
-  
-  
-  function updateProgress(step) {
-		const progressBar = document.getElementById('progressBar');
-		const steps = document.querySelectorAll('.step');
-		const labels = document.querySelectorAll('.step-label');
-
-		// 상태바 넓이 계산
-		const progressPercent = ((step - 1) / (steps.length - 1)) * 100;
-		progressBar.style.width = `${progressPercent}%`;
-
-		// 현재 단계 및 레이블 스타일링
-		steps.forEach(el => {
-		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
-		     if (currentStep <= step) {
-		         el.classList.add('active');
-		     } else {
-		         el.classList.remove('active');
-		     }
-		 });
-
-		 labels.forEach(el => {
-		     const currentStep = parseInt(el.getAttribute('data-step'), 10);
-		     if (currentStep <= step) {
-		         el.classList.add('active');
-		     } else {
-		         el.classList.remove('active');
-		     }
-		 });
-		 if (step == 4) {
-			window.location.href = "/orderHistory"
-		}
-	} 
- 
-  
-	function incrementProgress() {
-	 	  if (count < 5) { // 4단계 까지만
-	 	    updateProgress(count);
-	 	    document.getElementById('slider-step').value = count;
-	 	    count++;
-	 	    setTimeout(incrementProgress, 5000); // 5초마다 호출
-	 	  }
-	 }
-	// 처음 화면 진입 시 단계는 1로 고정
-	let count = document.getElementById('slider-step').value;
-	//let status = document.getElementById('stepSlider').value;
-	updateProgress(count);
-			 	 
-	//incrementProgress();
-	
-	const targetNode = document.getElementById("chatMessages");
-
-	const config = { attributes: true, childList: true, subtree: true };
-	const callback = (mutationList, observer) => {
-		  for (const mutation of mutationList) {
-		    if (mutation.type === "childList") {
-		    	const msg = document.getElementById("chatMessages").innerText;
-		      //alert("자식 노드가 추가되거나 제거됐습니다.");
-		      //alert(msg);
-		      //updateProgress(2);
-		      console.log(msg);
-		    } else if (mutation.type === "attributes") {
-		      alert(`${mutation.attributeName} 특성이 변경됐습니다.`);
-		    }
-		  }
-		};
-	const observer = new MutationObserver(callback);
-	observer.observe(targetNode, config);
-	
-	
-	//observer.disconnect();
-	//incrementProgress(); // 반복 시작	 
-  </script>
   <script th:src="@{/js/orderLive.js}"></script>
-  
 </section>
 </body>
 </html>
