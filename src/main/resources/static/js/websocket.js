@@ -39,6 +39,30 @@ function subscribeOrderChannels(paramOrderId) {
 	/* 상태 알림 */
 	stompClient.subscribe(`/topic/order/${paramOrderId}`, msg => {
 		const update = JSON.parse(msg.body);
+		if (typeof orderId === 'undefined') {
+			let statusMsg = "";
+			switch(update.orderToUser) {
+				case 'COOKING':
+					if (update.orderToOwner === 'IN_DELIVERY') {
+						statusMsg = "조리 완료"
+						break;
+					}
+					statusMsg = "조리 중";
+					break;
+				case 'DELIVERING':
+					statusMsg = "배달 중";
+					break;
+				case 'COMPLETED':
+					statusMsg = "배달 완료";
+					break;
+				case 'CANCELED':
+					statusMsg = "주문 취소";
+					break;
+				default:
+					break;
+			}
+			showToast(`📦 주문 #${update.orderId} 상태: "${statusMsg}"`);
+		}
 		if (update.orderId === orderId) {
 			console.log("subscribeOrderChannels 살아있음");
 			console.log('[order-topic]', paramOrderId, update);
@@ -72,12 +96,13 @@ function subscribeOrderChannels(paramOrderId) {
 		} else {
 			console.log("걸러진 주문");
 		}
-
+		
 	});
 
 	/* 채팅 메시지 */
 	stompClient.subscribe(`/topic/chat/${paramOrderId}`, msg => {
 		const chat = JSON.parse(msg.body);
+		//showToast(msg);
 		if (chat.orderId === orderId) {
 			showChatMessage(chat);
 		} else {
