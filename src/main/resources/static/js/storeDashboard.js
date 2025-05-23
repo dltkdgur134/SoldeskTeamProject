@@ -581,7 +581,7 @@ function updateOrderStatus(orderId, url) {
    
    
    function removeOrderFromList(orderId) {
-       $('#deliveringOrderList li').each(function () {
+       $('#newOrderList li, #processingOrderList li').each(function () {
            const currentId = $(this).data('orderid');
            if (currentId === orderId) {
                $(this).remove();
@@ -589,7 +589,7 @@ function updateOrderStatus(orderId, url) {
        });
    }
    function removeDeliveringOrderList(orderId) {
-       $('#newOrderList li, #processingOrderList li').each(function () {
+       $('#deliveringOrderList li').each(function () {
            const currentId = $(this).data('orderid');
            if (currentId === orderId) {
                $(this).remove();
