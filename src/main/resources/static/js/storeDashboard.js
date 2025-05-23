@@ -229,10 +229,6 @@ function createOrderListItem(order) {
         startCountdown(timerContainer[0], order.cookingStartTime, order.expectCookingTime);
     }
 
-    else if (status === 'IN_DELIVERY') {
-        const startBtn = $('<button>').addClass('startDeliveryBtn').data('orderid', order.orderId).text('배달시작');
-        buttonWrap.append(startBtn);
-    }
 
     li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
         .append(orderText, buttonWrap);
@@ -581,7 +577,18 @@ function updateOrderStatus(orderId, url) {
        });
    }
    
+   
+   
+   
    function removeOrderFromList(orderId) {
+       $('#deliveringOrderList li').each(function () {
+           const currentId = $(this).data('orderid');
+           if (currentId === orderId) {
+               $(this).remove();
+           }
+       });
+   }
+   function removeDeliveringOrderList(orderId) {
        $('#newOrderList li, #processingOrderList li').each(function () {
            const currentId = $(this).data('orderid');
            if (currentId === orderId) {

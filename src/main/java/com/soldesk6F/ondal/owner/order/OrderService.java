@@ -199,7 +199,7 @@ public class OrderService {
 
         OrderResponseDto orderDto = convertToDto(savedOrder);
         if (savedOrder.getUser() != null) {
-        	String destination = "/topic/user/" + savedOrder.getUser().getUserUuidAsString();
+        	String destination = "/topic/order/" + savedOrder.getOrderId().toString();
             System.out.println("발행 경로: " + destination);
             System.out.println("발행 메시지: " + orderDto);
             

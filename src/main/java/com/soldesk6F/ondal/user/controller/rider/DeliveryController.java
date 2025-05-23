@@ -23,6 +23,7 @@ import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.service.RiderService;
 import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
@@ -81,14 +82,6 @@ public class DeliveryController {
 	        message.setText("배달을 시작했습니다.");
 	        message.setTimestamp(LocalDateTime.now().toString());  // ISO 형식
 
-	        UUID userUuid  = order.getUser().getUserUuid();
-	        UUID storeUuid = order.getStore().getStoreId();
-	        UUID riderUuid = order.getRider().getRiderId();
-
-	        messagingTemplate.convertAndSendToUser(userUuid.toString(),  "/queue/chat", message);
-	        messagingTemplate.convertAndSendToUser(storeUuid.toString(), "/queue/chat", message);
-	        messagingTemplate.convertAndSendToUser(riderUuid.toString(), "/queue/chat", message);
-	        messagingTemplate.convertAndSend("/topic/chat/" + orderId.toString(), message);
 	        OrderStatusDto orderStatusDto = new OrderStatusDto();
 	        orderStatusDto.setOrderId(orderId);
 	        orderStatusDto.setCurrentStatus(4); // "배달 중" 단계
@@ -126,14 +119,6 @@ public class DeliveryController {
 	    message.setText("배달을 완료했습니다.");
 	    message.setTimestamp(LocalDateTime.now().toString());  // ISO 형식
 
-	    UUID userUuid  = order.getUser().getUserUuid();
-	    UUID storeUuid = order.getStore().getStoreId();
-	    UUID riderUuid = order.getRider().getRiderId();
-
-	    messagingTemplate.convertAndSendToUser(userUuid.toString(),  "/queue/chat", message);
-	    messagingTemplate.convertAndSendToUser(storeUuid.toString(), "/queue/chat", message);
-	    messagingTemplate.convertAndSendToUser(riderUuid.toString(), "/queue/chat", message);
-	    messagingTemplate.convertAndSend("/topic/chat/" + orderId.toString(), message);
 	    OrderStatusDto orderStatusDto = new OrderStatusDto();
         orderStatusDto.setOrderId(orderId);
         orderStatusDto.setCurrentStatus(5); // "배달 완료" 단계
