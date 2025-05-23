@@ -1,22 +1,32 @@
-// ✅ cart.js - 장바구니 렌더링 및 수량 조정
-
 window.addEventListener('DOMContentLoaded', () => {
 	const container = document.getElementById('cart-items-container');
 	const emptyBox = document.getElementById('empty-cart');
 	const summaryBox = document.getElementById('order-summary');
 	const orderPriceText = summaryBox.querySelector('p');
+	const orderBtn = document.getElementById('order-btn');
 
 	function saveCart(cartList) {
-		localStorage.setItem("user-cart", CryptoJS.AES.encrypt(JSON.stringify(cartList), "ondal-secret-key").toString());
+		const userUUID = document.body.dataset.useruuid;
+		const cartWrapper = {
+			cartId: crypto.randomUUID(),
+			userUUID,
+			items: cartList
+		};
+		const encrypted = CryptoJS.AES.encrypt(JSON.stringify(cartWrapper), "ondal-secret-key").toString();
+		localStorage.setItem(`cart-${userUUID}`, encrypted);
 	}
 
 	function getCart() {
-		const encrypted = localStorage.getItem("user-cart");
+		const userUUID = document.body.dataset.useruuid;
+		const encrypted = localStorage.getItem(`cart-${userUUID}`);
 		if (!encrypted) return [];
+
 		try {
 			const decrypted = CryptoJS.AES.decrypt(encrypted, "ondal-secret-key").toString(CryptoJS.enc.Utf8);
-			return JSON.parse(decrypted);
+			const parsed = JSON.parse(decrypted);
+			return parsed.items || [];
 		} catch (e) {
+			console.warn("❌ 복호화 실패:", e);
 			return [];
 		}
 	}
@@ -29,20 +39,36 @@ window.addEventListener('DOMContentLoaded', () => {
 		if (cartList.length === 0) {
 			emptyBox.style.display = 'block';
 			summaryBox.style.display = 'none';
+			orderBtn?.setAttribute('disabled', true);
 			return;
 		} else {
 			emptyBox.style.display = 'none';
 			summaryBox.style.display = 'block';
+			orderBtn?.removeAttribute('disabled');
 		}
 
 		cartList.forEach((item, index) => {
-			const itemTotal = (item.price + item.options.reduce((sum, opt) => sum + opt.price, 0)) * item.quantity;
+			const selectedOptionPrice = item.options
+				.filter(opt => opt.selected)
+				.reduce((sum, opt) => sum + opt.price, 0);
+
+			const itemTotal = (item.price + selectedOptionPrice) * item.quantity;
 			totalPrice += itemTotal;
 
-			const optionsHtml = item.options.map(opt =>
+			
+			/*const optionsHtml = item.options.map(opt =>
 				`<span>${opt.groupName} : ${opt.name} (${opt.price.toLocaleString()}원)</span><br>`
-			).join('');
-
+			).join('');*/
+			const hasOptions = Array.isArray(item.options) && item.options.some(opt => opt.selected);
+			const optionsHtml = hasOptions
+				? item.options
+					.filter(opt => opt.selected)
+					.map(opt =>
+						`<span>${opt.groupName} : ${opt.name} (${opt.price.toLocaleString()}원)</span><br>`
+					).join('')
+				: `<span class="no-option">옵션 없음</span>`;
+				
+				
 			const itemDiv = document.createElement('div');
 			itemDiv.className = 'cart-item';
 			itemDiv.setAttribute('data-index', index);
@@ -65,12 +91,19 @@ window.addEventListener('DOMContentLoaded', () => {
 					</div>
 				</div>
 			`;
+			
+			const changeOptionBtn = itemDiv.querySelector('.btn-change-option');
+			if (!item.options || item.options.length === 0) {
+				changeOptionBtn.style.display = 'none';
+			}
+			
 			container.appendChild(itemDiv);
 		});
 
 		orderPriceText.textContent = `결제금액: ${totalPrice.toLocaleString()}원`;
 	};
 
+	// 이벤트 위임으로 수량 변경
 	container.addEventListener('click', (e) => {
 		const itemDiv = e.target.closest('.cart-item');
 		if (!itemDiv) return;
@@ -99,3 +132,41 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	renderCart();
 });
+
+document.getElementById('clear-cart-btn')?.addEventListener('click', () => {
+	const confirmClear = confirm("장바구니를 모두 비우시겠습니까?");
+	if (!confirmClear) return;
+
+	localStorage.removeItem("user-cart");
+	renderCart();
+});
+
+function goToOrderPage() {
+	const cartData = getFromLocalStorage(); // localStorage에서 가져오기
+
+	if (!cartData || cartData.length === 0) {
+		alert("장바구니가 비어있습니다.");
+		return;
+	}
+
+	fetch('/api/order', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(cartData)
+	})
+	.then(res => {
+		if (!res.ok) throw new Error("서버 오류: 주문 실패");
+		return res.json();
+	})
+	.then(result => {
+		alert("주문이 성공적으로 접수되었습니다.");
+		clearCart(); // ✅ localStorage 초기화
+		window.location.href = "/mypage/orders"; // ✅ 주문 내역으로 이동
+	})
+	.catch(err => {
+		console.error("❌ 주문 실패:", err);
+		alert("주문 처리 중 오류가 발생했습니다.");
+	});
+}

@@ -296,6 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function setupCartButton(card) {
+		// 기존 설정 초기화
 		const oldBtn = document.getElementById('add-to-cart-btn');
 		const newBtn = oldBtn.cloneNode(true);
 		oldBtn.parentNode.replaceChild(newBtn, oldBtn);
@@ -312,35 +313,43 @@ document.addEventListener('DOMContentLoaded', function () {
 		newDecreaseBtn.addEventListener('click', () => {
 			if (quantity > 1) {
 				quantity--;
-				quantityEl.textContent = quantity;
+				document.getElementById('menu-quantity').textContent = quantity;
 				updateTotal();
 			}
 		});
+
 		newIncreaseBtn.addEventListener('click', () => {
 			if (quantity < 99) {
 				quantity++;
-				quantityEl.textContent = quantity;
+				document.getElementById('menu-quantity').textContent = quantity;
 				updateTotal();
 			}
 		});
 
+		const userUUID = document.body.dataset.useruuid;
+		
 		newBtn.addEventListener('click', () => {
-			const selectedOptions = Array.from(document.querySelectorAll('input[name^="menuOption"]:checked')).map(cb => {
-				const label = cb.closest('.option-label');
-				const group = cb.closest('.option-group-box')?.querySelector('.option-group-title')?.textContent?.trim();
-				const name = label.querySelector('.option-name')?.textContent?.trim() || cb.value;
-				const priceText = label.querySelector('.option-price')?.textContent || '';
-				const match = priceText.match(/[\+]?[\s]*([\d,]+)\s*원/);
-				const price = match ? parseInt(match[1].replace(/,/g, '')) : 0;
+			const allOptions = [];
 
-				return {
-					groupName: group || '',
-					name,
-					price
-				};
+			document.querySelectorAll('.option-group-box').forEach(groupBox => {
+				const groupName = groupBox.querySelector('.option-group-title')?.textContent?.trim() || '';
+				groupBox.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+					const label = cb.closest('.option-label');
+					const name = label.querySelector('.option-name')?.textContent?.trim() || cb.value;
+					const priceText = label.querySelector('.option-price')?.textContent || '';
+					const match = priceText.match(/\+([\d,]+)원/);
+					const price = match ? parseInt(match[1].replace(/,/g, '')) : 0;
+
+					allOptions.push({
+						groupName,
+						name,
+						price,
+						selected: cb.checked
+					});
+				});
 			});
 
-			const optionTotal = selectedOptions.reduce((sum, opt) => sum + opt.price, 0);
+			const optionTotal = allOptions.filter(opt => opt.selected).reduce((sum, opt) => sum + opt.price, 0);
 			const unitPrice = basePrice + optionTotal;
 			const totalPrice = unitPrice * quantity;
 
@@ -351,72 +360,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				menuImage: card.getAttribute('data-image'),
 				price: basePrice,
 				quantity,
-				options: selectedOptions,
+				options: allOptions
 			};
 
-			saveToLocalStorage(data); // ✅ 여기에 저장
+			saveToLocalStorage(userUUID, data);
 			alert("장바구니에 담았습니다.");
 			closeModal();
 		});
 
 		updateTotal();
-		const optionsContainer = document.getElementById('menu-options');
-		optionsContainer.innerHTML = '';
-
-		const option1 = card.getAttribute('data-option1');
-		const option1Price = card.getAttribute('data-option1-price');
-		const option2 = card.getAttribute('data-option2');
-		const option2Price = card.getAttribute('data-option2-price');
-		const option3 = card.getAttribute('data-option3');
-		const option3Price = card.getAttribute('data-option3-price');
-
-		function isValidOption(name, price) {
-			const trimmedName = String(name ?? '').trim();
-			let trimmedPrice = String(price ?? '').trim();
-			trimmedPrice = trimmedPrice.replace(/[\[\]]/g, '');
-			return (
-				trimmedName !== '' &&
-				trimmedName.toLowerCase() !== 'null' &&
-				trimmedName.toLowerCase() !== 'undefined' &&
-				trimmedPrice !== '' &&
-				/^\d+$/.test(trimmedPrice)
-			);
-		}
-
-		function createOptionCheckbox(optionName, optionPrice) {
-			if (!isValidOption(optionName, optionPrice)) return;
-
-			const cleanName = String(optionName).replace(/[\[\]]/g, '').trim();
-			const cleanPrice = String(optionPrice).replace(/[\[\]]/g, '').trim();
-
-			const label = document.createElement('label');
-			const checkbox = document.createElement('input');
-			checkbox.type = 'checkbox';
-			checkbox.name = 'menuOption';
-			checkbox.value = optionName.trim();
-
-			checkbox.addEventListener('change', updateTotal);
-
-			label.appendChild(checkbox);
-			label.appendChild(document.createTextNode(`${cleanName} +${cleanPrice}원`));
-
-			optionsContainer.appendChild(label);
-			optionsContainer.appendChild(document.createElement('br'));
-		}
-
-		if (isValidOption(option1, option1Price)) createOptionCheckbox(option1, option1Price);
-		if (isValidOption(option2, option2Price)) createOptionCheckbox(option2, option2Price);
-		if (isValidOption(option3, option3Price)) createOptionCheckbox(option3, option3Price);
-
-		if (
-			!isValidOption(option1, option1Price) &&
-			!isValidOption(option2, option2Price) &&
-			!isValidOption(option3, option3Price)
-		) {
-			const noOption = document.createElement('p');
-			noOption.textContent = '선택 가능한 옵션이 없습니다.';
-			optionsContainer.appendChild(noOption);
-		}
 	}
 
 	function closeModal() {
