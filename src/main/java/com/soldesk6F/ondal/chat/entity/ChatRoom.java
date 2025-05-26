@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.chat.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import com.soldesk6F.ondal.user.entity.User;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +32,10 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "chat_room_id", nullable = false, unique = true)
     private Long chatRoomId;  // 채팅방 ID (PK)
-
+    
+    @Column(name = "order_id", nullable = true)
+    private UUID orderId;
+    
     @ManyToMany
     @JoinTable(
       name = "chat_room_participants",
@@ -44,7 +49,7 @@ public class ChatRoom {
 
     @Builder
     public ChatRoom(List<User> participants) {
-        this.participants = participants;
+    	this.participants = participants;
         this.createdDate = LocalDateTime.now();
     }
     

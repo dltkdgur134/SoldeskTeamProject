@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal.useract.order.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.soldesk6F.ondal.chat.entity.ChatMessage;
+import com.soldesk6F.ondal.chat.service.ChatService;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.owner.order.dto.OrderLiveDto;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
@@ -19,14 +23,16 @@ import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
 public class UserOrderController {
 	
 	private final OrderService orderService;
+	private final ChatService chatService;
 
 	
     /** application.properties 에 kakao.maps.app-key=YOUR_APP_KEY 로 두셨다면 */
     @Value("${kakao.maps.app-key}")
     private String kakaoAppKey;
 
-    public UserOrderController(OrderService orderService) {
+    public UserOrderController(OrderService orderService, ChatService chatService) {
         this.orderService = orderService;
+        this.chatService = chatService;
     }
 
     @GetMapping("/{orderId}")

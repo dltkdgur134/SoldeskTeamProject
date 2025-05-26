@@ -72,7 +72,6 @@ function subscribeOrderChannels(paramOrderId) {
 					window.updateProgress(update.currentStatus);
 				}
 			}
-			//updateStatusChart?.(update.stage);   // 선택 UI
 			//moveRiderMarker?.(update.location?.lat, update.location?.lng);
 			if (window.hasOwnProperty('updateCookingProgress') &&
 				typeof window.updateCookingProgress === 'function') {
@@ -134,7 +133,8 @@ function showChatMessage(chat) {
 	const el = document.createElement('div');
 	el.className = 'chat-message';
 	el.innerHTML =
-		`<strong>${chat.senderType}:</strong> ${chat.text}
+		`<strong class="sender-type">${chat.senderType}:</strong> 
+		<span class="text">${chat.text}</span>
      <div class="timestamp small text-muted">
        ${new Date(chat.timestamp).toLocaleTimeString()}
      </div>`;

@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1) 페이지 로드 시, 서버에서 전체 주문 목록을 불러옴
     loadOrderList();
     setupOrderButtons();  // ✅ 버튼 바인딩
+	
 });
 
 function handleOrderAction(orderId, action, extra = {}) {
@@ -183,7 +184,7 @@ let selectedOrderTime = 15;
 function createOrderListItem(order) {
     const status = (order.orderToOwner || 'PENDING').toUpperCase();
     const orderText = $('<div>').addClass('order-text')
-        .html(`주문번호: ${order.orderId}<br>총 금액: ${order.totalPrice}원`);
+        .html(`주문번호: ${order.orderNumber}<br>총 금액: ${order.totalPrice}원`);
     const buttonWrap = $('<div>').addClass('order-buttons ms-auto d-flex align-items-center');
     let li;
 
@@ -351,6 +352,18 @@ function loadOrderDetail(orderId) {
             console.error('✖ 주문 상세 로드 실패:', err);
         }
     });
+	
+	fetch('/chat/getPrevMsgs/' + orderId)
+				  	.then(r => {
+						if (!r.ok) throw new Error(`HTTP ${r.status}`);
+						return r.json();
+					})
+					.then(msgs => {
+						console.log("가져온 메시지 내역 : ", msgs);
+						msgs.forEach(showPrevChatMessage);	
+					})
+					.catch(e => console.error('previous messages 가져오기 실패:', e));
+	
 }
 
 
@@ -458,15 +471,6 @@ function updateOrderStatus(orderId, url) {
 	  const payload = JSON.parse(message.body);
 	  console.log('🥡 메시지 페이로드:', payload);
 	  const { senderName, senderType, text, timestamp } = payload;
-	  /*const $msg = $(`
-	    <div class="chat-message">
-	      <span class="sender">${senderName}:</span>
-	      <span class="text">${text}</span>
-	      <div class="timestamp text-muted small">${new Date(timestamp).toLocaleTimeString()}</div>
-	    </div>
-	  `);
-	  $('#chatMessages').append($msg);
-	  $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);*/
 	  const container = document.getElementById('chatMessages');
 	    if (!container) {
 	        console.error("chatMessages element not found!");
@@ -719,6 +723,40 @@ function showToast(message) {
   const toast = new bootstrap.Toast(toastElement);
   toast.show();
 }
+
+function showPrevChatMessage(chat) {
+	const box = document.getElementById('chatMessages');
+		if (!box) return;
+
+		const senderType = chat.senderType || "Unknown";
+		let senderTypeText = '';
+		switch(senderType) {
+			case 'USER':
+				senderTypeText = '손님';
+				break;
+			case 'OWNER': 
+				senderTypeText = '사장님';
+				break;
+			case 'RIDER':
+				senderTypeText = '라이더';
+				break;
+		}
+		const message = chat.message || "No message";
+		const timestamp = chat.timestamp
+			? new Date(chat.timestamp).toLocaleTimeString()
+			: "Invalid Date";
+
+		const el = document.createElement('div');
+		el.className = 'chat-message';
+		el.innerHTML = `
+			<strong class="sender-type">${senderTypeText}:</strong> 
+			<span class="text">${message}</span>
+			<div class="timestamp small text-muted">${timestamp}</div>
+		`;
+		box.appendChild(el);
+		box.scrollTop = box.scrollHeight;
+}
+
 
 // 페이지 로드 시 WebSocket 연결
 $(document).ready(function() {	
