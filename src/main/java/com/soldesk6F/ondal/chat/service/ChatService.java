@@ -17,7 +17,6 @@ import com.soldesk6F.ondal.chat.entity.ChatRoom;
 import com.soldesk6F.ondal.chat.repository.ChatMessageRepository;
 import com.soldesk6F.ondal.chat.repository.ChatRoomRepository;
 import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 

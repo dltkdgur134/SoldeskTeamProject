@@ -54,24 +54,6 @@ public class ChatController {
      * 클라이언트가 "/app/chat/{orderId}" 로 보낸 메시지를
      * "/topic/chat/{orderId}" 로 다시 브로드캐스트
      */
-//    @MessageMapping("/chat/{orderId}")
-//    public void relayChat(@DestinationVariable("orderId") String orderId, @Payload ChatMessage message ,Principal principal) {
-//    	System.out.println("접근자체는 성공");
-//    	System.out.println("✅ 메시지 보낸 사용자: " + (principal != null ? principal.getName() : "null"));
-//    	System.out.println("✅ 메시지 내용: " + message.getText());
-//    	
-//    	UUID orderUuid = UUID.fromString(orderId);
-//    	Order order = orderRepository.findById(orderUuid).get();
-//    	
-//    	Store store = order.getStore();
-//    	Owner owner = store.getOwner();
-//    	String ownerId = owner.getOwnerUuidAsString();
-//    	
-//        messagingTemplate.convertAndSend("/topic/chat/" + orderId, message);
-//        messagingTemplate.convertAndSendToUser(principal.getName(), "/topic/chat/" +  orderId, message);
-//        messagingTemplate.convertAndSendToUser(ownerId, "/topic/chat/" +  orderId, message);
-//    }
-    
     @MessageMapping("/chat/{orderId}")
     public void sendChatMessage(@DestinationVariable("orderId") String orderId,
                                 ChatMessageDto          message,
