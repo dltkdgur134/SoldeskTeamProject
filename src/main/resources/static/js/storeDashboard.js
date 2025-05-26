@@ -365,6 +365,9 @@ function renderOrderDetail(order) {
   $('#detailStoreRequest').text(order.storeRequest);
   $('#detailDeliveryRequest').text(order.deliveryRequest);
   $('#detailTotalPrice').text(order.totalPrice);
+  $('#detailDeliveryFee').text(order.deliveryFee);
+  $('#TotalPrice').text(order.deliveryFee+order.totalPrice);
+  
 	
 	
   // 🧼 기존 메뉴 리스트 영역 비우기
