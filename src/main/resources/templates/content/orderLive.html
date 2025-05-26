@@ -187,6 +187,9 @@
 						<span th:if="${order.deliveryFee > 0}"><small class="order-detail-text" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
 						<span th:if="${order.deliveryFee == 0}"><small class="order-detail-text" th:text="${order.deliveryFee + ' 원'}"></small></span>
 					</div>
+					<div class="container d-flex justify-content-between">
+					<a id="refundLink" href="/userPayHistory" style="display: inline;">환불하러가기</a>
+					</div>
       			</div>
     		</div>
       	</div>

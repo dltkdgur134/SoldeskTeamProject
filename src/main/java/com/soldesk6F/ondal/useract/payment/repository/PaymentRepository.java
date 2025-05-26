@@ -32,7 +32,8 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID>{
 	@Query("SELECT p FROM Payment p LEFT JOIN FETCH p.order o WHERE p.user.userUuid = :userUuid "
 		     + "AND (:status IS NULL OR p.paymentStatus = :status) "
 		     + "AND (:usage IS NULL OR p.paymentUsageType = :usage) "
-		     + "AND (:since IS NULL OR p.requestedAt >= :since)")
+		     + "AND (:since IS NULL OR p.requestedAt >= :since) "
+		     + "ORDER BY p.requestedAt DESC")
 		List<Payment> findFilteredHistory(@Param("userUuid") UUID userUuid,
 		                                  @Param("status") Payment.PaymentStatus status,
 		                                  @Param("usage") Payment.PaymentUsageType usage,

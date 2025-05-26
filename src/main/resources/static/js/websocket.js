@@ -43,6 +43,14 @@ function subscribeOrderChannels(paramOrderId) {
 			alert("subscribeOrderChannels 살아있음");
 			console.log('[order-topic]', paramOrderId, update);
 			showOrderNotification(update);       // 토스트
+			const refundLink = document.getElementById("refundLink");
+			if (refundLink) {
+						if (update.orderToUser === 'PENDING') {
+							refundLink.style.display = 'inline';
+						} else {
+							refundLink.style.display = 'none';
+						}
+					}
 			if (typeof update.currentStatus === 'number') {
 				if (typeof window.updateProgress === 'function') {
 					window.updateProgress(update.currentStatus);
