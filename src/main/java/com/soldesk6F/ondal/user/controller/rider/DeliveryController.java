@@ -89,7 +89,7 @@ public class DeliveryController {
 	        orderStatusDto.setOrderToUser(OrderToUser.DELIVERING);
 
 	        messagingTemplate.convertAndSend("/topic/order/" + orderId.toString(), orderStatusDto);
-	    
+	        
 	    
 	    } else {
 	        throw new RuntimeException("배달 시작이 불가능한 상태입니다.");
@@ -126,6 +126,8 @@ public class DeliveryController {
         orderStatusDto.setOrderToUser(OrderToUser.COMPLETED);
 
         messagingTemplate.convertAndSend("/topic/order/" + orderId.toString(), orderStatusDto);
+        messagingTemplate.convertAndSend("/topic/store/removeOrder/" + order.getStore().getStoreId().toString(), orderStatusDto);
+        
 	    return "redirect:/rider/home";
 	}
 

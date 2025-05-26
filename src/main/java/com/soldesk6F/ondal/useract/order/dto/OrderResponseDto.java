@@ -25,6 +25,7 @@ public class OrderResponseDto {
     private String storeRequest;
     private String deliveryRequest;
     private int totalPrice;
+    private int deliveryFee;
     private LocalDateTime orderTime;
     private LocalDateTime cookingStartTime;
     private LocalTime expectCookingTime;
@@ -60,7 +61,6 @@ public class OrderResponseDto {
                 .price(detail.getPrice())
                 .optionNames(detail.getOptionNames())
                 .optionPrices(detail.getOptionPrices())
-                
                 .build())
             .collect(Collectors.toList());
 
@@ -92,7 +92,7 @@ public class OrderResponseDto {
             .expectCookingTime(order.getExpectCookingTime())
             .cookingStartTime(order.getCookingStartTime())
             .orderDetails(detailDtos)
-
+            .deliveryFee(order.getDeliveryFee())
             // ✅ 신규 주문 알림용 필드
             .menuNameList(menuSummary)
             .totalCount(totalCount)

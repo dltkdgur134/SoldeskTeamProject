@@ -183,7 +183,7 @@ let selectedOrderTime = 15;
 function createOrderListItem(order) {
     const status = (order.orderToOwner || 'PENDING').toUpperCase();
     const orderText = $('<div>').addClass('order-text')
-        .html(`주문번호: ${order.orderNumber}<br>총 금액: ${order.totalPrice}원`);
+        .html(`주문번호: ${order.orderId}<br>총 금액: ${order.totalPrice}원`);
     const buttonWrap = $('<div>').addClass('order-buttons ms-auto d-flex align-items-center');
     let li;
 
@@ -365,6 +365,9 @@ function renderOrderDetail(order) {
   $('#detailStoreRequest').text(order.storeRequest);
   $('#detailDeliveryRequest').text(order.deliveryRequest);
   $('#detailTotalPrice').text(order.totalPrice);
+  $('#detailDeliveryFee').text(order.deliveryFee);
+  $('#TotalPrice').text(order.deliveryFee+order.totalPrice);
+  
 	
 	
   // 🧼 기존 메뉴 리스트 영역 비우기
@@ -432,6 +435,12 @@ function updateOrderStatus(orderId, url) {
            stompClient.subscribe('/topic/store/' + storeId, function(message) {
                const orderData = JSON.parse(message.body);
                showNewOrderPopup(orderData);
+           });
+           stompClient.subscribe('/topic/store/removeOrder/' + storeId, function(message) {
+               const orderData = JSON.parse(message.body);
+			   console.log(orderData.orderToUser);
+			   removeDeliveringOrderList(orderData.orderId);
+			   alert("배달이 완료되었습니다. 주문번호 :")
            });
            if (currentOrderId) {
 				alert('오더아이디 어디선가');
