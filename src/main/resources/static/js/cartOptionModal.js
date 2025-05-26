@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.addEventListener('click', (e) => {
 		if (!e.target.classList.contains('btn-change-option')) return;
 
-		const userUUID = document.body.dataset.useruuid;
+		/*const userUUID = document.body.dataset.useruuid;*/
+		const userUUID = document.getElementById('user-uuid')?.value;
 		const index = e.target.dataset.index;
 		const wrapper = getFromLocalStorage(userUUID);
 		const item = wrapper.items[index];
@@ -72,7 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	saveBtn?.addEventListener('click', () => {
 		if (currentIndex == null) return;
 
-		const userUUID = document.body.dataset.useruuid;
+		/*const userUUID = document.body.dataset.useruuid;*/
+		const userUUID = document.getElementById('user-uuid')?.value;
 		const wrapper = getFromLocalStorage(userUUID);
 		const original = wrapper.items[currentIndex];
 		const allOptions = original.options || [];
@@ -103,7 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	// 초기 로딩 시 옵션 없는 항목은 버튼 숨기기
-	const userUUID = document.body.dataset.useruuid;
+	/*const userUUID = document.body.dataset.useruuid;*/
+	const userUUID = document.getElementById('user-uuid')?.value;
 	const wrapper = getFromLocalStorage(userUUID);
 	document.querySelectorAll('.btn-change-option').forEach((button, index) => {
 		const item = wrapper.items[index];

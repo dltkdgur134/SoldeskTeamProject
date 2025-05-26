@@ -60,6 +60,7 @@ import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentMethod;
 import com.soldesk6F.ondal.useract.payment.entity.Payment.PaymentStatus;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentFailLogRepository;
 import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
+import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 
 import lombok.RequiredArgsConstructor;
 
@@ -87,16 +88,10 @@ public class PaymentService {
 	private final UserRepository userRepository;
 	private final PaymentFailLogRepository paymentFailLogRepository;
 	private final PaymentFailLogService paymentFailLogService;
-	
-	
 
 	@Value("${toss.secret-key}")
     private String tossSecretKey;
 
-
-
-
- 
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -153,10 +148,17 @@ public class PaymentService {
 		if (cart == null)
 			throw new IllegalStateException("해당하는 유저가 없습니다");
 
-		return UserInfoDTO.builder().userLoc(cart.getUser().getUserSelectedAddress().getAddress())
-				.userSepLoc(cart.getUser().getUserSelectedAddress().getDetailAddress())
-				.userTel(cart.getUser().getUserPhone()).build();
+		User user = cart.getUser();
+		RegAddress addr = user.getUserSelectedAddress();
+		if (addr == null) {
+			throw new IllegalStateException("선택된 주소가 없습니다. 마이페이지에서 주소를 등록해주세요.");
+		}
 
+		return UserInfoDTO.builder()
+				.userLoc(addr.getAddress())
+				.userSepLoc(addr.getDetailAddress())
+				.userTel(user.getUserPhone())
+				.build();
 	}
 
 	public String getCartStore(UUID cartUUID) {

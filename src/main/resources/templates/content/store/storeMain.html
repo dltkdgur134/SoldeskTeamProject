@@ -12,6 +12,7 @@
 </head>
 <body>
 	<div layout:fragment="content">
+		<input type="hidden" id="user-uuid" th:value="${#authentication.principal.userUUID}" />
 		<section class="store-info">
 			<div class="store-image-slider">
 				<div class="slides" id="slides">

@@ -4,20 +4,45 @@ window.addEventListener('DOMContentLoaded', () => {
 	const summaryBox = document.getElementById('order-summary');
 	const orderPriceText = summaryBox.querySelector('p');
 	const orderBtn = document.getElementById('order-btn');
+	
+	const userUUID = document.getElementById('user-uuid')?.value;
+
+	fetch(`/cart/api/restore?userUuid=${userUUID}`)
+		.then(res => res.json())
+		.then(data => {
+			if (data.restored) {
+				const items = data.cartItems;
+				/*items.forEach(item => {
+					saveToLocalStorage(userUUID, item); // 기존 담기 로직 재활용
+				});*/
+				saveCart(items);
+				console.log('✅ 이전 장바구니 복원 완료');
+			} else {
+				console.log('ℹ️ 복원할 장바구니 없음');
+			}
+		});
 
 	function saveCart(cartList) {
-		const userUUID = document.body.dataset.useruuid;
+		const userUUID = document.getElementById('user-uuid')?.value;
+		if (!userUUID) {
+			console.warn("❌ userUUID 없음, 저장 실패");
+			return;
+		}
+		
 		const cartWrapper = {
 			cartId: crypto.randomUUID(),
 			userUUID,
 			items: cartList
 		};
 		const encrypted = CryptoJS.AES.encrypt(JSON.stringify(cartWrapper), "ondal-secret-key").toString();
+		console.log("💾 localStorage 저장됨:", `cart-${userUUID}`, encrypted);
 		localStorage.setItem(`cart-${userUUID}`, encrypted);
 	}
 
 	function getCart() {
-		const userUUID = document.body.dataset.useruuid;
+		const userUUID = document.getElementById('user-uuid')?.value;
+		if (!userUUID) return [];
+
 		const encrypted = localStorage.getItem(`cart-${userUUID}`);
 		if (!encrypted) return [];
 
@@ -134,23 +159,27 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('clear-cart-btn')?.addEventListener('click', () => {
+	const userUUID = document.getElementById('user-uuid')?.value;
+	if (!userUUID) {
+		alert("사용자 정보가 없습니다.");
+		return;
+	}
+
 	const confirmClear = confirm("장바구니를 모두 비우시겠습니까?");
 	if (!confirmClear) return;
 
-	localStorage.removeItem("user-cart");
+	localStorage.removeItem(`cart-${userUUID}`);
 	renderCart();
 });
 
 function goToOrderPage() {
-	const cartData = getFromLocalStorage(); // localStorage에서 가져오기
-	if (!cartData || cartData.length === 0) {
+	const userUUID = document.getElementById('user-uuid')?.value;
+	const cartData = getFromLocalStorage(userUUID);
+	/*const cartData = getFromLocalStorage(); // localStorage에서 가져오기*/
+	if (!cartData || !Array.isArray(cartData.items) || cartData.items.length === 0) {
 		alert("장바구니가 비어있습니다.");
 		return;
 	}
-	
-	/*const userUUID = document.body.dataset.useruuid;*/
-	const userUUID = document.getElementById('user-uuid')?.value;
-	console.log("✅ userUUID:", userUUID);
 	
 	const validItems = cartData.items.map(item => ({
 		menuId: item.menuId,
@@ -162,26 +191,33 @@ function goToOrderPage() {
 			price: opt.price
 		}))
 	}));
-	
+
 	fetch("/cart/api/init", {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json"
-		},
-		body: JSON.stringify({
-			userUUID,
-			items: validItems
-			/*items: getFromLocalStorage(userUUID).items*/
-		})
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ userUUID, items:  validItems })
 	})
 	.then(res => {
 		if (!res.ok) throw new Error("서버 오류: 장바구니 초기화 실패");
 		return res.json();
 	})
 	.then(data => {
-		localStorage.removeItem(`cart-${userUUID}`);				// 기존 cart 삭제
-		localStorage.setItem("pending-cart-id", data.cartId);		// 결제대기 cartId 저장
-		window.location.href = `/order/pay?cartId=${data.cartId}`;	// 결제페이지 이동
+		localStorage.removeItem(`cart-${userUUID}`);
+		localStorage.setItem("pending-cart-id", data.cartId);
+		window.location.href = `/store/pay?cartId=${data.cartId}`;
+		
+		const form = document.createElement('form');
+		form.method = 'POST';
+		form.action = '/store/pay';
+
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'cartUUID';
+		input.value = data.cartId;
+		form.appendChild(input);
+
+		document.body.appendChild(form);
+		form.submit();
 	})
 	.catch(err => {
 		console.error("❌ 장바구니 저장 실패:", err);

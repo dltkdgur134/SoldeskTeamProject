@@ -30,21 +30,7 @@ public class CartService {
 	private final MenuService menuService;
 	private final CartRepository cartRepository;
 	private final CartItemsRepository cartItemsRepository;
-	
-	public Cart getCartByUser(User user) {
-		Optional<Cart> existingCart = cartRepository.findByUser(user);
-		if (existingCart.isPresent()) {
-			return existingCart.get();
-		}
 
-		Cart newCart = Cart.builder()
-			.user(user)
-			.store(null)
-			.build();
-
-		return cartRepository.save(newCart);
-	}
-	
 	public int getUpdatedTotal(UUID cartItemUuid) {
 		CartItems item = cartItemsRepository.findById(cartItemUuid)
 			.orElseThrow(() -> new IllegalArgumentException("CartItem not found"));
@@ -79,25 +65,25 @@ public class CartService {
 	
 	@Transactional
 	public Cart createCart(User user, Store store, List<CartAddRequestDto> itemsDto) {
-		// 기존 Cart가 있는지 확인
-		Optional<Cart> optionalCart = cartRepository.findByUserAndStore(user, store);
+		// 1. Cart 객체 생성 및 저장
+		Cart cart = Cart.builder()
+			.user(user)
+			.store(store)
+			.status(CartStatus.PENDING)
+			.build();
+		cart = cartRepository.save(cart); // ✅ 여기서 먼저 save 해야 JPA가 ID 부여함
 
-		Cart cart = optionalCart.orElseGet(() -> {
-			return Cart.builder()
-				.user(user)
-				.store(store)
-				.status(CartStatus.PENDING)
-				.build();
-		});
+		// 2. 기존 항목 제거 (해당 cart에 대한 기존 내용 정리)
+		cartItemsRepository.deleteAllByCart(cart);
 
-		// 기존 항목 삭제 (필요 시)
-		cart.getCartItems().clear(); // 이 줄이 중요함 (중복 방지)
-		cartItemsRepository.deleteAllByCart(cart); // DB에서도 삭제
-
-		// 새 항목 추가
+		// 3. 새 항목 추가
 		for (CartAddRequestDto itemDto : itemsDto) {
 			Menu menu = menuService.findById(itemDto.getMenuId());
 			CartItems item = new CartItems(cart, menu, itemDto.getQuantity(), new ArrayList<>());
+			
+			item.setMenuName(menu.getMenuName());
+			item.setMenuPrice(menu.getPrice());
+			item.setMenuImage(menu.getMenuImg());
 
 			for (CartOptionDto opt : itemDto.getOptions()) {
 				if (!opt.isSelected()) continue;
@@ -106,9 +92,22 @@ public class CartService {
 				item.getCartItemOptions().add(option);
 			}
 			cart.getCartItems().add(item);
+			cartItemsRepository.save(item); // 명시적으로 저장
 		}
 
 		return cart;
+	}
+	
+	public Optional<Cart> findLatestCartByUser(User user) {
+		return cartRepository.findByUser(user)
+			.filter(cart -> cart.getStatus() == CartStatus.PENDING || cart.getStatus() == CartStatus.CANCELED);
+	}
+
+	@Transactional
+	public void deleteCart(Cart cart) {
+		// 장바구니 항목 먼저 삭제 (연관관계 정리)
+		cartItemsRepository.deleteAllByCart(cart);
+		cartRepository.delete(cart);
 	}
 	
 }

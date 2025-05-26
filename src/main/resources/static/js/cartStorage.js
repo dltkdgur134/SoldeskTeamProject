@@ -63,7 +63,9 @@ function getFromLocalStorage(userUUID) {
 
 	try {
 		const decrypted = CryptoJS.AES.decrypt(encrypted, SECRET_KEY).toString(CryptoJS.enc.Utf8);
-		return JSON.parse(decrypted);
+		const parsed = JSON.parse(decrypted);
+		if (!Array.isArray(parsed.items)) parsed.items = [];
+		return parsed;
 	} catch (e) {
 		console.warn("❌ 복호화 실패:", e);
 		return { cartId: crypto.randomUUID(), userUUID, items: [] };
