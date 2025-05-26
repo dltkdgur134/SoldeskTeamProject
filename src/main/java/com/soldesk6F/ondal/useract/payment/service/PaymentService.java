@@ -36,8 +36,13 @@ import com.soldesk6F.ondal.config.SecurityConfig;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.login.OAuth2LoginSuccessHandler;
 import com.soldesk6F.ondal.owner.order.OrderService;
+import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.controller.user.DeleteUserController;
+import com.soldesk6F.ondal.user.entity.Owner;
+import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.user.repository.OwnerRepository;
+import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.cart.controller.CartController;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
@@ -48,6 +53,8 @@ import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderResponseDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 import com.soldesk6F.ondal.useract.order.repository.OrderDetailRepository;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
@@ -88,7 +95,9 @@ public class PaymentService {
 	private final UserRepository userRepository;
 	private final PaymentFailLogRepository paymentFailLogRepository;
 	private final PaymentFailLogService paymentFailLogService;
-
+	private final OwnerRepository ownerRepository;
+	private final RiderRepository riderRepository;
+	
 	@Value("${toss.secret-key}")
     private String tossSecretKey;
 
@@ -205,7 +214,7 @@ public class PaymentService {
 //	}
 	
 	@Transactional
-	public String tryOndalPay(UUID cartUUID , String reqDel , String reqStore) {
+	public String tryOndalPay(UUID cartUUID , String reqDel , String reqStore,int totalPrice) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -217,7 +226,7 @@ public class PaymentService {
 		        User nowUser = userRepository.getById(user.getUserUuid());
 			    Optional<Cart> optCart = cartRepository.findByUser(nowUser);
 			    Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
-			    int totalPrice = cart.getTotalPrice();
+			    int deliveryFee = cart.getStore().getDeliveryFee();
 			    int ondalPay = nowUser.getOndalPay();
 			    if(totalPrice>ondalPay) {
 			    	return "잔액이 부족합니다\n현재 잔액:"+ondalPay+":@:실패";
@@ -228,7 +237,7 @@ public class PaymentService {
 						OrderDetail orderDetail = new OrderDetail();
 
 						orderDetail.setMenu(cartItem.getMenu());
-						orderDetail.setPrice(cartItem.getItemTotalPrice());
+						orderDetail.setPrice(totalPrice);
 						orderDetail.setQuantity(cartItem.getQuantity());
 						orderDetail.setOptionNames(cartItem.getOptionsAsList());
 						List<Integer> ciop = new ArrayList<Integer>();
@@ -243,32 +252,34 @@ public class PaymentService {
 					}
 
 					Payment payment = new Payment();
-					payment.setAmount(cart.getTotalPrice());
+					payment.setAmount(totalPrice);
 					payment.setPaymentKey(null);
 					payment.setTossOrderId(cartUUID.toString());
 					payment.setUser(user);
 					payment.setApprovedAt(LocalDateTime.now());
 					payment.setRequestedAt(LocalDateTime.now());
 					payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
-					
-
 					payment.setPaymentStatus(PaymentStatus.COMPLETED);
+					payment.setPaymentMethod(Payment.PaymentMethod.ONDALPAY);
+			    	paymentRepository.save(payment);
+					
+					
 					Order order = Order.builder().store(cart.getStore()).user(cart.getUser())
-								.totalPrice(cart.getTotalPrice())
+								.totalPrice(totalPrice)
 								.storeRequest(reqStore)
 								.deliveryRequest(reqDel).orderDetails(orderDetailList)
 								.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
 								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
-								.orderToOwner(OrderToOwner.PENDING).build();
+								.orderToUser(OrderToUser.PENDING)
+								.orderToOwner(OrderToOwner.PENDING)
+								.deliveryFee(deliveryFee)
+								.build();
+					
 			    	payment.setOrder(order);
 					for (OrderDetail od : order.getOrderDetails()) {
 						od.setOrder(order);
 					}
-				
-			    	payment.setPaymentMethod(Payment.PaymentMethod.ONDALPAY);
-			    	payment.setPaymentStatus(PaymentStatus.COMPLETED);
-			    	paymentRepository.save(payment);
 			    	orderRepository.save(order);
 			    	user.setOndalPay(nowOndalPay);
 			    	userRepository.save(user);
@@ -276,6 +287,13 @@ public class PaymentService {
 			    	OrderResponseDto orderResponseDto = OrderResponseDto.from(order);
 			    	UUID storeId = cart.getStore().getStoreId(); // 또는 적절한 store UUID 참조
 
+			    	
+			    	Owner owner = order.getStore().getOwner();
+			    	owner.setOwnerWallet(owner.getOwnerWallet()+(totalPrice-deliveryFee));
+			    	ownerRepository.save(owner);
+			    	
+			    	
+			    	
 			    	// WebSocket 전송
 			    	simpMessagingTemplate.convertAndSend("/topic/store/" + storeId, orderResponseDto);
 			    	return nowOndalPay + ":@:" + order.getOrderId() + ":@:성공";
@@ -606,7 +624,11 @@ public class PaymentService {
 	    // 1. 결제 정보 조회
 	    Payment payment = paymentRepository.findByTossOrderId(tossOrderId)
 	        .orElseThrow(() -> new IllegalArgumentException("해당 tossOrderId의 결제 내역을 찾을 수 없습니다."));
-
+	    Order order = payment.getOrder();
+	    Owner owner = order.getStore().getOwner();
+	    Rider rider = order.getRider();
+	    int deliveryFee = order.getStore().getDeliveryFee();
+	    
 	    // 2. 결제 유효성 검사
 	    if (!payment.getUser().getUserUuid().equals(userUUID)) {
 	        throw new SecurityException("본인의 결제 내역만 환불할 수 있습니다.");
@@ -623,12 +645,6 @@ public class PaymentService {
 	    // 3. 유저 정보 및 환불 금액 확보
 	    User user = payment.getUser();
 	    int refundAmount = payment.getAmount(); // 원 단위 금액
-
-	    // 4. 유저 지갑에 금액 복구
-	    user.setOndalPay(user.getOndalPay() + refundAmount);
-	    
-	    userRepository.save(user);
-
 	    // 5. 결제 상태 업데이트
 	    payment.setPaymentStatus(PaymentStatus.REFUNDED);
 	    payment.setRefundReason(cancelReason);
@@ -636,6 +652,35 @@ public class PaymentService {
 	    
 	    paymentRepository.save(payment);
 
+	    
+	   
+	    
+	    if(order.getOrderToUser() == OrderToUser.PENDING
+	    		|| order.getOrderToUser() == OrderToUser.CONFIRMED
+	    		|| order.getOrderToUser() == OrderToUser.COOKING) {//배달 전 환불 요청
+	    	order.setOrderToOwner(OrderToOwner.CANCELED);
+	    	order.setOrderToUser(OrderToUser.CANCELED);
+	    	owner.setOwnerWallet(owner.getOwnerWallet() - refundAmount);
+	    	user.setOndalPay(user.getOndalPay() + refundAmount);
+	    }else if (order.getOrderToUser() == OrderToUser.DELIVERING) {// 배달 중 환불 요청
+	    	owner.setOwnerWallet(owner.getOwnerWallet() - refundAmount);
+	    	rider.setRiderWallet(rider.getRiderWallet() + deliveryFee);
+	    	user.setOndalPay(user.getOndalPay() + refundAmount);
+	    	order.setOrderToOwner(OrderToOwner.CANCELED);
+	    	order.setOrderToUser(OrderToUser.CANCELED);
+	    	order.setOrderToRider(OrderToRider.INTERRUPTED);
+		}
+	    else {// 배달 완료 후 환불 요청
+	    	rider.setRiderWallet(rider.getRiderWallet()- deliveryFee);
+	    	owner.setOwnerWallet(owner.getOwnerWallet() - (refundAmount - deliveryFee));
+	    	user.setOndalPay(user.getOndalPay() + refundAmount);
+	    }
+	    orderRepository.save(order);
+	    ownerRepository.save(owner);
+	    userRepository.save(user);
+	    riderRepository.save(rider);
+	    
+	    
 	}
 
 	

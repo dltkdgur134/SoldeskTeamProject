@@ -51,7 +51,7 @@ public class CartController {
 		User user = userService.findUserByUuid(userUuid)
 				.orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다."));
 
-		// ✅ 기존 Cart 확인 후 localStorage에 저장할 데이터 반환 후 삭제
+		// 기존 Cart 확인 후 localStorage에 저장할 데이터 반환 후 삭제
 		Optional<Cart> optionalCart = cartRepository.findByUser(user)
 				.filter(cart -> cart.getStatus() == CartStatus.PENDING || cart.getStatus() == CartStatus.CANCELED);
 		if (optionalCart.isPresent()) {
@@ -193,7 +193,7 @@ public class CartController {
 			return menuData;
 		}).collect(Collectors.toList());
 
-		// ✅ delete from DB after collecting data
+		// delete from DB after collecting data
 		cartService.deleteCart(cart);
 
 		return ResponseEntity.ok(Map.of(

@@ -4,6 +4,7 @@
 .live-container {
 	display: flex;
 	height: calc(100vh - 300px); /* header 높이만큼 빼주세요 */
+	margin-bottom: 200px;
 }
 
 /* 왼쪽 메인 패널 */
@@ -34,11 +35,16 @@
 /* 오른쪽 채팅 패널 */
 .chat-panel {
 	max-height: 900px;
+	margin-left: 25px;
 	width: 300px;
 	display: flex;
 	flex-direction: column;
-	border-left: 1px solid #ddd;
+	border: 1px solid #ddd;
 	background: #fafafa;
+}
+
+.chat-panel h3 {
+	margin-top: 10px;
 }
 
 /* 메시지 리스트 */
@@ -46,6 +52,10 @@
 	flex: 1;
 	padding: 10px;
 	overflow-y: auto;
+}
+
+.chat-message {
+	margin-bottom: 8px;
 }
 
 /* 입력 창 */
@@ -71,7 +81,10 @@
 .progress-container {
 	position: relative;
 	width: 100%;
-	margin: 50px auto;
+	margin-top: 50px;
+	margin-left: 25px;
+	margin-bottom: auto;
+	margin-right: auto; 
 }
 
 .progress {
@@ -102,12 +115,37 @@
 	color: white;
 }
 
+@media (max-width: 1200px) {
+  .step-label {
+    font-size: 1vw;
+  }
+}
+
+@media (max-width: 992px) {
+  .step-label {
+    font-size: 1vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .step-label {
+    font-size: 0.5vw;
+  }
+}
+
+@media (max-width: 576px) {
+  .step-label {
+    font-size:calc(1rem - 1vw); 
+  }
+} 
+
+
 /* 상테 레이블 */
 .step-label {
 	position: absolute;
 	top: -40px;
 	transform: translateX(-50%);
-	font-size: 1rem;
+	font-size: 1vw;
 	font-weight: normal;
 	color: gray;
 	white-space: nowrap;
@@ -120,18 +158,32 @@
 }
 
 /* 마지막 레이블 조정 */
-.step-label[data-step="4"] {
+.step-label[data-step="5"] {
 	transform: translateX(-50%) translateY(0);
-	text-align: right; /* Ensures proper alignment */
-	white-space: nowrap; /* Prevents wrapping */
+	text-align: right; /* 오른쪽 끝 */
+	white-space: nowrap; /* wrapping 해제 */
 }
 
 .step-timestamp {
 	position: absolute;
 	top: 40px;
-	transform: translateX(-50%);
+	transform: translateX(-25%);
 	font-size: 14px;
 	font-weight: normal;
 	color: gray;
 	white-space: nowrap;
+}
+
+.rounded-circle {
+	height: 50px;
+	width: 50px;
+}
+
+.store-name {
+	font-size: 1.5em;
+}
+
+.icon-link {
+	text-decoration: none;
+	color: black;
 }

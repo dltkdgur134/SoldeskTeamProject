@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
+
 import lombok.Data;
 
 @Data
@@ -16,6 +18,7 @@ public class OrderHistoryDto {
     private String storeName;
     private String storeImageUrl;
     private String orderStatus;
+    private OrderToUser orderToUser;
     //private List<String> menuItems;
     private HashMap<String, Integer> menuItems;
     private String menuName;
