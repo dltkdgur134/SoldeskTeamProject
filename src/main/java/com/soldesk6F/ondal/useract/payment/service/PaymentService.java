@@ -623,10 +623,7 @@ public class PaymentService {
 	    // 1. 결제 정보 조회
 	    Payment payment = paymentRepository.findByTossOrderId(tossOrderId)
 	        .orElseThrow(() -> new IllegalArgumentException("해당 tossOrderId의 결제 내역을 찾을 수 없습니다."));
-	    Order order = payment.getOrder();
-	    Owner owner = order.getStore().getOwner();
-	    Rider rider = order.getRider();
-	    int deliveryFee = order.getStore().getDeliveryFee();
+	    
 	    
 	    // 2. 결제 유효성 검사
 	    if (!payment.getUser().getUserUuid().equals(userUUID)) {
@@ -640,7 +637,20 @@ public class PaymentService {
 	    if (payment.getPaymentMethod() != PaymentMethod.ONDALPAY) {
 	        throw new IllegalStateException("온달페이 결제만 환불 가능합니다.");
 	    }
+	    Order order = payment.getOrder();
+	    if (order == null) {
+	        throw new IllegalStateException("결제에 연결된 주문이 없습니다.");
+	    }
 
+	    Store store = order.getStore();
+	    if (store == null) {
+	        throw new IllegalStateException("주문에 연결된 가게 정보가 없습니다.");
+	    }
+
+	    Owner owner = store.getOwner();
+	    if (owner == null) {
+	        throw new IllegalStateException("가게에 연결된 점주 정보가 없습니다.");
+	    }
 	    // 3. 유저 정보 및 환불 금액 확보
 	    User user = payment.getUser();
 	    int refundAmount = payment.getAmount(); // 원 단위 금액
@@ -650,34 +660,50 @@ public class PaymentService {
 	    payment.setApprovedAt(LocalDateTime.now());
 	    
 	    paymentRepository.save(payment);
+	    paymentRepository.flush();
 
 	    
-	   
-	    
-	    if(order.getOrderToUser() == OrderToUser.PENDING
-	    		|| order.getOrderToUser() == OrderToUser.CONFIRMED
-	    		|| order.getOrderToUser() == OrderToUser.COOKING) {//배달 전 환불 요청
-	    	order.setOrderToOwner(OrderToOwner.CANCELED);
-	    	order.setOrderToUser(OrderToUser.CANCELED);
-	    	owner.setOwnerWallet(owner.getOwnerWallet() - refundAmount);
-	    	user.setOndalPay(user.getOndalPay() + refundAmount);
-	    }else if (order.getOrderToUser() == OrderToUser.DELIVERING) {// 배달 중 환불 요청
-	    	owner.setOwnerWallet(owner.getOwnerWallet() - refundAmount);
-	    	rider.setRiderWallet(rider.getRiderWallet() + deliveryFee);
-	    	user.setOndalPay(user.getOndalPay() + refundAmount);
-	    	order.setOrderToOwner(OrderToOwner.CANCELED);
-	    	order.setOrderToUser(OrderToUser.CANCELED);
-	    	order.setOrderToRider(OrderToRider.INTERRUPTED);
+	    if (payment.getOrder() != null) {
+	    	int deliveryFee = order.getStore().getDeliveryFee();
+	    	if(order.getOrderToUser() == OrderToUser.PENDING
+	    			|| order.getOrderToUser() == OrderToUser.CONFIRMED
+	    			|| order.getOrderToUser() == OrderToUser.COOKING) {//배달 전 환불 요청
+	    		order.setOrderToOwner(OrderToOwner.CANCELED);
+	    		order.setOrderToUser(OrderToUser.CANCELED);
+	    		owner.setOwnerWallet(owner.getOwnerWallet() - refundAmount);
+	    		user.setOndalPay(user.getOndalPay() + refundAmount);
+	    	}else if (order.getOrderToUser() == OrderToUser.DELIVERING) {// 배달 중 환불 요청
+	    		Rider rider = order.getRider(); // 배차 안된 경우 null일 수 있음
+	    	    if (rider == null && order.getOrderToUser() != OrderToUser.DELIVERING && order.getOrderToUser() != OrderToUser.COMPLETED) {
+	    	        // rider가 필요한 로직인지 조건 확인 필요
+	    	        throw new IllegalStateException("라이더 정보가 없습니다.");
+	    	    }
+	    		owner.setOwnerWallet(owner.getOwnerWallet() - refundAmount);
+	    		rider.setRiderWallet(rider.getRiderWallet() + deliveryFee);
+	    		user.setOndalPay(user.getOndalPay() + refundAmount);
+	    		order.setOrderToOwner(OrderToOwner.CANCELED);
+	    		order.setOrderToUser(OrderToUser.CANCELED);
+	    		order.setOrderToRider(OrderToRider.INTERRUPTED);
+	    	}
+	    	else {// 배달 완료 후 환불 요청
+	    		Rider rider = order.getRider(); // 배차 안된 경우 null일 수 있음
+	    	    if (rider == null && order.getOrderToUser() != OrderToUser.DELIVERING && order.getOrderToUser() != OrderToUser.COMPLETED) {
+	    	        // rider가 필요한 로직인지 조건 확인 필요
+	    	        throw new IllegalStateException("라이더 정보가 없습니다.");
+	    	    }
+	    		rider.setRiderWallet(rider.getRiderWallet()- deliveryFee);
+	    		owner.setOwnerWallet(owner.getOwnerWallet() - (refundAmount - deliveryFee));
+	    		user.setOndalPay(user.getOndalPay() + refundAmount);
+	    	}
+	    	orderRepository.save(order);
+	    	orderRepository.flush();
+	    	ownerRepository.save(owner);
+	    	ownerRepository.flush();
+	    	userRepository.save(user);
+	    	userRepository.flush();
+			
 		}
-	    else {// 배달 완료 후 환불 요청
-	    	rider.setRiderWallet(rider.getRiderWallet()- deliveryFee);
-	    	owner.setOwnerWallet(owner.getOwnerWallet() - (refundAmount - deliveryFee));
-	    	user.setOndalPay(user.getOndalPay() + refundAmount);
-	    }
-	    orderRepository.save(order);
-	    ownerRepository.save(owner);
-	    userRepository.save(user);
-	    riderRepository.save(rider);
+	    
 	    
 	    
 	}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+    <title>문의글 수정</title>
+    <link th:href="@{/css/Custom.css}" rel="stylesheet"/>
+</head>
+<div layout:fragment="content" class="container py-5">
+    <h2>문의글 수정</h2>
+    <form th:action="@{'/complains/edit/' + ${complain.complainId}}" th:method="post">
+        <div class="mb-3">
+            <label for="title" class="form-label">제목</label>
+            <input type="text" class="form-control" id="title" name="title"
+                   th:value="${complain.complainTitle}" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea class="form-control" id="content" name="content" rows="6"
+                      required th:text="${complain.complainContent}"></textarea>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">수정 완료</button>
+            <a th:href="@{'/complains/view/' + ${complain.complainId}}" class="btn btn-secondary">취소</a>
+        </div>
+    </form>
+</div>
+</html>

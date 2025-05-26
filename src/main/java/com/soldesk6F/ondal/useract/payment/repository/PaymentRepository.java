@@ -28,7 +28,7 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID>{
 	List<Payment> findByUser_UserUuid(UUID uuid);
 	List<Payment> findByUserUserUuidOrderByApprovedAtDesc(UUID userUuid);
 	Optional<Payment> findByTossOrderId(String tossOrderId);
-	
+	Payment findByUserUserUuid(UUID uuid);
 	@Query("SELECT p FROM Payment p LEFT JOIN FETCH p.order o WHERE p.user.userUuid = :userUuid "
 		     + "AND (:status IS NULL OR p.paymentStatus = :status) "
 		     + "AND (:usage IS NULL OR p.paymentUsageType = :usage) "
