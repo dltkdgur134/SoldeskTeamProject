@@ -11,7 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.soldesk6F.ondal.admin.filter.AdminSessionAuthenticationFilter;
 import com.soldesk6F.ondal.login.CustomAuthFailureHandler;
 import com.soldesk6F.ondal.login.CustomOAuth2UserService;
 import com.soldesk6F.ondal.login.CustomUserDetailsService;
@@ -71,8 +73,8 @@ public class SecurityConfig{
 //        http
 //            .authorizeHttpRequests(auth -> auth
 //                  .requestMatchers("/", "/alert", "/login/**", "/register/**", "/css/**", "/js/**").permitAll()
-////                   .requestMatchers("/admin/**").hasRole(Role.OWNER)
-////                   .requestMatchers("/")
+//                   .requestMatchers("/admin/**").hasRole(Role.OWNER)
+//                   .requestMatchers("/")
 //                   .anyRequest().authenticated()
 //            )
 //            .formLogin(form -> form
@@ -90,14 +92,16 @@ public class SecurityConfig{
 //                );
     
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http , AdminSessionAuthenticationFilter adminFilter) throws Exception {
     	http
+        .addFilterBefore(adminFilter, UsernamePasswordAuthenticationFilter.class)
+
     		.csrf(csrf -> csrf
     			.ignoringRequestMatchers("/api/**") // REST API는 CSRF 무시
     			.ignoringRequestMatchers("/stomp/**")
     		)
     		.authorizeHttpRequests(auth -> auth
-    			.requestMatchers("/**","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
+    			.requestMatchers("/","/admin/login","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
     			.requestMatchers("/api/category/**").hasAuthority("OWNER")
     			.requestMatchers("/owner/**").hasAnyRole("OWNER", "ALL")
     			.anyRequest().authenticated() 

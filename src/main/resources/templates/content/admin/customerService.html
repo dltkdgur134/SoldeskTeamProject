@@ -1,7 +1,5 @@
-<!-- ===== 고객센터 탭 DIV – #setting-content 에 주입 ===== -->
+<!-- ===== 고객센터 탭 DIV – id="setting-content" 에 주입될 조각 ===== -->
 <div>
-
-	
 
   <section class="cs-card p-4 mb-4">
 
@@ -11,6 +9,7 @@
       <li class="nav-item"><button class="nav-link" data-role="USER">일반 사용자</button></li>
       <li class="nav-item"><button class="nav-link" data-role="RIDER">라이더</button></li>
       <li class="nav-item"><button class="nav-link" data-role="OWNER">업주</button></li>
+      <li class="nav-item"><button class="nav-link" data-role="GUEST">비회원</button></li>
     </ul>
 
     <!-- 2차 필터 + 검색 -->
@@ -37,61 +36,69 @@
       <table class="table table-hover text-center align-middle">
         <thead class="table-light"><tr>
           <th style="width:70px">#</th><th class="text-start">제목</th>
-          <th style="width:100px">id</th>
-		  <th style="width:100px">주체</th><th style="width:120px">카테고리</th>
+          <th style="width:100px">ID</th>
+          <th style="width:100px">주체</th><th style="width:120px">카테고리</th>
           <th style="width:160px">작성일</th><th style="width:100px">상태</th>
           <th style="width:90px">관리</th>
         </tr></thead>
-        <tbody>
-          <tr data-id="1" data-role="USER" data-category="DELAY"
-              data-title="배달이 너무 늦어요"
-              data-content="주문한 지 1시간이 지났는데 아직도 안 와요.">
-            <td>1</td><td class="text-start">배달이 너무 늦어요</td>
-			<td></td>
-            <td><span class="badge bg-secondary">사용자</span></td><td>배달 지연</td>
-            <td>2025-05-23 14:22</td><td><span class="badge bg-light text-dark">대기</span></td>
-            <td><button class="btn btn-sm btn-outline-primary reply-btn" data-bs-toggle="modal"
-                        data-bs-target="#replyModal">답변</button></td>
-          </tr>
-          <!-- ↓ 4건 더 생략. 같은 패턴으로 data-* 채워 넣으세요 -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
+
+    <!-- 페이지네이션 -->
+    <nav id="csPagination" class="d-flex justify-content-center mt-3"></nav>
   </section>
 
-  <section class="cs-card p-4">
-    <h5 class="mb-3">자주 묻는 질문(FAQ)</h5>
-    <div class="accordion" id="faqAccordion">
-      <div class="accordion-item">
-        <h2 class="accordion-header"><button class="accordion-button collapsed"
-             data-bs-toggle="collapse" data-bs-target="#f0">배달은 얼마나 걸리나요?</button></h2>
-        <div id="f0" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-          <div class="accordion-body">평균 30분 이내 도착합니다.</div>
-        </div>
-      </div>
-      <!-- FAQ 2,3 … -->
-    </div>
-  </section>
-
-  <!-- 모달은 탭 내부에 둬도 되고 body 맨 끝에 하나만 둬도 됩니다. -->
+  <!-- 모달 -->
   <div class="modal fade" id="replyModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
-        <form>
-          <input type="hidden" id="modalComplainId">
+        <form id="replyForm" enctype="multipart/form-data">
+          <input type="hidden" id="modalComplainId" name="id">
+
           <div class="modal-header">
-            <h5 class="modal-title">문의 답변</h5>
+            <h5 class="modal-title">문의 상세 / 답변 작성</h5>
             <button class="btn-close" data-bs-dismiss="modal"></button>
           </div>
+
           <div class="modal-body">
-            <div class="mb-3"><label class="fw-bold">제목</label><p id="modalTitle" class="form-control-plaintext"></p></div>
-            <div class="mb-3"><label class="fw-bold">문의 내용</label><p id="modalContent" class="form-control-plaintext"></p></div>
-            <div class="mb-3"><label class="fw-bold">답변 작성</label><textarea class="form-control" rows="5" required></textarea></div>
+            <!-- 문의 제목·내용 -->
+            <div class="mb-2"><label class="fw-bold">제목</label>
+              <p id="modalTitle" class="form-control-plaintext mb-0"></p></div>
+            <div class="mb-3"><label class="fw-bold">내용</label>
+              <p id="modalContent" class="form-control-plaintext"></p></div>
+
+            <!-- 문의 이미지 미리보기 -->
+            <div class="mb-3">
+              <label class="fw-bold">첨부 이미지</label>
+              <div id="complainImages" class="d-flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- 답변 입력 -->
+            <div class="mb-3">
+              <label class="fw-bold">답변 작성</label>
+              <textarea id="replyText" class="form-control" rows="5" required></textarea>
+            </div>
+
+            <!-- 답변 이미지 업로드 + 프리뷰 -->
+            <div class="mb-3">
+              <label class="fw-bold d-block mb-1">답변 이미지 (여러 장 선택 가능)</label>
+              <input id="replyImages" name="images" type="file" accept="image/*" multiple class="form-control mb-2">
+              <div id="replyPreview" class="d-flex flex-wrap gap-2"></div>
+            </div>
           </div>
-          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button><button class="btn btn-primary">저장</button></div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button class="btn btn-primary" type="submit">저장</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 
 </div>
+
+<!-- 필요 CDN -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js" defer></script>

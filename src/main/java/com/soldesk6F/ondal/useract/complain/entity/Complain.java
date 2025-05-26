@@ -66,6 +66,10 @@ public class Complain {
     @CreationTimestamp
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 10)
+    private Role role;   
 
     @UpdateTimestamp
     @Column(name = "updated_date", nullable = false)
@@ -96,5 +100,6 @@ public class Complain {
 	public String getComplainUuidAsString() {
 	    return complainId != null ? complainId .toString() : null;
 	}
-	
+    public enum Role { USER, RIDER, OWNER, OTHER }
+
 }
