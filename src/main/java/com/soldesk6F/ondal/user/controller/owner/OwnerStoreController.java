@@ -39,7 +39,9 @@ import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/owner")
 @RequiredArgsConstructor
@@ -209,6 +211,8 @@ public class OwnerStoreController {
 		@RequestParam(value = "holiday", required = false) List<String> holidays,
 		@RequestParam(value = "storeEvent", required = false) String storeEvent,
 		@RequestParam(value = "foodOrigin", required = false) String foodOrigin,
+		@RequestParam(value = "deliveryFee", required = false) int deliveryFee,
+		
 		RedirectAttributes redirectAttributes) {
 
 		try {
@@ -238,7 +242,7 @@ public class OwnerStoreController {
 				holidayStr, 
 				Store.DeliveryRange.valueOf(deliveryRange), 
 				storeEvent, foodOrigin, 
-				latitude, longitude
+				latitude, longitude,deliveryFee
 			);
 
 			redirectAttributes.addFlashAttribute("result", 1);
@@ -265,12 +269,12 @@ public class OwnerStoreController {
 
 		try {
 			storeService.uploadBrandImg(storeId, loginUserId, brandImgFile);
-			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "이미지 업로드 성공");
+			redirectAttributes.addFlashAttribute("brandResult", 1);
+			redirectAttributes.addFlashAttribute("brandResultMsg", "이미지 업로드 성공");
 		} catch (Exception e) {
 			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("result", 0);
-			redirectAttributes.addFlashAttribute("resultMsg", e.getMessage());
+			redirectAttributes.addFlashAttribute("brandResult", 0);
+			redirectAttributes.addFlashAttribute("brandResultMsg", e.getMessage());
 		}
 
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";
@@ -287,12 +291,46 @@ public class OwnerStoreController {
 
 		try {
 			storeService.uploadStoreImgs(storeId, loginUserId, storeImgFiles);
-			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "가게 소개 이미지 업로드 완료");
+			redirectAttributes.addFlashAttribute("storeImgResult", 1);
+			redirectAttributes.addFlashAttribute("storeImgResultMsg", "가게 소개 이미지 업로드 완료");
 		} catch (Exception e) {
 			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("result", 0);
-			redirectAttributes.addFlashAttribute("resultMsg", "가게 소개 이미지 업로드 실패");
+			redirectAttributes.addFlashAttribute("storeImgResult", 0);
+			redirectAttributes.addFlashAttribute("storeImgResultMsg", "가게 소개 이미지 업로드 실패");
+		}
+
+		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";
+	}
+	
+	@PostMapping("/storeManagement/{storeId}/info-manage/updateOrDelete-storeImg/{imgId}")
+	public String updateOrDeleteImage(
+		@PathVariable("storeId") UUID storeId,
+		@PathVariable("imgId") UUID imgId,
+		@RequestParam("action") String action,
+		@RequestParam(value = "updatedImg", required = false) MultipartFile updatedImg,
+		@AuthenticationPrincipal CustomUserDetails userDetails,
+		RedirectAttributes redirectAttributes) {
+
+		String loginUserId = userDetails.getUser().getUserId();
+
+		try {
+			if ("update".equals(action)) {
+				if (updatedImg == null || updatedImg.isEmpty()) {
+					throw new IllegalArgumentException("이미지 파일이 업로드되지 않았습니다.");
+				}
+				storeService.updateStoreImg(storeId, loginUserId, imgId, updatedImg);
+				redirectAttributes.addFlashAttribute("storeImgResultMsg", "이미지가 수정되었습니다.");
+			} else if ("delete".equals(action)) {
+				storeService.deleteStoreImg(storeId, loginUserId, imgId);
+				redirectAttributes.addFlashAttribute("storeImgResultMsg", "이미지가 삭제되었습니다.");
+			} else {
+				throw new IllegalArgumentException("알 수 없는 요청입니다.");
+			}
+			redirectAttributes.addFlashAttribute("result", 1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("storeImgResult", 0);
+			redirectAttributes.addFlashAttribute("storeImgResultMsg", "처리 중 오류가 발생했습니다.");
 		}
 
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";

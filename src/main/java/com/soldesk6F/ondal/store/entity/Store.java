@@ -124,6 +124,10 @@ public class Store {
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus;
 
+    @Column(name = "delivery_fee")
+    private int deliveryFee; 
+    
+    
     @JsonIgnore
     @CreationTimestamp
     @Column(name = "registration_date", updatable = false,nullable = false)
@@ -134,6 +138,8 @@ public class Store {
     private List<MenuCategory> menuCategories;
 
     public enum StoreStatus {
+    	PENDING_APPROVAL("승인대기중"),
+    	PENDING_REFUSES("승인거부"),
         OPEN("영업중"),
         CLOSED("영업종료"),
         SUSPENDED("일시정지"),
@@ -185,17 +191,16 @@ public class Store {
     @Builder
     public Store(Owner owner,String businessNum, String storeName, String category, String storePhone,
                  List<StoreImg> storeImgs,List<StoreIntroduceImg> StoreIntroduceImgs, String brandImg, String storeAddress,
-                 double storeLatitude, double storeLongitude, DeliveryRange deliveryRange,
+                 double storeLatitude, double storeLongitude, Point storeLocation, DeliveryRange deliveryRange,
                  String storeIntroduce, String storeEvent , String foodOrigin,
                  LocalTime openingTime, LocalTime closingTime,
-                 String holiday, StoreStatus storeStatus) {
+                 String holiday, StoreStatus storeStatus,int deliveryFee) {
         this.owner = owner;
         this.businessNum = businessNum;
         this.storeName = storeName;
         this.category = category;
         this.storePhone = storePhone;
 
-        // 이미지 리스트 추가
         if (storeImgs != null) {
             storeImgs.forEach(this::addStoreImg);
         }
@@ -207,6 +212,7 @@ public class Store {
         this.storeAddress = storeAddress;
         this.storeLatitude = storeLatitude;
         this.storeLongitude = storeLongitude;
+        this.storeLocation = storeLocation;
         this.deliveryRange = deliveryRange;
         this.storeIntroduce = storeIntroduce;
         this.storeEvent = storeEvent;
@@ -215,6 +221,7 @@ public class Store {
         this.closingTime = closingTime;
         this.holiday = holiday;
         this.storeStatus = storeStatus != null ? storeStatus : StoreStatus.CLOSED;
+        this.deliveryFee = deliveryFee;
     }
     
     public String getStoreUuidAsString() {

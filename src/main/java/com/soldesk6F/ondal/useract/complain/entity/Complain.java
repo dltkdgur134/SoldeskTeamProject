@@ -74,9 +74,15 @@ public class Complain {
     @OneToMany(mappedBy = "complain", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ComplainReply> replies = new ArrayList<>();
 
+    
+    public enum Role { USER, RIDER, OWNER, OTHER }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 10)
+    private Role role;
+    
     @Builder
     public Complain(User user, String guestId, String complainPassword, String complainTitle, String complainContent,
-			 ComplainStatus complainStatus) {
+			 ComplainStatus complainStatus, Role role) {
 		super();
 		this.user = user;
 		this.guestId = guestId;
@@ -84,7 +90,8 @@ public class Complain {
 		this.complainTitle = complainTitle;
 		this.complainContent = complainContent;
 		this.complainStatus = complainStatus != null ? complainStatus : ComplainStatus.PENDING;
-	}
+		this.role = role;
+    }
 
 
 	public enum ComplainStatus {

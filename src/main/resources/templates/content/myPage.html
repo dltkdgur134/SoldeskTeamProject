@@ -4,90 +4,105 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/Layouts}">
 <head>
-	<link th:href="@{/css/custom.css}" rel="stylesheet" />
-	<link th:href="@{/css/update.css}" rel="stylesheet" />
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-	<script th:src="@{/js/initialize.js}"></script>
-	<script th:src="@{/js/update.js}"></script>
+<link th:href="@{/css/custom.css}" rel="stylesheet" />
+<link th:href="@{/css/update.css}" rel="stylesheet" />
+<script
+	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script th:src="@{/js/initialize.js}"></script>
+<script th:src="@{/js/update.js}"></script>
 </head>
 
 <div layout:fragment="content" class="container py-5">
-	 <div class="container text-center">
-	<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
-		<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+	<div class="container text-center">
+		<div class="alert alert-success" id="flash-messages" role="alert"
+			th:if="${result} == 0">
+			<i class="fa-solid fa-circle-check"></i> <strong
+				th:text="${resultMsg}"></strong>
+		</div>
+		<div class="alert alert-danger" id="flash-messages" role="alert"
+			th:if="${result} == 1">
+			<i class="fa-solid fa-circle-exclamation"></i> <strong
+				th:text="${resultMsg}"></strong>
+		</div>
 	</div>
-	<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
-		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
-	</div>
-	</div> 
-	<div class="card info-card border-light d-flex justify-content-between my-3 text-center">
-    	<div class="card-body">
-    	<div class="row justify-content-start align-items-center">
-        	<div class="col-auto me-5">
-            	<a type="button" class="btn btn-link position-relative" id="profile-pic-btn" data-bs-toggle="modal" data-bs-target="#updateProfilePicModal">
-					<img th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
+	<div
+		class="card info-card border-light d-flex justify-content-between my-3 text-center">
+		<div class="card-body">
+			<div class="row justify-content-start align-items-center">
+				<div class="col-auto me-5">
+					<a type="button" class="btn btn-link position-relative"
+						id="profile-pic-btn" data-bs-toggle="modal"
+						data-bs-target="#updateProfilePicModal"> <img
+						th:src="${#strings.startsWith(#authentication.principal.user.userProfile, 'http') 
              			? #authentication.principal.user.userProfile 
              			: '/img/userProfiles/' + #authentication.principal.user.userProfile}"
 						class="rounded-circle img-thumbnail img-fluid"
-						alt="Profile Picture" id="profile-pic">
-					<span class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle" id="profile-pic-update-btn">
-	    				<i class="fa-solid fa-pen-to-square"></i>
-	  				</span>
-				</a>
-				<br>
-				<br>
-        	</div>
-        	<div class="col-auto ms-5">
-				<h5 id="profile-nickName"
-					th:text="${#authentication.principal.user.nickName}"></h5>
-				<h5 id="profile-id" th:text="${#authentication.principal.user.userId}"></h5>
-				<span class="badge rounded-pill text-bg-success justify-content-center"
-					th:text="${#authentication.principal.user.UserRole}"></span>
-        	</div>
-    	</div>
-    	</div>
+						alt="Profile Picture" id="profile-pic"> <span
+						class="position-absolute top-100 start-50 translate-middle p-1 bg-light rounded-circle"
+						id="profile-pic-update-btn"> <i
+							class="fa-solid fa-pen-to-square"></i>
+					</span>
+					</a> <br> <br>
+				</div>
+				<div class="col-auto ms-5">
+					<h5 id="profile-nickName"
+						th:text="${#authentication.principal.user.nickName}"></h5>
+					<h5 id="profile-id"
+						th:text="${#authentication.principal.user.userId}"></h5>
+					<span
+						class="badge rounded-pill text-bg-success justify-content-center"
+						th:text="${#authentication.principal.user.UserRole}"></span>
+				</div>
+			</div>
+		</div>
 	</div>
 	<div class="card info-card p-4">
 		<h5 class="card-title">
-			기본 정보 <span class="mypage-title-icon"><i class="fa-solid fa-circle-info"></i></span>
+			기본 정보 <span class="mypage-title-icon"><i
+				class="fa-solid fa-circle-info"></i></span>
 		</h5>
 		<div class="card-body">
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item d-flex justify-content-between"><Label>닉네임</Label>
-				<strong  th:text="${#authentication.principal.user.nickName}"></strong>
-					<a type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateNicknameModal">수정</a>
+					<strong th:text="${#authentication.principal.user.nickName}"></strong>
+					<a type="button" class="btn btn-secondary btn-sm"
+					data-bs-toggle="modal" data-bs-target="#updateNicknameModal">수정</a>
 				</li>
-				<li class="list-group-item d-flex justify-content-between"><Label>전화번호</Label><strong th:text="${#authentication.principal.user.userPhone}"></strong>
-				<a type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updatePhoneModal">수정</a>
-				</li>
+				<li class="list-group-item d-flex justify-content-between"><Label>전화번호</Label><strong
+					th:text="${#authentication.principal.user.userPhone}"></strong> <a
+					type="button" class="btn btn-secondary btn-sm"
+					data-bs-toggle="modal" data-bs-target="#updatePhoneModal">수정</a></li>
 			</ul>
 		</div>
 	</div>
-	<div class="modal fade" id="updateNicknameModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateNicknameModalLabel" aria-hidden="true">
-  		<div class="modal-dialog modal-dialog-centered">
-    		<div class="modal-content">
-      			<div class="modal-header justify-content-center">
-        			<h1 class="modal-title fs-5" id="updateNicknameModalLabel">닉네임 변경</h1>
-        			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     	 		</div>
-      			<div class="modal-body">
-       				 <form th:action="@{/content/updateNickname}" method="post" name="upNickForm"
-						autocomplete="off" class="needs-validation" id="update-nickname-form"
-						novalidate>
+	<div class="modal fade" id="updateNicknameModal"
+		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="updateNicknameModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header justify-content-center">
+					<h1 class="modal-title fs-5" id="updateNicknameModalLabel">닉네임
+						변경</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/content/updateNickname}" method="post"
+						name="upNickForm" autocomplete="off" class="needs-validation"
+						id="update-nickname-form" novalidate>
 						<div class="input-group mb-3">
-							<span class="input-group-text" id="basic-addon2">
-							<i class="fa-solid fa-id-card"></i></span> 
-							<input type="text" class="form-control" aria-label="nickname" name="nickname" id="nickname-input" data-status="no"
-								aria-describedby="basic-addon2" maxlength="30" th:value="${#authentication.principal.user.nickName}">
-							<span class="input-group-text" id="basic-addon2">
-								<button type="button" class="check-exists-btn" id="nickname-exists">중복확인</button>
+							<span class="input-group-text" id="basic-addon2"> <i
+								class="fa-solid fa-id-card"></i></span> <input type="text"
+								class="form-control" aria-label="nickname" name="nickname"
+								id="nickname-input" data-status="no"
+								aria-describedby="basic-addon2" maxlength="30"
+								th:value="${#authentication.principal.user.nickName}"> <span
+								class="input-group-text" id="basic-addon2">
+								<button type="button" class="check-exists-btn"
+									id="nickname-exists">중복확인</button>
 							</span>
-							<div class="invalid-feedback">
-     							닉네임을 확인해주세요. 
-   			 				</div>
-   			 				<div class="valid-feedback">
-     							닉네임 변경이 가능합니다.
-   			 				</div>
+							<div class="invalid-feedback">닉네임을 확인해주세요.</div>
+							<div class="valid-feedback">닉네임 변경이 가능합니다.</div>
 						</div>
 					</form>
 				</div>
@@ -100,120 +115,171 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal fade" id="updateProfilePicModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateProfilePicModalLabel" aria-hidden="true">
-  		<div class="modal-dialog modal-dialog-centered">
-    		<div class="modal-content">
-      			<div class="modal-header">
-        			<h1 class="modal-title fs-5" id="updateProfilePicModalLabel">프로필 사진 변경  <i class="fa-solid fa-circle-question" data-bs-toggle="tooltip"
-						data-bs-placement="right" title="아무 이미지 파일도 올리지 않은 채로 변경하면 온달 기본 사진이 적용됩니다."></i></h1>   
-        			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     	 		</div>
-      			<div class="modal-body">
-       				 <form th:action="@{/content/updateProfilePic}" method="post" 
-						autocomplete="off" id="update-profilePic-form" enctype="multipart/form-data">
+	<div class="modal fade" id="updateProfilePicModal"
+		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="updateProfilePicModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="updateProfilePicModalLabel">
+						프로필 사진 변경 <i class="fa-solid fa-circle-question"
+							data-bs-toggle="tooltip" data-bs-placement="right"
+							title="아무 이미지 파일도 올리지 않은 채로 변경하면 온달 기본 사진이 적용됩니다."></i>
+					</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/content/updateProfilePic}" method="post"
+						autocomplete="off" id="update-profilePic-form"
+						enctype="multipart/form-data">
 						<div class="input-group mb-3">
-  							<label class="input-group-text" for="profileImage"><i class="fa-solid fa-folder-open input-icon"></i></label>
-  							<input type="file" class="form-control" id="profileImage" name="profileImage">
+							<label class="input-group-text" for="profileImage"><i
+								class="fa-solid fa-folder-open input-icon"></i></label> <input
+								type="file" class="form-control" id="profileImage"
+								name="profileImage">
 						</div>
-						<div
-  							id="drop-zone"
-  							ondrop="dropHandler(event);"
-  							ondragover="dragOverHandler(event);"
-  							ondragenter="dragEnterHandler(event);">
-  							<p>이미지 파일을 <i>여기에</i> 드래그하여 업로드.</p>
+						<div id="drop-zone" ondrop="dropHandler(event);"
+							ondragover="dragOverHandler(event);"
+							ondragenter="dragEnterHandler(event);">
+							<p>
+								이미지 파일을 <i>여기에</i> 드래그하여 업로드.
+							</p>
 						</div>
-			  			<div id="file-name-display" class="file-name"></div>
-					</form>	
-      			</div>
-      			<div class="modal-footer">
-        			<button type="submit" class="btn btn-primary" form="update-profilePic-form">변경</button>
-        			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-      			</div>
-    		</div>
-  		</div>
+						<div id="file-name-display" class="file-name"></div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary"
+						form="update-profilePic-form">변경</button>
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="modal fade" id="updatePhoneModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updatePhoneModalLabel" aria-hidden="true">
-  		<div class="modal-dialog modal-dialog-centered">
-    		<div class="modal-content">
-      			<div class="modal-header">
-        			<h1 class="modal-title fs-5" id="updatePhoneModalLabel">전화번호 변경</h1>
-        			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-     	 		</div>
-      			<div class="modal-body">
-       				 <form th:action="@{/content/updatePhoneNum}" method="post" name="upPhoneForm"
-						autocomplete="off" class="needs-validation" id="update-phone-form"
-						novalidate>
+	<div class="modal fade" id="updatePhoneModal" data-bs-backdrop="static"
+		data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="updatePhoneModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="updatePhoneModalLabel">전화번호
+						변경</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/content/updatePhoneNum}" method="post"
+						name="upPhoneForm" autocomplete="off" class="needs-validation"
+						id="update-phone-form" novalidate>
 						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2"> <i
+								class="fa-solid fa-phone"></i></span> <input type="text"
+								class="form-control" aria-label="userPhone" name="userPhone"
+								id="phone-input" data-status="no"
+								aria-describedby="basic-addon2" maxlength="13"
+								th:value="${#authentication.principal.user.userPhone}">
 							<span class="input-group-text" id="basic-addon2">
-							<i class="fa-solid fa-phone"></i></span> 
-							<input type="text" class="form-control" aria-label="userPhone" name="userPhone" id="phone-input" data-status="no"
-								aria-describedby="basic-addon2" maxlength="13" th:value="${#authentication.principal.user.userPhone}">
-							<span class="input-group-text" id="basic-addon2">
-								<button type="button" class="check-exists-btn" id="phonenum-exists">중복확인</button>
+								<button type="button" class="check-exists-btn"
+									id="phonenum-exists">중복확인</button>
 							</span>
-							<div class="invalid-feedback">
-     							전화번호를 확인해주세요.
-   			 				</div>
-   			 				<div class="valid-feedback">
-     							전화번호 변경이 가능합니다.
-   			 				</div>
+							<div class="invalid-feedback">전화번호를 확인해주세요.</div>
+							<div class="valid-feedback">전화번호 변경이 가능합니다.</div>
 						</div>
-					</form>	
-      			</div>
-      			<div class="modal-footer">
-        			<button type="submit" class="btn btn-primary" form="update-phone-form" id="update-phone-btn">변경</button>
-        			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-      			</div>
-    		</div>
-  		</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary"
+						form="update-phone-form" id="update-phone-btn">변경</button>
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
 	</div>
 	<br>
 	<div class="card info-card p-4">
 		<h5 class="card-title">
-			보안 정보 <span class="mypage-title-icon"><i class="fa-solid fa-lock"></i></span>
+			보안 정보 <span class="mypage-title-icon"><i
+				class="fa-solid fa-lock"></i></span>
 		</h5>
 		<div class="card-body">
 			<ul class="list-group list-group-flush">
-				<li class="list-group-item d-flex justify-content-between">
-					<Label>비밀번호</Label>
-					<a type="button" class="btn btn-secondary btn-sm" href="mySecurity" >수정</a>
+				<li class="list-group-item d-flex justify-content-between"><Label>비밀번호</Label>
+					<a type="button" class="btn btn-secondary btn-sm" href="mySecurity">수정</a>
 				</li>
 				<li class="list-group-item d-flex justify-content-between"><Label>소셜로그인</Label>
-				<strong th:if="${#authentication.principal.user.socialLoginProvider} != 'NONE'">
-					<img th:src="@{/css/imgs/kakao.png}" class="img-fluid float-end" id="kakao-logo" />
-				</strong>
-				<strong th:if="${#authentication.principal.user.socialLoginProvider} == 'NONE'">
-					<a href="#">
-						<img th:src="@{/css/imgs/kakao.png}" class="img-fluid float-end grayscale" id="kakao-logo" />
+					<strong
+					th:if="${#authentication.principal.user.socialLoginProvider} != 'NONE'">
+						<img th:src="@{/css/imgs/kakao.png}" class="img-fluid float-end"
+						id="kakao-logo" />
+				</strong> <strong
+					th:if="${#authentication.principal.user.socialLoginProvider} == 'NONE'">
+						<a href="#"> <img th:src="@{/css/imgs/kakao.png}"
+							class="img-fluid float-end grayscale" id="kakao-logo" />
 					</a>
-				</strong>
-				</li>
+				</strong></li>
 			</ul>
 		</div>
 	</div>
 	<br>
 	<div class="card info-card p-4">
-		<h5 class="card-title">주소 관리 <span class="mypage-title-icon"><i class="fa-solid fa-house"></i></span></h5>
+		<h5 class="card-title">
+			주소 관리 <span class="mypage-title-icon"><i
+				class="fa-solid fa-house"></i></span>
+		</h5>
 		<div class="card-body">
-			<th:block th:if="${#authentication.principal.user.userSelectedAddress == null}">
-				<a href="regAddress" type="button" class="btn btn-success" id="regAddress-btn">주소 등록하러 가기</a>
+			<th:block
+				th:if="${#authentication.principal.user.userSelectedAddress == null}">
+				<a href="regAddress" type="button" class="btn btn-success"
+					id="regAddress-btn">주소 등록하러 가기</a>
 			</th:block>
-			<th:block th:if="${#authentication.principal.user.userSelectedAddress != null}">
-				<span>
-					<strong th:text="${#authentication.principal.user.userSelectedAddress.address} 
+			<th:block
+				th:if="${#authentication.principal.user.userSelectedAddress != null}">
+				<span> <strong
+					th:text="${#authentication.principal.user.userSelectedAddress.address} 
 					+ ' ' + ${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
 				</span>
 				<br>
 				<br>
-				<a href="myAddress" type="button" class="btn btn-warning" id="manageAddress-btn">내 주소 관리</a>
+				<a href="myAddress" type="button" class="btn btn-warning"
+					id="manageAddress-btn">주소 관리</a>
 			</th:block>
 		</div>
 	</div>
 	<br>
 	<div class="card info-card p-4">
-		<h5 class="card-title">내가 쓴 리뷰 <span class="mypage-title-icon"><i class="fa-solid fa-pen-to-square"></i></span></h5>
+	<h5 class="card-title">
+			결제 관리 <span class="mypage-title-icon">
+			<a href = "/userPayHistory"><i class="fa-solid fa-wallet"></i></a></span>
+		</h5>
 		<div class="card-body">
-			<a href="#" type="button" class="btn btn-warning" id="manageReview-btn">내 리뷰 관리</a>
+		<ul class="list-group list-group-flush">
+		<li class="list-group-item d-flex justify-content-between"><label>온달
+						지갑</label> <strong
+					th:text="${ondalWallet}+' 원'"></strong>
+					<a class="btn btn-secondary btn-sm" href="/user/ondalWallet"
+					data-bs-toggle="modal"
+					data-bs-target="#checkUserPasswordAndGoWallet">조회하기</a></li>
+				<li class="list-group-item d-flex justify-content-between"><label>온달
+						페이</label> <strong
+					th:text="${ondalPay}+' 원'"></strong>
+					<a class="btn btn-secondary btn-sm" href="/user/OndalPay"
+					data-bs-toggle="modal"
+					data-bs-target="#checkUserPasswordAndGoOndalPay">조회하기</a></li>
+		</ul>
+		</div>
+	</div>
+	<br>
+	<div class="card info-card p-4">
+		<h5 class="card-title">
+			내가 쓴 리뷰 <span class="mypage-title-icon"><i
+				class="fa-solid fa-pen-to-square"></i></span>
+		</h5>
+		<div class="card-body">
+			<a href="myReview" type="button" class="btn btn-warning"
+				id="manageReview-btn">리뷰 관리</a>
 		</div>
 	</div>
 	<br>
@@ -256,13 +322,83 @@
 	</div>
 	<br>
 	<div class="card info-card p-4">
-		<h5 class="card-title">
-			계정 관리
-		</h5>
+		<h5 class="card-title">계정 관리</h5>
 		<div class="card-body d-flex justify-content-between">
-			<a href="checkMyPass" type="button" class="btn btn-danger" id="delete-account-btn">회원탈퇴</a>
-			<a href="#" type="button" class="btn btn-danger" id="sns-account-unlink" th:if="${#authentication.principal.user.socialLoginProvider} != 'NONE'">소셜연동 해제</a>
-			<a href="#" type="button" class="btn btn-info" id="sns-account-link" th:if="${#authentication.principal.user.socialLoginProvider} == 'NONE'">소셜연동</a>
+			<a href="checkMyPass" type="button" class="btn btn-danger"
+				id="delete-account-btn">회원탈퇴</a> <a href="#" type="button"
+				class="btn btn-danger" id="sns-account-unlink"
+				th:if="${#authentication.principal.user.socialLoginProvider} != 'NONE'">소셜연동
+				해제</a> <a href="#" type="button" class="btn btn-info"
+				id="sns-account-link"
+				th:if="${#authentication.principal.user.socialLoginProvider} == 'NONE'">소셜연동</a>
+		</div>
+	</div>
+	<div class="modal fade" id="checkUserPasswordAndGoWallet"
+		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="checkUserPasswordAndGoWalletLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="checkUserPasswordAndGoWalletLabel">
+						비밀번호 입력</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/checkUserPasswordAndGoWallet}" method="post"
+						name="checkUserPasswordAndGoWalletForm" autocomplete="off"
+						class="needs-validation" id="check-user-password-form" novalidate>
+
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2"> <i
+								class="fa-solid fa-id-card"></i>
+							</span> <input type="password" class="form-control" placeholder="비밀번호"
+								name="currentPassword" id="currentPassword-input"
+								aria-describedby="basic-addon2">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary"
+						form="check-user-password-form" id="check-user-password-btn">확인</button>
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="checkUserPasswordAndGoOndalPay"
+		data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="checkUserPasswordAndGoOndalPayLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="checkUserPasswordAndGoOndalPayLabel">
+						비밀번호 입력</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/checkUserPasswordAndGoOndalPay}" method="post"
+						name="checkUserPasswordAndGoOndalPayForm" autocomplete="off"
+						class="needs-validation" id="check-user-password-form2" novalidate>
+
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="basic-addon2"> <i
+								class="fa-solid fa-id-card"></i>
+							</span> <input type="password" class="form-control" placeholder="비밀번호"
+								name="Password" id="Password-input"
+								aria-describedby="basic-addon2">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary"
+						form="check-user-password-form2" id="check-user-password-btn2">확인</button>
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">취소</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

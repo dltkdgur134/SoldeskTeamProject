@@ -1,3 +1,41 @@
+let stompClient = null;
+let storeId = null;    // ❗ 전역 변수로 선언
+let currentOrderId = null;
+
+console.log('🧪 [window.storeId]:', window.storeId);
+console.log('🧪 [document.body.dataset.storeid]:', document.body.dataset.storeid);
+
+function notifyUserOrderUpdate(order) {
+  if (!order || !order.userUuid) {
+    console.warn('🔕 유저 알림 보낼 수 없음: userUuid 없음');
+    return;
+  }
+  stompClient.send('/app/notifyUser', {}, JSON.stringify(order));
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const storeIdAttr = document.body.dataset.storeid;
+  if (!storeIdAttr || storeIdAttr === 'undefined') {
+    console.warn('❗ storeId가 유효하지 않음:', storeIdAttr);
+    return;
+  }
+
+  storeId = storeIdAttr; // 안전하게 전역 storeId에 할당
+  console.log('✅ storeId loaded:', storeId);
+
+    // WebSocket 연결, etc.
+    connect();
+	// 채팅 전송 버튼
+	  $('#sendChatBtn').on('click', sendChat);
+	  $('#chatInput').on('keypress', e => {
+	    if (e.which === 13) sendChat();
+	  });
+
+    // 1) 페이지 로드 시, 서버에서 전체 주문 목록을 불러옴
+    loadOrderList();
+    setupOrderButtons();  // ✅ 버튼 바인딩
+});
+
 function handleOrderAction(orderId, action, extra = {}) {
     let url = '';
     let payload = { orderId };
@@ -6,6 +44,8 @@ function handleOrderAction(orderId, action, extra = {}) {
         if (action === 'accept') {
             payload.completionTime = completionTime || 15;
         }
+        
+        console.log("🚀 접수 요청 보내기:", url, payload);
 
         $.ajax({
             url: url,
@@ -17,6 +57,7 @@ function handleOrderAction(orderId, action, extra = {}) {
                 renderOrderDetail(updatedOrder);
                 removeOrderFromList(updatedOrder.orderId);
                 addOrderToList(updatedOrder);
+                notifyUserOrderUpdate(updatedOrder);
             },
             error: function(err) {
                 console.error(`${action} 실패:`, err);
@@ -113,23 +154,34 @@ function updateTemporaryCookingTime(orderId, minutes) {
 
 // 주문 목록 불러오기
 function loadOrderList() {
+	  const storeIdAttr = document.body.dataset.storeid;
+
+  if (!storeIdAttr || storeIdAttr === 'undefined') {
+    console.warn('❗ storeId가 유효하지 않음:', storeIdAttr);
+    return;
+  }
+
+  storeId = storeIdAttr; // 안전하게 전역 storeId에 할당
+  console.log('✅ storeId loaded:', storeId);
     $.ajax({
-        url: '/owner/order/list',
+        url: `/owner/order/list?storeId=${storeId}`,
         method: 'GET',
         success: function(orderList) {
 			console.log('🍀 loadOrderList 응답:', orderList);
             renderOrderList(orderList);
         },
         error: function(err) {
-            console.error(err);
-        }
+		  console.error('Status:', err.status);
+		  console.error('Response body:', err.responseText);
+		}
+
     });
 }
 
 let selectedOrderTime = 15;
 
 function createOrderListItem(order) {
-    const status = (order.orderStatus || 'PENDING').toUpperCase();
+    const status = (order.orderToOwner || 'PENDING').toUpperCase();
     const orderText = $('<div>').addClass('order-text')
         .html(`주문번호: ${order.orderId}<br>총 금액: ${order.totalPrice}원`);
     const buttonWrap = $('<div>').addClass('order-buttons ms-auto d-flex align-items-center');
@@ -177,10 +229,6 @@ function createOrderListItem(order) {
         startCountdown(timerContainer[0], order.cookingStartTime, order.expectCookingTime);
     }
 
-    else if (status === 'IN_DELIVERY') {
-        const startBtn = $('<button>').addClass('startDeliveryBtn').data('orderid', order.orderId).text('배달시작');
-        buttonWrap.append(startBtn);
-    }
 
     li = $('<li>').addClass('order-item').attr('data-orderid', order.orderId)
         .append(orderText, buttonWrap);
@@ -207,48 +255,52 @@ function renderOrderList(orderList) {
     });
 }
 
-function startCountdown(timerElem, cookingStartTime, expectCookingTime) {
-    const circle = timerElem.querySelector('.circle');
-    const text = timerElem.querySelector('.inside-text');
+function startCountdown(timerElem, cookingStartTimeArr, expectCookingTimeArr) {
+  const circle = timerElem.querySelector('.circle');
+  const text = timerElem.querySelector('.inside-text');
 
-    if (!cookingStartTime || !expectCookingTime) {
-        text.textContent = '--';
-        return;
+  if (!Array.isArray(cookingStartTimeArr) || !Array.isArray(expectCookingTimeArr)) {
+    text.textContent = '--';
+    return;
+  }
+
+  // ✅ Java LocalDateTime => [YYYY, MM, DD, HH, mm, ss, nano]
+  const start = new Date(
+    cookingStartTimeArr[0],           // year
+    cookingStartTimeArr[1] - 1,       // month (0-based)
+    cookingStartTimeArr[2],           // day
+    cookingStartTimeArr[3],           // hour
+    cookingStartTimeArr[4],           // minute
+    cookingStartTimeArr[5] || 0       // second
+  );
+
+  // ✅ Java LocalTime => [HH, mm]
+  const cookingMinutes = (expectCookingTimeArr[0] || 0) * 60 + (expectCookingTimeArr[1] || 0);
+  const endTime = new Date(start.getTime() + cookingMinutes * 60000);
+
+  if (timerElem._intervalId) {
+    clearInterval(timerElem._intervalId);
+  }
+
+  function update() {
+    const now = new Date();
+    const remainingMs = endTime.getTime() - now.getTime();
+    const remainingMinutes = Math.floor(remainingMs / 60000);
+    const elapsedPercent = Math.max((1 - (remainingMs / (cookingMinutes * 60000))) * 100, 0);
+
+    if (remainingMinutes < 0) {
+      circle.classList.add('overdue');
+      text.textContent = '+' + Math.abs(remainingMinutes) + '분';
+    } else {
+      circle.classList.remove('overdue');
+      text.textContent = remainingMinutes + '분';
     }
 
-    const start = new Date(cookingStartTime);  // 정확한 시작 시간
-    const [h, m] = expectCookingTime.split(':').map(Number);
-    const totalMinutes = h * 60 + m;
+    circle.style.setProperty('--progress', 100 - elapsedPercent);
+  }
 
-    const endTime = new Date(start.getTime() + totalMinutes * 60000);
-
-    if (timerElem._intervalId) {
-        clearInterval(timerElem._intervalId);
-    }
-
-    function update() {
-        const now = new Date();
-        const elapsedMs = now - start;
-        const remainingMs = endTime - now;
-
-        const remainingMinutes = Math.floor(remainingMs / 60000);
-        const percent = Math.max((1 - (elapsedMs / (totalMinutes * 60000))) * 100, 0);
-        circle.style.setProperty('--progress', percent);
-
-        if (remainingMinutes < 0) {
-            circle.classList.add('overdue');
-            text.textContent = '+' + Math.abs(remainingMinutes) + '분';
-        } else {
-            circle.classList.remove('overdue');
-            text.textContent = remainingMinutes + '분';
-        }
-    }
-
-    update();
-
-    timerElem._intervalId = setInterval(() => {
-        update();
-    }, 1000);
+  update();
+  timerElem._intervalId = setInterval(update, 1000);
 }
 
 
@@ -267,17 +319,24 @@ function startTimer(elemId, minutes) {
 
     updateCircle();
 }
-
+let currentChatSubscription = null;
 // 특정 주문 상세 불러오기
 function loadOrderDetail(orderId) {
     console.log('▶▶▶ loadOrderDetail 시작:', orderId);
     currentOrderId = orderId;
     $('#chatMessages').empty();
 
+	if (currentChatSubscription) {
+		currentChatSubscription.unsubscribe();
+		console.log('✖ 이전 구독 해제됨');
+	}
+	
     // — 기존에 있던 채팅 재구독 로직
     if (stompClient) {
         // (선택) 이전 구독 토픽 해제 로직이 필요하면 여기서 처리
-        stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+        //stompClient.subscribe('/user/queue/chat', onChatMessage);
+		//stompClient.subscribe('/topic/chat/' + orderId, onChatMessage);
+		currentChatSubscription = stompClient.subscribe('/topic/chat/' + orderId, onChatMessage);
     }
 
     // — AJAX 로 상세 정보 가져오기
@@ -297,12 +356,39 @@ function loadOrderDetail(orderId) {
 
 // 주문 상세 표시
 function renderOrderDetail(order) {
+  $('#detailOrderNumber').text(
+  order.orderNumber ? ` [${order.orderNumber.toString().padStart(3, '0')}]` : ''
+	);
   $('#detailOrderId').text(order.orderId);
   $('#detailAddress').text(order.deliveryAddress);
   $('#detailStatus').text(order.orderStatus);
   $('#detailStoreRequest').text(order.storeRequest);
   $('#detailDeliveryRequest').text(order.deliveryRequest);
   $('#detailTotalPrice').text(order.totalPrice);
+  $('#detailDeliveryFee').text(order.deliveryFee);
+  $('#TotalPrice').text(order.deliveryFee+order.totalPrice);
+  
+	
+	
+  // 🧼 기존 메뉴 리스트 영역 비우기
+  $('#detailMenuList').empty();
+  
+  
+  const $detailArea = $('<div>');
+
+  order.orderDetails.forEach(detail => {
+    const $menu = $('<div>').text(`${detail.menuName}  x ${detail.quantity}`).css({ fontWeight: 'bold' });
+    $detailArea.append($menu);
+
+    if (detail.optionNames && detail.optionNames.length > 0) {
+      detail.optionNames.forEach((opt, idx) => {
+        const optText = `└ ${opt}`;
+        $detailArea.append($('<div>').text(optText).css({ marginLeft: '10px', fontSize: '0.9em' }));
+      });
+    }
+  });
+
+  $('#detailMenuList').append($detailArea);
 
   $('#confirmBtn, #cancelBtn, #completeBtn, #startDeliveryBtn')
   .data('orderid', order.orderId)
@@ -325,9 +411,11 @@ function updateOrderStatus(orderId, url) {
         contentType: 'application/json',
         data: JSON.stringify({ orderId: orderId }),
         success: function(updatedOrder) {
+			console.log('🔄 updatedOrder 응답:', updatedOrder);
             renderOrderDetail(updatedOrder);
             removeOrderFromList(updatedOrder.orderId); // ✅ 삭제 후
             addOrderToList(updatedOrder);         // ✅ 갱신
+            notifyUserOrderUpdate(updatedOrder);
         },
         error: function(err) {
             console.error('상태 변경 실패:', err);
@@ -336,10 +424,8 @@ function updateOrderStatus(orderId, url) {
     });
 }
 
-   let stompClient = null;
-   const storeId = "[[${storeId}]]";
-   let currentOrderId = null;
 
+	//Web Socket Connect
    function connect() {
        const socket = new SockJS('/stomp');
        stompClient = Stomp.over(socket);
@@ -350,8 +436,19 @@ function updateOrderStatus(orderId, url) {
                const orderData = JSON.parse(message.body);
                showNewOrderPopup(orderData);
            });
+           stompClient.subscribe('/topic/store/removeOrder/' + storeId, function(message) {
+               const orderData = JSON.parse(message.body);
+			   console.log(orderData.orderToUser);
+			   removeDeliveringOrderList(orderData.orderId);
+			   alert("배달이 완료되었습니다. 주문번호 :")
+           });
            if (currentOrderId) {
-		   		stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+				alert('오더아이디 어디선가');
+		   		//stompClient.subscribe('/topic/chat/' + currentOrderId, onChatMessage);
+				stompClient.subscribe('/topic/chat/' + currentOrderId, message => {
+					console.log('채팅 메시지 도착:', message);
+					onChatMessage(message);
+				})
 		   }
        });
    }
@@ -360,26 +457,43 @@ function updateOrderStatus(orderId, url) {
 	  console.log('🥡 onChatMessage 호출됨:', message);
 	  const payload = JSON.parse(message.body);
 	  console.log('🥡 메시지 페이로드:', payload);
-	  const { sender, text, timestamp } = payload;
-	  const $msg = $(`
+	  const { senderName, senderType, text, timestamp } = payload;
+	  /*const $msg = $(`
 	    <div class="chat-message">
-	      <span class="sender">${sender}:</span>
+	      <span class="sender">${senderName}:</span>
 	      <span class="text">${text}</span>
 	      <div class="timestamp text-muted small">${new Date(timestamp).toLocaleTimeString()}</div>
 	    </div>
 	  `);
 	  $('#chatMessages').append($msg);
-	  $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);
+	  $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);*/
+	  const container = document.getElementById('chatMessages');
+	    if (!container) {
+	        console.error("chatMessages element not found!");
+	        return;
+	    }
+	    const el = document.createElement('div');
+	    el.className = 'chat-message';
+	    el.innerHTML = `
+	      <strong class="sender">${senderType}:</strong>
+	      <span class="text">${text}</span>
+	      <div class="timestamp text-muted small">
+	        ${new Date(timestamp).toLocaleTimeString()}
+	      </div>
+	    `;
+	    container.append(el);
+	    container.scrollTop = container.scrollHeight;
 	}
 	
-	// 채팅 보내기
+	//  보내기
 	function sendChat() {
 	  const text = $('#chatInput').val().trim();
 	  if (!text || !currentOrderId) return;
 	  const payload = {
 	    storeId,
 	    orderId: currentOrderId,
-	    sender: '사장님',
+	    senderName: '사장님',
+		senderType: '사장님',
 	    text,
 	    timestamp: new Date().toISOString()
 	  };
@@ -390,6 +504,7 @@ function updateOrderStatus(orderId, url) {
    // 새 주문 팝업 표시
    function showNewOrderPopup(order) {
    	// 주문 정보 표시
+   	   $('#orderNumber').text(order.orderNumber?.toString().padStart(3, '0') || '-');
        $('#orderInfo').text(order.menuNameList);
        $('#orderOptions').text(order.options);
        $('#orderCount').text(order.totalCount);
@@ -399,9 +514,11 @@ function updateOrderStatus(orderId, url) {
        $('#deliveryRequest').text(order.deliveryRequest);
        $('#needSpoon').text(order.needSpoon ? '예' : '아니오');
 
-       $('#orderId').text(order.id);
+       $('#orderId').text(order.orderId);
        $('#contactNumber').text(order.contactNumber);
-       $('#address').text(order.address);
+       $('#address').text(order.deliveryAddress);
+
+		loadOrderList();
 
        // 모달 열기
        newOrderModal.show();
@@ -411,10 +528,10 @@ function updateOrderStatus(orderId, url) {
 
        // 버튼 이벤트 등록
        $('#acceptBtn').off('click').on('click', function() {
-           acceptOrder(order.id, $('#completionTime').val());
+           acceptOrder(order.orderId, $('#completionTime').val());
        });
        $('#rejectBtn').off('click').on('click', function() {
-           rejectOrder(order.id);
+           rejectOrder(order.orderId);
        });
    }
 
@@ -460,6 +577,7 @@ function updateOrderStatus(orderId, url) {
                renderOrderDetail(updatedOrder);  // ✅ 추가
                removeOrderFromList(orderId);
                addOrderToList(updatedOrder);
+               notifyUserOrderUpdate(updatedOrder);
            },
            error: function(err) {
                console.error('접수 실패:', err);
@@ -467,6 +585,9 @@ function updateOrderStatus(orderId, url) {
            }
        });
    }
+   
+   
+   
    
    function removeOrderFromList(orderId) {
        $('#newOrderList li, #processingOrderList li').each(function () {
@@ -476,8 +597,16 @@ function updateOrderStatus(orderId, url) {
            }
        });
    }
+   function removeDeliveringOrderList(orderId) {
+       $('#deliveringOrderList li').each(function () {
+           const currentId = $(this).data('orderid');
+           if (currentId === orderId) {
+               $(this).remove();
+           }
+       });
+   }
 
-   // 주문 거부
+// 주문 거부
 function rejectOrder(orderId) {
     $.ajax({
         url: '/owner/order/reject',
@@ -505,22 +634,25 @@ function extendTime(orderId, minutes) {
         success: function(updatedOrder) {
             alert('시간 추가 완료.');
 
+            // ✅ 1. 리스트에서 해당 주문 아이템 찾기
             const $li = $(`li[data-orderid='${orderId}']`);
             const timerElem = $li.find('.countdown-timer')[0];
 
             if (timerElem) {
-                // 기존 타이머 제거
-                if (timerElem._intervalId) clearInterval(timerElem._intervalId);
+                // ✅ 2. 기존 타이머 중지
+                if (timerElem._intervalId) {
+                    clearInterval(timerElem._intervalId);
+                    timerElem._intervalId = null;
+                }
+
+                // ✅ 3. 타이머 UI 초기화
                 timerElem.querySelector('.circle')?.classList.remove('overdue');
+                timerElem.querySelector('.inside-text').textContent = '--';
 
-                // ✅ ⬇️ 정확한 남은 시간 계산
-                const remainingTime = getRemainingMinutes(
-                    updatedOrder.cookingStartTime,
-                    updatedOrder.expectCookingTime
-                );
-
+                // ✅ 4. 새로 받은 시간으로 타이머 재시작
                 startCountdown(timerElem, updatedOrder.cookingStartTime, updatedOrder.expectCookingTime);
             }
+            notifyUserOrderUpdate(updatedOrder);
         },
         error: function(err) {
             console.error("시간 추가 실패:", err);
@@ -571,6 +703,7 @@ function completeOrder(orderId) {
             removeOrderFromList(orderId);
             addOrderToList(updatedOrder);
             loadOrderList();
+            notifyUserOrderUpdate(updatedOrder);
         },
         error: function(err) {
             console.error('조리 완료 실패:', err);
@@ -578,24 +711,22 @@ function completeOrder(orderId) {
     });
 }
 
+function showToast(message) {
+  const toastBody = document.getElementById('orderToastBody');
+  toastBody.textContent = message;
+
+  const toastElement = document.getElementById('orderToast');
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
+}
+
 // 페이지 로드 시 WebSocket 연결
-$(document).ready(function() {
+$(document).ready(function() {	
     // Bootstrap Modal 객체 생성
     const modalElem = document.getElementById('newOrderPopup');
     newOrderModal = new bootstrap.Modal(modalElem, {
         backdrop: 'static', // 모달 밖 클릭해도 닫히지 않도록
         keyboard: false     // ESC로 닫히지 않도록
     });
-    
-    // WebSocket 연결, etc.
-    connect();
-	// 채팅 전송 버튼
-	  $('#sendChatBtn').on('click', sendChat);
-	  $('#chatInput').on('keypress', e => {
-	    if (e.which === 13) sendChat();
-	  });
 
-    // 1) 페이지 로드 시, 서버에서 전체 주문 목록을 불러옴
-    loadOrderList();
-    setupOrderButtons();  // ✅ 버튼 바인딩
 });

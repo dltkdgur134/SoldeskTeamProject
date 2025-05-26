@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	const history = loadHistory();
 		clearList();
      	  history.forEach(word => {
-		if(!word)list.appendChild(createItem(word, true)); 
+		if(word)list.appendChild(createItem(word, true)); 
 	  });
 
 	}
@@ -57,11 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		if(!query)return;
 		
 		if(!hadAddress()){
-		
+			
 		sessionStorage.setItem("address" , query);
 		searchInput.value = sessionStorage.getItem("food") || "";
 		searchInput.setAttribute("placeholder" , "뭐 먹을까?");
 		showHistory();
+		saveAddrHistory(query);
 		showReenterBtn();
 		
 	}else{
@@ -87,7 +88,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	  clearList();
 	  const hist = loadAddrHistory();
 	  
-	  hist.forEach(a => {if(!a)list.appendChild(createItem(a, /* isHistory */ true))});
+	  hist.forEach(a => {
+		if(a)list.appendChild(createItem(a, /* isHistory */ true))});
+
+	  hist.forEach(a => {if(a)list.appendChild(createItem(a,true))});
+
 	  listWrapper.classList.remove('d-none');
 	  listWrapper.classList.add('d-flex');
 	}

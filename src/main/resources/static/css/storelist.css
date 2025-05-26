@@ -35,7 +35,7 @@
 }
 
 .store-name {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 5px;
 }
@@ -43,12 +43,14 @@
 .store-category {
   color: #888;
   font-size: 14px;
+  margin: auto;
 }
 
-#btn-area {
-	
+.store-delivery {
+  color: #888;
+  font-size: 14px;
+  margin: auto;
 }
-
 .storeReg-btn {
 	background-color: #FFDF33;
 	border: none !important;
@@ -62,3 +64,8 @@
 	transition: background-color 0.3s;
 	padding: 10px;
 }
+
+
+
+
+

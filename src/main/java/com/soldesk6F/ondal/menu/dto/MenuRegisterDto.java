@@ -19,6 +19,10 @@ public class MenuRegisterDto {
 	private int price;
 	private MultipartFile menuImg;
 	
+	private String menuOptions1GroupName;
+	private String menuOptions2GroupName;
+	private String menuOptions3GroupName;
+	
 	private List<String> menuOptions1;
 	private List<String> menuOptions1Price;
 	

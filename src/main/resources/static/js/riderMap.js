@@ -199,7 +199,7 @@ function displayOrdersForStore(storeName) {
                 <p>배달 주소: <span>${order.deliveryAddress}</span></p>
                 <button class="assign-btn" data-order-id="${order.orderId}">배차</button>
             </div>
-        ;`
+        `
 
 		orderItemsContainer.appendChild(orderDiv);
 	});
@@ -333,7 +333,7 @@ document.addEventListener("click", async (e) => {
 			</style>
 			/*e5d3b43b5ba403cc978d5770a28e29af*/
 			/*a82eb7e13124954eb1c020ac4cece497*/
-            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e5d3b43b5ba403cc978d5770a28e29af"></script>
+            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a82eb7e13124954eb1c020ac4cece497"></script>
           </head>
           <body>
             <div id="map"></div>

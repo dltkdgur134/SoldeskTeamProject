@@ -1,83 +1,92 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
 <head>
 	<meta charset="UTF-8">
 	<title>설정 페이지</title>
-	<link rel="stylesheet" th:href="@{/css/storeSetting.css}">
+	<link th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:href="@{/css/ownerCustom.css}" rel="stylesheet" />
+	<link th:href="@{/css/storeSetting.css}" rel="stylesheet" />
 </head>
 <body>
-	<div class="setting-container">
-		<div class="setting-header">
-			<span class="back-btn">❮ 이전</span>
-			<span class="datetime" id="today-date"></span>
-		</div>
-	
-		<div class="tab-buttons">
-			<button onclick="loadSetting('/setting/operation', this)">운영 설정</button>
-			<button onclick="loadSetting('/setting/printer', this)">프린터 설정</button>
-			<button onclick="loadSetting('/setting/alarm', this)">알림 설정</button>
-			<button onclick="loadSetting('/setting/delivery', this)">배달대행사 설정</button>
-		</div>
-	
-		<div class="content" id="setting-content">
+	<div layout:fragment="content">
+		<div class="setting-container">
+			<div class="setting-header">
+				<span class="back-btn">❮ 이전</span>
+				<span class="datetime" id="today-date"></span>
+			</div>
 			
+			<div class="tab-buttons">
+				<button onclick="loadSetting('/owner/setting/operation', this)">운영 설정</button>
+				<button onclick="loadSetting('/owner/setting/ordersetting', this)">주문 설정</button>
+				<button onclick="loadSetting('/owner/setting/deliverysetting', this)">배달 설정</button>
+				<button onclick="loadSetting('/owner/setting/deliveryAgency', this)">배달대행사 설정</button>
+			</div>
+		
+			<div class="content" id="setting-content">
+				
+			</div>
 		</div>
 	</div>
-	<script>
-	    function loadSetting(url, btn) {
-	        document.querySelectorAll(".tab-buttons button").forEach(b => b.classList.remove("active"));
-	        btn.classList.add("active");
-	        fetch(url)
-	            .then(res => res.text())
-	            .then(html => {
-	                document.getElementById("setting-content").innerHTML = html;
-	            })
-	            .catch(err => {
-	                document.getElementById("setting-content").innerHTML = '<p>로드에 실패했습니다.</p>';
-	                console.error(err);
-	            });
-	    }
+	<div layout:fragment="js">
+		<script th:src="@{/js/index.js}"></script>
+		<script>
+		    function loadSetting(url, btn) {
+		        document.querySelectorAll(".tab-buttons button").forEach(b => b.classList.remove("active"));
+		        btn.classList.add("active");
+		        fetch(url)
+		            .then(res => res.text())
+		            .then(html => {
+		                document.getElementById("setting-content").innerHTML = html;
+		            })
+		            .catch(err => {
+		                document.getElementById("setting-content").innerHTML = '<p>로드에 실패했습니다.</p>';
+		                console.error(err);
+		            });
+		    }
 
-	    function formatDate(date) {
-	        const days = ['일', '월', '화', '수', '목', '금', '토'];
-	        const month = date.getMonth() + 1;
-	        const day = date.getDate();
-	        const weekday = days[date.getDay()];
-	        let hours = date.getHours();
-	        const minutes = date.getMinutes().toString().padStart(2, '0');
-	        const isAM = hours < 12;
-	        const ampm = isAM ? '오전' : '오후';
-	        if (!isAM) hours = hours > 12 ? hours - 12 : hours;
-	        if (hours === 0) hours = 12;
-	        return `${new Date().getMonth() + 1}. ${day} (${weekday}) ${ampm} ${hours}:${minutes}`;
-	    }
+		    function formatDate(date) {
+		        const days = ['일', '월', '화', '수', '목', '금', '토'];
+		        const month = date.getMonth() + 1;
+		        const day = date.getDate();
+		        const weekday = days[date.getDay()];
+		        let hours = date.getHours();
+		        const minutes = date.getMinutes().toString().padStart(2, '0');
+		        const isAM = hours < 12;
+		        const ampm = isAM ? '오전' : '오후';
+		        if (!isAM) hours = hours > 12 ? hours - 12 : hours;
+		        if (hours === 0) hours = 12;
+		        return `${new Date().getMonth() + 1}. ${day} (${weekday}) ${ampm} ${hours}:${minutes}`;
+		    }
 
-	    function updateTime() {
-	        const now = new Date();
-	        document.getElementById("today-date").textContent = formatDate(now);
-	    }
+		    function updateTime() {
+		        const now = new Date();
+		        document.getElementById("today-date").textContent = formatDate(now);
+		    }
 
-	    document.addEventListener("DOMContentLoaded", () => {
-			updateTime();
-			setInterval(updateTime, 1000);
-			const params = new URLSearchParams(window.location.search);
-				const tab = params.get("tab");
+		    document.addEventListener("DOMContentLoaded", () => {
+				updateTime();
+				setInterval(updateTime, 1000);
+				const params = new URLSearchParams(window.location.search);
+					const tab = params.get("tab");
 
-				if (tab) {
-					const buttonMap = {
-						operation: 0,
-						printer: 1,
-						alarm: 2,
-						delivery: 3
-					};
-					const btnIndex = buttonMap[tab];
-					if (btnIndex !== undefined) {
-						const buttons = document.querySelectorAll(".tab-buttons button");
-						buttons[btnIndex].click(); // 자동 클릭
+					if (tab) {
+						const buttonMap = {
+							operation: 0,
+							printer: 1,
+							alarm: 2,
+							delivery: 3
+						};
+						const btnIndex = buttonMap[tab];
+						if (btnIndex !== undefined) {
+							const buttons = document.querySelectorAll(".tab-buttons button");
+							buttons[btnIndex].click(); // 자동 클릭
+						}
 					}
-				}
-		});
-	</script>
-
+			});
+		</script>
+	</div>
 </body>
 </html>

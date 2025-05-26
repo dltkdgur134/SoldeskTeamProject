@@ -7,10 +7,10 @@
 }
 
 .option-group {
-	display: grid;
+/*	display: grid;
 	grid-template-columns: 1fr 1fr auto;
 	gap: 8px;
-	align-items: center;
+	align-items: center;*/
 	margin-top: 10px;
 }
 
@@ -47,6 +47,72 @@
 
 .category-input + button {
 	margin-left: 5px;
+}
+
+/* 옵션 그룹 박스 스타일 */
+.option-group-wrapper {
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	padding: 15px;
+	margin-bottom: 20px;
+	background-color: #fefefe;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 옵션 그룹 이름 input */
+.option-group-wrapper > input[type="text"] {
+	width: 100%;
+	margin-bottom: 10px;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+/* 하위 옵션들 wrapper */
+.option-items {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+/* 하위 옵션 한 줄 */
+.sub-option {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+/* 이름과 가격 input 크기 조절 */
+.sub-option input[type="text"],
+.sub-option input[type="number"] {
+	flex: 2;
+	padding: 6px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+/* 삭제 버튼 */
+.sub-option button {
+	background-color: #ffdddd;
+	border: 1px solid #e88;
+	color: #a00;
+	padding: 6px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.remove-btn.danger {
+	background-color: #ffdddd;
+	color: #a00;
+	border: 1px solid #eaa;
+	width: 25%;
+}
+
+.sub-option button:hover,
+.option-group-wrapper button:hover {
+	background-color: #ddd;
 }
 
 

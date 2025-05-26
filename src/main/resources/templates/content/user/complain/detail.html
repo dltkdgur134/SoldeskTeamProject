@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+    <link th:href="@{/css/Custom.css}" rel="stylesheet"/>
+    <title>문의 상세</title>
+</head>
+<div layout:fragment="content" class="container py-5">
+    <h2>문의 상세</h2>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">제목</label>
+        <p th:text="${complain.complainTitle}">제목</p>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">작성자</label>
+        <p>
+            <span th:if="${complain.user != null}" th:text="${complain.user.userId}">회원</span>
+            <span th:if="${complain.user == null}" th:text="${complain.guestId}">비회원</span>
+        </p>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">문의 유형</label>
+        <p th:text="${complain.role}">USER</p>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">내용</label>
+        <div th:utext="${complain.complainContent}">내용</div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">작성일</label>
+        <p th:text="${#temporals.format(complain.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</p>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">처리 상태</label>
+        <p th:text="${complain.complainStatus}">답변 대기</p>
+    </div>
+
+    <div>
+        <a th:href="@{/complains}" class="btn btn-secondary">목록으로</a>
+  	<div th:if="${complain.user != null and #strings.equals(complain.user.userUuid.toString(), userUuid)}">
+    	<a th:href="@{'/complains/edit/' + ${complain.complainId}}" class="btn btn-primary">수정</a>
+    	<a th:href="@{'/complains/delete/' + ${complain.complainId}}" class="btn btn-danger">삭제</a>
+	</div>
+    </div>
+  <!-- 본인 글일 경우에만 수정/삭제 버튼 노출 -->
+</div>
+</html>

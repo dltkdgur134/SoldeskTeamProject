@@ -71,3 +71,15 @@ body {
 	border: none;
 	background-color: transparent;
 }
+
+/* 버튼 */
+#regAddress-btn, #manageAddress-btn, #manageReview-btn {
+	background-color: #ffdf33;
+	border-color: #ffdf33;
+	font-weight: 900;
+}
+
+#regAddress-btn:hover, #manageAddress-btn:hover, #manageReview-btn:hover {
+	background-color: #ffef99;
+	border-color: #ffef99;
+}

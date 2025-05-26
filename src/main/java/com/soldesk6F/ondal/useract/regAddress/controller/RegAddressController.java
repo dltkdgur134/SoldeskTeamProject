@@ -36,14 +36,14 @@ public class RegAddressController {
 			@RequestParam("address") String address, 
 			@RequestParam("detailAddress") String detailAddress,
 			@RequestParam("latitude") String latitude,
-			@RequestParam("longitude") String longitude, 
+			@RequestParam("longitude") String longitude,
 			RedirectAttributes redirectAttributes) {
 		regAddressService.regAddress(userDetails, redirectAttributes, address, detailAddress, latitude, longitude);
 		return "redirect:/myAddress";
 	}
 
 	// 유저의 모든 주소 (주소 관리)
-	@GetMapping(value = "/myAddress")
+	@GetMapping("/myAddress")
 	public String goMyAddress(
 			@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes redirectAttributes, 

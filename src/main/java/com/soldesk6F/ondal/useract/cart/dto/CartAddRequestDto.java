@@ -10,5 +10,5 @@ public class CartAddRequestDto {
 	private UUID menuId;
 	private UUID storeId;
 	private int quantity;
-	private List<String> options;
+	private List<CartOptionDto> options;
 }

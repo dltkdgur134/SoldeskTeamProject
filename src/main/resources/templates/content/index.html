@@ -15,6 +15,9 @@
 		style="margin-bottom: 20px;">
 		<span th:text="${riderSuccess}"></span>
 	</div>
+	<div th:if="${errorMessage}" class="alert alert-danger">
+    <p th:text="${errorMessage}"></p>
+	</div>
 	<div th:if="${riderExists}" class="alert alert-danger text-center" role="alert"
      style="margin-bottom: 20px;" id="riderAlert">
      
@@ -136,35 +139,35 @@ style="height: 10px;"
 	<div class="container-md text-center px-3 mt-3">
   			<div class="row d-flex justify-content-start">
     			<div class="col">
-    				<a th:href="@{/list(category='fastfood')}">
+    				<a th:href="@{/store/list(category='fastfood')}">
     	  				<img src="/css/imgs/category1.webp" alt="패스트푸드" class="img-fluid">
 	      				<br>
 						<label class="category-label">패스트푸드</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='cn')}">
+    				<a th:href="@{/store/list(category='cn')}">
      					<img src="/css/imgs/category2.webp" alt="중식" class="img-fluid">
       					<br>
 						<label class="category-label">중식</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='kr')}">
+    				<a th:href="@{/store/list(category='kr')}">
 	      				<img src="/css/imgs/category3.webp" alt="한식" class="img-fluid">
       					<br>
 						<label class="category-label">한식</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='bunsik')}">
+    				<a th:href="@{/store/list(category='bunsik')}">
       					<img src="/css/imgs/category4.webp" alt="분식" class="img-fluid">
       					<br>
 						<label class="category-label">분식</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='chicken')}">
+    				<a th:href="@{/store/list(category='chicken')}">
       					<img src="/css/imgs/category5.webp" alt="치킨" class="img-fluid">
       					<br>
 						<label class="category-label">치킨</label>
@@ -174,35 +177,35 @@ style="height: 10px;"
   			<br>
   			<div class="row d-flex justify-content-between">
     			<div class="col">
-    				<a th:href="@{/list(category='pizza')}">
+    				<a th:href="@{/store/list(category='pizza')}">
       					<img src="/css/imgs/category6.webp" alt="피자" class="img-fluid">
       					<br>
 						<label class="category-label">피자</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='jjimtang')}">
+    				<a th:href="@{/store/list(category='jjimtang')}">
      					<img src="/css/imgs/category7.webp" alt="찜탕" class="img-fluid">
       					<br>
 						<label class="category-label">찜 · 탕</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='jp')}">
+    				<a th:href="@{/store/list(category='jp')}">
       					<img src="/css/imgs/category8.webp" alt="일식" class="img-fluid">
       					<br>
 						<label class="category-label">일식</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='roast')}">
+    				<a th:href="@{/store/list(category='roast')}">
       					<img src="/css/imgs/category9.webp" alt="구이" class="img-fluid">
       					<br>
 						<label class="category-label">구이</label>
 					</a>
     			</div>
     			<div class="col">
-    				<a th:href="@{/list(category='caffe')}">
+    				<a th:href="@{/store/list(category='caffe')}">
       					<img src="/css/imgs/category10.webp" alt="카페" class="img-fluid">
       					<br>
 						<label class="category-label">카페</label>

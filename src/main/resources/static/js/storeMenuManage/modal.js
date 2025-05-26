@@ -1,7 +1,8 @@
 import { dynamicCategories, renderEditCategorySelect } from './category.js';
-import { maxOption, editOptionCount } from './options.js';
+import { maxOption, fillEditOptions, editOptionCount } from './options.js';
 
 export function openMenuModal() {
+	document.getElementById("editMenuModal").style.display = "none";
 	document.getElementById("menuModal").style.display = "flex";
 }
 
@@ -12,6 +13,8 @@ export function closeMenuModal() {
 export function openEditMenuModal(menuId) {
 	const menu = window.menuList.find(m => m.menuId === menuId);
 	if (!menu) return;
+	
+	document.getElementById("menuModal").style.display = "none";
 
 	console.log("👉 선택할 카테고리 ID:", menu.menuCategoryId);
 	console.log("🧭 전체 카테고리 목록:", [...dynamicCategories.entries()]);
@@ -25,43 +28,14 @@ export function openEditMenuModal(menuId) {
 	document.getElementById('editMenuCategory').value = menu.menuCategory || "";
 	
 	renderEditCategorySelect(menu.menuCategoryId);
-
-	const container = document.getElementById("edit-option-container");
-	container.innerHTML = "";
-	editOptionCount.value = 0;
-
-	for (let i = 1; i <= 3; i++) {
-		const nameKey = `menuOptions${i}`;
-		const priceKey = `menuOptions${i}Price`;
-
-		if (menu[nameKey] && menu[priceKey]) {
-			const names = Array.isArray(menu[nameKey]) ? menu[nameKey] : menu[nameKey].split("온달");
-			const prices = Array.isArray(menu[priceKey]) ? menu[priceKey] : menu[priceKey].split("온달");
-
-			for (let j = 0; j < names.length; j++) {
-				if (names[j].trim() === "") continue;
-
-				editOptionCount.value++;
-
-				const div = document.createElement("div");
-				div.className = "option-group";
-				div.innerHTML = `
-					<label>옵션 ${editOptionCount.value}</label><br>
-					<input type="text" name="menuOptions${editOptionCount.value}[]" value="${names[j].trim()}" required />
-					<input type="number" name="menuOptions${editOptionCount.value}Price[]" value="${String(prices[j]).trim() || 0}" required />
-					<button type="button" onclick="removeOption(this)">삭제</button>
-				`;
-
-				container.appendChild(div);
-			}
-		}
-	}
-
+	
+	fillEditOptions(menu);
+	
 	document.getElementById('editMenuModal').style.display = 'flex';
+	document.getElementById('deleteMenuId').value = menu.menuId;
 	const addBtn = document.getElementById("edit-add-option-btn");
 	addBtn.disabled = editOptionCount.value >= maxOption;
 	
-	document.getElementById('deleteMenuId').value = menu.menuId;
 }
 
 export function closeEditMenuModal() {

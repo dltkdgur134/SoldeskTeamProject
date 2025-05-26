@@ -29,54 +29,61 @@
 			</th:block>
 		</div>
 		<form class="p-3" name="regReviewForm" id="regReviewForm" th:action="@{/content/regReview}" enctype="multipart/form-data" onsubmit="return checkReview();" method="POST" autocomplete="off">
-		<div class="container-fluid d-flex justify-content-center flex-column align-items-center">
-    		<div class="rating mb-3">
-  				<span id="5" class="fa-solid fa-moon mx-2"></span>
-  				<span id="4" class="fa-solid fa-moon mx-2"></span>
-  				<span id="3" class="fa-solid fa-moon mx-2"></span>
-  				<span id="2" class="fa-solid fa-moon mx-2"></span>
-  				<span id="1" class="fa-solid fa-moon mx-2"></span>
+			<input type="text" class="form-control" name="orderId" placeholder="Order ID" id="order-id" th:value="${order.orderId}" hidden="true" />
+			<div class="container-fluid d-flex justify-content-center flex-column align-items-center">
+	    		<div class="rating mb-3">
+	  				<span id="5" class="fa-solid fa-moon mx-2"></span>
+	  				<span id="4" class="fa-solid fa-moon mx-2"></span>
+	  				<span id="3" class="fa-solid fa-moon mx-2"></span>
+	  				<span id="2" class="fa-solid fa-moon mx-2"></span>
+	  				<span id="1" class="fa-solid fa-moon mx-2"></span>
+				</div>
+				<input name="rating" class="form-control mb-3" id="rating-stars" type="text" hidden="true"/>
+				<div class="invalid-feedback text-center">
+	     			달점을 선택해주세요!
+	   			</div>
 			</div>
-			<input name="rating" class="form-control mb-3" id="rating-stars" type="text" hidden="true"/>
-			<div class="invalid-feedback text-center">
-     			달점을 선택해주세요!
-   			</div>
-		</div>
-		<div class="d-flex justify-content-center mb-3">
-  			<label for="review-img" class="custom-file-upload"><i class="fa-solid fa-camera"></i>  사진 첨부하기</label> 
-  			<input type="file" class="form-control" id="review-img" name="reviewImg" multiple>
-		</div>
-		<div class="preview-container d-flex justify-content-center mt-3" id="image-preview-container">
-    		
-  		</div>
-		<div class="form-floating my-3">
-			<input type="text" class="form-control" name="reviewTitle" placeholder="리뷰 제목" id="review-title" maxlength="30"/>
-			<label for="review-title">리뷰 제목</label>
-		</div>
-		
-		<div class="form-floating">
-  			<textarea class="form-control" placeholder="리뷰를 작성해주세요." id="review-content" maxlength="255"></textarea>
-  			<label for="review-content">리뷰 내용</label>
-		</div>
-		<br>
-		<div class="d-flex justify-content-evenly my-3">
-			<button class="btn btn-warning" form="regReviewForm" id="reg-review-form-btn">작성</button>
-			<a type="button" class="btn btn-secondary" th:href="@{/orderHistory}">뒤로가기</a>
-		</div>
-	</form>
-	<ul class="list-group list-group-flush" id="review-footer-list">
-  		<li class="list-group-item">
-  			작성한 리뷰는 닉네임, 프로필 이미지와 함께 누구나 볼 수 있도록 공개됩니다. 리뷰 내용에 민간함 개인정보가 포함되지 않도록 조심해주세요.
-  		</li>
-  		<li class="list-group-item">
-  			솔직하게 작성하신 리뷰는 주문을 고민하는 분들께 큰 도움이 됩니다. 하지만, 허위 리뷰나 명예훼손, 욕설, 타인비방글 등 선량한 업주나 
-  			제 3자의 권리를 침해하는 게시물은 서비스 이용약관이나 관련 법률에 따라 제재를 받을 수 있습니다.
-  		</li>
-  		<li class="list-group-item">
-  			㈜평강공주의남자들은 위와 같은 게시물 작성자에게 경고, 주의 등의 조치를 취할 수 있고, 해당 게시물을 삭제하거나 보이지 않게 할 수 있습니다. 
-  			게시에 따른 책임은 작성자에게 있으며, ㈜평강공주의남자들은 이에 대한 법적 책임을 지지 않습니다.
-  		</li>
-	</ul>
+			<div class="d-flex justify-content-center mb-3">
+	  			<label for="review-img" class="custom-file-upload"><i class="fa-solid fa-camera"></i>  사진 첨부하기</label> 
+	  			<input type="file" class="form-control" id="review-img" name="reviewImg" multiple="multiple">
+			</div>
+			<div class="preview-container d-flex justify-content-center mt-3" id="image-preview-container">
+	    		
+	  		</div>
+	  		<div class="d-flex justify-content-end">
+	  			<div id="file-count"></div>
+	  		</div>
+			<div class="form-floating my-3">
+				<input type="text" class="form-control" name="reviewTitle" placeholder="리뷰 제목" id="review-title" maxlength="30"/>
+				<label for="review-title">리뷰 제목</label>
+			</div>
+			
+			<div class="form-floating">
+	  			<textarea class="form-control" name="reviewContent" placeholder="리뷰를 작성해주세요." id="review-content" maxlength="255"></textarea>
+	  			<label for="review-content">리뷰 내용</label>
+			</div>
+			<div class="d-flex justify-content-end">
+				<div id="show-word-count"></div>
+			</div>
+			<br>
+			<div class="d-flex justify-content-evenly my-3">
+				<button class="btn btn-warning" form="regReviewForm" id="reg-review-form-btn">작성</button>
+				<a type="button" class="btn btn-secondary" th:href="@{/orderHistory}">뒤로가기</a>
+			</div>
+		</form>
+		<ul class="list-group list-group-flush" id="review-footer-list">
+	  		<li class="list-group-item">
+	  			작성한 리뷰는 닉네임, 프로필 이미지와 함께 누구나 볼 수 있도록 공개됩니다. 리뷰 내용에 민간함 개인정보가 포함되지 않도록 조심해주세요.
+	  		</li>
+	  		<li class="list-group-item">
+	  			솔직하게 작성하신 리뷰는 주문을 고민하는 분들께 큰 도움이 됩니다. 하지만, 허위 리뷰나 명예훼손, 욕설, 타인비방글 등 선량한 업주나 
+	  			제 3자의 권리를 침해하는 게시물은 서비스 이용약관이나 관련 법률에 따라 제재를 받을 수 있습니다.
+	  		</li>
+	  		<li class="list-group-item">
+	  			㈜평강공주의남자들은 위와 같은 게시물 작성자에게 경고, 주의 등의 조치를 취할 수 있고, 해당 게시물을 삭제하거나 보이지 않게 할 수 있습니다. 
+	  			게시에 따른 책임은 작성자에게 있으며, ㈜평강공주의남자들은 이에 대한 법적 책임을 지지 않습니다.
+	  		</li>
+		</ul>
 	</div>
 </div>
 </html>

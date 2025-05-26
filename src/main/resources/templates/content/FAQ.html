@@ -9,11 +9,10 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script th:src="@{/js/initialize.js}"></script>
-<script th:src="@{/js/update.js}"></script>
 <script type="text/javascript">
 $(function () {
     // 전체탭에 클론
-    $("#pills-user .accordion, #pills-orders .accordion, #pills-delivery .accordion").each(function () {
+    $("#pills-user .accordion, #pills-orders .accordion, #pills-delivery .accordion, #pills-review .accordion, #pills-other .accordion").each(function () {
         // 클론한 ID 및 data-bs-parent 변경
         const clonedAccordion = $(this).clone();
         clonedAccordion.find(".accordion-collapse").each(function () {
@@ -28,27 +27,55 @@ $(function () {
 </head>
 
 <div layout:fragment="content" class="container py-5">
-	<h6>자주 묻는 질문</h6>
+<div class="container text-center">
+		<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+			<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+		<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+			<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+	</div>
+	<h3 class="display-6">자주 묻는 질문</h3>
 	<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-		<li class="nav-item" role="presentation">
+		<li class="nav-item me-2" role="presentation">
 			<button class="nav-link" id="pills-all-tab" data-bs-toggle="pill"
 				data-bs-target="#pills-all" type="button" role="tab"
 				aria-controls="pills-all" aria-selected="true">전체</button>
 		</li>
-		<li class="nav-item" role="presentation">
+		<li class="nav-item me-2" role="presentation">
 			<button class="nav-link active" id="pills-user-tab"
 				data-bs-toggle="pill" data-bs-target="#pills-user" type="button"
 				role="tab" aria-controls="pills-user" aria-selected="false">계정</button>
 		</li>
-		<li class="nav-item" role="presentation">
+		<li class="nav-item me-2" role="presentation">
 			<button class="nav-link" id="pills-orders-tab" data-bs-toggle="pill"
 				data-bs-target="#pills-orders" type="button" role="tab"
 				aria-controls="pills-orders" aria-selected="false">주문</button>
 		</li>
-		<li class="nav-item" role="presentation">
+		<li class="nav-item me-2" role="presentation">
 			<button class="nav-link" id="pills-delivery-tab"
 				data-bs-toggle="pill" data-bs-target="#pills-delivery" type="button"
 				role="tab" aria-controls="pills-delivery" aria-selected="false">배달</button>
+		</li>
+		<li class="nav-item me-2" role="presentation">
+			<button class="nav-link" id="pills-review-tab"
+				data-bs-toggle="pill" data-bs-target="#pills-review" type="button"
+				role="tab" aria-controls="pills-review" aria-selected="false">리뷰</button>
+		</li>
+		<li class="nav-item me-2" role="presentation">
+			<button class="nav-link" id="pills-payment-tab"
+				data-bs-toggle="pill" data-bs-target="#pills-payment" type="button"
+				role="tab" aria-controls="pills-payment" aria-selected="false">결제</button>
+		</li>
+		<li class="nav-item me-2" role="presentation">
+			<button class="nav-link" id="pills-other-tab"
+				data-bs-toggle="pill" data-bs-target="#pills-other" type="button"
+				role="tab" aria-controls="pills-other" aria-selected="false">기타</button>
+		</li>
+		<li class="nav-item me-2" role="presentation">
+			<button class="nav-link" id="pills-other-tab"
+				data-bs-toggle="pill" data-bs-target="#pills-complain" type="button"
+				role="tab" aria-controls="pills-complain" aria-selected="false">문의</button>
 		</li>
 	</ul>
 
@@ -116,6 +143,25 @@ $(function () {
 						</div>
 					</div>
 				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#userCollapseFour"
+							aria-expanded="true" aria-controls="collapseOne">
+							[계정] 비밀번호를 잊어버렸어요</button>
+					</h2>
+					<div id="userCollapseFour" class="accordion-collapse collapse"
+						data-bs-parent="#userAccordion">
+						<div class="accordion-body">
+							비밀번호 찾기는 <a sec:authorize="isAnonymous()" href="login">[로그인 > 비밀번호 찾기]</a> 
+							<a sec:authorize="isAuthenticated()" href="logout">[로그아웃 > 로그인 > 비밀번호 찾기]</a> 를 통해 진행 가능합니다. <br>
+							<div class="faq-small">
+								이메일 인증을 통하여 새 비밀번호를 설정할 수 있습니다.
+							</div>
+						</div>
+					</div>
+				</div>
+				
 			</div>
 		</div>
 		<div class="tab-pane fade" id="pills-orders" role="tabpanel"
@@ -129,9 +175,9 @@ $(function () {
 					</h2>
 					<div id="ordersCollapseOne" class="accordion-collapse collapse"
 						data-bs-parent="#ordersAccordion">
-						<div class="accordion-body">온달 라이더가 주문하신 음식을 픽업하기 전에는 가게 측과
-							실시간 채팅을 통하여 언제든지 변경이 가능합니다. 라이더가 이미 음식을 픽업 후 배달중인 경우에는 고객센터로 연락
-							주시면 빠르게 확인 도와드리겠습니다.
+						<div class="accordion-body">
+							온달 라이더가 주문하신 음식을 픽업하기 전에는 가게 측과 실시간 채팅을 통하여 언제든지 변경이 가능합니다. 
+							라이더가 이미 음식을 픽업 후 배달중인 경우에는 고객센터로 연락 주시면 빠르게 확인 도와드리겠습니다.
 						</div>
 					</div>
 				</div>
@@ -142,7 +188,7 @@ $(function () {
 							aria-expanded="false" aria-controls="collapseTwo">[주문]	주문을 취소하고 싶어요.</button>
 					</h2>
 					<div id="ordersCollapseTwo" class="accordion-collapse collapse"
-						data-bs-parent="#userAccordion">
+						data-bs-parent="#ordersAccordion">
 						<div class="accordion-body">
 							가게에서 주문을 접수하기 전이라면 배달 현황해서 주문
 							취소를 통하여 직접 주문을 취소하실 수 있습니다. 가게에서 주문을 이미 접수한 경우에는 고객센터로 연락주시면 빠르게
@@ -158,7 +204,7 @@ $(function () {
 							[주문] 주문 내역을 확인하고 싶어요.</button>
 					</h2>
 					<div id="ordersCollapseThree" class="accordion-collapse collapse"
-						data-bs-parent="#userAccordion">
+						data-bs-parent="#ordersAccordion">
 						<div class="accordion-body">
 							결제가 완료된 주문 내역은 
 							<a sec:authorize="isAuthenticated()" href="orderHistory">[주문내역]</a> 
@@ -179,7 +225,7 @@ $(function () {
 							음식을 못 받았어요</button>
 					</h2>
 					<div id="deliveryCollapseOne" class="accordion-collapse collapse"
-						data-bs-parent="#ordersAccordion">
+						data-bs-parent="#deliveryAccordion">
 						<div class="accordion-body">
 							서비스 이용에 불편을 드린 점 양해 부탁드립니다. <br> 주문하신 가게 혹은 고객센터로 연락 주시면 빠르게
 							확인 도와드리겠습니다. 고객님 부재로 음식 수령을 못하신 경우에는 도와드릴 수 없습니다.
@@ -194,7 +240,7 @@ $(function () {
 							배달받은 음식에 문제가 있어요.</button>
 					</h2>
 					<div id="deliveryCollapseTwo" class="accordion-collapse collapse"
-						data-bs-parent="#userAccordion">
+						data-bs-parent="#deliveryAccordion">
 						<div class="accordion-body">
 							배달 과정에서 음식이 변질되거나 용기가 파손된 경우, 잘못된 음식을 받은 경우에는 고객센터로 연락주시면 빠르게 확인
 							후 조치해드리겠습니다. <br> 음식에서 이물질이 발견된 경우에는, 식품의약품안전처(1399)에 직접
@@ -210,7 +256,7 @@ $(function () {
 							[배달] 주문했는데 언제 배달되나요?</button>
 					</h2>
 					<div id="deliveryCollapseThree" class="accordion-collapse collapse"
-						data-bs-parent="#userAccordion">
+						data-bs-parent="#deliveryAccordion">
 						<div class="accordion-body">
 							배달 현황은 <a sec:authorize="isAuthenticated()" href="orderLive">[주문내역
 								> 배달현황]</a> <a sec:authorize="isAnonymous()" href="login">[주문내역
@@ -221,6 +267,273 @@ $(function () {
 				</div>
 			</div>
 		</div>
+		<div class="tab-pane fade" id="pills-review" role="tabpanel"
+			aria-labelledby="pills-review-tab" tabindex="0">
+			<div class="accordion" id="reviewAccordion">
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#reviewCollapseOne"
+							aria-expanded="true" aria-controls="collapseOne">
+							[리뷰] 리뷰는 주문 후 언제까지 작성할 수 있나요?
+						</button>
+					</h2>
+					<div id="reviewCollapseOne" class="accordion-collapse collapse"
+						data-bs-parent="#reviewAccordion">
+						<div class="accordion-body">
+							리뷰는 주문 후 3일이내에 작성하셔야 하며, 수정은 리뷰 작성 최초일자 기준 3일까지만 가능합니다. 
+							삭제는 언제든지 가능하지만 ㈜평강공주의남자들은 이용자의 리뷰를 완전히 삭제하지 않고 일정 기간동안 보관하는 점을 주의해주세요.
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#reviewCollapseTwo"
+							aria-expanded="false" aria-controls="collapseTwo">
+							[리뷰] 리뷰 어디에서 작성할 수 있나요?
+						</button>
+					</h2>
+					<div id="reviewCollapseTwo" class="accordion-collapse collapse"
+						data-bs-parent="#reviewAccordion">
+						<div class="accordion-body">
+							리뷰 작성은 <a sec:authorize="isAuthenticated()" href="orderHistory">[주문내역
+								> 리뷰 작성]</a> <a sec:authorize="isAnonymous()" href="login">[주문내역
+								> 리뷰 작성]</a> 에서 가능합니다. 
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#reviewCollapseThree"
+							aria-expanded="false" aria-controls="collapseThree">
+							[리뷰] 지금까지 작성한 리뷰들은 어디에서 볼 수 있나요?
+						</button>
+					</h2>
+					<div id="reviewCollapseThree" class="accordion-collapse collapse"
+						data-bs-parent="#reviewAccordion">
+						<div class="accordion-body">
+							지금까지 작성하신 리뷰들은 <a sec:authorize="isAuthenticated()" href="myReview">[마이페이지 > 리뷰 관리]</a>
+							<a sec:authorize="isAnonymous()" href="login">[마이페이지 > 리뷰 관리]</a> 에서 확인 가능합니다.
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#reviewCollapseFour"
+							aria-expanded="false" aria-controls="collapseTwo">
+							[리뷰] 리뷰 작성할 때에 주의할 점이 있나요? 
+						</button>
+					</h2>
+					<div id="reviewCollapseFour" class="accordion-collapse collapse"
+						data-bs-parent="#reviewAccordion">
+						<div class="accordion-body">
+							작성한 리뷰는 닉네임, 프로필 이미지와 함께 누구나 볼 수 있도록 공개됩니다. 리뷰 내용에 민간함 개인정보가 포함되지 않도록 조심해주세요. <br> 
+							솔직하게 작성하신 리뷰는 주문을 고민하는 분들께 큰 도움이 됩니다. 하지만, 허위 리뷰나 명예훼손, 욕설, 타인비방글 등 선량한 업주나 
+	  						제 3자의 권리를 침해하는 게시물은 서비스 이용약관이나 관련 법률에 따라 제재를 받을 수 있습니다. <br> 
+	  						㈜평강공주의남자들은 위와 같은 게시물 작성자에게 경고, 주의 등의 조치를 취할 수 있고, 해당 게시물을 삭제하거나 보이지 않게 할 수 있습니다. 
+	  						게시에 따른 책임은 작성자에게 있으며, ㈜평강공주의남자들은 이에 대한 법적 책임을 지지 않습니다.
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="tab-pane fade" id="pills-payment" role="tabpanel"
+			aria-labelledby="pills-payment-tab" tabindex="0">
+			<div class="accordion" id="paymentAccordion">
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#paymentCollapseOne"
+							aria-expanded="true" aria-controls="collapseOne">
+							[결제] 온달페이는 어떻게 사용하나요?
+						</button>
+					</h2>
+					<div id="paymentCollapseOne" class="accordion-collapse collapse"
+						data-bs-parent="#paymentAccordion">
+						<div class="accordion-body">
+							온달페이는 온달 앱에서 제공하는 간편결제 서비스로 음식을 주문하거나 상품을 구매할 때 사용 할 수 있습니다. <br><br> 
+							<div class="faq-small">
+								*온달페이 사용방법
+								- 충전 : <a sec:authorize="isAuthenticated()" href="myPage">[마이페이지 > 온달 지갑]</a> 
+								<a sec:authorize="isAnonymous()" href="login">[마이페이지 > 온달 지갑]</a> 에서 충전 가능합니다.
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#paymentCollapseTwo"
+							aria-expanded="false" aria-controls="collapseTwo">
+							[결제] 포인트는 어떻게 사용하나요?
+						</button>
+					</h2>
+					<div id="paymentCollapseTwo" class="accordion-collapse collapse"
+						data-bs-parent="#paymentAccordion">
+						<div class="accordion-body">
+							1원 이상 적립된 포인트는 1원 단위로 사용 가능합니다. 다만, 포인트 사용은 온달 앱을을 통한 직접 결제시 이용할 수 있으며, 만나서결제를 이용하는 경우 사용이 불가합니다.
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#paymentCollapseThree"
+							aria-expanded="false" aria-controls="collapseThree">
+							[결제] 주문 취소했는데 환불이 안되었어요.
+						</button>
+					</h2>
+					<div id="paymentCollapseThree" class="accordion-collapse collapse"
+						data-bs-parent="#paymentAccordion">
+						<div class="accordion-body">
+							주문이 최소되었다면 실제 환불까지 영업일 기준 2-5일 소요될 수 있습니다. 모든 결제 수단 동일하게 적용되며, 
+							주문 당시 결제한 수단으로 환불처리됩니다. 만약 환불소요기간 이후에도 환불이 되지 않았다면 결제사로 문의 부탁드립니다.
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="tab-pane fade" id="pills-other" role="tabpanel"
+			aria-labelledby="pills-payment-tab" tabindex="0">
+			<div class="accordion" id="otherAccordion">
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#otherCollapseOne"
+							aria-expanded="true" aria-controls="collapseOne">
+							[기타] 주소 설정은 어떻게 하나요?
+						</button>
+					</h2>
+					<div id="otherCollapseOne" class="accordion-collapse collapse"
+						data-bs-parent="#otherAccordion">
+						<div class="accordion-body">
+							<th:block sec:authorize="isAuthenticated()">
+								온달 앱 메뉴 버튼 클릭 후 상단의 내 정보 카드에 있는 <a href="myAddress">[주소관리]</a> 혹은 
+								<a href="myPage">[마이페이지 > 주소 관리]</a> 에서 주소 설정, 수정 및 삭제가 가능합니다.
+							</th:block>
+							<th:block sec:authorize="isAnonymous()">비회원 주문의 경우에는 <a href="/">[메인페이지]</a> 상단의 주소 입력바에 입력 후 이용 가능합니다.</th:block>
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#otherCollapseTwo"
+							aria-expanded="false" aria-controls="collapseTwo">
+							[기타] 외부 소비자 분쟁조정기관을 알고 싶어요.
+						</button>
+					</h2>
+					<div id="otherCollapseTwo" class="accordion-collapse collapse"
+						data-bs-parent="#otherAccordion">
+						<div class="accordion-body">
+							㈜평강공주의남자들은 24시간 고객센터를 통해 온달에서 발생하는 분쟁을 조정하고 있습니다. 그러나 외부 기관에 분쟁해결을 의뢰하고 싶은 경우, 아래의 기관을 통해 진행하실 수 있습니다.
+							<ul class="faq-small">
+								<li>1372 소비자상담센터(1372) : 소비자 민원 해결</li>
+								<li>온라인피해365센터(142-235) : 온라인 서비스 이용 중의 피해상담 진행</li>
+								<li>통신분쟁조정위원회(142-246) : 통신서비스 이용 과정에서의 전기통신사업자와 발생한 분쟁 해결</li>
+								<li>경찰청 사이버범죄 신고시스템(182) : 정보통신망 침해 및 이용 범죄 (해킹, 사이버 사기) 등 상담 진행</li>
+								<li>한국인터넷진흥원(118) : 해킹/피싱/정보보호 침해 신고</li>
+								<li>식품의약품안전처(1399) : 부정, 불량식품 신고</li>
+								<li>한국저작권위원회(1800-5455) : 저작권 침해 관련 분쟁 조정</li>
+								<li>방송통신심의의원회(1377) : 사생활 침해, 명예훼손 관련 분쟁조정</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#otherCollapseThree"
+							aria-expanded="false" aria-controls="collapseThree">
+							[기타] 온달이 정책으로 금지하는 행위는 무엇이 있나요?
+						</button>
+					</h2>
+					<div id="otherCollapseThree" class="accordion-collapse collapse"
+						data-bs-parent="#otherAccordion">
+						<div class="accordion-body">
+							온달은 음란성 또는 부적절한 표현, 허위 리뷰·거래 행위등을 금지하고 있으며, 이를 발견한 경우 고객센터로 신고할 수 있습니다. <br>
+							온달의 금지 행위 유형은 아래와 같습니다.
+							<ol class="faq-small">
+								<li>
+								음란성 및 기타 부적절한 표현
+									<ul class="faq-sublist">
+										<li>1) 과도한 신체 노출</li>
+										<li>2) 욕설, 비속어 표현</li>
+										<li>3) 상대방에게 공포심을 느끼게 하는 표현</li>
+										<li>4) 성별, 종교, 장애, 연령, 사회적 신분, 인종, 지역, 직업등을 차별하거나 편견을 조장 또는 비방하는 표현</li>
+										<li>5) 음란한 단어나 노골적인 성 묘사 등을 통해 성적 수치심을 느끼게 하는 표현</li>
+										<li>6) 회사가 청소년에게 유해하거나 음란성 및 기타 부적절한 것으로 판단한 표현</li>
+									</ul>
+								</li>
+								<li>
+								허위 리뷰·거래
+									<ul class="faq-sublist">
+										<li>1) 자신의 가게, 상품을 홍보할 목적으로 직접 또는 제3자를 통하여 이용하지 않은 가게, 상품을 실제 이용한 것처럼 가장해 이용후기, 평가 등을 작성하는 행위</li>
+										<li>2) 자신의 가게, 상품을 구매자로 가장하거나 제3자와 협의하여 허위로 주문하는 행위</li>
+									</ul>
+								</li>
+								<li>
+								직거래 유도
+									<ul class="faq-sublist">
+										<li>온달 서비스를 이용하지 않고 고객과 직접거래를 유도하는 행위 <br>
+											예시) 가게 매장으로 직접 전화해서 주만하면 20% 할인됩니다.(계좌이체)</li>
+									</ul>
+								</li>
+								<li>
+									기타
+									<ul class="faq-sublist">
+										<li>회사 정책 또는 공서양속을 위반하는 행위</li>
+									</ul>
+								</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="pills-complain" role="tabpanel" aria-labelledby="pills-other-tab">
+    <div class="container py-4">
+      <h5>문의하기</h5>
+      <form id="complainForm" th:action ="@{/submitComplain}" method = "post" enctype="multipart/form-data">
+                <!-- 역할 선택 -->
+	<div class="mb-3">
+	  <label for="role" class="form-label">문의자 유형</label>
+  		<select class="form-select" id="role" name="role" required>
+    		<option value="USER">일반 사용자</option>
+    		<option value="RIDER">라이더</option>
+    		<option value="OWNER">점주</option>
+    		<option value="OTHER">기타</option>
+  		</select>
+		</div>
+		<!-- 비밀번호 (비밀글용, 선택값) -->
+	<div class="mb-3">
+  	  <label for="complainPassword" class="form-label">비밀번호 (선택사항, 4자리 숫자)</label>
+ 		<input type="password" class="form-control" id="complainPassword" name="complainPassword" pattern="\d{4}" maxlength="4" placeholder="비밀글일 경우 4자리 숫자 입력">
+		</div>
+        <div class="mb-3">
+          <label for="complainTitle" class="form-label">제목</label>
+          <input type="text" class="form-control" id="complainTitle" name="complainTitle" required>
+        </div>
+        <div class="mb-3">
+          <label for="complainContent" class="form-label">내용</label>
+          <textarea class="form-control" id="complainContent" name="complainContent" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="complainFiles" class="form-label">첨부 파일</label>
+          <input type="file" class="form-control" id="complainFiles" name="files" multiple>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <a href="/complains" class="btn btn-outline-secondary me-2">전체글</a>
+          <button type="submit" class="btn btn-primary">제출하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
 	</div>
 </div>
 
