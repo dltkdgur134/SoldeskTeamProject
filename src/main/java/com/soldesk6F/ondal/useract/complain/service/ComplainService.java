@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+
 @Service
 @RequiredArgsConstructor
 public class ComplainService {
@@ -34,6 +36,7 @@ public class ComplainService {
     private final UserRepository userRepository;
     private final ComplainRepository complainRepository;
     private final ComplainImgRepository complainImgRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     private final List<String> allowedExtensions = List.of("jpg", "jpeg", "png", "gif");
 
@@ -59,7 +62,12 @@ public class ComplainService {
         complain.setComplainContent(content);
     }
     
-    
+    public boolean checkPassword(UUID id, String rawPassword) {
+        Complain complain = complainRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 문의글입니다."));
+
+        return passwordEncoder.matches(rawPassword, complain.getComplainPassword());
+    }
     
     
     @Transactional
@@ -70,12 +78,14 @@ public class ComplainService {
         User user = userRepository.findById(userDetails.getUser().getUserUuid())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
+        String encodedPassword = passwordEncoder.encode(dto.getComplainPassword());
+        
         Complain complain = Complain.builder()
                 .user(user)
                 .complainTitle(dto.getComplainTitle())
                 .complainContent(dto.getComplainContent())
                 .role(dto.getRole()) // ✅ 역할 저장
-                .complainPassword(dto.getComplainPassword()) // ✅ 비밀번호 저장
+                .complainPassword(encodedPassword) // ✅ 비밀번호 저장
                 .build();
 
         complainRepository.save(complain);
@@ -144,5 +154,42 @@ public class ComplainService {
             complainImgRepository.save(img);
             count++;
         }
+    }
+
+    @Transactional
+    public void updateComplainWithImages(UUID id,
+                                         String title,
+                                         String content,
+                                         List<MultipartFile> newImages,
+                                         List<UUID> deleteImageIds,
+                                         User user) throws IOException {
+
+        Complain complain = complainRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 문의입니다."));
+
+        if (!complain.getUser().getUserUuid().equals(user.getUserUuid())) {
+            throw new AccessDeniedException("수정 권한이 없습니다.");
+        }
+
+        // 1. 제목과 내용 수정
+        complain.setComplainTitle(title);
+        complain.setComplainContent(content);
+
+        // 2. 기존 이미지 삭제 처리
+        if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
+            for (UUID imgId : deleteImageIds) {
+                ComplainImg img = complainImgRepository.findById(imgId)
+                    .orElseThrow(() -> new IllegalArgumentException("이미지 없음: " + imgId));
+
+                File file = new File(uploadComplainDir, img.getComplainImg());
+                if (file.exists()) file.delete();
+
+                complainImgRepository.delete(img);
+            }
+        }
+
+        // 3. 새 이미지 업로드
+        validateFiles(newImages);
+        saveImages(complain, newImages); // 기존 메서드 그대로 사용
     }
 }

@@ -48,7 +48,7 @@ public class Complain {
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @Column(name = "complain_password", length = 4)
+    @Column(name = "complain_password")
     private String complainPassword;
 
     @Column(name = "complain_title", nullable = false, length = 50)
@@ -74,6 +74,8 @@ public class Complain {
     @OneToMany(mappedBy = "complain", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ComplainReply> replies = new ArrayList<>();
 
+    @OneToMany(mappedBy = "complain", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ComplainImg> complainImgs = new ArrayList<>();
     
     public enum Role { USER, RIDER, OWNER, OTHER }
     @Enumerated(EnumType.STRING)

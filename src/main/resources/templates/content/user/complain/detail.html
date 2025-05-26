@@ -32,7 +32,18 @@
         <label class="form-label fw-bold">내용</label>
         <div th:utext="${complain.complainContent}">내용</div>
     </div>
-
+	<div class="mb-3">
+	    <label class="form-label fw-bold">첨부 이미지</label>
+	    <div th:if="${#lists.isEmpty(complainImgList)}">
+	        <p>첨부 이미지가 없습니다.</p>
+	    </div>
+	    <div th:if="${not #lists.isEmpty(complainImgList)}" class="d-flex flex-wrap gap-2">
+	        <div th:each="img : ${complainImgList}">
+	            <img th:src="@{|/img/complain/${img.complainImg}|}" alt="첨부 이미지" class="img-thumbnail" style="max-width: 200px;">
+	        </div>
+	    </div>
+	</div>
+	
     <div class="mb-3">
         <label class="form-label fw-bold">작성일</label>
         <p th:text="${#temporals.format(complain.createdDate, 'yyyy-MM-dd HH:mm')}">날짜</p>

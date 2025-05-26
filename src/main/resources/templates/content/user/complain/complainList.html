@@ -12,7 +12,7 @@
 
 <div layout:fragment="content" class="container py-5">
   <h3>전체 문의글</h3>
-
+  <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
   <!-- 검색 & 필터 -->
   <form method="get" th:action="@{/complains}" class="row mb-3">
     <div class="col-md-4">
@@ -66,20 +66,24 @@
         <td th:text="${#temporals.format(c.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
         <td th:if="${c.complainStatus.name() == 'PENDING'}" th:text="처리중">
         </td>
-        <td th:if="${c.complainStatus.name() == 'RESOLVED'}" th:text="문의확인">
-        <a href = "/#"></a>
-        </td>
+		<td>
+		  <a th:if="${c.complainStatus.name() == 'RESOLVED'}" th:href="@{/}" >
+		    문의확인
+		  </a>
+		</td>
       </tr>
     </tbody>
   </table>
 
   <!-- 비밀번호 입력 모달 -->
-  <div id= "#passwordModalBackdrop">
-  <div id="passwordModal" style="display:none;">
-    <h3>비밀번호 입력</h3>
-    <input type="password" id="complainPasswordInput" />
-    <button onclick="submitPassword()">확인</button>
-  </div>
-  </div>
+	<!-- 비밀번호 입력 모달 -->
+	<div id="passwordModal" style="display:none;">
+	  <h3>비밀번호 입력</h3>
+	  <form id="passwordForm" method="post" action="">
+	    <input type="password" name="password" id="complainPasswordInput" required />
+	    <button type="submit">확인</button>
+	    <button type="button" onclick="closePasswordModal()">취소</button>
+	  </form>
+	</div>
 </div>
 </html>
