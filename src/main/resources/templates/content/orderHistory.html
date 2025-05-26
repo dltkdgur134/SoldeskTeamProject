@@ -32,14 +32,12 @@
       <div class="card-body row" >
         <!-- 왼쪽: 매장 대표 이미지 -->
         <div class="col d-flex justify-content-between">
-		    <!-- <small class="order-date" th:text="${order.orderDate}"></small> --> 
 		    <small class="order-date" th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"
 		    th:if="${#temporals.year(order.orderDate) != #dates.year(#dates.createNow())}"></small>
 		    <small class="order-date" th:text="${#temporals.format(order.orderDate, 'MM월 dd일 HH:mm')}"
 		    th:if="${#temporals.year(order.orderDate) == #dates.year(#dates.createNow())}"></small>
 		    <small class="order-date"></small>
-		    <!-- <span class="status" th:text="${order.orderStatus}">배달중</span> -->
-		    <span class="status" th:text="${order.orderToUser}"></span>
+		    <span class="status" th:text="${order.orderToUser.getDescription()}"></span>
         </div>
         <div class="row">
 	        <div class="img-container col-md-auto ms-4">
@@ -61,15 +59,6 @@
         <div class="container text-start ms-4 my-3">
           <!-- 메뉴 항목 2개까지만, 나머지는 "외 n개" -->
           <p class="card-text" th:each="item : ${order.menuItems}">
-            <!-- <span th:each="item,iterStat : ${order.menuItems}"
-                  th:if="${iterStat.index < 2}"
-                  th:text="${iterStat.index == 0 ? item : ', ' + item}">
-              메뉴1, 메뉴2
-            </span>
-            <span th:if="${order.menuItems.size() > 2}"
-                  th:text="'외 ' + (${order.menuItems.size()} - 2) + '개'">
-              외 n개
-            </span> -->
             <span><strong th:text="${item.key}"></strong></span>
             <span><small class="menu-item-quantity" th:text="${item.value + ' 개'}"></small></span>
           </p>
