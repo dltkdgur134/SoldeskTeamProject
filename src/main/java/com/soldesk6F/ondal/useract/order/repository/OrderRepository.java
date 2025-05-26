@@ -6,6 +6,7 @@ import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -53,12 +54,21 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
      *  특정 사용자(userUuid) && 주문 상태가 주어진 집합(statuses) 안에 포함되는
      *  주문의 ID(UUID) 만 뽑아 온다.
      */
+//    @Query("""
+//            select o.orderId
+//            from Order o
+//            where o.user.userUuid = :userUuid
+//              and o.orderToOwner in :activeStatuses
+//            """)
+//        List<UUID> findActiveOrderIds(@Param("userUuid")       UUID userUuid,
+//                                      @Param("activeStatuses") List<OrderToOwner> activeStatuses);
+    
     @Query("""
-            select o.orderId
-            from Order o
-            where o.user.userUuid = :userUuid
-              and o.orderToOwner in :activeStatuses
-            """)
-        List<UUID> findActiveOrderIds(@Param("userUuid")       UUID userUuid,
-                                      @Param("activeStatuses") List<OrderToOwner> activeStatuses);
+    		select o.orderId
+    		from Order o
+    		where o.user.userUuid = :userUuid
+    			and o.orderToUser in :activeStatuses
+    		""")
+    List<UUID> findActiveOrderIds(@Param("userUuid") UUID userUuid,
+    		@Param("activeStatuses") List<OrderToUser> activeStatuses);
 }

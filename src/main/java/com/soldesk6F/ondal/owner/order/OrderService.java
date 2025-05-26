@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.owner.order;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -84,7 +85,8 @@ public class OrderService {
 	        this.regAddressRepository = regAddressRepository;
 	        this.dateFunctions = dateFunctions;
 	    }
-
+	    
+	// 주문 저장
     public Order saveOrder(OrderRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
                 .orElseThrow(() -> new RuntimeException("가게를 찾을 수 없습니다. storeId=" + requestDto.getStoreId()));
@@ -113,24 +115,30 @@ public class OrderService {
         return orderRepository.save(order);
     }
     
+    // 주문 수락
     public Order acceptOrder(UUID orderId, int completionTime) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문 없음"));
         
-        Store store = order.getStore(); 
+        Store store = order.getStore();
         
-        if (order.getOrderTime().getDayOfMonth() == LocalDateTime.now().getDayOfMonth()) {
-        	if (store.getOrderCount() == 0) {
-            	store.setOrderCount(1);
-            	order.setOrderNumber(1);
+        
+        if (store.getLastOrderDate().toLocalDate().equals(LocalDate.now())) {
+            if (store.getOrderCount() == 0) {
+                // 해당 날짜 첫번째 주문일 경우
+                store.setOrderCount(1);
+                order.setOrderNumber(1);
             } else {
+                // 해당 날짜 첫번째 주문이 아닐 경우 주문번호 1씩 더하기
             	int currentOrderCount = store.getOrderCount() + 1;
-            	store.setOrderCount(currentOrderCount);
-            	order.setOrderNumber(currentOrderCount);
+                store.setOrderCount(currentOrderCount);
+                order.setOrderNumber(currentOrderCount);
             }
         } else {
-        	store.setOrderCount(1);
-        	order.setOrderNumber(1);
+            // 다음날일 경우 주문번호 초기화
+            store.setOrderCount(1);
+            order.setOrderNumber(1);
+            store.setLastOrderDate(LocalDateTime.now());
         }
         
         order.setOrderToOwner(OrderToOwner.CONFIRMED);
@@ -143,6 +151,8 @@ public class OrderService {
 
         return savedOrder;
     }
+    
+    // 주문 거부 및 환불
     @Transactional
     public Order rejectOrderAndRefund(UUID orderId) {
         Order order = orderRepository.findById(orderId)
@@ -205,6 +215,7 @@ public class OrderService {
         return order;
     }
     
+    // 주문 상태 수정
     @Transactional
     public Order updateOrderStatus(UUID orderId, OrderToOwner orderToOwner, OrderToUser orderToUser) {
         Order order = orderRepository.findById(orderId)
@@ -238,10 +249,16 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
     }
     
+//    public List<UUID> findActiveOrderIdsByUser(String userUuid) {
+//        return orderRepository.findActiveOrderIds(
+//                 UUID.fromString(userUuid),
+//                 List.of(OrderToOwner.PENDING, OrderToOwner.CONFIRMED, OrderToOwner.IN_DELIVERY));
+//    }
+    
     public List<UUID> findActiveOrderIdsByUser(String userUuid) {
-        return orderRepository.findActiveOrderIds(
-                 UUID.fromString(userUuid),
-                 List.of(OrderToOwner.PENDING, OrderToOwner.CONFIRMED, OrderToOwner.IN_DELIVERY));
+    	return orderRepository.findActiveOrderIds(
+    			UUID.fromString(userUuid),
+    			List.of(OrderToUser.PENDING, OrderToUser.CONFIRMED, OrderToUser.COOKING, OrderToUser.DELIVERING));
     }
 
     @Transactional(readOnly = true)
