@@ -436,6 +436,10 @@ function updateOrderStatus(orderId, url) {
 		}
 	});
 }
+<<<<<<< HEAD
+
+=======
+>>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 //Web Socket Connect
 function connect() {
 	const socket = new SockJS('/stomp');

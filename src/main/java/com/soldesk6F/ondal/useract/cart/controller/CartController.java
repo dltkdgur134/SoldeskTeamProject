@@ -50,7 +50,6 @@ public class CartController {
 		UUID userUuid = userDetails.getUser().getUserUuid();
 		User user = userService.findUserByUuid(userUuid)
 				.orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다."));
-
 		// 기존 Cart 확인 후 localStorage에 저장할 데이터 반환 후 삭제
 		Optional<Cart> optionalCart = cartRepository.findByUser(user)
 				.filter(cart -> cart.getStatus() == CartStatus.PENDING || cart.getStatus() == CartStatus.CANCELED);
@@ -81,6 +80,36 @@ public class CartController {
 		}
 
 		return "content/cart";
+/*	    Cart cart = cartService.getCartByUser(user);
+	    List<CartItems> cartItems = cart.getCartItems();
+
+	    if (cartItems.isEmpty()) {
+	        model.addAttribute("cart", cart);
+	        model.addAttribute("cartItems", cartItems);
+	        model.addAttribute("totalMenuPrice", 0);
+	        model.addAttribute("deliveryFee", 0);
+	        model.addAttribute("totalPrice", 0);
+	        return "content/cart";
+	    }
+
+	    // ✅ 하나의 가게 정보 추출
+	    Store store = cartItems.get(0).getMenu().getStore();
+	    int deliveryFee = store.getDeliveryFee();
+
+	    // ✅ 메뉴 총합 계산
+	    int totalMenuPrice = cartItems.stream()
+	    		.mapToInt(item -> item.getItemTotalPrice()) // 개당 가격 * 수량
+	            .sum();
+
+	    int totalPrice = totalMenuPrice + deliveryFee;
+
+	    model.addAttribute("cart", cart);
+	    model.addAttribute("cartItems", cartItems);
+	    model.addAttribute("totalMenuPrice", totalMenuPrice);
+	    model.addAttribute("deliveryFee", deliveryFee);
+	    model.addAttribute("totalPrice", totalPrice); // 💡 프론트에 결제금액으로 전달
+
+	    return "content/cart";*/
 	}
 
 	@GetMapping("/api/cart-item/options")

@@ -102,9 +102,10 @@ public class UserService {
 
 			userRepository.save(user);
 
-			Cart cart = Cart.builder().user(user).store(null) // 혹은 default store 지정
-					.build();
-			cartRepository.save(cart);
+			/*
+			 * Cart cart = Cart.builder().user(user).store(null) // 혹은 default store 지정
+			 * .build(); cartRepository.save(cart);
+			 */
 
 			return true;
 		} catch (IOException e) {
