@@ -5,14 +5,12 @@ import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.entity.Store.StoreStatus;
 import com.soldesk6F.ondal.user.entity.Owner;
 
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-
-import java.awt.print.Pageable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
