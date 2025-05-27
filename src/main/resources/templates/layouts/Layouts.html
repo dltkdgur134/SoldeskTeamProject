@@ -35,9 +35,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<div th:replace="~{fragments/footer::footer}"></div>
 
     <th:block layout:fragment="js">
-    	<script th:src="@{/js/hideLogo.js}"></script>
     </th:block>
     <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
 </body>
+<script th:src="@{/js/hideLogo.js}"></script>
 <script th:src="@{/js/websocket.js}"></script>
 </html>

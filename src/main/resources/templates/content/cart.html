@@ -10,9 +10,10 @@
 	<link th:href="@{/css/custom.css}" rel="stylesheet" />
 	<link th:href="@{/css/cart.css}" rel="stylesheet" />
 </head>
-<body data-useruuid="[[${#authentication.principal.userUUID}]]">
+<body>
 	<div layout:fragment="content">
 		<div class="cart-container">
+			<input type="hidden" id="user-uuid" th:value="${#authentication.principal.userUUID}" />
 			<h2 id="store-name">가게 이름</h2>
 			
 			<div class="cart-empty" id="empty-cart" style="display: none;">

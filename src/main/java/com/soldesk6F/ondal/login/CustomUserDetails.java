@@ -22,7 +22,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User, Principal {
     private final User user;                       // 실제 DB 사용자 엔티티
     private final Map<String, Object> attributes;  // OAuth2 전용 속성 (일반 로그인 시 null)
     private final Collection<GrantedAuthority> authorities;
-
+    private UUID userUUID;
     /* ========== 생성자 ========== */
     /** 일반(폼) 로그인용 */
     public CustomUserDetails(User user) {
@@ -89,4 +89,9 @@ public class CustomUserDetails implements UserDetails, OAuth2User, Principal {
     }
     @Override
     public int hashCode() { return Objects.hash(user.getUserUuid()); }
+
+	/* Thymeleaf principal.userUUID 용 */
+    public UUID getUserUUID() {
+		return user.getUserUuid();
+	}
 }

@@ -10,8 +10,9 @@
 	<link th:href="@{/css/custom.css}" rel="stylesheet" />
 	<link th:href="@{/css/storeMain.css}" rel="stylesheet" />
 </head>
-<body data-useruuid="[[${#authentication.principal.userUUID}]]">
+<body>
 	<div layout:fragment="content">
+		<input type="hidden" id="user-uuid" th:value="${#authentication.principal.userUUID}" />
 		<section class="store-info">
 			<div class="store-image-slider">
 				<div class="slides" id="slides">

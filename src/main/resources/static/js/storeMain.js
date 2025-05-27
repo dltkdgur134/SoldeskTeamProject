@@ -326,7 +326,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 
-		const userUUID = document.body.dataset.useruuid;
+		/*const userUUID = document.body.dataset.useruuid;*/
+		/*const userUUID = document.querySelector('meta[name="user-uuid"]')?.content;*/
+		/*const userUUID = document.body.getAttribute('data-useruuid');*/
+		const userUUID = document.getElementById('user-uuid')?.value;
 		
 		newBtn.addEventListener('click', () => {
 			const allOptions = [];

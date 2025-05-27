@@ -35,7 +35,7 @@ public class StorePayController {
 	
 
 	@PostMapping("/store/pay")
-	public String tryPay(@RequestParam("cartUUID")UUID cartuuid , Model model, RedirectAttributes redirectAttributes,
+	public String tryPay(@RequestParam("cartUUID") UUID cartuuid , Model model, RedirectAttributes redirectAttributes,
 			@RequestParam(value = "passCheckFail", required = false, defaultValue = "false") boolean passCheckFail) {
 		Cart cart = cartService.findById(cartuuid);
 

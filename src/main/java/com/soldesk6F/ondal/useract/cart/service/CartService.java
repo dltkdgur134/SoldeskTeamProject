@@ -1,17 +1,24 @@
 package com.soldesk6F.ondal.useract.cart.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soldesk6F.ondal.menu.entity.Menu;
+import com.soldesk6F.ondal.menu.service.MenuService;
 import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.user.entity.User;
+import com.soldesk6F.ondal.useract.cart.dto.CartAddRequestDto;
+import com.soldesk6F.ondal.useract.cart.dto.CartOptionDto;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
-import com.soldesk6F.ondal.useract.cart.repository.CartItemRepository;
+import com.soldesk6F.ondal.useract.cart.entity.CartStatus;
+import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,63 +27,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CartService {
 	
+	private final MenuService menuService;
 	private final CartRepository cartRepository;
-	private final CartItemRepository cartItemRepository;
-	
-	public Cart getCartByUser(User user) {
-		Optional<Cart> existingCart = cartRepository.findByUser(user);
-		if (existingCart.isPresent()) {
-			return existingCart.get();
-		}
+	private final CartItemsRepository cartItemsRepository;
 
-		Cart newCart = Cart.builder()
-			.user(user)
-			.store(null)
-			.build();
-
-		return cartRepository.save(newCart);
-	}
-	
-	public Cart getCartByUserAndStore(User user, Store incomingStore) {
-		Optional<Cart> existingCartOpt = cartRepository.findByUser(user);
-
-		if (existingCartOpt.isPresent()) {
-			Cart existingCart = existingCartOpt.get();
-
-			// 🔥 다른 가게라면 장바구니 초기화
-			if (existingCart.getStore() != null && !existingCart.getStore().getStoreId().equals(incomingStore.getStoreId())) {
-				existingCart.getCartItems().clear(); // 연결된 아이템 삭제
-				existingCart.setStore(incomingStore);
-				return cartRepository.save(existingCart);
-			}
-
-			// 장바구니에 store 없던 경우
-			if (existingCart.getStore() == null) {
-				existingCart.setStore(incomingStore);
-				return cartRepository.save(existingCart);
-			}
-
-			return existingCart;
-		}
-
-		// 처음 생성
-		Cart newCart = Cart.builder()
-			.user(user)
-			.store(incomingStore)
-			.build();
-
-		return cartRepository.save(newCart);
-	}
-	
-	@Transactional
-	public void updateQuantity(UUID cartItemUuid, int quantity) {
-		CartItems item = cartItemRepository.findById(cartItemUuid)
-			.orElseThrow(() -> new IllegalArgumentException("CartItem not found"));
-		item.setQuantity(quantity);
-	}
-	
 	public int getUpdatedTotal(UUID cartItemUuid) {
-		CartItems item = cartItemRepository.findById(cartItemUuid)
+		CartItems item = cartItemsRepository.findById(cartItemUuid)
 			.orElseThrow(() -> new IllegalArgumentException("CartItem not found"));
 		
 		int menuPrice = item.getMenu().getPrice();
@@ -102,16 +58,56 @@ public class CartService {
 			.sum();
 	}
 	
-	@Transactional
-	public void deleteItem(UUID cartItemsId) {
-		if (!cartItemRepository.existsById(cartItemsId)) {
-			throw new IllegalArgumentException("해당 항목이 존재하지 않습니다: " + cartItemsId);
-		}cartItemRepository.deleteById(cartItemsId);
-	}
-	
 	public Cart findById(UUID cartId) {
 		return cartRepository.findById(cartId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 장바구니가 존재하지 않습니다: " + cartId));
+	}
+	
+	@Transactional
+	public Cart createCart(User user, Store store, List<CartAddRequestDto> itemsDto) {
+		// 1. Cart 객체 생성 및 저장
+		Cart cart = Cart.builder()
+			.user(user)
+			.store(store)
+			.status(CartStatus.PENDING)
+			.build();
+		cart = cartRepository.save(cart); // ✅ 여기서 먼저 save 해야 JPA가 ID 부여함
+
+		// 2. 기존 항목 제거 (해당 cart에 대한 기존 내용 정리)
+		cartItemsRepository.deleteAllByCart(cart);
+
+		// 3. 새 항목 추가
+		for (CartAddRequestDto itemDto : itemsDto) {
+			Menu menu = menuService.findById(itemDto.getMenuId());
+			CartItems item = new CartItems(cart, menu, itemDto.getQuantity(), new ArrayList<>());
+			
+			item.setMenuName(menu.getMenuName());
+			item.setMenuPrice(menu.getPrice());
+			item.setMenuImage(menu.getMenuImg());
+
+			for (CartOptionDto opt : itemDto.getOptions()) {
+				if (!opt.isSelected()) continue;
+				CartItemOption option = new CartItemOption(
+					item, opt.getGroupName(), opt.getName(), opt.getPrice());
+				item.getCartItemOptions().add(option);
+			}
+			cart.getCartItems().add(item);
+			cartItemsRepository.save(item); // 명시적으로 저장
+		}
+
+		return cart;
+	}
+	
+	public Optional<Cart> findLatestCartByUser(User user) {
+		return cartRepository.findByUser(user)
+			.filter(cart -> cart.getStatus() == CartStatus.PENDING || cart.getStatus() == CartStatus.CANCELED);
+	}
+
+	@Transactional
+	public void deleteCart(Cart cart) {
+		// 장바구니 항목 먼저 삭제 (연관관계 정리)
+		cartItemsRepository.deleteAllByCart(cart);
+		cartRepository.delete(cart);
 	}
 	
 }

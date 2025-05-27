@@ -1,10 +1,6 @@
 package com.soldesk6F.ondal.useract.cart.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
@@ -13,13 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.menu.entity.Menu;
@@ -28,14 +18,15 @@ import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.service.UserService;
-import com.soldesk6F.ondal.useract.cart.dto.CartAddRequestDto;
+import com.soldesk6F.ondal.useract.cart.dto.CartInitRequestDto;
 import com.soldesk6F.ondal.useract.cart.dto.CartItemOptionSaveDto;
 import com.soldesk6F.ondal.useract.cart.dto.CartOptionDto;
-import com.soldesk6F.ondal.useract.cart.dto.CartUpdateRequestDto;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
-import com.soldesk6F.ondal.useract.cart.repository.CartItemRepository;
+import com.soldesk6F.ondal.useract.cart.entity.CartStatus;
+import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
+import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.cart.service.CartItemService;
 import com.soldesk6F.ondal.useract.cart.service.CartService;
 
@@ -48,7 +39,8 @@ public class CartController {
 
 	private final CartService cartService;
 	private final CartItemService cartItemService;
-	private final CartItemRepository cartItemRepository;
+	private final CartItemsRepository cartItemsRepository;
+	private final CartRepository cartRepository;
 	private final UserService userService;
 	private final MenuService menuService;
 	private final StoreService storeService;
@@ -59,70 +51,42 @@ public class CartController {
 		User user = userService.findUserByUuid(userUuid)
 				.orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다."));
 
-		Cart cart = cartService.getCartByUser(user);
+		// ✅ 기존 Cart 확인 후 localStorage에 저장할 데이터 반환 후 삭제
+		Optional<Cart> optionalCart = cartRepository.findByUser(user)
+				.filter(cart -> cart.getStatus() == CartStatus.PENDING || cart.getStatus() == CartStatus.CANCELED);
+		if (optionalCart.isPresent()) {
+			Cart cart = optionalCart.get();
 
-		model.addAttribute("cart", cart);
-		model.addAttribute("cartItems", cart.getCartItems());
-		model.addAttribute("totalPrice", cart.getTotalPrice());
+			List<Map<String, Object>> restoredItems = new ArrayList<>();
+			for (CartItems item : cart.getCartItems()) {
+				Map<String, Object> data = new HashMap<>();
+				data.put("menuId", item.getMenu().getMenuId());
+				data.put("storeId", cart.getStore().getStoreId());
+				data.put("menuName", item.getMenu().getMenuName());
+				data.put("menuImage", item.getMenu().getMenuImg());
+				data.put("price", item.getMenu().getPrice());
+				data.put("quantity", item.getQuantity());
+
+				List<CartOptionDto> options = item.getCartItemOptions().stream().map(opt ->
+					new CartOptionDto(opt.getGroupName(), opt.getOptionName(), opt.getOptionPrice(), true)
+				).collect(Collectors.toList());
+				data.put("options", options);
+
+				restoredItems.add(data);
+			}
+
+			model.addAttribute("restoredCartItems", restoredItems);
+
+			cartRepository.delete(cart);
+		}
 
 		return "content/cart";
 	}
-	
-	@PostMapping("/add")
-	@ResponseBody
-	public ResponseEntity<?> addToCart(@RequestBody CartAddRequestDto dto,
-	                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
-		User user = userService.findUserByUuid(userDetails.getUser().getUserUuid())
-			.orElseThrow(() -> new IllegalStateException("유저 없음"));
 
-		Menu menu = menuService.findById(dto.getMenuId()); // 예외처리 필요
-		Store store = storeService.findById(dto.getStoreId()); // 예외처리 필요
-
-		Cart cart = cartService.getCartByUserAndStore(user, store); // 자동 생성 포함
-
-		cartItemService.addItemToCart(cart, menu, store, dto.getQuantity(), dto.getOptions());
-		
-
-		return ResponseEntity.ok(Map.of("message", "장바구니에 담았습니다!"));
-	}
-	
-	@PostMapping("/api/cart/update-quantity")
-	@ResponseBody
-	public Map<String, Object> updateQuantity(@RequestBody CartUpdateRequestDto dto,
-			 								@AuthenticationPrincipal CustomUserDetails userDetails) {
-		User user = userService.findUserByUuid(userDetails.getUser().getUserUuid())
-			.orElseThrow(() -> new IllegalStateException("User not found"));
-
-		cartService.updateQuantity(dto.getCartItemUuid(), dto.getQuantity());
-		int itemTotal = cartService.getUpdatedTotal(dto.getCartItemUuid());
-		int cartTotal = cartService.getCartTotalPriceForUser(user);
-
-		return Map.of(
-			"totalPrice", itemTotal, "cartTotalPrice", cartTotal
-		);
-	}
-
-	@PostMapping("/api/cart/delete")
-	@ResponseBody
-	public void deleteItem(@RequestBody Map<String, String> body) {
-		UUID uuid = UUID.fromString(body.get("cartItemUuid"));
-		cartService.deleteItem(uuid);
-	}
-
-	@GetMapping("/api/cart/total-price")
-	@ResponseBody
-	public Map<String, Object> getTotalCartPrice(@AuthenticationPrincipal CustomUserDetails userDetails) {
-		User user = userService.findUserByUuid(userDetails.getUser().getUserUuid())
-			.orElseThrow(() -> new IllegalStateException("유저 없음"));
-
-		int totalPrice = cartService.getCartTotalPriceForUser(user);
-		return Map.of("cartTotalPrice", totalPrice);
-	}
-	
 	@GetMapping("/api/cart-item/options")
 	@ResponseBody
 	public List<CartOptionDto> getMenuOptions(@RequestParam("uuid") UUID cartItemUuid) {
-		CartItems cartItem = cartItemRepository.findById(cartItemUuid)
+		CartItems cartItem = cartItemsRepository.findById(cartItemUuid)
 			.orElseThrow(() -> new IllegalArgumentException("장바구니 항목 없음"));
 
 		Menu menu = cartItem.getMenu();
@@ -136,13 +100,12 @@ public class CartController {
 
 		for (CartOptionDto dto : optionDtos) {
 			boolean isSelected = selectedOptions.stream()
-				.anyMatch(opt -> opt.getOptionName().equals(dto.getName())
-				              && opt.getGroupName().equals(dto.getGroupName()));
+				.anyMatch(opt -> opt.getOptionName().equals(dto.getName()) && opt.getGroupName().equals(dto.getGroupName()));
 			dto.setSelected(isSelected);
 		}
 		return optionDtos;
 	}
-	
+
 	private void parseOptions(String rawOption, String rawPrice, List<CartOptionDto> resultList) {
 		if (!StringUtils.hasText(rawOption) || !StringUtils.hasText(rawPrice)) return;
 
@@ -164,11 +127,11 @@ public class CartController {
 			}
 		}
 	}
-	
+
 	@PostMapping("/api/cart-item/save-options")
 	@ResponseBody
 	public ResponseEntity<Map<String, String>> saveCartItemOptions(@RequestBody CartItemOptionSaveDto dto) {
-		CartItems cartItem = cartItemRepository.findById(dto.getCartItemUuid())
+		CartItems cartItem = cartItemsRepository.findById(dto.getCartItemUuid())
 			.orElseThrow(() -> new IllegalArgumentException("장바구니 항목을 찾을 수 없습니다."));
 
 		cartItemService.updateOptions(cartItem, dto.getOptions());
@@ -176,10 +139,66 @@ public class CartController {
 		Map<String, String> response = new HashMap<>();
 		response.put("message", "옵션이 저장되었습니다.");
 
-		return ResponseEntity.ok()
-			.contentType(MediaType.APPLICATION_JSON)
-			.body(response);
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
+	}
+
+	@PostMapping("/api/init")
+	@ResponseBody
+	public ResponseEntity<Map<String, String>> initCart(@RequestBody CartInitRequestDto dto) {
+		User user = userService.findUserByUuid(dto.getUserUUID())
+				.orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+
+		if (dto.getItems().isEmpty()) throw new IllegalArgumentException("아이템 없음");
+		Store store = storeService.findById(dto.getItems().get(0).getStoreId());
+		Cart cart = cartService.createCart(user, store, dto.getItems());
+		return ResponseEntity.ok(Map.of("cartId", cart.getCartId().toString()));
 	}
 	
-	
+	@GetMapping("/api/restore")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> restoreCart(@RequestParam UUID userUuid) {
+		User user = userService.findUserByUuid(userUuid)
+			.orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+
+		Optional<Cart> optionalCart = cartService.findLatestCartByUser(user);
+		if (optionalCart.isEmpty()) {
+			return ResponseEntity.ok(Map.of("restored", false));
+		}
+
+		Cart cart = optionalCart.get();
+
+		if (cart.getStatus() != CartStatus.PENDING && cart.getStatus() != CartStatus.CANCELED) {
+			return ResponseEntity.ok(Map.of("restored", false));
+		}
+
+		List<Map<String, Object>> restoredItems = cart.getCartItems().stream().map(item -> {
+			Map<String, Object> menuData = new HashMap<>();
+			menuData.put("menuId", item.getMenu().getMenuId());
+			menuData.put("storeId", cart.getStore().getStoreId());
+			menuData.put("menuName", item.getMenu().getMenuName());
+			menuData.put("menuImage", item.getMenu().getMenuImg());
+			menuData.put("price", item.getMenu().getPrice());
+			menuData.put("quantity", item.getQuantity());
+
+			List<Map<String, Object>> options = item.getCartItemOptions().stream().map(opt -> {
+				Map<String, Object> optMap = new HashMap<>();
+				optMap.put("groupName", opt.getGroupName());
+				optMap.put("name", opt.getOptionName());
+				optMap.put("price", opt.getOptionPrice());
+				optMap.put("selected", true);
+				return optMap;
+			}).collect(Collectors.toList());
+
+			menuData.put("options", options);
+			return menuData;
+		}).collect(Collectors.toList());
+
+		// ✅ delete from DB after collecting data
+		cartService.deleteCart(cart);
+
+		return ResponseEntity.ok(Map.of(
+			"restored", true,
+			"cartItems", restoredItems
+		));
+	}
 }
