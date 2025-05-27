@@ -174,11 +174,11 @@ public class ComplainController {
     	boolean isValid = complainService.checkPassword(id, password);
     	if (isValid) {
     		// 비밀번호 맞으면 상세 페이지로 이동
-    		return "redirect:/complains/" + id + "?password=" + password;
+    		return "redirect:/complains/complainReply" + id + "?password=" + password;
     	} else {
     		// 틀리면 에러 메시지 넣고 리스트 페이지로
     		redirectAttributes.addFlashAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
-    		return "redirect:/complains";
+    		return "redirect:/complains/complainReply";
     	}
     }
     
