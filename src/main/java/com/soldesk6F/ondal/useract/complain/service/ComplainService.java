@@ -78,7 +78,10 @@ public class ComplainService {
         User user = userRepository.findById(userDetails.getUser().getUserUuid())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        String encodedPassword = passwordEncoder.encode(dto.getComplainPassword());
+        String encodedPassword = null;
+        if (dto.getComplainPassword() != null && !dto.getComplainPassword().isBlank()) {
+            encodedPassword = passwordEncoder.encode(dto.getComplainPassword());
+        }
         
         Complain complain = Complain.builder()
                 .user(user)
