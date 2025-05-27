@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.soldesk6F.ondal.useract.complain.dto.ComplainSearchCond;
 import com.soldesk6F.ondal.useract.complain.entity.Complain;
+import com.soldesk6F.ondal.useract.complain.entity.Complain.ComplainStatus;
 import com.soldesk6F.ondal.useract.complain.entity.Complain.Role;
 
 import java.util.List;
@@ -19,5 +20,6 @@ public interface ComplainRepository extends JpaRepository<Complain, UUID>,Compla
     List<Complain> findByComplainTitleContaining(String keyword);
     List<Complain> findByRole(Role role);
     List<Complain> findByUser_UserId(String userId);
+	List<Complain> findByComplainStatus(ComplainStatus complainStatus);
 }
 

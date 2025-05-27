@@ -15,6 +15,7 @@ import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.useract.complain.entity.Complain;
+import com.soldesk6F.ondal.useract.complain.entity.Complain.ComplainStatus;
 import com.soldesk6F.ondal.useract.complain.entity.Complain.Role;
 import com.soldesk6F.ondal.useract.complain.repository.ComplainRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
@@ -162,34 +163,50 @@ public class PageController {
 	private final ComplainRepository complainRepository;
 	
 	@GetMapping("/complains")
-    public String viewComplains(
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "role", required = false) Role role,
-            @RequestParam(value = "userId", required = false) String userId,
-            Model model
-    ) {
-        List<Complain> complains;
+	public String viewComplains(
+	        @RequestParam(value = "keyword", required = false) String keyword,
+	        @RequestParam(value = "role", required = false) Role role,
+	        @RequestParam(value = "userId", required = false) String userId,
+	        @RequestParam(value = "complainStatus", required = false) ComplainStatus complainStatus,
+	        Model model
+	) {
+	    List<Complain> complains = complainRepository.findAll(); // 일단 전부 불러옴 (단순한 구조)
 
-        if (userId != null && !userId.isBlank()) {
-            complains = complainRepository.findByUser_UserId(userId);
-        } else if (keyword != null && !keyword.isBlank()) {
-            complains = complainRepository.findByComplainTitleContaining(keyword);
-        } else if (role != null) {
-            complains = complainRepository.findByRole(role);
-        } else {
-            complains = complainRepository.findAll();
-        }
+	    // 필터링 적용
+	    if (userId != null && !userId.isBlank()) {
+	        complains = complains.stream()
+	                .filter(c -> c.getUser() != null && userId.equals(c.getUser().getUserId()))
+	                .toList();
+	    }
 
-     // 로그 확인
-        complains.forEach(c -> {
-            System.out.println("제목: " + c.getComplainTitle());
-            System.out.println("유저: " + (c.getUser() != null ? c.getUser().getUserId() : "비회원"));
-        });
-        
-        
-        model.addAttribute("complains", complains);
-        return "content/user/complain/complainList"; // complain/list.html
-    }
+	    if (keyword != null && !keyword.isBlank()) {
+	        complains = complains.stream()
+	                .filter(c -> c.getComplainTitle() != null && c.getComplainTitle().contains(keyword))
+	                .toList();
+	    }
+
+	    if (role != null) {
+	        complains = complains.stream()
+	                .filter(c -> c.getRole() == role)
+	                .toList();
+	    }
+
+	    if (complainStatus != null) {
+	        complains = complains.stream()
+	                .filter(c -> c.getComplainStatus() == complainStatus)
+	                .toList();
+	    }
+
+	    // 로그 확인
+	    complains.forEach(c -> {
+	        System.out.println("제목: " + c.getComplainTitle());
+	        System.out.println("유저: " + (c.getUser() != null ? c.getUser().getUserId() : "비회원"));
+	        System.out.println("상태: " + c.getComplainStatus());
+	    });
+
+	    model.addAttribute("complains", complains);
+	    return "content/user/complain/complainList";
+	}
 	
 	
 }
