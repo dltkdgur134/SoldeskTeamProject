@@ -8,7 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.soldesk6F.ondal.useract.complain.dto.ComplainDto;
+import com.soldesk6F.ondal.useract.complain.dto.ComplainUserDTO;
+import com.soldesk6F.ondal.useract.complain.dto.ComplainAdminDto;
 import com.soldesk6F.ondal.useract.complain.dto.ComplainSearchCond;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ExpressionUtils;
@@ -28,7 +29,7 @@ public class ComplainRepositoryImpl implements ComplainRepositoryCustom {
     private final JPAQueryFactory qf;
 
     @Override
-    public Page<ComplainDto> search(ComplainSearchCond cond, Pageable pageable) {
+    public Page<ComplainAdminDto> search(ComplainSearchCond cond, Pageable pageable) {
 
         QComplain c = QComplain.complain;
         QComplainImg  i = new QComplainImg("img");        // ★ static 대신 new
@@ -45,8 +46,8 @@ public class ComplainRepositoryImpl implements ComplainRepositoryCustom {
             );
         }
 
-        List<ComplainDto> rows = qf.select(
-                Projections.constructor(ComplainDto.class,
+        List<ComplainAdminDto> rows = qf.select(
+                Projections.constructor(ComplainAdminDto.class,
                     c.complainId,
                     c.complainTitle,
                     c.complainContent,

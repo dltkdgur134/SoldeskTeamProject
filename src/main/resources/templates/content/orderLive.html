@@ -17,9 +17,6 @@
   <script
     th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}">
   </script>
-   <script th:inline="javascript">
-    let userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest'; 
-  </script>
   <!-- 페이지 전용 JS -->
 </head>
 <body>
@@ -41,7 +38,7 @@
         		<!-- <div class="step-timestamp" data-step="1" style="left: 0%;" th:if="${order.timeline[0].timestamp != null}" th:text="${#temporals.format(order.timeline[0].timestamp, 'HH:mm')}"></div> -->
 
 							<div class="step-label" data-step="2" style="left: 25%;">주문
-								확인 완료</div>
+								확인</div>
 							<div class="step" data-step="2" style="left: 25%;"></div>
         		<!-- <div class="step-timestamp" data-step="2" style="left: 33.33%;" th:if="${order.timeline[1].timestamp != null}" th:text="${#temporals.format(order.timeline[1].timestamp, 'HH:mm')}"></div> -->
 
@@ -187,16 +184,24 @@
 						<span th:if="${order.deliveryFee > 0}"><small class="order-detail-text" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
 						<span th:if="${order.deliveryFee == 0}"><small class="order-detail-text" th:text="${order.deliveryFee + ' 원'}"></small></span>
 					</div>
+					<div class="container d-flex justify-content-between">
+					<a id="refundLink" href="/userPayHistory" style="display: inline;">환불하러가기</a>
+					</div>
       			</div>
     		</div>
       	</div>
       </div>
 	</div>
-
+		
     <!-- 오른쪽 채팅 패널 -->
     <div id="chatPanel" class="text-center chat-panel">
       <h3>실시간 채팅</h3>
-      <div id="chatMessages" class="chat-messages"></div>
+      <div id="chatMessages" class="chat-messages text-start">
+      	<!-- <th:block th:each="msg : ${prevMsgs}">
+      		<strong th:text="${msg.senderType}"></strong><th:block th:text="${msg.message}"></th:block>
+      		<div class="timestamp small text-muted" th:text="${new Date(msg.timestamp).toLocaleTimeString()}"></div>
+      	</th:block> -->
+      </div>
       <div class="chat-input">
         <input type="text" id="chatInput" placeholder="메시지를 입력하세요…" />
         <button id="sendChatBtn">

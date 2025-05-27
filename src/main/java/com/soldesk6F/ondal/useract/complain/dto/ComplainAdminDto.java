@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record ComplainDto(
+public record ComplainAdminDto(
         UUID id,
         String title,
         String content,

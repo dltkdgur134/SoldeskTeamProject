@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.soldesk6F.ondal.admin.entity.Admin;
 import com.soldesk6F.ondal.admin.repository.AdminRepository;
-import com.soldesk6F.ondal.useract.complain.dto.ComplainDto;
+import com.soldesk6F.ondal.useract.complain.dto.ComplainAdminDto;
 import com.soldesk6F.ondal.useract.complain.dto.ComplainSearchCond;
 import com.soldesk6F.ondal.useract.complain.dto.ReplySavedDto;
 import com.soldesk6F.ondal.useract.complain.entity.Complain;
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-class ComplainServiceImpl  implements ComplainService {
+class ComplainServiceImpl  implements ComplainInterface {
 
     private final ComplainRepository complainRepo;
     private final AdminRepository    adminRepo;
@@ -34,12 +34,13 @@ class ComplainServiceImpl  implements ComplainService {
 
     /* 목록 ------------------------------------------------------------ */
     @Override
-    public Page<ComplainDto> list(ComplainSearchCond cond, Pageable pageable) {
+    public Page<ComplainAdminDto> list(ComplainSearchCond cond, Pageable pageable) {
         return complainRepo.search(cond, pageable);
     }
 
     /* 답변 ------------------------------------------------------------ */
-    @Override @Transactional
+    @Override 
+    @Transactional
     public ReplySavedDto reply(UUID complainId, String adminId,
                                String content, List<MultipartFile> images) throws IOException {
 

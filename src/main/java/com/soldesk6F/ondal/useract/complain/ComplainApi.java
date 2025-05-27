@@ -19,10 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.soldesk6F.ondal.admin.entity.Admin;
 import com.soldesk6F.ondal.login.CustomUserDetails;
-import com.soldesk6F.ondal.useract.complain.dto.ComplainDto;
+import com.soldesk6F.ondal.useract.complain.dto.ComplainAdminDto;
 import com.soldesk6F.ondal.useract.complain.dto.ComplainSearchCond;
 import com.soldesk6F.ondal.useract.complain.dto.ReplySavedDto;
-import com.soldesk6F.ondal.useract.complain.service.ComplainService;
+import com.soldesk6F.ondal.useract.complain.service.ComplainInterface;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,11 +31,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ComplainApi {
 
-    private final ComplainService service;
+    private final ComplainInterface service;
 
     /* === 목록 === */
     @GetMapping
-    public Page<ComplainDto> list(
+    public Page<ComplainAdminDto> list(
             @RequestParam(name = "role",    required = false) String role,
             @RequestParam(name = "keyword", required = false) String keyword,
             @PageableDefault(size = 20, sort = "createdDate", direction = Direction.DESC)

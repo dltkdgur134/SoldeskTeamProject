@@ -280,26 +280,29 @@
 		    <span>상품 합계</span>
 		    <span id="subtotal" th:text="|₩${#numbers.formatInteger(totalPrice, 3, 'COMMA')}|"></span>
 		  </div>
-
+		  <div class="price-line mb-1">
+		    <span>배달료</span>
+		    <span id="subtotal" th:text="|₩${#numbers.formatInteger(deliveryFee, 3, 'COMMA')}|"></span>
+		  </div>
 		  <div class="price-line mb-1">
 		    <span>할인</span>
-		    <span id="discount">-₩1,000</span>
+		    <span id="discount" th:text="| -₩${#numbers.formatInteger(discountAmount, 3, 'COMMA')}|"></span>
 		  </div>
 
 		  <hr />
 
 		  <div class="price-line total-price">
 		    <span>총 결제금액</span>
-		    <span id="totalPrice" th:text="|₩${#numbers.formatInteger(totalPrice, 3, 'COMMA')}|"></span>
+		    <span id="subtotal" th:text="|₩${#numbers.formatInteger(totalPayAmount, 3, 'COMMA')}|"></span>
 		  </div>
 
 		  <button class="btn btn-primary w-100 btn-lg mt-3" id="pay-btn"
-		          th:text="|₩${#numbers.formatInteger(totalPrice, 3, 'COMMA')} 결제하기|">
+		          th:text="|₩${#numbers.formatInteger(totalPayAmount, 3, 'COMMA')} 결제하기|">
 		  </button>
         </div>
       </div>
     </div>
-	<input type="hidden" id="savedTotalPrice" th:value="${totalPrice}" />
+	<input type="hidden" id="savedTotalPrice" th:value="${totalPayAmount}" />
 	<input type="hidden" id="savedStoreName" th:value="${storeName}" />
 	<input type="hidden" id="savedCartId" th:value="${cartId}" />
 	<input type="hidden" id="savedSuccessUrl" th:value="${successUrl}" />
@@ -355,7 +358,8 @@
 								name="currentPassword" id="currentPassword-input"
 								aria-describedby="basic-addon2">
 						</div>
-						<input type="hidden" th:value="${cartId}" name="cartUUID"/>												
+						<input type="hidden" th:value="${cartId}" name="cartUUID"/>
+						<input type="hidden" th:value="${totalPayAmount}" name="totalPrice"/>												
 					</form>
 						<input type="hidden" th:value="${status}" id = "status">
 						<input type="hidden" th:value="${failReason}" name="failReason" id = "failReason">

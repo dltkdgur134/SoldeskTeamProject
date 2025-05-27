@@ -62,6 +62,7 @@
 				      <!-- 온달 지갑 충전일 때 -->
 				      <form th:case="'ONDAL_WALLET'" th:action="@{/user/refund}" method="post" style="display:inline;">
 				        <input type="hidden" name="paymentKey" th:value="${payment.paymentKey}" />
+				        <input type="hidden" name="paymentMethod" th:value="${payment.paymentMethod.name()}" />
 				        <select name="refundReason" required>
 				          <option value="">-- 환불 사유 선택 --</option>
 				          <option value="사용자 요청">사용자 요청</option>
@@ -77,7 +78,7 @@
           <div th:case="'ORDER_PAYMENT'">
             <div th:if="${payment.orderToOwner.name() == 'PENDING'}">
               <!-- orderToOwner가 PENDING이면 환불 버튼 -->
-              <form th:action="@{/user/refund}" method="post" style="display:inline;">
+              <form onsubmit="clickBtn()" th:action="@{/user/refund}" method="post" style="display:inline;">
                 <input type="hidden" name="paymentKey" th:value="${payment.paymentKey}" />
                 <input type="hidden" name="paymentMethod" th:value="${payment.paymentMethod.name()}" />
                 <input type="hidden" name="tossOrderId" id="toss_order_id" th:value="${payment.tossOrderId}" />
@@ -89,7 +90,7 @@
                   <option value="서비스 불만족">서비스 불만족</option>
                   <option value="기타">기타</option>
                 </select>
-                <button type="submit" class="refund-btn">환불</button>
+                <button type="submit" class="refund-btn"  onclick = "clickBtn()">환불</button>
               </form>
             </div>
             <div th:if="${payment.orderToOwner.name() != 'PENDING'}">
@@ -117,5 +118,8 @@
     var currentUsage = /*[[${currentUsage}]]*/"-";
 </script>
 </div>
+<script>
+ 
+</script>
 
 </html>

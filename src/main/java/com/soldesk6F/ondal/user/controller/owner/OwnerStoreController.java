@@ -205,6 +205,8 @@ public class OwnerStoreController {
 		@RequestParam(value = "holiday", required = false) List<String> holidays,
 		@RequestParam(value = "storeEvent", required = false) String storeEvent,
 		@RequestParam(value = "foodOrigin", required = false) String foodOrigin,
+		@RequestParam(value = "deliveryFee", required = false) int deliveryFee,
+		
 		RedirectAttributes redirectAttributes) {
 
 		try {
@@ -234,7 +236,7 @@ public class OwnerStoreController {
 				holidayStr, 
 				Store.DeliveryRange.valueOf(deliveryRange), 
 				storeEvent, foodOrigin, 
-				latitude, longitude
+				latitude, longitude,deliveryFee
 			);
 
 			redirectAttributes.addFlashAttribute("result", 1);

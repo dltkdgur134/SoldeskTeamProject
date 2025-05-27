@@ -48,7 +48,7 @@ public class Complain {
     @Column(name = "guest_id", length = 36)
     private String guestId;
 
-    @Column(name = "complain_password", length = 4)
+    @Column(name = "complain_password")
     private String complainPassword;
 
     @Column(name = "complain_title", nullable = false, length = 50)
@@ -67,10 +67,6 @@ public class Complain {
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
     
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 10)
-    private Role role;   
-
     @UpdateTimestamp
     @Column(name = "updated_date", nullable = false)
     private LocalDateTime updatedDate;
@@ -78,9 +74,17 @@ public class Complain {
     @OneToMany(mappedBy = "complain", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ComplainReply> replies = new ArrayList<>();
 
+    @OneToMany(mappedBy = "complain", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ComplainImg> complainImgs = new ArrayList<>();
+    
+    public enum Role { USER, RIDER, OWNER, OTHER }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 10)
+    private Role role;
+    
     @Builder
     public Complain(User user, String guestId, String complainPassword, String complainTitle, String complainContent,
-			 ComplainStatus complainStatus) {
+			 ComplainStatus complainStatus, Role role) {
 		super();
 		this.user = user;
 		this.guestId = guestId;
@@ -88,7 +92,8 @@ public class Complain {
 		this.complainTitle = complainTitle;
 		this.complainContent = complainContent;
 		this.complainStatus = complainStatus != null ? complainStatus : ComplainStatus.PENDING;
-	}
+		this.role = role;
+    }
 
 
 	public enum ComplainStatus {
@@ -100,6 +105,5 @@ public class Complain {
 	public String getComplainUuidAsString() {
 	    return complainId != null ? complainId .toString() : null;
 	}
-    public enum Role { USER, RIDER, OWNER, OTHER }
 
 }
