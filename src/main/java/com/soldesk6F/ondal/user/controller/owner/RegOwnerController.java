@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,6 @@ import com.soldesk6F.ondal.user.service.UserRoleService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/owner")
 @RequiredArgsConstructor
 public class RegOwnerController {
 	private final OwnerService ownerService;
@@ -33,7 +33,7 @@ public class RegOwnerController {
 	private final UserRoleService userRoleService;
 	
 	
-	@GetMapping("/register")
+	@GetMapping("/user/ownerRegister")
 	public String showOwnerRegistratinForm(@AuthenticationPrincipal CustomUserDetails userDetails,
 			RedirectAttributes redirectAttributes) {
 		String userId = userDetails.getUser().getUserId();
@@ -48,13 +48,14 @@ public class RegOwnerController {
 	
 	
 	
-	@PostMapping("/ownerRegGoToStoreReg")
+	@PostMapping("/user/ownerRegGoToStoreReg")
 	public String showStoreRegistrationPage(
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@ModelAttribute OwnerForm ownerForm,
 		@RequestParam("ownerNickname") String ownerNickname,
 		@RequestParam("secondaryPassword") String secondaryPassword,
 		@RequestParam("secondaryPasswordConfirm") String secondaryPasswordConfirm,
+		Model model,
 	    RedirectAttributes redirectAttributes) {
 		 // 확인 비밀번호 비교 로직 추가 가능
 	    if (!secondaryPassword.equals(secondaryPasswordConfirm)) {
@@ -71,30 +72,35 @@ public class RegOwnerController {
 	    // 바로 점주 등록 (암호화는 서비스 내부에서 처리)
         
 	    
-	 // 🔁 4. 세션의 Authentication 갱신
-        // 변경된 사용자 정보를 다시 로딩
-        User updatedUser = userRepository.findByUserId(userId).orElseThrow();
-
-        // 새로운 CustomUserDetails 생성
-        CustomUserDetails updatedDetails = new CustomUserDetails(updatedUser, UserRole.valueOf(updatedUser.getUserRole().name()));
-
-        // 새로운 Authentication 객체 생성
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(
-            updatedDetails, null, updatedDetails.getAuthorities()
-        );
-
-        // SecurityContext에 설정
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-        redirectAttributes.addFlashAttribute("ownerSuccess", "점주 등록이 완료되었습니다!");
+		/*
+		 * // 🔁 4. 세션의 Authentication 갱신 // 변경된 사용자 정보를 다시 로딩 User updatedUser =
+		 * userRepository.findByUserId(userId).orElseThrow();
+		 * 
+		 * // 새로운 CustomUserDetails 생성 CustomUserDetails updatedDetails = new
+		 * CustomUserDetails(updatedUser,
+		 * UserRole.valueOf(updatedUser.getUserRole().name()));
+		 * 
+		 * // 새로운 Authentication 객체 생성 Authentication newAuth = new
+		 * UsernamePasswordAuthenticationToken( updatedDetails, null,
+		 * updatedDetails.getAuthorities() );
+		 * 
+		 * // SecurityContext에 설정
+		 * SecurityContextHolder.getContext().setAuthentication(newAuth);
+		 */
+        
+		/*
+		 * redirectAttributes.addFlashAttribute("ownerSuccess", "점주 등록 신청이 완료되었습니다!");
+		 */
         
         User user = userRepository.findByUserId(userId).orElseThrow();
         userRoleService.changeRoleToOwner(user, ownerForm);
-	    // 가게 등록 페이지로 이동
-	    return "redirect:/owner/store/submit";
+        // 알림을 띄움
+        model.addAttribute("ownerSuccess", "점주 등록 신청이 완료되었습니다!");
+        return "content/owner/ownerRegister";
 	    
 	}
 	
-	@GetMapping("/store/submit")
+	@GetMapping("/owner/store/submit")
 	public String showSubmitPage() {
 		
 	    return "content/store/submit";  // submit.html 파일을 Thymeleaf 템플릿으로 처리
