@@ -32,13 +32,12 @@
       <div class="card-body row" >
         <!-- 왼쪽: 매장 대표 이미지 -->
         <div class="col d-flex justify-content-between">
-		    <!-- <small class="order-date" th:text="${order.orderDate}"></small> --> 
 		    <small class="order-date" th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"
 		    th:if="${#temporals.year(order.orderDate) != #dates.year(#dates.createNow())}"></small>
 		    <small class="order-date" th:text="${#temporals.format(order.orderDate, 'MM월 dd일 HH:mm')}"
 		    th:if="${#temporals.year(order.orderDate) == #dates.year(#dates.createNow())}"></small>
 		    <small class="order-date"></small>
-		    <span class="status" th:text="${order.orderStatus}">배달중</span>
+		    <span class="status" th:text="${order.orderToUser.getDescription()}"></span>
         </div>
         <div class="row">
 	        <div class="img-container col-md-auto ms-4">
@@ -60,32 +59,23 @@
         <div class="container text-start ms-4 my-3">
           <!-- 메뉴 항목 2개까지만, 나머지는 "외 n개" -->
           <p class="card-text" th:each="item : ${order.menuItems}">
-            <!-- <span th:each="item,iterStat : ${order.menuItems}"
-                  th:if="${iterStat.index < 2}"
-                  th:text="${iterStat.index == 0 ? item : ', ' + item}">
-              메뉴1, 메뉴2
-            </span>
-            <span th:if="${order.menuItems.size() > 2}"
-                  th:text="'외 ' + (${order.menuItems.size()} - 2) + '개'">
-              외 n개
-            </span> -->
             <span><strong th:text="${item.key}"></strong></span>
             <span><small class="menu-item-quantity" th:text="${item.value + ' 개'}"></small></span>
           </p>
         </div>
       </div>
       <!-- 하단: 상세 정보 보기 버튼 -->
-      <div class="container d-flex justify-content-center mb-4" th:unless="${#strings.equals(order.orderStatus, 'CANCELED')}">
+      <div class="container d-flex justify-content-center mb-4" th:unless="${#strings.equals(order.orderToUser, 'CANCELED')}">
         <a th:href="@{'/user/order/' + ${order.orderId}}"
-           class="btn btn-outline-primary go-order-details-btn" th:if="${#strings.equals(order.orderStatus, 'COMPLETED')}">
+           class="btn btn-outline-primary go-order-details-btn" th:if="${#strings.equals(order.orderToUser, 'COMPLETED')}">
           상세 정보 보기
         </a>
          <a th:href="@{'/user/order/' + ${order.orderId}}"
-           class="btn btn-outline-primary go-order-details-btn" th:unless="${#strings.equals(order.orderStatus, 'COMPLETED')}">
+           class="btn btn-outline-primary go-order-details-btn" th:unless="${#strings.equals(order.orderToUser, 'COMPLETED')}">
           실시간 주문 현황
         </a>
        </div>
-       <div class="container d-flex justify-content-center mb-4" th:if="${#strings.equals(order.orderStatus, 'CANCELED')}">
+       <div class="container d-flex justify-content-center mb-4" th:if="${#strings.equals(order.orderToUser, 'CANCELED')}">
        		<strong class="order-canceled">주문 취소됨</strong>
        </div>
         <!-- <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
@@ -93,7 +83,7 @@
         <div class="container d-flex justify-content-center mb-4">
         <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
         	class="btn btn-outline-secondary position-relative write-review-btn"
-        	th:if="${#strings.equals(order.orderStatus, 'COMPLETED') && order.daysLeftForReview > 0}">
+        	th:if="${#strings.equals(order.orderToUser, 'COMPLETED') && order.daysLeftForReview > 0}">
         	리뷰 작성
         	 <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-dark days-left">
     			<strong th:text="${'D-' + order.daysLeftForReview}"></strong>
@@ -107,7 +97,7 @@
 </section>
 
 <script>
-let stompClient = null;
+/* let stompClient = null;
 const userId = "user123"; // 실제 로그인 유저ID, 혹은 UUID
 
 function connect() {
@@ -132,7 +122,7 @@ function handleOrderUpdate(order) {
     // or 전체 리스트 다시 로드
 }
 
-window.onload = connect;
+window.onload = connect; */
 </script>
 
 </body>

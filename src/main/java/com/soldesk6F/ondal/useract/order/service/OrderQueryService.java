@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
 @Service
@@ -27,9 +27,15 @@ public class OrderQueryService {
     }
 
     /** 진행 중으로 간주하는 상태 Enum 값들 */
-    private static final List<OrderToOwner> ACTIVE_STATUSES = List.of(
-            OrderToOwner.PENDING,
-            OrderToOwner.CONFIRMED,
-            OrderToOwner.IN_DELIVERY
+//    private static final List<OrderToOwner> ACTIVE_STATUSES = List.of(
+//            OrderToOwner.PENDING,
+//            OrderToOwner.CONFIRMED,
+//            OrderToOwner.IN_DELIVERY
+//    );
+    private static final List<OrderToUser> ACTIVE_STATUSES = List.of(
+    		OrderToUser.PENDING,
+    		OrderToUser.CONFIRMED,
+    		OrderToUser.COOKING,
+    		OrderToUser.DELIVERING
     );
 }

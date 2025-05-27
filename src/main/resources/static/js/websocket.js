@@ -39,8 +39,32 @@ function subscribeOrderChannels(paramOrderId) {
 	/* 상태 알림 */
 	stompClient.subscribe(`/topic/order/${paramOrderId}`, msg => {
 		const update = JSON.parse(msg.body);
+		if (typeof orderId === 'undefined') {
+			let statusMsg = "";
+			switch(update.orderToUser) {
+				case 'COOKING':
+					if (update.orderToOwner === 'IN_DELIVERY') {
+						statusMsg = "조리 완료"
+						break;
+					}
+					statusMsg = "조리 중";
+					break;
+				case 'DELIVERING':
+					statusMsg = "배달 중";
+					break;
+				case 'COMPLETED':
+					statusMsg = "배달 완료";
+					break;
+				case 'CANCELED':
+					statusMsg = "주문 취소";
+					break;
+				default:
+					break;
+			}
+			showToast(`📦 주문 #${update.orderId} 상태: "${statusMsg}"`);
+		}
 		if (update.orderId === orderId) {
-			alert("subscribeOrderChannels 살아있음");
+			console.log("subscribeOrderChannels 살아있음");
 			console.log('[order-topic]', paramOrderId, update);
 			showOrderNotification(update);       // 토스트
 			const refundLink = document.getElementById("refundLink");
@@ -56,7 +80,6 @@ function subscribeOrderChannels(paramOrderId) {
 					window.updateProgress(update.currentStatus);
 				}
 			}
-			//updateStatusChart?.(update.stage);   // 선택 UI
 			//moveRiderMarker?.(update.location?.lat, update.location?.lng);
 			if (window.hasOwnProperty('updateCookingProgress') &&
 				typeof window.updateCookingProgress === 'function') {
@@ -65,10 +88,6 @@ function subscribeOrderChannels(paramOrderId) {
 			if (typeof window.startExpectedTimeCountdown === 'function') {
 				window.startExpectedTimeCountdown(update.expectCookingTime, update.expectDeliveryTime);
 			}
-			//alert(update.orderToUser);
-			/*if(update.orderToUser === 'CONFIRMED') {
-			   updateProgress(2);
-			}*/
 			switch (update.orderToUser) {
 				case 'CONFIRMED':
 					updateProgress(2);
@@ -82,18 +101,19 @@ function subscribeOrderChannels(paramOrderId) {
 					break;
 			}
 		} else {
-			alert("걸러진 주문");
+			console.log("걸러진 주문");
 		}
-
+		
 	});
 
 	/* 채팅 메시지 */
 	stompClient.subscribe(`/topic/chat/${paramOrderId}`, msg => {
 		const chat = JSON.parse(msg.body);
+		//showToast(msg);
 		if (chat.orderId === orderId) {
 			showChatMessage(chat);
 		} else {
-			alert("테스트:걸러진 주문");
+			console.log("테스트:걸러진 주문");
 		}
 	});
 }
@@ -121,7 +141,8 @@ function showChatMessage(chat) {
 	const el = document.createElement('div');
 	el.className = 'chat-message';
 	el.innerHTML =
-		`<strong>${chat.senderType}:</strong> ${chat.text}
+		`<strong class="sender-type">${chat.senderType}:</strong> 
+		<span class="text">${chat.text}</span>
      <div class="timestamp small text-muted">
        ${new Date(chat.timestamp).toLocaleTimeString()}
      </div>`;
@@ -154,7 +175,8 @@ function showToast(msg) {
 function sendChat() {
 	const input = document.getElementById('chatInput');
 	if (!input.value.trim() || !stompClient) return;
-	const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
+	//const orderId = Array.from(currentOrderIds).at(-1); // 최근 방
+	//const orderId = document.getElementById('orderIdInput').value;
 	stompClient.send(`/app/chat/${orderId}`, {}, JSON.stringify({
 		orderId, senderType: '손님', senderName: userId, text: input.value.trim(),
 		timestamp: new Date().toISOString()

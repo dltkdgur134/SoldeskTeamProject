@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.owner.order;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class OrderService {
 	    private final SimpMessagingTemplate messagingTemplate;
 	    private final RegAddressRepository regAddressRepository;
 	    private final DateFunctions dateFunctions;
+	    
 
 	    private final PaymentService paymentService;  // 이걸 @Lazy 처리 필요
 
@@ -83,7 +85,8 @@ public class OrderService {
 	        this.regAddressRepository = regAddressRepository;
 	        this.dateFunctions = dateFunctions;
 	    }
-
+	    
+	// 주문 저장
     public Order saveOrder(OrderRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
                 .orElseThrow(() -> new RuntimeException("가게를 찾을 수 없습니다. storeId=" + requestDto.getStoreId()));
@@ -112,10 +115,32 @@ public class OrderService {
         return orderRepository.save(order);
     }
     
+    // 주문 수락
     public Order acceptOrder(UUID orderId, int completionTime) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("주문 없음"));
-
+        
+        Store store = order.getStore();
+        
+        
+        if (store.getLastOrderDate().toLocalDate().equals(LocalDate.now())) {
+            if (store.getOrderCount() == 0) {
+                // 해당 날짜 첫번째 주문일 경우
+                store.setOrderCount(1);
+                order.setOrderNumber(1);
+            } else {
+                // 해당 날짜 첫번째 주문이 아닐 경우 주문번호 1씩 더하기
+            	int currentOrderCount = store.getOrderCount() + 1;
+                store.setOrderCount(currentOrderCount);
+                order.setOrderNumber(currentOrderCount);
+            }
+        } else {
+            // 다음날일 경우 주문번호 초기화
+            store.setOrderCount(1);
+            order.setOrderNumber(1);
+            store.setLastOrderDate(LocalDateTime.now());
+        }
+        
         order.setOrderToOwner(OrderToOwner.CONFIRMED);
         order.setOrderToRider(OrderToRider.CONFIRMED);
         order.setOrderToUser(OrderToUser.COOKING);
@@ -126,6 +151,8 @@ public class OrderService {
 
         return savedOrder;
     }
+    
+    // 주문 거부 및 환불
     @Transactional
     public Order rejectOrderAndRefund(UUID orderId) {
         Order order = orderRepository.findById(orderId)
@@ -188,6 +215,7 @@ public class OrderService {
         return order;
     }
     
+    // 주문 상태 수정
     @Transactional
     public Order updateOrderStatus(UUID orderId, OrderToOwner orderToOwner, OrderToUser orderToUser) {
         Order order = orderRepository.findById(orderId)
@@ -221,10 +249,16 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
     }
     
+//    public List<UUID> findActiveOrderIdsByUser(String userUuid) {
+//        return orderRepository.findActiveOrderIds(
+//                 UUID.fromString(userUuid),
+//                 List.of(OrderToOwner.PENDING, OrderToOwner.CONFIRMED, OrderToOwner.IN_DELIVERY));
+//    }
+    
     public List<UUID> findActiveOrderIdsByUser(String userUuid) {
-        return orderRepository.findActiveOrderIds(
-                 UUID.fromString(userUuid),
-                 List.of(OrderToOwner.PENDING, OrderToOwner.CONFIRMED, OrderToOwner.IN_DELIVERY));
+    	return orderRepository.findActiveOrderIds(
+    			UUID.fromString(userUuid),
+    			List.of(OrderToUser.PENDING, OrderToUser.CONFIRMED, OrderToUser.COOKING, OrderToUser.DELIVERING));
     }
 
     @Transactional(readOnly = true)
@@ -278,15 +312,11 @@ public class OrderService {
         	dto.setOrderStatus("CANCELED");
         } 
         
-        //dto.setOrderStatus(order.getOrderToOwner().name());
-        //dto.setOrderStatus(order.getOrderToOwner().getDescription().toString());
-        //dto.setOrderDate(order.getOrderTime().toString());
+        dto.setOrderToUser(order.getOrderToUser());
+        
+        
         dto.setOrderDate(order.getOrderTime());
         dto.setTotalPrice(order.getTotalPrice());
-//        var menuNames = order.getOrderDetails().stream()
-//                             .map(d -> d.getMenu().getMenuName())
-//                             .collect(Collectors.toList());
-//        dto.setMenuItems(menuNames);
         var menuItems = new HashMap<String, Integer>();
         for (int i = 0; i < order.getOrderDetails().size(); i++) {
         	menuItems.put(order.getOrderDetails().get(i).getMenu().getMenuName(), 
@@ -501,35 +531,6 @@ public class OrderService {
 			return 0;
 		}
     }
-    
-//    @Transactional(readOnly = true)
-//    public OrderLiveDto getOrderLiveDto(String orderId) {
-//        UUID uuid = UUID.fromString(orderId);
-//        var order = orderRepository.findById(uuid)
-//            .orElseThrow(() -> new IllegalArgumentException("Invalid orderId: " + orderId));
-//
-//        var dto = new OrderLiveDto();
-//        dto.setOrderId(order.getOrderId().toString());
-//        dto.setOrderStatus(order.getOrderToRider());
-//        // 추가
-//        dto.setExpectCookingTime(order.getExpectCookingTime());
-//
-//        var timeline = new ArrayList<StatusTimeline>();
-//        // 시간 필드들이 있다고 가정
-//        timeline.add(new StatusTimeline("PENDING",             order.getOrderTime()));
-//        timeline.add(new StatusTimeline("CONFIRMED",           order.getCookingStartTime()));
-//        timeline.add(new StatusTimeline("COOKING_COMPLETED",   order.getCookingEndTime()));
-//        timeline.add(new StatusTimeline("IN_DELIVERY",         order.getDeliveryStartTime()));
-//        timeline.add(new StatusTimeline("COMPLETED",           order.getDeliveryCompleteTime()));
-//        dto.setTimeline(timeline);
-//        
-//        // 2) 가게 위치 (라이더 대신)
-//        Store store = order.getStore();
-//        dto.setLat(store.getStoreLatitude());   // 또는 store.getHubAddressLatitude()
-//        dto.setLng(store.getStoreLongitude());  // 또는 store.getHubAddressLongitude()
-//
-//        return dto;
-//    }
     
     @Transactional
     public void createTestOrder(TestOrderRequestDto dto, UUID userId) {

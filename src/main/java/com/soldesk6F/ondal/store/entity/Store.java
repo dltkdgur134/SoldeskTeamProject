@@ -137,6 +137,12 @@ public class Store {
     @OrderBy("order ASC")
     private List<MenuCategory> menuCategories;
 
+    @Column(name="order_count")
+    private int orderCount;
+    
+    @Column(name="last_order_date")
+    private LocalDateTime lastOrderDate;
+    
     public enum StoreStatus {
     	PENDING_APPROVAL("승인대기중"),
     	PENDING_REFUSES("승인거부"),
