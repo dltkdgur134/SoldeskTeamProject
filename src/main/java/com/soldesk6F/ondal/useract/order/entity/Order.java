@@ -122,7 +122,11 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(name = "order_to_rider", nullable = false)
     private OrderToRider orderToRider;
-
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_to_user", nullable = true)
+    private OrderToUser orderToUser;
+    
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
 
@@ -138,12 +142,11 @@ public class Order {
     @JsonIgnoreProperties("order")
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
-
     public enum OrderToOwner {
         PENDING("주문 요청 중"), 
         CONFIRMED("주문 확인 완료"),
         IN_DELIVERY("배달 중"), 
-        COMPLETED("주문 및 결재 완료"), 
+        COMPLETED("조리 완료"), 
         CANCELED("주문 취소");
     	private final String description;
     	OrderToOwner(String description) {
@@ -186,17 +189,34 @@ public class Order {
 			return description;
 		}
     }
+    
+    public enum OrderToUser {
+        PENDING("주문 요청 중"), 
+        CONFIRMED("주문 확인 완료"),
+        COOKING("조리중"),
+        DELIVERING("배달중"),
+        COMPLETED("주문 완료"), 
+        CANCELED("주문 취소");
+    	private final String description;
+    	OrderToUser(String description) {
+			this.description = description;
+		}
+		
+		public String getDescription() {
+			return description;
+		}
+    }
+    
     @Builder
-    public Order(User user, Integer orderNumber, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
+    public Order(User user, String guestId, Store store, Rider rider, LocalTime expectCookingTime,
                  LocalDateTime cookingStartTime, LocalTime realCookingTime, LocalDateTime deliveryStartTime,
                  LocalTime expectDeliveryTime, LocalTime realDeliveryTime, String deliveryAddress,
                  Double deliveryAddressLatitude, Double deliveryAddressLongitude, int deliveryFee,
                  String storeRequest, String deliveryRequest, OrderToOwner orderToOwner, CancledWhy cancledWhy,
-                 OrderToRider orderToRider, int totalPrice, String orderAdditional1, String orderAdditional2,
+                 OrderToRider orderToRider,OrderToUser orderToUser, int totalPrice, String orderAdditional1, String orderAdditional2,
                  List<OrderDetail> orderDetails) {
 
         this.user = user;
-        this.orderNumber = orderNumber;
         this.guestId = guestId;
         this.store = store;
         this.rider = rider;
@@ -215,6 +235,7 @@ public class Order {
         this.orderToOwner = orderToOwner;
         this.cancledWhy = cancledWhy;
         this.orderToRider = orderToRider;
+        this.orderToUser = orderToUser;
         this.totalPrice = totalPrice;
         this.orderAdditional1 = orderAdditional1;
         this.orderAdditional2 = orderAdditional2;

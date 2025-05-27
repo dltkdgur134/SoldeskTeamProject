@@ -102,10 +102,13 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_status", nullable = false, length = 20)
 	private UserStatus userStatus = UserStatus.UNLINKED;
-	
-	@Column(name = "ondal_point",nullable = true)
-	private int ondalPoint;
-	
+    
+    @Column(name = "owner_requested", nullable = false)
+    private boolean ownerRequested = false;
+
+    @Column(name = "rider_requested", nullable = false)
+    private boolean riderRequested = false;
+
 	public enum UserStatus {
 		ACTIVE("정상"), // 정상 회원
 		SUSPENDED("일시 정지"), // 일시 정지
@@ -127,18 +130,21 @@ public class User {
 
 	public enum UserRole {
 		USER("유저"), OWNER("점주"), RIDER("배달원"), ALL("모든");
-
+		
 		private final String description;
-
+		
 		UserRole(String description) {
 			this.description = description;
 		}
-
+		
 		public String getDescription() {
 			return description;
 		}
 	}
-
+	
+	
+	
+	
 	@Builder
 	public User(String userId, String password, String userProfile, String userName, String nickName, String email,
 			String userPhone, RegAddress userSelectedAddress, String socialLoginProvider, UserRole userRole,

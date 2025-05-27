@@ -18,7 +18,7 @@ import com.soldesk6F.ondal.useract.cart.entity.Cart;
 import com.soldesk6F.ondal.useract.cart.entity.CartItemOption;
 import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.repository.CartItemOptionRepository;
-import com.soldesk6F.ondal.useract.cart.repository.CartItemRepository;
+import com.soldesk6F.ondal.useract.cart.repository.CartItemsRepository;
 import com.soldesk6F.ondal.useract.cart.repository.CartRepository;
 import com.soldesk6F.ondal.useract.cart.dto.CartOptionDto;
 
@@ -30,7 +30,7 @@ public class CartItemService {
 
 	private final CartRepository cartRepository;
 	private final CartItemOptionRepository cartItemOptionRepository;
-	private final CartItemRepository cartItemRepository;
+	private final CartItemsRepository cartItemsRepository;
 
 	public void addItemToCart(Cart cart, Menu menu, Store store, int quantity, List<CartOptionDto> selectedOptions) {
 		cart.setStore(store);
@@ -41,7 +41,7 @@ public class CartItemService {
 
 			if (sameMenu && sameOptions) {
 				existingItem.setQuantity(existingItem.getQuantity() + quantity);
-				cartItemRepository.save(existingItem);
+				cartItemsRepository.save(existingItem);
 				return;
 			}
 		}
@@ -113,7 +113,7 @@ public class CartItemService {
 				// 병합
 				other.setQuantity(other.getQuantity() + cartItem.getQuantity());
 				cart.getCartItems().remove(cartItem);
-				cartItemRepository.delete(cartItem);
+				cartItemsRepository.delete(cartItem);
 				return;
 			}
 		}
@@ -133,7 +133,6 @@ public class CartItemService {
 		int totalOptionPrice = newOptions.stream().mapToInt(CartItemOption::getOptionPrice).sum();
 		cartItem.setOptionTotalPrice(totalOptionPrice);
 
-		cartItemRepository.save(cartItem);
+		cartItemsRepository.save(cartItem);
 	}
 }
-

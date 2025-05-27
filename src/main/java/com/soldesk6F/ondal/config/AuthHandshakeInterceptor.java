@@ -43,7 +43,10 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
             if (auth != null && auth.getPrincipal() instanceof CustomUserDetails cud) {
 
                 /* === WebSocket 세션 attribute 에 사용자 정보 저장 === */
-                UUID   userUuid = cud.getUserUuid();       // 커스텀 getter
+                //UUID   userUuid = cud.getUserUuid();       // 커스텀 getter
+                String userId = cud.getUser().getUserUuidAsString();
+                UUID userUuid = UUID.fromString(userId);
+                
                 String username = cud.getUsername();
 
                 attributes.put("userUuid", userUuid);

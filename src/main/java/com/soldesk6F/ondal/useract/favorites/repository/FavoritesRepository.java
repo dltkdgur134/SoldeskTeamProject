@@ -1,5 +1,6 @@
 package com.soldesk6F.ondal.useract.favorites.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,8 +16,9 @@ public interface FavoritesRepository extends JpaRepository<Favorites, UUID> {
 	Optional<Favorites> findByUserAndStore(User user, Store store);
 	long countByStore(Store store);
 
-	Optional<Favorites> findByUser_UserUuid(UUID userUUID);
-	
+
+	List<Favorites> findByUser_UserUuid(UUID userUUID);
+
 
 }
 

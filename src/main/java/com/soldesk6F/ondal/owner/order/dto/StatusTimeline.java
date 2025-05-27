@@ -8,10 +8,18 @@ import lombok.Data;
 public class StatusTimeline {
     private String status;
     private LocalDateTime timestamp;
-
+    private int statusNum;
+    
     public StatusTimeline(String status, LocalDateTime timestamp) {
         this.status = status;
         this.timestamp = timestamp;
     }
+    
+    public StatusTimeline(String status, int statusNum, LocalDateTime timestamp) {
+    	this.status = status;
+    	this.timestamp = timestamp;
+    	this.statusNum = statusNum;
+    }
     // + getters / setters
+    
 }

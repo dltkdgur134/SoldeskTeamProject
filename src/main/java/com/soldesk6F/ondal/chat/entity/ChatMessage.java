@@ -8,6 +8,8 @@ import com.soldesk6F.ondal.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,12 +36,16 @@ public class ChatMessage {
 
     @ManyToOne
     @JoinColumn(name = "chat_room_id", nullable = false)
-    private ChatRoom chatRoom;  // 채팅방 ID (FK)
+    private ChatRoom chatRoom;  // 채팅방 ID (FK)	
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;  // 메시지 발신자
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sender_type", nullable = false)
+    private SenderType senderType;
+    
     @Lob
     @Column(name = "message", nullable = false)
     private String message;  // 메시지 내용
@@ -48,10 +54,26 @@ public class ChatMessage {
     @Column(name = "timestamp", nullable = false, updatable = false)
     private LocalDateTime timestamp;  // 메시지 전송 시간
 
+    public enum SenderType {
+    	USER("손님"), OWNER("사장님"), RIDER("라이더");
+    	
+    	private final String description;
+    	
+    	SenderType(String description) {
+    		this.description = description;
+    	}
+    	
+    	public String getDescription() {
+    		return description;
+    	}
+    }
+    
+    
     @Builder
-    public ChatMessage(ChatRoom chatRoom, User sender, String message) {
+    public ChatMessage(ChatRoom chatRoom, User sender, SenderType senderType, String message) {
         this.chatRoom = chatRoom;
         this.sender = sender;
+        this.senderType = senderType;
         this.message = message;
     }
     

@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.store.repository;
 
 import com.soldesk6F.ondal.store.dto.StoreDistanceProjection;
 import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.entity.Store.StoreStatus;
 import com.soldesk6F.ondal.user.entity.Owner;
 
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -16,7 +17,7 @@ import java.util.UUID;
 public interface StoreRepository extends JpaRepository<Store, UUID> {
 	List<Store> findByCategory(String category);
 	List<Store> findByOwner(Owner owner);
-	 
+	List<Store> findByStoreStatus(StoreStatus status);
 	 
 	 
 	 @Query(value = """

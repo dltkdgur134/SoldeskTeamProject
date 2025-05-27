@@ -35,7 +35,7 @@ public class StorePayController {
 	
 
 	@PostMapping("/store/pay")
-	public String tryPay(@RequestParam("cartUUID")UUID cartuuid , Model model, RedirectAttributes redirectAttributes,
+	public String tryPay(@RequestParam("cartUUID") UUID cartuuid , Model model, RedirectAttributes redirectAttributes,
 			@RequestParam(value = "passCheckFail", required = false, defaultValue = "false") boolean passCheckFail) {
 		Cart cart = cartService.findById(cartuuid);
 
@@ -44,12 +44,19 @@ public class StorePayController {
 		
 		List<CartItemsDTO> cids =  paymentService.getAllCartItems(cartuuid);
 		int totalPrice = paymentService.getListTotalPrice(cids);
+		int deliveryFee = cart.getStore().getDeliveryFee(); // 가게에서 배달료 가져오기
+		int discountAmount = 1000; 
+		int totalPayAmount = totalPrice + deliveryFee - discountAmount;
+		if(totalPayAmount < 0) totalPayAmount = 0;
 		UserInfoDTO uid = paymentService.getUserInfo(cartuuid);
 		String storeName = paymentService.getCartStore(cartuuid);
 		
 		model.addAttribute("cart", cart);
 		model.addAttribute("cids" , cids);
-		model.addAttribute("totalPrice" , totalPrice);
+		model.addAttribute("totalPrice", totalPrice); // 메뉴+옵션 가격
+	    model.addAttribute("deliveryFee", deliveryFee); // 배달료
+	    model.addAttribute("discountAmount", discountAmount);
+	    model.addAttribute("totalPayAmount", totalPayAmount); // 결제 총액
 		model.addAttribute("cartId",cartuuid);
 		model.addAttribute("storeName" ,storeName);
 		model.addAttribute("successUrl","https://localhost:8443/store/paySuccess");

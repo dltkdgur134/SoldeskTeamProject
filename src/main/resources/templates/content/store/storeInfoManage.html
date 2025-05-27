@@ -15,7 +15,7 @@
 <body th:data-store-id="${store.storeId}">
 	<div layout:fragment="content">
 		<header class="menu-header">
-			<img th:src="${store.brandImg != null} ? @{${store.brandImg}} : @{/img/default-store.png}" class="store-image" alt="가게 이미지" />
+			<img th:src="${store.brandImg != null} ? @{${store.brandImg}} : @{/img/store/default.png}" class="store-image" alt="가게 이미지" />
 			<h2 th:text="${store.storeName} + ' 점포 설정'">가게 정보 관리</h2>
 		</header>
 		
@@ -79,10 +79,17 @@
 					</div>
 					<div class="form-group">
 						<label>점포 상태</label>
-						<select name="storeStatus" required>
-							<option th:selected="${store.storeStatus == 'OPEN'}" value="OPEN">영업중</option>
-							<option th:selected="${store.storeStatus == 'CLOSED'}" value="CLOSED">영업종료</option>
+						<select name="storeStatus_display" disabled>
+							<option th:value="'OPEN'" th:selected="${store.storeStatus.name() == 'OPEN'}">영업중</option>
+							<option th:value="'CLOSED'" th:selected="${store.storeStatus.name() == 'CLOSED'}">영업종료</option>
+
+							<option th:if="${store.storeStatus.name() == 'PENDING_APPROVAL'}" value="PENDING_APPROVAL" selected>승인대기중</option>
+							<option th:if="${store.storeStatus.name() == 'PENDING_REFUSES'}" value="PENDING_REFUSES" selected>승인거부</option>
+							<option th:if="${store.storeStatus.name() == 'SUSPENDED'}" value="SUSPENDED" selected>일시정지</option>
+							<option th:if="${store.storeStatus.name() == 'BANNED'}" value="BANNED" selected>영구정지</option>
 						</select>
+						<!-- 실제 form 전송용 -->
+						<input type="hidden" name="storeStatus" th:value="${store.storeStatus.name()}">
 					</div>
 					<div class="form-group">
 						<label>점포 소개</label>
@@ -138,6 +145,12 @@
 						<label>식자재 원산지 표기</label>
 						<textarea name="foodOrigin" rows="3" placeholder="식자재 원산지를 입력하세요." th:text="${store.foodOrigin}"></textarea>
 					</div>
+					<div class="form-group">
+						<label>배달료</label>
+						<input type="text" name="deliveryFee" th:value="${store.deliveryFee}" required />
+					</div>
+					
+					
 					<button type="submit" class="save-btn">정보 저장</button>
 				</form>
 			</section>

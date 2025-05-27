@@ -7,13 +7,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.complain.entity.Complain;
+import com.soldesk6F.ondal.useract.complain.entity.Complain.Role;
+import com.soldesk6F.ondal.useract.complain.repository.ComplainRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
+import com.soldesk6F.ondal.useract.order.entity.Order;
+import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 import com.soldesk6F.ondal.useract.payment.dto.PaymentHistoryDTO;
 import com.soldesk6F.ondal.useract.payment.service.PaymentHistoryService;
 
@@ -53,12 +59,12 @@ public class PageController {
 
     @GetMapping("/orderHistory")
     public String orderHistory(
-            @AuthenticationPrincipal CustomUserDetails cud,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
     	
         // cud가 null이었으니, @AuthenticationPrincipal을 붙여서 바인딩
     	
-        String userId = cud.getUser().getUserId();
+        String userId = userDetails.getUser().getUserId();
         List<OrderHistoryDto> history = orderService.getOrderHistoryByUser(userId);
         model.addAttribute("history", history);
         return "content/orderHistory";
@@ -88,7 +94,7 @@ public class PageController {
 	    model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	    model.addAttribute("ondalPay", freshUser.getOndalPay());
 
-	    return "content/user/ondalPay";
+	    return "content/user/pay/ondalPay";
 	}
 	// 온달 페이 이동
 	@GetMapping("/userWallet")
@@ -99,7 +105,7 @@ public class PageController {
 		
 		model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 		
-		return "content/user/UserWallet";
+		return "content/user/pay/UserWallet";
 	}
 	
 	private final PaymentHistoryService paymentHistoryService;
@@ -126,8 +132,61 @@ public class PageController {
 	    model.addAttribute("currentDays", days);
 	    model.addAttribute("currentUsage", usage);
 
-	    return "content/user/userPayHistory";  // JSP나 Thymeleaf 뷰 이름
+	    return "content/user/pay/userPayHistory";  // JSP나 Thymeleaf 뷰 이름
 	}
 
+	private final OrderRepository orderRepository;
+	
+	@GetMapping("/userOrderLive/{orderId}")
+	public String goUserOrderLive(
+	        @PathVariable("orderId") UUID orderId,
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        Model model) {
+
+	    UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
+	    User freshUser = userRepository.findById(userUuid).orElseThrow();
+
+	    Order order = orderRepository.findById(orderId)
+	            .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다"));
+
+	    model.addAttribute("user", freshUser);
+	    model.addAttribute("userUuid", userDetails.getUser().getUserUuidAsString());
+	    model.addAttribute("order", order); // 특정 주문 정보도 전달
+
+	    return "content/orderLive";
+	}
+
+	private final ComplainRepository complainRepository;
+	
+	@GetMapping("/complains")
+    public String viewComplains(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "role", required = false) Role role,
+            @RequestParam(value = "userId", required = false) String userId,
+            Model model
+    ) {
+        List<Complain> complains;
+
+        if (userId != null && !userId.isBlank()) {
+            complains = complainRepository.findByUser_UserId(userId);
+        } else if (keyword != null && !keyword.isBlank()) {
+            complains = complainRepository.findByComplainTitleContaining(keyword);
+        } else if (role != null) {
+            complains = complainRepository.findByRole(role);
+        } else {
+            complains = complainRepository.findAll();
+        }
+
+     // 로그 확인
+        complains.forEach(c -> {
+            System.out.println("제목: " + c.getComplainTitle());
+            System.out.println("유저: " + (c.getUser() != null ? c.getUser().getUserId() : "비회원"));
+        });
+        
+        
+        model.addAttribute("complains", complains);
+        return "content/user/complain/complainList"; // complain/list.html
+    }
+	
 	
 }

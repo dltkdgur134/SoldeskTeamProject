@@ -22,12 +22,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <!-- <th:block layout:fragment="css"></th:block> -->
 	<script th:inline="javascript">
 	/*<![CDATA[*/
-	const userId = /*[[${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userId : ''}]]*/ '';
+	const userId = /*[[${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}]]*/ '';
 	/*]]>*/
 	</script>
     <th:block layout:fragment="css"></th:block>
 </head>
-<body th:data-userid="${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userId : ''}">
+<body th:data-userid="${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}">
 	<div th:replace="~{fragments/header::header}"></div>
 	
 	<div layout:fragment="content" class="content"></div>
@@ -35,9 +35,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<div th:replace="~{fragments/footer::footer}"></div>
 
     <th:block layout:fragment="js">
-    	<script th:src="@{/js/hideLogo.js}"></script>
     </th:block>
     <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
 </body>
+<script th:src="@{/js/hideLogo.js}"></script>
 <script th:src="@{/js/websocket.js}"></script>
 </html>

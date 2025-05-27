@@ -1,7 +1,11 @@
 package com.soldesk6F.ondal.functions;
 
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.stereotype.Service;
@@ -57,7 +61,27 @@ public class DateFunctions {
 		return years + "년 전";
 	}
 	
+	public String changeDateToString(LocalDateTime date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.DD (E) hh:mm");
+		return sdf.format(date);
+	}
 	
+	public Long getDaysLeftForReview(LocalDateTime createdDateTime) {		
+		LocalDate createdDate = createdDateTime.toLocalDate();
+		LocalDate now = LocalDate.now();
+		long daysBetween = ChronoUnit.DAYS.between(createdDate, now);
+		return 14 - daysBetween;
+	}
+	
+	public LocalDateTime addTime(LocalDateTime startTime, LocalTime addTime) {
+		if (startTime == null || addTime == null) {
+	        throw new IllegalArgumentException("Base time or additional time cannot be null");
+	    }
+		
+		Duration duration = Duration.between(LocalTime.MIN, addTime);
+		return startTime.plus(duration);
+		
+	}
 	
 }
 

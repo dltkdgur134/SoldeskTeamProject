@@ -40,26 +40,62 @@ document.addEventListener('DOMContentLoaded', function () {
 		filterMenus(category);
 		btn.classList.add('active');
 	};
-
-	let currentSlide = 0;
+	
+	let currentSlide = 1;
 	const slidesContainer = document.getElementById('slides');
-	const slideItems = document.querySelectorAll('#slides .slide');
+	let slideItems = document.querySelectorAll('#slides .slide');
+
+	const firstClone = slideItems[0].cloneNode(true);
+	const lastClone = slideItems[slideItems.length - 1].cloneNode(true);
+	firstClone.id = 'first-clone';
+	lastClone.id = 'last-clone';
+
+	slidesContainer.appendChild(firstClone); // 마지막에 첫 복제
+	slidesContainer.insertBefore(lastClone, slideItems[0]); // 처음에 마지막 복제
+
+	// 다시 슬라이드 목록 갱신
+	slideItems = document.querySelectorAll('#slides .slide');
+
 	const dots = document.querySelectorAll('.dot');
+	const slideWidth = slideItems[0].clientWidth;
 	const totalSlides = slideItems.length;
-	const slideWidth = slideItems.length > 0 ? slideItems[0].clientWidth : 0;
+
+	slidesContainer.style.transform = `translateX(-${slideWidth * currentSlide}px)`;
 
 	function showSlide(index) {
-		currentSlide = (index + totalSlides) % totalSlides;
-		slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+		currentSlide = index + 1; // index는 0부터 시작, 실제로는 +1 위치
+		slidesContainer.classList.add('transition');
+		slidesContainer.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+		updateDots();
+	}
+
+	function updateDots() {
 		dots.forEach(dot => dot.classList.remove('active'));
-		if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+		const dotIndex = currentSlide - 1;
+		if (dots[dotIndex]) dots[dotIndex].classList.add('active');
 	}
 
 	dots.forEach((dot, index) => {
 		dot.addEventListener('click', () => showSlide(index));
 	});
 
-	let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = 0, animationID;
+	slidesContainer.addEventListener('transitionend', () => {
+		if (slideItems[currentSlide].id === 'first-clone') {
+			slidesContainer.classList.remove('transition');
+			currentSlide = 1;
+			slidesContainer.style.transform = `translateX(-${slideWidth * currentSlide}px)`;
+		}
+		if (slideItems[currentSlide].id === 'last-clone') {
+			slidesContainer.classList.remove('transition');
+			currentSlide = slideItems.length - 2;
+			slidesContainer.style.transform = `translateX(-${slideWidth * currentSlide}px)`;
+		}
+		updateDots();
+	});
+
+	// 드래그 기능 그대로 유지
+	let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = -slideWidth * currentSlide, animationID;
+
 	function getPositionX(event) {
 		return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
 	}
@@ -75,8 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		currentTranslate = -currentSlide * slideWidth;
 		prevTranslate = currentTranslate;
 		slidesContainer.style.transform = `translateX(${currentTranslate}px)`;
-		dots.forEach(dot => dot.classList.remove('active'));
-		if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+		updateDots();
 	}
 
 	slideItems.forEach((slide, index) => {
@@ -88,21 +123,24 @@ document.addEventListener('DOMContentLoaded', function () {
 		slide.addEventListener('touchstart', start(index));
 		slide.addEventListener('touchend', end);
 		slide.addEventListener('touchmove', move);
-		slideImage.addEventListener('dragstart', e => e.preventDefault());
+		slideImage?.addEventListener('dragstart', e => e.preventDefault());
 	});
+
 	function start(index) {
 		return function (event) {
 			isDragging = true;
 			startX = getPositionX(event);
 			animationID = requestAnimationFrame(animation);
 			slidesContainer.classList.remove('transition');
-		}
+		};
 	}
+
 	function move(event) {
 		if (!isDragging) return;
 		const currentPosition = getPositionX(event);
 		currentTranslate = prevTranslate + currentPosition - startX;
 	}
+
 	function end() {
 		isDragging = false;
 		cancelAnimationFrame(animationID);
@@ -111,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (movedBy > 50) currentSlide--;
 		setPositionByIndex();
 	}
+
 	setPositionByIndex();
 
 	const modal = document.getElementById('menu-modal');
@@ -257,6 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function setupCartButton(card) {
+		// 기존 설정 초기화
 		const oldBtn = document.getElementById('add-to-cart-btn');
 		const newBtn = oldBtn.cloneNode(true);
 		oldBtn.parentNode.replaceChild(newBtn, oldBtn);
@@ -273,126 +313,65 @@ document.addEventListener('DOMContentLoaded', function () {
 		newDecreaseBtn.addEventListener('click', () => {
 			if (quantity > 1) {
 				quantity--;
-				quantityEl.textContent = quantity;
+				document.getElementById('menu-quantity').textContent = quantity;
 				updateTotal();
 			}
 		});
+
 		newIncreaseBtn.addEventListener('click', () => {
 			if (quantity < 99) {
 				quantity++;
-				quantityEl.textContent = quantity;
+				document.getElementById('menu-quantity').textContent = quantity;
 				updateTotal();
 			}
 		});
 
+		/*const userUUID = document.body.dataset.useruuid;*/
+		/*const userUUID = document.querySelector('meta[name="user-uuid"]')?.content;*/
+		/*const userUUID = document.body.getAttribute('data-useruuid');*/
+		const userUUID = document.getElementById('user-uuid')?.value;
+		
 		newBtn.addEventListener('click', () => {
-			const selectedOptions = Array.from(document.querySelectorAll('input[name^="menuOption"]:checked')).map(cb => {
-				const label = cb.closest('.option-label');
-				const group = cb.closest('.option-group-box')?.querySelector('.option-group-title')?.textContent?.trim();
-				const name = label.querySelector('.option-name')?.textContent?.trim() || cb.value;
-				const priceText = label.querySelector('.option-price')?.textContent || '';
-				const match = priceText.match(/[\+]?[\s]*([\d,]+)\s*원/);
-				const price = match ? parseInt(match[1].replace(/,/g, '')) : 0;
-				
-				console.log('📦 Parsed option:', {
-					groupName: group,
-					name,
-					priceRaw: priceText,
-					priceParsed: price
-				});
+			const allOptions = [];
 
-				return {
-					groupName: group || '',
-					name,
-					price
-				};
+			document.querySelectorAll('.option-group-box').forEach(groupBox => {
+				const groupName = groupBox.querySelector('.option-group-title')?.textContent?.trim() || '';
+				groupBox.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+					const label = cb.closest('.option-label');
+					const name = label.querySelector('.option-name')?.textContent?.trim() || cb.value;
+					const priceText = label.querySelector('.option-price')?.textContent || '';
+					const match = priceText.match(/\+([\d,]+)원/);
+					const price = match ? parseInt(match[1].replace(/,/g, '')) : 0;
+
+					allOptions.push({
+						groupName,
+						name,
+						price,
+						selected: cb.checked
+					});
+				});
 			});
 
-			const optionTotal = selectedOptions.reduce((sum, opt) => sum + opt.price, 0);
-
+			const optionTotal = allOptions.filter(opt => opt.selected).reduce((sum, opt) => sum + opt.price, 0);
 			const unitPrice = basePrice + optionTotal;
 			const totalPrice = unitPrice * quantity;
 
 			const data = {
 				menuId: card.getAttribute('data-id'),
 				storeId: card.getAttribute('data-store-id'),
-				quantity: quantity,
-				options: selectedOptions,
+				menuName: card.getAttribute('data-name'),
+				menuImage: card.getAttribute('data-image'),
+				price: basePrice,
+				quantity,
+				options: allOptions
 			};
-			fetch('/cart/add', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data)
-			})
-			.then(res => res.json())
-			.then(result => {
-				alert(result.message || '장바구니에 담겼습니다.');
-				closeModal();
-			})
-			.catch(err => {
-				console.error(err);
-				alert('담기에 실패했습니다.');
-			});
+
+			saveToLocalStorage(userUUID, data);
+			alert("장바구니에 담았습니다.");
+			closeModal();
 		});
 
 		updateTotal();
-		const optionsContainer = document.getElementById('menu-options');
-		optionsContainer.innerHTML = '';
-
-		const option1 = card.getAttribute('data-option1');
-		const option1Price = card.getAttribute('data-option1-price');
-		const option2 = card.getAttribute('data-option2');
-		const option2Price = card.getAttribute('data-option2-price');
-		const option3 = card.getAttribute('data-option3');
-		const option3Price = card.getAttribute('data-option3-price');
-
-		function isValidOption(name, price) {
-			const trimmedName = String(name ?? '').trim();
-			let trimmedPrice = String(price ?? '').trim();
-			trimmedPrice = trimmedPrice.replace(/[\[\]]/g, '');
-			return (
-				trimmedName !== '' &&
-				trimmedName.toLowerCase() !== 'null' &&
-				trimmedName.toLowerCase() !== 'undefined' &&
-				trimmedPrice !== '' &&
-				/^\d+$/.test(trimmedPrice)
-			);
-		}
-
-		function createOptionCheckbox(optionName, optionPrice) {
-			if (!isValidOption(optionName, optionPrice)) return;
-
-			const cleanName = String(optionName).replace(/[\[\]]/g, '').trim();
-			const cleanPrice = String(optionPrice).replace(/[\[\]]/g, '').trim();
-
-			const label = document.createElement('label');
-			const checkbox = document.createElement('input');
-			checkbox.type = 'checkbox';
-			checkbox.name = 'menuOption';
-			checkbox.value = optionName.trim();
-
-			checkbox.addEventListener('change', updateTotal);
-
-			label.appendChild(checkbox);
-			label.appendChild(document.createTextNode(`${cleanName} +${cleanPrice}원`));
-
-			optionsContainer.appendChild(label);
-			optionsContainer.appendChild(document.createElement('br'));
-		}
-
-		if (isValidOption(option1, option1Price)) createOptionCheckbox(option1, option1Price);
-		if (isValidOption(option2, option2Price)) createOptionCheckbox(option2, option2Price);
-		if (isValidOption(option3, option3Price)) createOptionCheckbox(option3, option3Price);
-
-		if (
-			!isValidOption(option1, option1Price) &&
-			!isValidOption(option2, option2Price) &&
-			!isValidOption(option3, option3Price)
-		) {
-			const noOption = document.createElement('p');
-			noOption.textContent = '선택 가능한 옵션이 없습니다.';
-			optionsContainer.appendChild(noOption);
-		}
 	}
 
 	function closeModal() {

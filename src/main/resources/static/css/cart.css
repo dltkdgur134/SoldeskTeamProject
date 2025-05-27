@@ -79,6 +79,9 @@
 	font-weight: bold;
 	line-height: 1.4;
 	margin-bottom: 6px;
+	word-break: break-word;
+	white-space: normal;         /* 줄바꿈 허용 */
+	max-width: 200px;
 }
 
 .cart-item-middle p {
@@ -171,6 +174,13 @@
 	padding: 4px 10px;
 }
 
+#order-btn:disabled {
+	background-color: #ccc;
+	color: #888;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
 .order-summary {
 	position: sticky;
 	bottom: 0;
@@ -250,6 +260,11 @@
 
 #optionList {
 	margin-bottom: 20px;
+}
+
+.no-option {
+	color: #888;
+	font-style: italic;
 }
 
 .modal-option-row {

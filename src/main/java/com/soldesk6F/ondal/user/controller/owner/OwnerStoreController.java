@@ -54,13 +54,8 @@ public class OwnerStoreController {
 	
 	@GetMapping("/ownerStoreList")
 	public String getOwnerStores(@AuthenticationPrincipal CustomUserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
-//		if (principal == null) {
-//			redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
-//			return "redirect:/login";
-//		}
 
 		UUID userUuid = userDetails.getUser().getUserUuid();
-		System.out.println("로그인한 사용자 UUID: " + userUuid);
 
 		Optional<Owner> ownerOpt = userService.findOwnerByUserUuid(userUuid.toString());
 
@@ -72,7 +67,6 @@ public class OwnerStoreController {
 		Owner owner = ownerOpt.get();
 
 		List<Store> myStores = storeService.findStoresByOwner(owner);
-		System.out.println("📦 해당 점주의 가게 수: " + myStores.size());
 
 		model.addAttribute("myStores", myStores);
 
@@ -211,6 +205,8 @@ public class OwnerStoreController {
 		@RequestParam(value = "holiday", required = false) List<String> holidays,
 		@RequestParam(value = "storeEvent", required = false) String storeEvent,
 		@RequestParam(value = "foodOrigin", required = false) String foodOrigin,
+		@RequestParam(value = "deliveryFee", required = false) int deliveryFee,
+		
 		RedirectAttributes redirectAttributes) {
 
 		try {
@@ -240,7 +236,7 @@ public class OwnerStoreController {
 				holidayStr, 
 				Store.DeliveryRange.valueOf(deliveryRange), 
 				storeEvent, foodOrigin, 
-				latitude, longitude
+				latitude, longitude,deliveryFee
 			);
 
 			redirectAttributes.addFlashAttribute("result", 1);

@@ -1,5 +1,7 @@
 package com.soldesk6F.ondal.useract.favorites.dto;
 
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +10,7 @@ import lombok.Getter;
 public class FavoriteStoreDto {
 
     /** 매장 PK (상세 페이지 링크용) */
-    private Long id;
+    private UUID id;
 
     private String name;
 
@@ -16,15 +18,12 @@ public class FavoriteStoreDto {
 
     private String category;
 
-//    private Double avgRating;
+    private Double avgRating;
 //
-//    private Long reviewCount;
+    private Long reviewCount;
 //
-//    private String summary;
-//
-//    private String discountText;
-//
-//    private boolean express;
+//    private String MinimumPay;
+    
 }
 
 

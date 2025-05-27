@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToOwner;
 import com.soldesk6F.ondal.useract.order.entity.Order.OrderToRider;
+import com.soldesk6F.ondal.useract.order.entity.Order.OrderToUser;
 import com.soldesk6F.ondal.useract.order.entity.OrderDetail;
 
 import lombok.Builder;
@@ -24,13 +25,15 @@ public class OrderResponseDto {
     private String storeRequest;
     private String deliveryRequest;
     private int totalPrice;
+    private int deliveryFee;
     private LocalDateTime orderTime;
     private LocalDateTime cookingStartTime;
     private LocalTime expectCookingTime;
 
+    private OrderToUser orderToUser;
     private OrderToOwner orderToOwner;
     private OrderToRider orderToRider;
-
+    
     private List<OrderDetailDto> orderDetails;
 
     // ✅ 추가 필드 (프론트에서 팝업 요약용)
@@ -58,7 +61,6 @@ public class OrderResponseDto {
                 .price(detail.getPrice())
                 .optionNames(detail.getOptionNames())
                 .optionPrices(detail.getOptionPrices())
-                
                 .build())
             .collect(Collectors.toList());
 
@@ -78,8 +80,10 @@ public class OrderResponseDto {
         	.userUuid(order.getUser() != null ? order.getUser().getUserUuid() : null)
             .orderId(order.getOrderId())
             .orderNumber(order.getOrderNumber())
+            .orderToUser(order.getOrderToUser())
             .orderToOwner(order.getOrderToOwner())
             .orderToRider(order.getOrderToRider())
+            .orderToUser(order.getOrderToUser())
             .deliveryAddress(order.getDeliveryAddress())
             .storeRequest(order.getStoreRequest())
             .deliveryRequest(order.getDeliveryRequest())
@@ -88,7 +92,7 @@ public class OrderResponseDto {
             .expectCookingTime(order.getExpectCookingTime())
             .cookingStartTime(order.getCookingStartTime())
             .orderDetails(detailDtos)
-
+            .deliveryFee(order.getDeliveryFee())
             // ✅ 신규 주문 알림용 필드
             .menuNameList(menuSummary)
             .totalCount(totalCount)

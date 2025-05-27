@@ -20,6 +20,7 @@ import com.soldesk6F.ondal.rider.repository.RiderManagementRepository;
 import com.soldesk6F.ondal.rider.repository.RiderWalletHistoryRepository;
 import com.soldesk6F.ondal.rider.service.RiderWalletHistoryService;
 import com.soldesk6F.ondal.user.dto.rider.RiderForm;
+import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 import com.soldesk6F.ondal.user.entity.User;
@@ -218,13 +219,16 @@ public class RiderService {
 		return riderRepository.save(rider);
 	}
 
-	// OrderToRider 변경 및 배달료 riderWallet에 입금 (OrderToRider = COMPLETED)
+	// OrderToRider , OrderToUser 변경 및 배달료 riderWallet에 입금 (OrderToRider = COMPLETED)
 	@Transactional
 	public void completeOrderAndRewardRider(UUID orderId) {
 	    // 1. Order 정보 가져오기
 	    Order order = orderRepository.findById(orderId)
 	        .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
+	    Owner owner = order.getStore().getOwner();
 
+	    
+	    
 	    // 상태 검증
 	    if (order.getOrderToRider() != Order.OrderToRider.ON_DELIVERY) {
 	        throw new RuntimeException("배달 완료가 불가능한 상태입니다.");
@@ -249,11 +253,11 @@ public class RiderService {
 
 	    order.setRealDeliveryTime(realDeliveryTime);
 	    order.setOrderToRider(Order.OrderToRider.COMPLETED);
+	    order.setOrderToUser(Order.OrderToUser.COMPLETED);
 	    orderRepository.save(order);
 
 	    // 4. 배달료 및 수수료 계산
 	    int deliveryFee = order.getDeliveryFee();
-	    int deliveryPrice = deliveryFee;  // 라이더 매출액
 	    int vat = (int) (deliveryFee * 0.1);  // 예시: 10%가 수수료
 	    int riderNetIncome = deliveryFee - vat; // 실제 라이더 수익
 
@@ -261,7 +265,7 @@ public class RiderService {
 	    DeliverySales deliverySales = new DeliverySales();
 	    deliverySales.setOrder(order);
 	    deliverySales.setStore(order.getStore());
-	    deliverySales.setDeliveryPrice(deliveryPrice);
+	    deliverySales.setDeliveryPrice(deliveryFee);
 	    deliverySales.setDeliveryVat(vat);
 	    deliverySales.setRiderNetIncome(riderNetIncome);
 	    deliverySales.setDeliverySalesDate(LocalDate.now());
@@ -277,10 +281,16 @@ public class RiderService {
 
 	    rider.setRiderWallet(newWalletAmount);
 	    rider.setRiderStatus(Rider.RiderStatus.WAITING);  // 상태 업데이트 (배달 완료 후)
+	    owner.setOwnerWallet(owner.getOwnerWallet() - deliveryFee);
+	    
+	    
+	    
+	    
+	    
 	    riderRepository.save(rider);
 
 	    // 7. RiderManagement 업데이트: 총 매출 및 수수료 업데이트
-	    riderManagement.updateTotalSalesAndVat(deliveryPrice, vat);
+	    riderManagement.updateTotalSalesAndVat(deliveryFee, vat);
 	    riderManagementRepository.save(riderManagement);
 	}
 

@@ -40,8 +40,13 @@ public class StoreMainController {
 		Store store = storeService.findByIdWithImgs(storeId);
 		if (store == null) {throw new IllegalArgumentException("가게를 찾을 수 없습니다.");}
 		List<MenuDto> menus = menuService.getMenusByStore(store);
+		//Map<String, List<MenuDto>> groupedMenus = menus.stream()
+		//	.collect(Collectors.groupingBy(MenuDto::getMenuCategory));
 		Map<String, List<MenuDto>> groupedMenus = menus.stream()
-			.collect(Collectors.groupingBy(MenuDto::getMenuCategory));
+				.collect(Collectors.groupingBy(menu -> {
+					String category = menu.getMenuCategory();
+			        return category != null ? category : "없음";
+				}));
 		model.addAttribute("groupedMenus", groupedMenus);
 
 		model.addAttribute("store", store);

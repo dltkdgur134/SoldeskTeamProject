@@ -124,6 +124,10 @@ public class Store {
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus;
 
+    @Column(name = "delivery_fee")
+    private int deliveryFee; 
+    
+    
     @JsonIgnore
     @CreationTimestamp
     @Column(name = "registration_date", updatable = false,nullable = false)
@@ -133,7 +137,15 @@ public class Store {
     @OrderBy("order ASC")
     private List<MenuCategory> menuCategories;
 
+    @Column(name="order_count")
+    private int orderCount;
+    
+    @Column(name="last_order_date")
+    private LocalDateTime lastOrderDate;
+    
     public enum StoreStatus {
+    	PENDING_APPROVAL("승인대기중"),
+		PENDING_REFUSES("승인거부"),
         OPEN("영업중"),
         CLOSED("영업종료"),
         SUSPENDED("일시정지"),
@@ -188,7 +200,7 @@ public class Store {
                  double storeLatitude, double storeLongitude, Point storeLocation, DeliveryRange deliveryRange,
                  String storeIntroduce, String storeEvent , String foodOrigin,
                  LocalTime openingTime, LocalTime closingTime,
-                 String holiday, StoreStatus storeStatus) {
+                 String holiday, StoreStatus storeStatus,int deliveryFee) {
         this.owner = owner;
         this.businessNum = businessNum;
         this.storeName = storeName;
@@ -215,6 +227,7 @@ public class Store {
         this.closingTime = closingTime;
         this.holiday = holiday;
         this.storeStatus = storeStatus != null ? storeStatus : StoreStatus.CLOSED;
+        this.deliveryFee = deliveryFee;
     }
     
     public String getStoreUuidAsString() {

@@ -1,81 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/Layouts}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
 <head>
-	<link th:href="@{/css/custom.css}" rel="stylesheet" />
-	<link th:href="@{/css/favorties/favorites.css}" rel="stylesheet"/>
-	<script src="@{/js/favorites.js}"></script>
+  <meta charset="UTF-8">
+  <title>내 찜 목록</title>
+
+  <!-- 공통 CSS -->
+  <link th:href="@{/css/custom.css}"    rel="stylesheet"/>
+  <link th:href="@{/css/storelist.css}" rel="stylesheet"/>
+
+  <!-- 🎯 ‘추가’·‘하트’ 전용 오버라이드 -->
+  <link th:href="@{/css/favorites.css}" rel="stylesheet"/>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}"/>
 </head>
-	
+
 <body>
-	
-	<!-- templates/favorite/favorite-list.html -->
-	<div layout:fragment="content" id="favorite-area">
+<div layout:fragment="content" class="favorites-page">
 
-	  <!-- 비어있을 때 안내 -->
-	  <p class="favorite-empty" 
-	     th:if="${#lists.isEmpty(favoriteStores)}">
-	      아직 찜한 매장이 없습니다 &#128148;
-	  </p>
+  <section class="container py-4">
+    <h2 class="fw-bold mb-4" style="font-size:26px;">내&nbsp;찜&nbsp;목록</h2>
 
-	  <!-- 찜 목록 -->
-	  <ul class="favorite-list"
-	      th:unless="${#lists.isEmpty(favoriteStores)}">
+    <div id="gallery-area">
+      <div class="text-center py-5 text-muted"
+           th:if="${#lists.isEmpty(favorites)}">
+        아직&nbsp;찜한&nbsp;가게가&nbsp;없습니다.
+      </div>
 
-	    <!-- ★ 각각의 매장 카드 -->
-	    <li class="favorite-item"
-	        th:each="store : ${favoriteStores}">
-	      <a class="favorite-link"
-	         th:href="@{/store/view/{id}(id=${store.id})}">
+      <!-- ☆☆ store-list 기본 구조 유지 ☆☆ -->
+      <a th:each="store : ${favorites}"
+         class="store-list"
+         th:href="@{|/store/view/${store.id}|}">
 
-	        <!-- 썸네일 -->
-	        <img class="favorite-img"
-	             th:src="${store.imageUrl}"
-	             th:alt="${store.name}"/>
+        <div class="store-row">
 
-	        <!-- 정보 영역 -->
-	        <div class="favorite-info">
-	          <h3 class="store-title" 
-	              th:text="${store.name}">마카나이</h3>
+          <!-- ❤️ 하트 (우상단) -->
+          <button type="button"
+                  class="fav-btn"
+                  title="찜/찜취소"
+                  onclick="event.stopPropagation(); toggleFav([[${store.id}]])">
+            <i class="fa-regular fa-heart"></i>
+          </button>
 
-	          <!-- 평점·리뷰 -->
-	          <div class="store-meta">
-	            <span class="star">&#11088;</span>
-	            <span class="rating"
-	                  th:text="${#numbers.formatDecimal(store.avgRating,1,1)}">4.5</span>
-	            <span class="review"
-	                  th:text="|리뷰 ${store.reviewCount}|">리뷰 245</span>
-	          </div>
+          <!-- ➕ 플러스 (우하단) -->
+          <button type="button"
+                  class="add-btn"
+                  title="추가"
+                  onclick="event.stopPropagation(); addStore([[${store.id}]])">
+            <i class="fa-solid fa-plus"></i>
+          </button>
 
-	          <!-- 한 줄 소개(카테고리·대표메뉴) -->
-	          <p class="store-desc" 
-	             th:text="${store.summary}">매운 돈코츠 라멘, 차슈 덮밥</p>
+          <!-- 이미지 -->
+          <img class="store-image"
+               th:src="${store.imageUrl != null ? store.imageUrl : '/css/imgs/default-store.png'}"
+               th:alt="${store.name}"/>
 
-	          <!-- 할인 배지 (있을 때만) -->
-	          <p class="store-discount"
-	             th:if="${store.discountText != null}"
-	             th:text="${store.discountText}">2,000원 할인</p>
+          <!-- 정보 -->
+          <div class="store-info">
+            <p class="store-category"
+               th:text="'[' + ${store.category} + ']'">[cat]</p>
 
-	          <!-- 퀵배달 배지 -->
-	          <span class="store-badge"
-	                th:if="${store.express}"
-	                >익스프레스</span>
-	        </div>
+            <p class="store-name">
+              <span th:text="${store.name}">가게</span>
+              <span class="rating-badge">
+                <i class="fa-solid fa-moon"></i>
+                <span th:text="${store.avgRating != null ? store.avgRating : 0.0}">0.0</span>
+                (<span th:text="${store.reviewCount}">0</span>)
+              </span>
+            </p>
 
-	        <!-- 하트 아이콘 – 이미 찜된 상태라 filled -->
-	        <button type="button"
-	                class="heart-btn active"
-	                aria-label="찜 해제"
-	                th:data-id="${store.id}">
-	          <i class="fa-solid fa-heart"></i>
-	        </button>
-	      </a>
-	    </li>
-	  </ul>
-	</div>
+            <p class="store-delivery"
+               th:text="'무료배달 최소주문 ' + ${#numbers.formatInteger(10000,0,'COMMA')} + '원'">
+              무료배달 최소주문 10,000원
+            </p>
+          </div>
 
+        </div><!-- /.store-row -->
+      </a><!-- /.store-list -->
+
+    </div><!-- /gallery-area -->
+  </section>
+
+</div><!-- /.favorites-page -->
 </body>
-
 </html>

@@ -9,7 +9,6 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script th:src="@{/js/initialize.js}"></script>
-<script th:src="@{/js/update.js}"></script>
 <script type="text/javascript">
 $(function () {
     // 전체탭에 클론
@@ -28,6 +27,14 @@ $(function () {
 </head>
 
 <div layout:fragment="content" class="container py-5">
+<div class="container text-center">
+		<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+			<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+		<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+			<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+		</div>
+	</div>
 	<h3 class="display-6">자주 묻는 질문</h3>
 	<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
 		<li class="nav-item me-2" role="presentation">
@@ -64,6 +71,11 @@ $(function () {
 			<button class="nav-link" id="pills-other-tab"
 				data-bs-toggle="pill" data-bs-target="#pills-other" type="button"
 				role="tab" aria-controls="pills-other" aria-selected="false">기타</button>
+		</li>
+		<li class="nav-item me-2" role="presentation">
+			<button class="nav-link" id="pills-other-tab"
+				data-bs-toggle="pill" data-bs-target="#pills-complain" type="button"
+				role="tab" aria-controls="pills-complain" aria-selected="false">문의</button>
 		</li>
 	</ul>
 
@@ -163,9 +175,9 @@ $(function () {
 					</h2>
 					<div id="ordersCollapseOne" class="accordion-collapse collapse"
 						data-bs-parent="#ordersAccordion">
-						<div class="accordion-body">온달 라이더가 주문하신 음식을 픽업하기 전에는 가게 측과
-							실시간 채팅을 통하여 언제든지 변경이 가능합니다. 라이더가 이미 음식을 픽업 후 배달중인 경우에는 고객센터로 연락
-							주시면 빠르게 확인 도와드리겠습니다.
+						<div class="accordion-body">
+							온달 라이더가 주문하신 음식을 픽업하기 전에는 가게 측과 실시간 채팅을 통하여 언제든지 변경이 가능합니다. 
+							라이더가 이미 음식을 픽업 후 배달중인 경우에는 고객센터로 연락 주시면 빠르게 확인 도와드리겠습니다.
 						</div>
 					</div>
 				</div>
@@ -484,7 +496,44 @@ $(function () {
 				</div>
 			</div>
 		</div>
-		
+		<div class="tab-pane fade" id="pills-complain" role="tabpanel" aria-labelledby="pills-other-tab">
+    <div class="container py-4">
+      <h5>문의하기</h5>
+      <form id="complainForm" th:action ="@{/submitComplain}" method = "post" enctype="multipart/form-data">
+                <!-- 역할 선택 -->
+	<div class="mb-3">
+	  <label for="role" class="form-label">문의자 유형</label>
+  		<select class="form-select" id="role" name="role" required>
+    		<option value="USER">일반 사용자</option>
+    		<option value="RIDER">라이더</option>
+    		<option value="OWNER">점주</option>
+    		<option value="OTHER">기타</option>
+  		</select>
+		</div>
+		<!-- 비밀번호 (비밀글용, 선택값) -->
+	<div class="mb-3">
+  	  <label for="complainPassword" class="form-label">비밀번호 (선택사항, 4자리 숫자)</label>
+ 		<input type="password" class="form-control" id="complainPassword" name="complainPassword" pattern="\d{4}" maxlength="4" placeholder="비밀글일 경우 4자리 숫자 입력">
+		</div>
+        <div class="mb-3">
+          <label for="complainTitle" class="form-label">제목</label>
+          <input type="text" class="form-control" id="complainTitle" name="complainTitle" required>
+        </div>
+        <div class="mb-3">
+          <label for="complainContent" class="form-label">내용</label>
+          <textarea class="form-control" id="complainContent" name="complainContent" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="complainFiles" class="form-label">첨부 파일</label>
+          <input type="file" class="form-control" id="complainFiles" name="files" multiple>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <a href="/complains" class="btn btn-outline-secondary me-2">전체글</a>
+          <button type="submit" class="btn btn-primary">제출하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
 	</div>
 </div>
 

@@ -17,6 +17,8 @@ public class UserUpdateRequest {
 	private String nickName;
 	private String email;
 	private String userPhone;
+	private String userRole;
+	private String userStatus;
 	
 	public String getUserUuidAsString() {
 		return userUuid != null ? userUuid.toString() : null;
