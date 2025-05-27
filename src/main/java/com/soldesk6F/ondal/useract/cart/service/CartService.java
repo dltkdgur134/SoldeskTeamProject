@@ -86,11 +86,21 @@ public class CartService {
 			item.setMenuImage(menu.getMenuImg());
 
 			for (CartOptionDto opt : itemDto.getOptions()) {
-				if (!opt.isSelected()) continue;
-				CartItemOption option = new CartItemOption(
-					item, opt.getGroupName(), opt.getName(), opt.getPrice());
-				item.getCartItemOptions().add(option);
+				/* if (!opt.isSelected()) continue; */
+				CartItemOption option = new CartItemOption();
+				option.setGroupName(opt.getGroupName());
+				option.setOptionName(opt.getName());
+				option.setOptionPrice(opt.getPrice());
+				item.addCartOption(option);
 			}
+			
+			int optionTotal = itemDto.getOptions().stream()
+					/* .filter(CartOptionDto::isSelected) */
+				.mapToInt(CartOptionDto::getPrice)
+				.sum();
+
+			item.setOptionTotalPrice(optionTotal);
+			
 			cart.getCartItems().add(item);
 			cartItemsRepository.save(item); // 명시적으로 저장
 		}
@@ -109,13 +119,5 @@ public class CartService {
 		cartItemsRepository.deleteAllByCart(cart);
 		cartRepository.delete(cart);
 	}
-
-	public Cart getCartByUser(User user) {
-		Optional<Cart> cart = cartRepository.findByUser(user);
-		
-		
-		return cart.get();
-	}
 	
 }
-
