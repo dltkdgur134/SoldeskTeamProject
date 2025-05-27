@@ -101,7 +101,7 @@ public class SecurityConfig{
     			.ignoringRequestMatchers("/stomp/**")
     		)
     		.authorizeHttpRequests(auth -> auth
-    			.requestMatchers("/","/admin/login","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
+    			.requestMatchers("/","/admin/**","/register","/oauth2/**", "/login/**", "/css/**", "/js/**",  "/img/**").permitAll()
     			.requestMatchers("/api/category/**").hasAuthority("OWNER")
     			.requestMatchers("/owner/**").hasAnyAuthority("OWNER", "ALL")
     			.anyRequest().authenticated() 
