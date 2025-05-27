@@ -17,9 +17,6 @@
   <script
     th:src="@{'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoMapsAppKey} + '&autoload=false&libraries=services'}">
   </script>
-   <script th:inline="javascript">
-    let userId = /*[[${#authentication.principal.user.userId}]]*/ 'guest'; 
-  </script>
   <!-- 페이지 전용 JS -->
 </head>
 <body>
@@ -187,6 +184,9 @@
 						<span th:if="${order.deliveryFee > 0}"><small class="order-detail-text" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
 						<span th:if="${order.deliveryFee == 0}"><small class="order-detail-text" th:text="${order.deliveryFee + ' 원'}"></small></span>
 					</div>
+					<div class="container d-flex justify-content-between">
+					<a id="refundLink" href="/userPayHistory" style="display: inline;">환불하러가기</a>
+					</div>
       			</div>
     		</div>
       	</div>
@@ -212,6 +212,13 @@
     </div>
   </div>
   <script th:src="@{/js/orderLive.js}"></script>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+  <input type="hidden" th:value="${orderId}" id ="orderIdInput">
+=======
+>>>>>>> bbc7eb4f7a5eb57cc485b05fd933bb852133cfdc
+>>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 </section>
 </body>
 </html>

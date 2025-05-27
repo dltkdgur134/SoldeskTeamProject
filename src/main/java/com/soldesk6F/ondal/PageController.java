@@ -14,6 +14,9 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.useract.complain.entity.Complain;
+import com.soldesk6F.ondal.useract.complain.entity.Complain.Role;
+import com.soldesk6F.ondal.useract.complain.repository.ComplainRepository;
 import com.soldesk6F.ondal.useract.order.dto.OrderHistoryDto;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
@@ -91,7 +94,7 @@ public class PageController {
 	    model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 	    model.addAttribute("ondalPay", freshUser.getOndalPay());
 
-	    return "content/user/ondalPay";
+	    return "content/user/pay/ondalPay";
 	}
 	// 온달 페이 이동
 	@GetMapping("/userWallet")
@@ -102,7 +105,7 @@ public class PageController {
 		
 		model.addAttribute("ondalWallet", freshUser.getOndalWallet());
 		
-		return "content/user/UserWallet";
+		return "content/user/pay/UserWallet";
 	}
 	
 	private final PaymentHistoryService paymentHistoryService;
@@ -129,7 +132,7 @@ public class PageController {
 	    model.addAttribute("currentDays", days);
 	    model.addAttribute("currentUsage", usage);
 
-	    return "content/user/userPayHistory";  // JSP나 Thymeleaf 뷰 이름
+	    return "content/user/pay/userPayHistory";  // JSP나 Thymeleaf 뷰 이름
 	}
 
 	private final OrderRepository orderRepository;
@@ -153,7 +156,37 @@ public class PageController {
 	    return "content/orderLive";
 	}
 
+	private final ComplainRepository complainRepository;
 	
+	@GetMapping("/complains")
+    public String viewComplains(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "role", required = false) Role role,
+            @RequestParam(value = "userId", required = false) String userId,
+            Model model
+    ) {
+        List<Complain> complains;
+
+        if (userId != null && !userId.isBlank()) {
+            complains = complainRepository.findByUser_UserId(userId);
+        } else if (keyword != null && !keyword.isBlank()) {
+            complains = complainRepository.findByComplainTitleContaining(keyword);
+        } else if (role != null) {
+            complains = complainRepository.findByRole(role);
+        } else {
+            complains = complainRepository.findAll();
+        }
+
+     // 로그 확인
+        complains.forEach(c -> {
+            System.out.println("제목: " + c.getComplainTitle());
+            System.out.println("유저: " + (c.getUser() != null ? c.getUser().getUserId() : "비회원"));
+        });
+        
+        
+        model.addAttribute("complains", complains);
+        return "content/user/complain/complainList"; // complain/list.html
+    }
 	
 	
 }

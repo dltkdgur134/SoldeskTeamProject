@@ -89,3 +89,4 @@ function updateExcelDownloadUrl() {
 
 	excelBtn.href = url;
 }
+

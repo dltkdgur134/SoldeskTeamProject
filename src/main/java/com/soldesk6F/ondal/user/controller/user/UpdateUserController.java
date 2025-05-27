@@ -152,7 +152,9 @@ public class UpdateUserController {
 	            String[] resultAndStatus = Paystatus.split(":@:");
 	            if (resultAndStatus.length == 3 && "성공".equals(resultAndStatus[2])) {
 	                String orderId = resultAndStatus[1];
+	                
 	                return "redirect:/user/order/" + orderId;
+
 	            } else {
 	                model.addAttribute("cartUUID", cartUUID);
 	                model.addAttribute("failReason", resultAndStatus[0]);
