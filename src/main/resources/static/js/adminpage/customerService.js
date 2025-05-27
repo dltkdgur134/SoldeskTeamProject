@@ -51,7 +51,6 @@ export function initCustomerService(root) {
         <td class="text-start">${imgIcon}${esc(c.title)}</td>
         <td>${esc(c.userId)}</td>
         <td><span class="badge bg-secondary">${ROLE[c.role] ?? c.role}</span></td>
-        <td>${CAT[c.category] ?? c.category}</td>
         <td>${dayjs(c.createdAt).format('YYYY-MM-DD HH:mm')}</td>
         <td><span class="badge ${cls}">${st}</span></td>
         <td><button class="btn btn-sm btn-outline-primary reply-btn">답변</button></td>
