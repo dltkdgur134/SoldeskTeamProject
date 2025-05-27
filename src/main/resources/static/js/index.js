@@ -8,7 +8,15 @@ $(function () {
 
 /* ───────────────────────────────  검색 로직  ─────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
-    var searchInput = document.getElementById('inp-search');
+	var flashDurationInSeconds = 5;
+	 var flashContainerId = 'flash-messages';
+
+	 function removeFlashMessages() {
+	    $('#' + flashContainerId).remove();
+	 }
+	 setTimeout(removeFlashMessages, flashDurationInSeconds * 500);
+	
+	var searchInput = document.getElementById('inp-search');
 	var searchBtn = document.getElementById('btn-search');
     var listWrapper = document.getElementById('list-wrapper');
     var list = document.getElementById('list-autocomplete');
