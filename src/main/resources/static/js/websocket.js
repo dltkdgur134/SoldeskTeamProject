@@ -13,6 +13,7 @@ function connectGlobalWebSocket() {
 	const onConnected = frame => {
 		console.log('🌐 connected:', frame.headers);
 
+
 		/* 로그인 직후 서버에 “진행 중 주문 목록” 요청 */
 		fetch('/user/order/active-ids')
 			.then(r => {
@@ -66,14 +67,6 @@ function subscribeOrderChannels(paramOrderId) {
 			console.log("subscribeOrderChannels 살아있음");
 			console.log('[order-topic]', paramOrderId, update);
 			showOrderNotification(update);       // 토스트
-			const refundLink = document.getElementById("refundLink");
-			if (refundLink) {
-						if (update.orderToUser === 'PENDING') {
-							refundLink.style.display = 'inline';
-						} else {
-							refundLink.style.display = 'none';
-						}
-					}
 			if (typeof update.currentStatus === 'number') {
 				if (typeof window.updateProgress === 'function') {
 					window.updateProgress(update.currentStatus);

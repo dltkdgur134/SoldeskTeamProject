@@ -39,6 +39,9 @@ public class PageController {
         model.addAttribute("ondalWallet", freshUser.getOndalWallet());
         model.addAttribute("ondalPay", freshUser.getOndalPay());
         model.addAttribute("userSelectedAddress", freshUser.getUserSelectedAddress());
+        model.addAttribute("userRole", freshUser.getUserRole().name());
+    	model.addAttribute("riderRequested", freshUser.isRiderRequested());
+    	model.addAttribute("ownerRequested", freshUser.isOwnerRequested());
 		System.out.println("myPage 컨트롤러 진입");
 		return "content/myPage";
 	}
