@@ -13,7 +13,6 @@ function connectGlobalWebSocket() {
 	const onConnected = frame => {
 		console.log('🌐 connected:', frame.headers);
 
-
 		/* 로그인 직후 서버에 “진행 중 주문 목록” 요청 */
 		fetch('/user/order/active-ids')
 			.then(r => {
