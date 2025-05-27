@@ -18,25 +18,24 @@ import java.util.List;
 @Component
 public class AdminSessionAuthenticationFilter extends OncePerRequestFilter {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request,
+										HttpServletResponse response,
+										FilterChain filterChain)
+            throws ServletException, IOException {	
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             HttpSession session = request.getSession(false);
            
             if (session != null) {
                 Admin admin = (Admin) session.getAttribute("adminLogin");
                 if (admin != null) {
-                	System.out.println("✅ Admin 인증 주입됨: " + admin.getLoginId());
                     UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                             admin,
                             null,
                             List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-                        );
-					/* SecurityContextHolder.getContext().setAuthentication(auth); */
+                        		);
+					SecurityContextHolder.getContext().setAuthentication(auth);
 
                 }
             }
