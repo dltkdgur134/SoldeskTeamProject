@@ -32,11 +32,7 @@ console.log('Order ID:', orderId);
 /**---------------------------------------------------
  * 2) 채팅 수신 핸들러
  *--------------------------------------------------*/
-<<<<<<< HEAD
-function onChatMessage(message) {
-=======
 /*function onChatMessage(message) {
->>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 	//const { senderName, text, timestamp } = JSON.parse(message.body);
 	console.log('Raw message:', message);
 	console.log('Raw message.body:', message.body);
@@ -65,11 +61,7 @@ function onChatMessage(message) {
 /**---------------------------------------------------
  * 3) 채팅 전송 함수
  *--------------------------------------------------*/
-<<<<<<< HEAD
-function sendChat() {
-=======
 /*function sendChat() {
->>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 	const input = document.getElementById('chatInput');
 	let orderId = document.getElementById('orderIdInput').value;
 	const text = input.value.trim();
@@ -86,11 +78,8 @@ function sendChat() {
 	console.log("📤 전송 데이터:", JSON.stringify(payload));
 	stompClient.send('/app/chat/' + orderId, {}, JSON.stringify(payload));
 	input.value = '';
-<<<<<<< HEAD
 }
-=======
 }*/
->>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 
 /**---------------------------------------------------
  * 3.5) 채팅 읽었는지 확인하는 함수 "1"
@@ -119,13 +108,8 @@ $('.chat-button').click(function() {
 /**---------------------------------------------------
  * 4) 페이지 로드 시 초기화
  *--------------------------------------------------*/
-<<<<<<< HEAD
-window.addEventListener('load', () => {
-	//connectOrderWebSocket();
-=======
 /*window.addEventListener('load', () => {
 	connectOrderWebSocket();
->>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 
 	const sendBtn = document.getElementById('sendChatBtn');
 	const chatInput = document.getElementById('chatInput');
@@ -137,13 +121,10 @@ window.addEventListener('load', () => {
 		});
 	}
 
-<<<<<<< HEAD
-	/*initChart(currentStage);
-	kakao.maps.load(initMap);*/
-=======
+initChart(currentStage);
+	kakao.maps.load(initMap);
 	initChart(currentStage);
 	kakao.maps.load(initMap);
->>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 	updateCookingProgress(currentStage);
 	startExpectedTimeCountdown(expectCookingTime, expectDeliveryTime);
 });*/
@@ -191,10 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	const currentStage = document.getElementById('slider-step').value;
 	/*initChart(currentStage);
 	kakao.maps.load(initMap);*/
-<<<<<<< HEAD
-
-=======
->>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 });
 
 // HTML data- 속성에서 변수 읽기
