@@ -4,13 +4,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record ComplainAdminDtoWithImages(
+public record ComplainDetailViewDto(
 	    UUID complainId,
 	    String complainTitle,
 	    String complainContent,
-	    String userId,
 	    String role,
 	    LocalDateTime createdDate,
 	    String complainStatus,
-	    List<String> images
-	) {}
+	    String userId,         // 또는 guestId
+	    List<String> complainImgList,
+	    List<ReplyDto> replyList
+	) {
+	    public record ReplyDto(
+	        String replyContent,
+	        String adminId,
+	        LocalDateTime repliedDate
+	    ) {}
+	}

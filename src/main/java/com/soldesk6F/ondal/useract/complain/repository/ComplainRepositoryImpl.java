@@ -59,7 +59,8 @@ public class ComplainRepositoryImpl implements ComplainRepositoryCustom {
                         JPAExpressions.select(i.complainImg)
                                       .from(i)
                                       .where(i.complain.eq(c))
-                                      .limit(1),           // 첫 장만
+                                      .limit(1)
+                                      .exists(),           // 첫 장만
                         "firstImage")))
             .from(c)
             .where(where)
