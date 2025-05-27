@@ -32,7 +32,7 @@ console.log('Order ID:', orderId);
 /**---------------------------------------------------
  * 2) 채팅 수신 핸들러
  *--------------------------------------------------*/
-function onChatMessage(message) {
+/*function onChatMessage(message) {
 	//const { senderName, text, timestamp } = JSON.parse(message.body);
 	console.log('Raw message:', message);
 	console.log('Raw message.body:', message.body);
@@ -56,12 +56,12 @@ function onChatMessage(message) {
   `;
 	container.append(el);
 	container.scrollTop = container.scrollHeight;
-}
+}*/
 
 /**---------------------------------------------------
  * 3) 채팅 전송 함수
  *--------------------------------------------------*/
-function sendChat() {
+/*function sendChat() {
 	const input = document.getElementById('chatInput');
 	let orderId = document.getElementById('orderIdInput').value;
 	const text = input.value.trim();
@@ -78,7 +78,7 @@ function sendChat() {
 	console.log("📤 전송 데이터:", JSON.stringify(payload));
 	stompClient.send('/app/chat/' + orderId, {}, JSON.stringify(payload));
 	input.value = '';
-}
+}*/
 
 /**---------------------------------------------------
  * 3.5) 채팅 읽었는지 확인하는 함수 "1"
@@ -107,8 +107,8 @@ $('.chat-button').click(function() {
 /**---------------------------------------------------
  * 4) 페이지 로드 시 초기화
  *--------------------------------------------------*/
-window.addEventListener('load', () => {
-	//connectOrderWebSocket();
+/*window.addEventListener('load', () => {
+	connectOrderWebSocket();
 
 	const sendBtn = document.getElementById('sendChatBtn');
 	const chatInput = document.getElementById('chatInput');
@@ -120,11 +120,11 @@ window.addEventListener('load', () => {
 		});
 	}
 
-	/*initChart(currentStage);
-	kakao.maps.load(initMap);*/
+	initChart(currentStage);
+	kakao.maps.load(initMap);
 	updateCookingProgress(currentStage);
 	startExpectedTimeCountdown(expectCookingTime, expectDeliveryTime);
-});
+});*/
 
 document.addEventListener("DOMContentLoaded", () => {
 	const orderIdInput = document.getElementById("orderIdInput");
@@ -169,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	const currentStage = document.getElementById('slider-step').value;
 	/*initChart(currentStage);
 	kakao.maps.load(initMap);*/
-
 });
 
 // HTML data- 속성에서 변수 읽기
@@ -252,7 +251,6 @@ function updateCookingProgress(stage) {
 			updateProgress(4);
 			break;
 		case 'REJECTED':
-			setProgress(bar, 100, '주문 거부됨', 'bg-danger');
 			alert('해당 주문은 가게에서 거부되었습니다.');
 			disableOrderUI();
 			break;
@@ -373,7 +371,7 @@ function updateProgress(step) {
 	const progressPercent = ((step - 1) / (steps.length - 1)) * 100;
 	progressBar.style.width = `${progressPercent}%`;
 
-	// 현재 단계 및 레이블 스타일링
+	// 현재 단계에 따라 상태바 + 원 스타일 변경
 	steps.forEach(el => {
 		const currentStep = parseInt(el.getAttribute('data-step'), 10);
 		if (currentStep <= step) {
@@ -382,7 +380,8 @@ function updateProgress(step) {
 			el.classList.remove('active');
 		}
 	});
-
+	
+	// 현재 단계에 따라 단계 레이블 스타일 변경
 	labels.forEach(el => {
 		const currentStep = parseInt(el.getAttribute('data-step'), 10);
 		if (currentStep <= step) {
@@ -391,6 +390,7 @@ function updateProgress(step) {
 			el.classList.remove('active');
 		}
 	});
+	// 5단계 도달 시 주문 완료 -> 주문 내역 이동
 	if (step == 5) {
 		window.location.href = "/orderHistory"
 	}
