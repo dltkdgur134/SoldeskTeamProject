@@ -216,7 +216,8 @@
 		          <strong th:text="${item.menuName}">상품명</strong>
 		          <span th:text="'₩' + ${#numbers.formatInteger(item.totalPrice, 0)}">₩0</span>
 		        </div>
-		        <small class="text-muted" th:text="${item.optionNames}">옵션정보</small>
+		        <!--<small class="text-muted" th:text="${item.optionNames}">옵션정보</small>-->
+				<small class="text-muted" th:text="${#strings.listJoin(item.optionNames, ', ')}">옵션정보</small>
 		      </div>
 		    </div>
 		  </div>

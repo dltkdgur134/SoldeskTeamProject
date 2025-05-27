@@ -157,48 +157,56 @@ public class CartController {
 	@GetMapping("/api/restore")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> restoreCart(@RequestParam UUID userUuid) {
-		User user = userService.findUserByUuid(userUuid)
-			.orElseThrow(() -> new IllegalArgumentException("유저 없음"));
-
-		Optional<Cart> optionalCart = cartService.findLatestCartByUser(user);
-		if (optionalCart.isEmpty()) {
-			return ResponseEntity.ok(Map.of("restored", false));
-		}
-
-		Cart cart = optionalCart.get();
-
-		if (cart.getStatus() != CartStatus.PENDING && cart.getStatus() != CartStatus.CANCELED) {
-			return ResponseEntity.ok(Map.of("restored", false));
-		}
-
-		List<Map<String, Object>> restoredItems = cart.getCartItems().stream().map(item -> {
-			Map<String, Object> menuData = new HashMap<>();
-			menuData.put("menuId", item.getMenu().getMenuId());
-			menuData.put("storeId", cart.getStore().getStoreId());
-			menuData.put("menuName", item.getMenu().getMenuName());
-			menuData.put("menuImage", item.getMenu().getMenuImg());
-			menuData.put("price", item.getMenu().getPrice());
-			menuData.put("quantity", item.getQuantity());
-
-			List<Map<String, Object>> options = item.getCartItemOptions().stream().map(opt -> {
-				Map<String, Object> optMap = new HashMap<>();
-				optMap.put("groupName", opt.getGroupName());
-				optMap.put("name", opt.getOptionName());
-				optMap.put("price", opt.getOptionPrice());
-				optMap.put("selected", true);
-				return optMap;
+		try {
+			User user = userService.findUserByUuid(userUuid)
+					.orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+			
+			Optional<Cart> optionalCart = cartService.findLatestCartByUser(user);
+			if (optionalCart.isEmpty()) {
+				return ResponseEntity.ok(Map.of("restored", false));
+			}
+			
+			Cart cart = optionalCart.get();
+			
+			if (cart.getStatus() != CartStatus.PENDING && cart.getStatus() != CartStatus.CANCELED) {
+				return ResponseEntity.ok(Map.of("restored", false));
+			}
+			
+			List<Map<String, Object>> restoredItems = cart.getCartItems().stream().map(item -> {
+				Map<String, Object> menuData = new HashMap<>();
+				menuData.put("menuId", item.getMenu().getMenuId());
+				menuData.put("storeId", cart.getStore().getStoreId());
+				menuData.put("menuName", item.getMenu().getMenuName());
+				menuData.put("menuImage", item.getMenu().getMenuImg());
+				menuData.put("price", item.getMenu().getPrice());
+				menuData.put("quantity", item.getQuantity());
+				
+				List<Map<String, Object>> options = item.getCartItemOptions().stream().map(opt -> {
+					Map<String, Object> optMap = new HashMap<>();
+					optMap.put("groupName", opt.getGroupName());
+					optMap.put("name", opt.getOptionName());
+					optMap.put("price", opt.getOptionPrice());
+					optMap.put("selected", true);
+					return optMap;
+				}).collect(Collectors.toList());
+				
+				menuData.put("options", options);
+				return menuData;
 			}).collect(Collectors.toList());
-
-			menuData.put("options", options);
-			return menuData;
-		}).collect(Collectors.toList());
-
-		// delete from DB after collecting data
-		cartService.deleteCart(cart);
-
-		return ResponseEntity.ok(Map.of(
-			"restored", true,
-			"cartItems", restoredItems
-		));
+			
+			// delete from DB after collecting data
+			cartService.deleteCart(cart);
+			
+			return ResponseEntity.ok(Map.of(
+					"restored", true,
+					"cartItems", restoredItems
+					));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity
+				.status(500)
+				.body(Map.of("error", "restoreCart 서버 오류: " + e.getMessage()));
+		}
 	}
 }

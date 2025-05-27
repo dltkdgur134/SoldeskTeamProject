@@ -33,6 +33,32 @@ function saveToLocalStorage(userUUID, cartItem, existingWrapper = null) {
 		cartWrapper.items = [];
 	}
 
+	// ✅ 모든 옵션에 selected 포함해서 다시 저장
+	const fullOptionsWithSelected = (cartItem.options || []).map(opt => ({
+		groupName: opt.groupName,
+		name: opt.name,
+		price: opt.price,
+		selected: opt.selected ?? false
+	}));
+
+	cartItem.options = fullOptionsWithSelected;
+
+	// ✅ 중복 판단을 위한 selected 옵션만 추출
+	const itemOptions = JSON.stringify(
+		fullOptionsWithSelected
+			.filter(opt => opt.selected)
+			.sort((a, b) => a.groupName.localeCompare(b.groupName) || a.name.localeCompare(b.name))
+	);
+
+	const existing = cartWrapper.items.find(item =>
+		item.menuId === cartItem.menuId &&
+		JSON.stringify(
+			(item.options || [])
+				.filter(opt => opt.selected)
+				.sort((a, b) => a.groupName.localeCompare(b.groupName) || a.name.localeCompare(b.name))
+		) === itemOptions
+	);
+/*
 	const extractSelectedOptions = (list) =>
 		list
 			.filter(opt => opt.selected)
@@ -45,7 +71,7 @@ function saveToLocalStorage(userUUID, cartItem, existingWrapper = null) {
 		item.menuId === cartItem.menuId &&
 		JSON.stringify(extractSelectedOptions(item.options || [])) === itemOptions
 	);
-
+*/
 	if (existing) {
 		existing.quantity += cartItem.quantity;
 	} else {
