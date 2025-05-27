@@ -30,6 +30,14 @@
         <option value="OTHER">기타</option>
       </select>
     </div>
+    <div class="col-md-3">
+      <select name="complainStatus" class="form-select">
+        <option value="">전체 유형</option>
+        <option value="PENDING">처리 전</option>
+        <option value="IN_PROGRESS">처리 중</option>
+        <option value="RESOLVED">처리 완료</option>
+      </select>
+    </div>
     <div class="col-md-2">
       <button type="submit" class="btn btn-outline-primary">검색</button>
     </div>
@@ -64,8 +72,8 @@
           <span th:if="${c.user == null}" th:text="${c.guestId}">비회원 ID</span>
         </td>
         <td th:text="${#temporals.format(c.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
-        <td th:if="${c.complainStatus.name() == 'PENDING'}" th:text="처리중">
-        </td>
+        <td th:if="${c.complainStatus.name() == 'PENDING'}" th:text="처리전"></td>
+        <td th:if="${c.complainStatus.name() == 'IN_PROGRESS'}" th:text="처리중"></td>
 		<td>
 		  <a th:if="${c.complainStatus.name() == 'RESOLVED'}" th:href="@{/}" >
 		    문의확인

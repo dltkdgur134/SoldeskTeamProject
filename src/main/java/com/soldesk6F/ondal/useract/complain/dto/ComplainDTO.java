@@ -2,6 +2,7 @@ package com.soldesk6F.ondal.useract.complain.dto;
 
 import java.util.UUID;
 
+import com.soldesk6F.ondal.useract.complain.entity.Complain.ComplainStatus;
 import com.soldesk6F.ondal.useract.complain.entity.Complain.Role;
 
 import lombok.Data;
@@ -12,5 +13,6 @@ public class ComplainDTO {
     private String complainTitle;
     private String complainContent;
     private Role role;                    
-    private String complainPassword;      
+    private String complainPassword;
+    private ComplainStatus complainStatus;
 }
