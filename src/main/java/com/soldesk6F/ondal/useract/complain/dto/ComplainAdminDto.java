@@ -12,5 +12,5 @@ public record ComplainAdminDto(
         String role,
         LocalDateTime createdAt,
         String status,
-        List<String> images        // /uploads/complain/{file}
-) {}
+        boolean hasImg
+		) {}

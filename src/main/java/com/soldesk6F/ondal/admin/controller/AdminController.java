@@ -42,5 +42,4 @@ public class AdminController {
     public String deliverySetting() {
         return "content/admin/customerService";
     }
-	
 }

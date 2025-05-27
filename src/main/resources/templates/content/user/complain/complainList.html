@@ -13,14 +13,15 @@
 <div layout:fragment="content" class="container py-5">
   <h3>전체 문의글</h3>
   <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
   <!-- 검색 & 필터 -->
   <form method="get" th:action="@{/complains}" class="row mb-3">
     <div class="col-md-4">
       <input type="text" name="keyword" class="form-control" placeholder="제목 검색">
     </div>
     <div class="col-md-3">
-  	  <input type="text" name="userId" class="form-control" placeholder="작성자 ID">
-	</div>
+      <input type="text" name="userId" class="form-control" placeholder="작성자 ID">
+    </div>
     <div class="col-md-3">
       <select name="role" class="form-select">
         <option value="">전체 유형</option>
@@ -58,40 +59,51 @@
     <tbody>
       <tr th:each="c, stat : ${complains}">
         <td th:text="${stat.count}"></td>
+
         <td>
-          <a href="#" 
-             th:attr="data-id=${c.complainId}, data-password=${c.complainPassword != null}" 
-             onclick="openComplain(this)"> 
+          <span th:if="${c.complainStatus.name() == 'RESOLVED'}">
+            <span th:if="${c.complainPassword != null}">🔒</span>
+            <span th:text="${c.complainTitle}"></span>
+          </span>
+          <a th:if="${c.complainStatus.name() != 'RESOLVED'}"
+             href="#"
+             th:attr="data-id=${c.complainId}, data-password=${c.complainPassword != null}"
+             onclick="openComplain(this)">
             <span th:if="${c.complainPassword != null}">🔒</span>
             <span th:text="${c.complainTitle}"></span>
           </a>
         </td>
+
         <td th:text="${c.role}"></td>
+
         <td>
           <span th:if="${c.user != null}" th:text="${c.user.userId}">회원명</span>
           <span th:if="${c.user == null}" th:text="${c.guestId}">비회원 ID</span>
         </td>
+
         <td th:text="${#temporals.format(c.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
-        <td th:if="${c.complainStatus.name() == 'PENDING'}" th:text="처리전"></td>
-        <td th:if="${c.complainStatus.name() == 'IN_PROGRESS'}" th:text="처리중"></td>
-		<td>
-		  <a th:if="${c.complainStatus.name() == 'RESOLVED'}" th:href="@{/}" >
-		    문의확인
-		  </a>
-		</td>
+
+        <td>
+          <span th:if="${c.complainStatus.name() == 'PENDING'}">처리전</span>
+          <span th:if="${c.complainStatus.name() == 'IN_PROGRESS'}">처리중</span>
+          <a th:if="${c.complainStatus.name() == 'RESOLVED'}"
+             href="#"
+             th:attr="data-id=${c.complainId}, data-password=${c.complainPassword != null}"
+             onclick="openResolvedComplain(this)">문의확인</a>
+        </td>
       </tr>
     </tbody>
   </table>
 
   <!-- 비밀번호 입력 모달 -->
-	<!-- 비밀번호 입력 모달 -->
-	<div id="passwordModal" style="display:none;">
-	  <h3>비밀번호 입력</h3>
-	  <form id="passwordForm" method="post" action="">
-	    <input type="password" name="password" id="complainPasswordInput" required />
-	    <button type="submit">확인</button>
-	    <button type="button" onclick="closePasswordModal()">취소</button>
-	  </form>
-	</div>
+  <div id="passwordModal" style="display:none;">
+    <h3>비밀번호 입력</h3>
+    <form id="passwordForm" method="post" action="">
+      <input type="password" name="password" id="complainPasswordInput" required />
+      <button type="submit">확인</button>
+      <button type="button" onclick="closePasswordModal()">취소</button>
+    </form>
+  </div>
 </div>
+
 </html>

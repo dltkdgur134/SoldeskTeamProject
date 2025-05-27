@@ -69,4 +69,25 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     		""")
     List<UUID> findActiveOrderIds(@Param("userUuid") UUID userUuid,
     		@Param("activeStatuses") List<OrderToUser> activeStatuses);
+    
+ // Owner 매출 관련 레포지토리
+
+ // 1) ownerId로 기간 내 총 매출 합계 조회
+    @Query("SELECT SUM(o.totalPrice) FROM Order o " +
+           "WHERE o.store.owner.ownerId = :ownerId " +
+           "AND o.orderTime BETWEEN :start AND :end")
+    Integer sumSalesByOwnerIdAndPeriod(@Param("ownerId") UUID ownerId,
+                                      @Param("start") LocalDateTime start,
+                                      @Param("end") LocalDateTime end);
+
+    // 2) storeId로 기간 내 총 매출 합계 조회
+    @Query("SELECT SUM(o.totalPrice) FROM Order o " +
+           "WHERE o.store.storeId = :storeId " +
+           "AND o.orderTime BETWEEN :start AND :end")
+    Integer sumSalesByStoreIdAndPeriod(@Param("storeId") UUID storeId,
+                                      @Param("start") LocalDateTime start,
+                                      @Param("end") LocalDateTime end);
+
+    
+    
 }

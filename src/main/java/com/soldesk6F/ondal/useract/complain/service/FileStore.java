@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileStore {
 
-    @Value("${app.upload-root:/uploads}")   // application.yml에서 경로 변경 가능
+    @Value("${app.upload-root:/img/complain}")   // application.yml에서 경로 변경 가능
     private Path root;
 
     public String save(MultipartFile file, String dir) throws IOException {
@@ -30,4 +30,4 @@ public class FileStore {
         file.transferTo(folder.resolve(name));
         return dir + "/" + name;  // DB에는 상대경로 저장
     }
-}
+}	
