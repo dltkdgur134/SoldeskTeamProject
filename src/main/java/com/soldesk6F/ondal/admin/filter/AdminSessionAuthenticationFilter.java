@@ -36,7 +36,7 @@ public class AdminSessionAuthenticationFilter extends OncePerRequestFilter {
                             null,
                             List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
                         );
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+					/* SecurityContextHolder.getContext().setAuthentication(auth); */
                 }
             }
         }
