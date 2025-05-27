@@ -24,23 +24,24 @@ public class UserRoleService {
     }
 
     public void changeRoleToOwner(User user, OwnerForm form) {
-        if (riderService.isAlreadyRider(user.getUserId())) {
-            user.setUserRole(UserRole.ALL);  // 라이더와 점주 역할 동시에 부여
-        } else {
-            user.setUserRole(UserRole.OWNER);  // 점주 역할만 부여
-        }
+		/*
+		 * if (riderService.isAlreadyRider(user.getUserId())) {
+		 * user.setUserRole(UserRole.ALL); // 라이더와 점주 역할 동시에 부여 } else {
+		 * user.setUserRole(UserRole.OWNER); // 점주 역할만 부여 }
+		 */
+        user.setOwnerRequested(true);
         userRepository.save(user);
         // 기타 점주 관련 로직 처리
         ownerService.registerOwner(user, form); // Owner 등록
     }
 
     public void changeRoleToRider(User user, RiderForm form) {
-        if (ownerService.isAlreadyOwner(user.getUserId())) {
-            user.setUserRole(UserRole.ALL);  // 점주와 라이더 역할 동시에 부여
-        } else {
-            user.setUserRole(UserRole.RIDER);  // 라이더 역할만 부여
-        }
-        
+		/*
+		 * if (ownerService.isAlreadyOwner(user.getUserId())) {
+		 * user.setUserRole(UserRole.ALL); // 점주와 라이더 역할 동시에 부여 } else {
+		 * user.setUserRole(UserRole.RIDER); // 라이더 역할만 부여 }
+		 */
+        user.setRiderRequested(true);
         userRepository.save(user);
         // 기타 라이더 관련 로직 처리
         riderService.registerRider(user, form); // 라이더 등록 로직

@@ -288,19 +288,27 @@
 		<div class="reg-buttonContainer">
 			<h6 class="card-title">업종</h6>
 			<div class="reg-buttons">
-				<!-- 라이더 등록 버튼: user 또는 owner인 경우 보여줌 -->
-				<a th:href="@{/rider/register}" class="riderBtn">라이더 등록하러 가기</a>
 
-				<!-- 라이더 홈 이동 버튼: rider 또는 all인 경우 
-				<a th:if="${userRole == 'RIDER' or userRole == 'ALL'}"
-					th:href="@{/rider/home}" class="riderBtn">라이더 페이지로 가기</a>-->
+				<!-- 라이더 등록 버튼 -->
+				<th:block th:if="${((userRole == 'USER') or (userRole == 'OWNER')) and !riderRequested}">
+					<a th:href="@{/user/riderRegister}" class="riderBtn">라이더 등록하러 가기</a>
+				</th:block>
 
-				<!-- 점주 등록 버튼: user 또는 rider인 경우 보여줌 -->
-				<a th:href="@{/owner/register}" class="ownerBtn">점주 등록하러 가기</a>
+				<!-- 라이더 승인 대기중 -->
+				<th:block th:if="${((userRole == 'USER') or (userRole == 'OWNER')) and riderRequested}">
+					<span class="riderBtn disabled">라이더 승인 대기중</span>
+				</th:block>
 
-				<!-- 점주 홈 이동 버튼: owner 또는 all인 경우 
-				<a th:if="${userRole == 'OWNER' or userRole == 'ALL'}"
-					th:href="@{/owner/home}" class="ownerBtn">점주 페이지로 가기</a>-->
+				<!-- 점주 등록 버튼 -->
+				<th:block th:if="${((userRole == 'USER') or (userRole == 'RIDER')) and !ownerRequested}">
+					<a th:href="@{/user/ownerRegister}" class="ownerBtn">점주 등록하러 가기</a>
+				</th:block>
+
+				<!-- 점주 승인 대기중 -->
+				<th:block th:if="${((userRole == 'USER') or (userRole == 'RIDER')) and ownerRequested}">
+					<span class="ownerBtn disabled">점주 승인 대기중</span>
+				</th:block>
+
 			</div>
 		</div>
 	</div>

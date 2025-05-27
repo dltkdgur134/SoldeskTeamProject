@@ -28,7 +28,7 @@
 				<div class="error-message" th:if="${error}" th:text="${error}"></div>
 			</div>
 
-			<form th:action="@{/rider/register}" method="post">
+			<form th:action="@{/user/riderRegister}" method="post">
 				<div class="form-group">
 					<i class="fa-solid fa-id-card input-icon"></i> <input type="text"
 						name="riderNickname" placeholder="라이더 닉네임" maxlength="20" required>
@@ -96,4 +96,10 @@
 		</div>
 	</div>
 </div>
+<th:block layout:fragment="js">
+	<script th:if="${riderSuccess}" th:inline="javascript">
+		alert('[[${riderSuccess}]]');
+		window.location.href = '/';
+	</script>
+</th:block>
 </html>
