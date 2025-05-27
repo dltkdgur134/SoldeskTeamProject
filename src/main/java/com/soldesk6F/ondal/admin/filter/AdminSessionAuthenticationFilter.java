@@ -23,7 +23,6 @@ public class AdminSessionAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-    	System.out.println("접근자체는함");
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             HttpSession session = request.getSession(false);
            
