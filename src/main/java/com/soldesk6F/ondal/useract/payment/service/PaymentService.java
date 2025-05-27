@@ -74,12 +74,9 @@ public class PaymentService {
 	private final UserRepository userRepository;
 	private final PaymentFailLogService paymentFailLogService;
 	private final OwnerRepository ownerRepository;
-	
-	
-	
 
 	@Value("${toss.secret-key}")
-    private String tossSecretKey;
+	private String tossSecretKey;
 
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -106,13 +103,31 @@ public class PaymentService {
 				} else {
 					return items.stream().map(item -> {
 
-						List<String> options = (item.getOptions() == null) ? List.of("옵션없음")
-								: Arrays.asList(item.getOptions().split("온달"));
+						/*
+						 * List<String> options = (item.getOptions() == null) ? List.of("옵션없음") :
+						 * Arrays.asList(item.getOptions().split("온달"));
+						 */
+						List<CartItemOption> optList = item.getCartItemOptions();
 
+						List<String> options = optList.isEmpty() ? List.of("옵션없음")
+								: optList.stream().map(opt -> opt.getOptionName() + " (" + opt.getOptionPrice() + "원)")
+										.collect(Collectors.toList());
+						
 						return CartItemsDTO.builder().menuName(item.getMenu().getMenuName())
-								.menuPrice(item.getMenu().getPrice()).optionNames(options)
-								.optionTotalPrice(item.getOptionTotalPrice()).quantity(item.getQuantity())
-								.totalPrice(item.getItemTotalPrice()).menuImg(item.getMenu().getMenuImg()).build();
+						.menuPrice(item.getMenu().getPrice()).optionNames(options)
+						.optionTotalPrice(item.getOptionTotalPrice()).quantity(item.getQuantity())
+						.totalPrice(item.getItemTotalPrice()).menuImg(item.getMenu().getMenuImg()).
+						build();
+						 
+						/*
+						 * CartItemsDTO dto = CartItemsDTO.builder()
+						 * .menuName(item.getMenu().getMenuName()) .menuPrice(item.getMenu().getPrice())
+						 * .optionNames(options) .optionTotalPrice(item.getOptionTotalPrice())
+						 * .quantity(item.getQuantity()) .totalPrice(item.getItemTotalPrice())
+						 * .menuImg(item.getMenu().getMenuImg()) .build();
+						 * 
+						 * return dto;
+						 */
 
 					}).collect(Collectors.toList());
 				}
@@ -143,11 +158,8 @@ public class PaymentService {
 			throw new IllegalStateException("선택된 주소가 없습니다. 마이페이지에서 주소를 등록해주세요.");
 		}
 
-		return UserInfoDTO.builder()
-				.userLoc(addr.getAddress())
-				.userSepLoc(addr.getDetailAddress())
-				.userTel(user.getUserPhone())
-				.build();
+		return UserInfoDTO.builder().userLoc(addr.getAddress()).userSepLoc(addr.getDetailAddress())
+				.userTel(user.getUserPhone()).build();
 	}
 
 	public String getCartStore(UUID cartUUID) {
@@ -192,26 +204,26 @@ public class PaymentService {
 //	        return "<pre>토스 결제 승인 에러:\n" + e.getResponseBodyAsString() + "</pre>";
 //	    }
 //	}
-	
+
 	@Transactional
-	public String tryOndalPay(UUID cartUUID , String reqDel , String reqStore,int totalPrice) {
-		
+	public String tryOndalPay(UUID cartUUID, String reqDel, String reqStore, int totalPrice) {
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
 		if (auth != null && auth.isAuthenticated()) {
-		    Object principal = auth.getPrincipal();
+			Object principal = auth.getPrincipal();
 
-		    if (principal instanceof CustomUserDetails userDetails) {
-		        User user = userDetails.getUser();
-		        User nowUser = userRepository.getById(user.getUserUuid());
-			    Optional<Cart> optCart = cartRepository.findByUser(nowUser);
-			    Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
-			    int deliveryFee = cart.getStore().getDeliveryFee();
-			    int ondalPay = nowUser.getOndalPay();
-			    if(totalPrice>ondalPay) {
-			    	return "잔액이 부족합니다\n현재 잔액:"+ondalPay+":@:실패";
-			    }else {
-			    	int nowOndalPay = ondalPay-totalPrice;
+			if (principal instanceof CustomUserDetails userDetails) {
+				User user = userDetails.getUser();
+				User nowUser = userRepository.getById(user.getUserUuid());
+				Optional<Cart> optCart = cartRepository.findByUser(nowUser);
+				Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("카트 없음"));
+				int deliveryFee = cart.getStore().getDeliveryFee();
+				int ondalPay = nowUser.getOndalPay();
+				if (totalPrice > ondalPay) {
+					return "잔액이 부족합니다\n현재 잔액:" + ondalPay + ":@:실패";
+				} else {
+					int nowOndalPay = ondalPay - totalPrice;
 					List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
 					for (CartItems cartItem : cart.getCartItems()) {
 						OrderDetail orderDetail = new OrderDetail();
@@ -241,59 +253,47 @@ public class PaymentService {
 					payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
 					payment.setPaymentStatus(PaymentStatus.COMPLETED);
 					payment.setPaymentMethod(Payment.PaymentMethod.ONDALPAY);
-			    	paymentRepository.save(payment);
-					
-					
-					Order order = Order.builder().store(cart.getStore()).user(cart.getUser())
-								.totalPrice(totalPrice)
-								.storeRequest(reqStore)
-								.deliveryRequest(reqDel).orderDetails(orderDetailList)
-								.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
-								.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
-								.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
-								.orderToUser(OrderToUser.PENDING)
-								.orderToOwner(OrderToOwner.PENDING)
-								.deliveryFee(deliveryFee)
-								.build();
-					
-			    	payment.setOrder(order);
+					paymentRepository.save(payment);
+
+					Order order = Order.builder().store(cart.getStore()).user(cart.getUser()).totalPrice(totalPrice)
+							.storeRequest(reqStore).deliveryRequest(reqDel).orderDetails(orderDetailList)
+							.deliveryAddress(user.getUserSelectedAddress().getAddress() + " "
+									+ user.getUserSelectedAddress().getDetailAddress())
+							.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
+							.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
+							.orderToUser(OrderToUser.PENDING).orderToOwner(OrderToOwner.PENDING)
+							.deliveryFee(deliveryFee).build();
+
+					payment.setOrder(order);
 					for (OrderDetail od : order.getOrderDetails()) {
 						od.setOrder(order);
 					}
-			    	orderRepository.save(order);
-			    	user.setOndalPay(nowOndalPay);
-			    	userRepository.save(user);
-			    	cartRepository.deleteById(cartUUID);
-			    	OrderResponseDto orderResponseDto = OrderResponseDto.from(order);
-			    	UUID storeId = cart.getStore().getStoreId(); // 또는 적절한 store UUID 참조
+					orderRepository.save(order);
+					user.setOndalPay(nowOndalPay);
+					userRepository.save(user);
+					cartRepository.deleteById(cartUUID);
+					OrderResponseDto orderResponseDto = OrderResponseDto.from(order);
+					UUID storeId = cart.getStore().getStoreId(); // 또는 적절한 store UUID 참조
 
-			    	
-			    	Owner owner = order.getStore().getOwner();
-			    	owner.setOwnerWallet(owner.getOwnerWallet()+(totalPrice-deliveryFee));
-			    	ownerRepository.save(owner);
-			    	
-			    	
-			    	
-			    	// WebSocket 전송
-			    	simpMessagingTemplate.convertAndSend("/topic/store/" + storeId, orderResponseDto);
-			    	return nowOndalPay + ":@:" + order.getOrderId() + ":@:성공";
-			    }
-			    
-		        
-		        
-		    }
-		    return "유저가 비회원임:@:실패";
-		    
-		}else {
+					Owner owner = order.getStore().getOwner();
+					owner.setOwnerWallet(owner.getOwnerWallet() + (totalPrice - deliveryFee));
+					ownerRepository.save(owner);
+
+					// WebSocket 전송
+					simpMessagingTemplate.convertAndSend("/topic/store/" + storeId, orderResponseDto);
+					return nowOndalPay + ":@:" + order.getOrderId() + ":@:성공";
+				}
+
+			}
+			return "유저가 비회원임:@:실패";
+
+		} else {
 			return "유저가 없음:@:실패";
-			
+
 		}
-		
-	}	
-	
-	
-	
-	
+
+	}
+
 	@Transactional
 	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";
@@ -350,7 +350,7 @@ public class PaymentService {
 				orderDetail.setOptionNames(cartItem.getOptionsAsList());
 				List<Integer> ciop = new ArrayList<Integer>();
 				List<String> cion = new ArrayList<String>();
-				
+
 				for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
 					ciop.add(cartItemOption.getOptionPrice());
 					cion.add(cartItemOption.getOptionName());
@@ -384,7 +384,8 @@ public class PaymentService {
 						.totalPrice(tossResponse.getTotalAmount())
 						.storeRequest(tossResponse.getMetadata().getReqStore())
 						.deliveryRequest(tossResponse.getMetadata().getReqDel()).orderDetails(orderDetailList)
-						.deliveryAddress(user.getUserSelectedAddress().getAddress()+" "+user.getUserSelectedAddress().getDetailAddress())
+						.deliveryAddress(user.getUserSelectedAddress().getAddress() + " "
+								+ user.getUserSelectedAddress().getDetailAddress())
 						.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 						.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
 						.orderToOwner(OrderToOwner.PENDING).build();
@@ -415,192 +416,189 @@ public class PaymentService {
 
 	@Transactional
 	public void confirmOndalWalletCharge(String paymentKey, String orderId, int amount, UUID userUUID) {
-	    String url = "https://api.tosspayments.com/v1/payments/confirm";
+		String url = "https://api.tosspayments.com/v1/payments/confirm";
 
-	    Map<String, Object> requestBody = new HashMap<>();
-	    requestBody.put("paymentKey", paymentKey);
-	    requestBody.put("orderId", orderId);
-	    requestBody.put("amount", amount); // 정확한 금액 확인
+		Map<String, Object> requestBody = new HashMap<>();
+		requestBody.put("paymentKey", paymentKey);
+		requestBody.put("orderId", orderId);
+		requestBody.put("amount", amount); // 정확한 금액 확인
 
-	    String encodedKey = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+		String encodedKey = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
 
-	    HttpHeaders headers = new HttpHeaders();
-	    headers.setContentType(MediaType.APPLICATION_JSON);
-	    headers.set("Authorization", "Basic " + encodedKey);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("Authorization", "Basic " + encodedKey);
 
-	    HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-	    RestTemplate restTemplate = new RestTemplate();
+		HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+		RestTemplate restTemplate = new RestTemplate();
 
-	    try {
-	        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+		try {
+			ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 
-	        if (!response.getStatusCode().is2xxSuccessful()) {
-	            throw new IllegalStateException("결제 승인 실패: " + response.getBody());
-	        }
+			if (!response.getStatusCode().is2xxSuccessful()) {
+				throw new IllegalStateException("결제 승인 실패: " + response.getBody());
+			}
 
-	        // 응답 처리
-	        ObjectMapper objectMapper = new ObjectMapper();
-	        objectMapper.registerModule(new JavaTimeModule());
-	        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	        TossPaymentResponse tossResponse = objectMapper.readValue(response.getBody(), TossPaymentResponse.class);
+			// 응답 처리
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.registerModule(new JavaTimeModule());
+			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			TossPaymentResponse tossResponse = objectMapper.readValue(response.getBody(), TossPaymentResponse.class);
 
-	        User user = userRepository.findById(userUUID)
-	                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+			User user = userRepository.findById(userUUID)
+					.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-	        // 결제 방식 설정
-	        PaymentMethod method = tossResponse.getMethod().equals("카드") ? Payment.PaymentMethod.CREDIT
-	                : Payment.PaymentMethod.CASH;
+			// 결제 방식 설정
+			PaymentMethod method = tossResponse.getMethod().equals("카드") ? Payment.PaymentMethod.CREDIT
+					: Payment.PaymentMethod.CASH;
 
-	        // Payment 엔티티 저장
-	        Payment payment = Payment.builder()
-	                .user(user)
-	                .order(null) // 지갑 충전
-	                .paymentKey(tossResponse.getPaymentKey())
-	                .tossOrderId(tossResponse.getOrderId())
-	                .paymentMethod(method)
-	                .amount(tossResponse.getTotalAmount())
-	                .paymentUsageType(Payment.PaymentUsageType.ONDAL_WALLET)
-	                .paymentStatus(Payment.PaymentStatus.COMPLETED)
-	                .refundReason(null)
-	                .build();
+			// Payment 엔티티 저장
+			Payment payment = Payment.builder().user(user).order(null) // 지갑 충전
+					.paymentKey(tossResponse.getPaymentKey()).tossOrderId(tossResponse.getOrderId())
+					.paymentMethod(method).amount(tossResponse.getTotalAmount())
+					.paymentUsageType(Payment.PaymentUsageType.ONDAL_WALLET)
+					.paymentStatus(Payment.PaymentStatus.COMPLETED).refundReason(null).build();
 
-	        payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
-	        payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
+			payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
+			payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
 
-	        // 결제 방식에 따라 설정
-	        switch (tossResponse.getStatus()) {
-	            case "카드":
-	                payment.setPaymentMethod(Payment.PaymentMethod.CREDIT);
-	                break;
-	            default:
-	                payment.setPaymentMethod(Payment.PaymentMethod.CASH);
-	                break;
-	        }
+			// 결제 방식에 따라 설정
+			switch (tossResponse.getStatus()) {
+			case "카드":
+				payment.setPaymentMethod(Payment.PaymentMethod.CREDIT);
+				break;
+			default:
+				payment.setPaymentMethod(Payment.PaymentMethod.CASH);
+				break;
+			}
 
-	        paymentRepository.save(payment);
+			paymentRepository.save(payment);
 
-	        // 온달 지갑 충전
-	        user.setOndalWallet(user.getOndalWallet() + tossResponse.getTotalAmount());
-	        userRepository.save(user);
+			// 온달 지갑 충전
+			user.setOndalWallet(user.getOndalWallet() + tossResponse.getTotalAmount());
+			userRepository.save(user);
 
-	    } catch (HttpClientErrorException e) {
-	        // Toss 응답에서 오류 코드와 메시지 추출
-	        String errorJson = e.getResponseBodyAsString();
-	        ObjectMapper mapper = new ObjectMapper();
-	        String failCode = null;
-	        String failMessage = null;
+		} catch (HttpClientErrorException e) {
+			// Toss 응답에서 오류 코드와 메시지 추출
+			String errorJson = e.getResponseBodyAsString();
+			ObjectMapper mapper = new ObjectMapper();
+			String failCode = null;
+			String failMessage = null;
 
-	        try {
-	            JsonNode errorNode = mapper.readTree(errorJson);
-	            failCode = errorNode.get("code").asText();
-	            failMessage = errorNode.get("message").asText();
+			try {
+				JsonNode errorNode = mapper.readTree(errorJson);
+				failCode = errorNode.get("code").asText();
+				failMessage = errorNode.get("message").asText();
 
-	            // 실패 로그 기록
-	            paymentFailLogService.logWalletPaymentFailure(paymentKey, orderId, failCode, failMessage, userUUID);
-	            System.out.println("failCode :" + failCode);
-	            System.out.println("failMessage :" + failMessage);
-	         // 결제 승인 에러
-		        throw new IllegalArgumentException("토스 결제 승인 에러: " + e.getResponseBodyAsString(), e);
-	        } catch (JsonProcessingException parseEx) {
-	            failCode = "UNKNOWN_ERROR";
-	            failMessage = "응답 파싱 실패";
-	            // 파싱 실패 시 기본 메시지라도 기록
-	            paymentFailLogService.logWalletPaymentFailure(paymentKey, orderId, failCode, failMessage, userUUID);
-	        }
+				// 실패 로그 기록
+				paymentFailLogService.logWalletPaymentFailure(paymentKey, orderId, failCode, failMessage, userUUID);
+				System.out.println("failCode :" + failCode);
+				System.out.println("failMessage :" + failMessage);
+				// 결제 승인 에러
+				throw new IllegalArgumentException("토스 결제 승인 에러: " + e.getResponseBodyAsString(), e);
+			} catch (JsonProcessingException parseEx) {
+				failCode = "UNKNOWN_ERROR";
+				failMessage = "응답 파싱 실패";
+				// 파싱 실패 시 기본 메시지라도 기록
+				paymentFailLogService.logWalletPaymentFailure(paymentKey, orderId, failCode, failMessage, userUUID);
+			}
 
-	    } catch (JsonProcessingException e) {
-	        // JSON 파싱 실패 처리
-	        throw new IllegalStateException("토스 응답 파싱 실패", e);
-	    
+		} catch (JsonProcessingException e) {
+			// JSON 파싱 실패 처리
+			throw new IllegalStateException("토스 응답 파싱 실패", e);
+
+		}
+
 	}
 
-	}	
 	@Transactional
 	public void refundTossPayment(String paymentKey, String cancelReason, UUID userUuid) {
-	    Payment payment = paymentRepository.findByPaymentKey(paymentKey)
-	        .orElseThrow(() -> new IllegalArgumentException("해당 결제 정보를 찾을 수 없습니다."));
+		Payment payment = paymentRepository.findByPaymentKey(paymentKey)
+				.orElseThrow(() -> new IllegalArgumentException("해당 결제 정보를 찾을 수 없습니다."));
 
-	    // 온달 지갑 환불 시 잔액 체크 (환불 요청 전)
-	    if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
-	        User user = userRepository.findByUserUuid(userUuid)
-	            .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+		// 온달 지갑 환불 시 잔액 체크 (환불 요청 전)
+		if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
+			User user = userRepository.findByUserUuid(userUuid)
+					.orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-	        int newBalance = user.getOndalWallet() - payment.getAmount();
-	        if (newBalance < 0) throw new IllegalStateException("잔액 부족하여 환불을 진행할 수 없습니다.");
-	    }
+			int newBalance = user.getOndalWallet() - payment.getAmount();
+			if (newBalance < 0)
+				throw new IllegalStateException("잔액 부족하여 환불을 진행할 수 없습니다.");
+		}
 
-	    String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
+		String url = "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel";
 
-	    HttpHeaders headers = new HttpHeaders();
-	    headers.setContentType(MediaType.APPLICATION_JSON);
-	    String encodedAuth = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
-	    headers.set("Authorization", "Basic " + encodedAuth);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String encodedAuth = Base64.getEncoder().encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+		headers.set("Authorization", "Basic " + encodedAuth);
 
-	    Map<String, String> body = new HashMap<>();
-	    body.put("cancelReason", cancelReason);
+		Map<String, String> body = new HashMap<>();
+		body.put("cancelReason", cancelReason);
 
-	    HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-	    RestTemplate restTemplate = new RestTemplate();
+		HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+		RestTemplate restTemplate = new RestTemplate();
 
-	    ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+		ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
-	    ObjectMapper om = new ObjectMapper();
-	    om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		ObjectMapper om = new ObjectMapper();
+		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-	    try {
-	        TossRefundResponse tossRefundResponse = om.readValue(response.getBody(), TossRefundResponse.class);
+		try {
+			TossRefundResponse tossRefundResponse = om.readValue(response.getBody(), TossRefundResponse.class);
 
-	        // 환불 사유 저장
-	        payment.setRefundReason(cancelReason);
+			// 환불 사유 저장
+			payment.setRefundReason(cancelReason);
 
-	        switch (tossRefundResponse.getStatus()) {
-	            case "COMPLETED":
-	                payment.setPaymentStatus(Payment.PaymentStatus.COMPLETED);
-	                break;
+			switch (tossRefundResponse.getStatus()) {
+			case "COMPLETED":
+				payment.setPaymentStatus(Payment.PaymentStatus.COMPLETED);
+				break;
 
-	            case "PENDING":
-	                payment.setPaymentStatus(Payment.PaymentStatus.WAITING_FOR_REFUND);
-	                break;
+			case "PENDING":
+				payment.setPaymentStatus(Payment.PaymentStatus.WAITING_FOR_REFUND);
+				break;
 
-	            case "CANCELED":
-	                payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
+			case "CANCELED":
+				payment.setPaymentStatus(Payment.PaymentStatus.REFUNDED);
 
-	                // 온달 지갑 환불 차감 처리
-	                if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
-	                    User user = userRepository.findByUserUuid(userUuid)
-	                        .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+				// 온달 지갑 환불 차감 처리
+				if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ONDAL_WALLET) {
+					User user = userRepository.findByUserUuid(userUuid)
+							.orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-	                    int newBalance = user.getOndalWallet() - payment.getAmount();
-	                    user.setOndalWallet(newBalance);
-	                    userRepository.save(user); // 변경 사항 저장
-	                }
-	                // 주문 결제 환불일 경우 Order의 orderToOwner 상태 변경
-	                if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ORDER_PAYMENT) {
-	                    Order order = payment.getOrder();
-	                    if (order != null) {
-	                        order.setOrderToOwner(Order.OrderToOwner.CANCELED);
-	                        orderRepository.save(order);
-	                    } else {
-	                        throw new IllegalStateException("해당 결제에 연결된 주문이 없습니다.");
-	                    }
-	                }
-	                break;
-	            default:
-	                System.out.println("알 수 없는 상태: " + tossRefundResponse.getStatus());
-	                break;
-	        }
+					int newBalance = user.getOndalWallet() - payment.getAmount();
+					user.setOndalWallet(newBalance);
+					userRepository.save(user); // 변경 사항 저장
+				}
+				// 주문 결제 환불일 경우 Order의 orderToOwner 상태 변경
+				if (payment.getPaymentUsageType() == Payment.PaymentUsageType.ORDER_PAYMENT) {
+					Order order = payment.getOrder();
+					if (order != null) {
+						order.setOrderToOwner(Order.OrderToOwner.CANCELED);
+						orderRepository.save(order);
+					} else {
+						throw new IllegalStateException("해당 결제에 연결된 주문이 없습니다.");
+					}
+				}
+				break;
+			default:
+				System.out.println("알 수 없는 상태: " + tossRefundResponse.getStatus());
+				break;
+			}
 
-	        paymentRepository.save(payment); // 상태 및 환불 사유 저장
+			paymentRepository.save(payment); // 상태 및 환불 사유 저장
 
-	    } catch (JsonProcessingException e) {
-	        throw new RuntimeException("환불 응답 파싱 오류", e);
-	    }
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("환불 응답 파싱 오류", e);
+		}
 
-	    System.out.println("환불 응답: " + response.getBody());
+		System.out.println("환불 응답: " + response.getBody());
 	}
 
 	@Transactional
 	public void tryRefundOndalPay(String tossOrderId, String cancelReason, UUID userUUID) {
+
 	    // 1. 결제 정보 조회
 	    Payment payment = paymentRepository.findByTossOrderId(tossOrderId)
 	        .orElseThrow(() -> new IllegalArgumentException("해당 tossOrderId의 결제 내역을 찾을 수 없습니다."));
@@ -684,12 +682,7 @@ public class PaymentService {
 	    	userRepository.flush();
 			
 		}
-	    
-	    
-	    
+
 	}
 
-	
-	
-	    
 }

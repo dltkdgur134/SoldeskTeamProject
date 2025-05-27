@@ -47,11 +47,10 @@ public class CartController {
 
 	@GetMapping
 	public String viewCart(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-	    UUID userUuid = userDetails.getUser().getUserUuid();
-	    User user = userService.findUserByUuid(userUuid)
-	            .orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다."));
-
-		// ✅ 기존 Cart 확인 후 localStorage에 저장할 데이터 반환 후 삭제
+		UUID userUuid = userDetails.getUser().getUserUuid();
+		User user = userService.findUserByUuid(userUuid)
+				.orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다."));
+		// 기존 Cart 확인 후 localStorage에 저장할 데이터 반환 후 삭제
 		Optional<Cart> optionalCart = cartRepository.findByUser(user)
 				.filter(cart -> cart.getStatus() == CartStatus.PENDING || cart.getStatus() == CartStatus.CANCELED);
 		if (optionalCart.isPresent()) {
@@ -79,7 +78,9 @@ public class CartController {
 
 			cartRepository.delete(cart);
 		}
-	    Cart cart = cartService.getCartByUser(user);
+
+		return "content/cart";
+/*	    Cart cart = cartService.getCartByUser(user);
 	    List<CartItems> cartItems = cart.getCartItems();
 
 	    if (cartItems.isEmpty()) {
@@ -108,7 +109,7 @@ public class CartController {
 	    model.addAttribute("deliveryFee", deliveryFee);
 	    model.addAttribute("totalPrice", totalPrice); // 💡 프론트에 결제금액으로 전달
 
-	    return "content/cart";
+	    return "content/cart";*/
 	}
 
 	@GetMapping("/api/cart-item/options")
@@ -185,48 +186,56 @@ public class CartController {
 	@GetMapping("/api/restore")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> restoreCart(@RequestParam UUID userUuid) {
-		User user = userService.findUserByUuid(userUuid)
-			.orElseThrow(() -> new IllegalArgumentException("유저 없음"));
-
-		Optional<Cart> optionalCart = cartService.findLatestCartByUser(user);
-		if (optionalCart.isEmpty()) {
-			return ResponseEntity.ok(Map.of("restored", false));
-		}
-
-		Cart cart = optionalCart.get();
-
-		if (cart.getStatus() != CartStatus.PENDING && cart.getStatus() != CartStatus.CANCELED) {
-			return ResponseEntity.ok(Map.of("restored", false));
-		}
-
-		List<Map<String, Object>> restoredItems = cart.getCartItems().stream().map(item -> {
-			Map<String, Object> menuData = new HashMap<>();
-			menuData.put("menuId", item.getMenu().getMenuId());
-			menuData.put("storeId", cart.getStore().getStoreId());
-			menuData.put("menuName", item.getMenu().getMenuName());
-			menuData.put("menuImage", item.getMenu().getMenuImg());
-			menuData.put("price", item.getMenu().getPrice());
-			menuData.put("quantity", item.getQuantity());
-
-			List<Map<String, Object>> options = item.getCartItemOptions().stream().map(opt -> {
-				Map<String, Object> optMap = new HashMap<>();
-				optMap.put("groupName", opt.getGroupName());
-				optMap.put("name", opt.getOptionName());
-				optMap.put("price", opt.getOptionPrice());
-				optMap.put("selected", true);
-				return optMap;
+		try {
+			User user = userService.findUserByUuid(userUuid)
+					.orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+			
+			Optional<Cart> optionalCart = cartService.findLatestCartByUser(user);
+			if (optionalCart.isEmpty()) {
+				return ResponseEntity.ok(Map.of("restored", false));
+			}
+			
+			Cart cart = optionalCart.get();
+			
+			if (cart.getStatus() != CartStatus.PENDING && cart.getStatus() != CartStatus.CANCELED) {
+				return ResponseEntity.ok(Map.of("restored", false));
+			}
+			
+			List<Map<String, Object>> restoredItems = cart.getCartItems().stream().map(item -> {
+				Map<String, Object> menuData = new HashMap<>();
+				menuData.put("menuId", item.getMenu().getMenuId());
+				menuData.put("storeId", cart.getStore().getStoreId());
+				menuData.put("menuName", item.getMenu().getMenuName());
+				menuData.put("menuImage", item.getMenu().getMenuImg());
+				menuData.put("price", item.getMenu().getPrice());
+				menuData.put("quantity", item.getQuantity());
+				
+				List<Map<String, Object>> options = item.getCartItemOptions().stream().map(opt -> {
+					Map<String, Object> optMap = new HashMap<>();
+					optMap.put("groupName", opt.getGroupName());
+					optMap.put("name", opt.getOptionName());
+					optMap.put("price", opt.getOptionPrice());
+					optMap.put("selected", true);
+					return optMap;
+				}).collect(Collectors.toList());
+				
+				menuData.put("options", options);
+				return menuData;
 			}).collect(Collectors.toList());
-
-			menuData.put("options", options);
-			return menuData;
-		}).collect(Collectors.toList());
-
-		// ✅ delete from DB after collecting data
-		cartService.deleteCart(cart);
-
-		return ResponseEntity.ok(Map.of(
-			"restored", true,
-			"cartItems", restoredItems
-		));
+			
+			// delete from DB after collecting data
+			cartService.deleteCart(cart);
+			
+			return ResponseEntity.ok(Map.of(
+					"restored", true,
+					"cartItems", restoredItems
+					));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity
+				.status(500)
+				.body(Map.of("error", "restoreCart 서버 오류: " + e.getMessage()));
+		}
 	}
 }

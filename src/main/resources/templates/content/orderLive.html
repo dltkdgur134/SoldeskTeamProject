@@ -110,7 +110,7 @@
 									<small class="order-detail-small-text" th:text="${item.menuName}"></small>
 								</span> 
 								<span>
-									<small class="order-detail-small-text" th:text="'-' + ${item.menuPrice} + ' 원'"></small>
+									<small class="order-detail-small-text" th:text="': ' + ${item.menuPrice} + ' 원'"></small>
 								</span>
 							</div>
 							<div th:each="option : ${item.options}">
@@ -118,9 +118,6 @@
 								<small class="order-detail-text" th:text="${' - ' + option.value + ' 원'}"></small>
 							</div>
 							<div>
-								<span>
-									<strong class="order-detail-label" th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + ' 원'}"></strong>
-								</span>
 								<span>
 									<small class="order-detail-text" th:text="${item.quantity + '개'}"></small>
 								</span>
@@ -173,11 +170,11 @@
 					<hr>
 					<div class="container d-flex justify-content-between">
 						<span><strong>결제 금액</strong></span>
-						<span><strong th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA') + ' 원'}"></strong></span>
+						<span><strong th:text="${#numbers.formatInteger(order.menuTotalPrice + order.deliveryFee, 3, 'COMMA') + ' 원'}"></strong></span>
 					</div>
 					<div class="container d-flex justify-content-between">
 						<span><strong class="order-detail-sublabel">메뉴 금액</strong></span>
-						<span><small class="order-detail-text" th:text="${#numbers.formatInteger(order.menuTotalPrice, 3, 'COMMA') + ' 원'}"></small></span>
+						<span><small class="order-detail-text" th:text="${#numbers.formatInteger(order.menuTotalPrice - order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
 					</div>
 					<div class="container d-flex justify-content-between">
 						<span><strong class="order-detail-sublabel">배달팁</strong></span>
@@ -213,9 +210,12 @@
   </div>
   <script th:src="@{/js/orderLive.js}"></script>
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
   <input type="hidden" th:value="${orderId}" id ="orderIdInput">
 =======
 >>>>>>> bbc7eb4f7a5eb57cc485b05fd933bb852133cfdc
+>>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 </section>
 </body>
 </html>

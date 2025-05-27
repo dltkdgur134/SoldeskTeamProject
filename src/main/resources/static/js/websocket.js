@@ -3,6 +3,10 @@ let stompClient = null;
 const currentOrderIds = new Set();
 
 /* ─────────────────────────────── WebSocket 연결 ────────────────────────────── */
+<<<<<<< HEAD
+
+=======
+>>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 function connectGlobalWebSocket() {
 	const userUuid = document.body.dataset.userid;
 	if (!userUuid) return console.warn('userId 없음, WS 미연결');
@@ -13,7 +17,10 @@ function connectGlobalWebSocket() {
 	const onConnected = frame => {
 		console.log('🌐 connected:', frame.headers);
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
 		/* 로그인 직후 서버에 “진행 중 주문 목록” 요청 */
 		fetch('/user/order/active-ids')
 			.then(r => {
@@ -190,4 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.getElementById('sendChatBtn')?.addEventListener('click', sendChat);
 	document.getElementById('chatInput')?.addEventListener('keypress',
 		e => e.key === 'Enter' && sendChat());
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 03d6d967cfc3b6a30349ad61624e4f1291e9d9c8
