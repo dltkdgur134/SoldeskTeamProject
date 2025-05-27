@@ -164,6 +164,23 @@ public class ComplainController {
             return "redirect:/complains";
         }
     }
+    @PostMapping("/complains/{id}/checkRepliedPassword")
+    public String checkRepliedPassword(
+    		@PathVariable("id") UUID id,
+    		@RequestParam(name = "password") String password,
+    		
+    		RedirectAttributes redirectAttributes
+    		) {
+    	boolean isValid = complainService.checkPassword(id, password);
+    	if (isValid) {
+    		// 비밀번호 맞으면 상세 페이지로 이동
+    		return "redirect:/complains/complainReply" + id + "?password=" + password;
+    	} else {
+    		// 틀리면 에러 메시지 넣고 리스트 페이지로
+    		redirectAttributes.addFlashAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
+    		return "redirect:/complains/complainReply";
+    	}
+    }
     
     @GetMapping("/complains/complainReply/{id}")
     public String viewDetail(@PathVariable("id") UUID id, Model model) {
