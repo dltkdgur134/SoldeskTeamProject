@@ -119,13 +119,5 @@ public class CartService {
 		cartItemsRepository.deleteAllByCart(cart);
 		cartRepository.delete(cart);
 	}
-
-	public Cart getCartByUser(User user) {
-		Optional<Cart> cart = cartRepository.findByUser(user);
-		
-		
-		return cart.get();
-	}
 	
 }
-

@@ -146,6 +146,7 @@ public class OrderService {
         order.setOrderToUser(OrderToUser.COOKING);
         order.setExpectCookingTime(LocalTime.of(0, 0).plusMinutes(completionTime));
         order.setCookingStartTime(LocalDateTime.now());
+        store.setLastOrderDate(LocalDateTime.now());
         Order savedOrder = orderRepository.save(order);
         messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
 

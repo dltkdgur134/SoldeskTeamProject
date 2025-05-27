@@ -436,7 +436,6 @@ function updateOrderStatus(orderId, url) {
 		}
 	});
 }
-
 //Web Socket Connect
 function connect() {
 	const socket = new SockJS('/stomp');
