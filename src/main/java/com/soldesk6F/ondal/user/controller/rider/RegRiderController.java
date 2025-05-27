@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,7 @@ import com.soldesk6F.ondal.user.service.UserRoleService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/rider")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class RegRiderController {
 
@@ -37,7 +38,7 @@ public class RegRiderController {
     private final UserRoleService userRoleService;
     private final RiderManagementService riderManagementService;
 
-    @GetMapping("/register")
+    @GetMapping("/user/riderRegister")
     public String showRiderRegistrationForm(@AuthenticationPrincipal CustomUserDetails userDetails,
     		RedirectAttributes redirectAttributes) {
         String userId = userDetails.getUser().getUserId();
@@ -50,11 +51,12 @@ public class RegRiderController {
         return "content/rider/riderRegister";
     }
 
-    @PostMapping("/register")
+    @PostMapping("/user/riderRegister")
     public String registerRider(@AuthenticationPrincipal CustomUserDetails userDetails,
         @ModelAttribute RiderForm riderForm,
         @RequestParam("secondaryPassword") String secondaryPassword,
         @RequestParam("secondaryPasswordConfirm") String secondaryPasswordConfirm,
+        Model model,
         RedirectAttributes redirectAttributes) {
 
         if (!secondaryPassword.equals(secondaryPasswordConfirm)) {
@@ -82,13 +84,17 @@ public class RegRiderController {
         riderManagementService.createInitialRiderManagement(rider);
 
         // 세션 Authentication 갱신
-        CustomUserDetails updatedDetails = new CustomUserDetails(user, UserRole.valueOf(user.getUserRole().name()));
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(
-            updatedDetails, null, updatedDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-        redirectAttributes.addFlashAttribute("riderSuccess", "라이더 등록이 완료되었습니다!");
-        return "redirect:/";
+		/*
+		 * CustomUserDetails updatedDetails = new CustomUserDetails(user,
+		 * UserRole.valueOf(user.getUserRole().name())); Authentication newAuth = new
+		 * UsernamePasswordAuthenticationToken( updatedDetails, null,
+		 * updatedDetails.getAuthorities());
+		 * SecurityContextHolder.getContext().setAuthentication(newAuth);
+		 */
+//        redirectAttributes.addFlashAttribute("riderSuccess", "라이더 등록 신청이 완료되었습니다!");
+        model.addAttribute("riderSuccess", "라이더 등록 신청이 완료되었습니다!");
+        return "content/rider/riderRegister";
+        
     }
 
 }

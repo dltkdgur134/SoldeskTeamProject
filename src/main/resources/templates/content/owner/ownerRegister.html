@@ -19,7 +19,7 @@
 				<div class="error-message" th:if="${error}" th:text="${error}"></div>
 			</div>
 
-			<form th:action="@{/owner/ownerRegGoToStoreReg}" method="post">
+			<form th:action="@{/user/ownerRegGoToStoreReg}" method="post">
 				<div class="form-group">
 					<i class="fa-solid fa-id-card input-icon"></i> <input type="text"
 						name="ownerNickname" placeholder="점주 닉네임" maxlength="10" required>
@@ -35,10 +35,16 @@
 						maxlength="10" required>
 				</div>
 				<div class="form-group">
-					<button class="owner-reg-btn" type="submit">가게등록 하러하기</button>
+					<button class="owner-reg-btn" type="submit">점주 신청 하기</button>
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
+<th:block layout:fragment="js">
+	<script th:if="${ownerSuccess}" th:inline="javascript">
+		alert('[[${ownerSuccess}]]');
+		window.location.href = '/';
+	</script>
+</th:block>
 </html>

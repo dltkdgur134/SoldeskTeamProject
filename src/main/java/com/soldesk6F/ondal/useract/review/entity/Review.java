@@ -52,10 +52,9 @@ public class Review {
 	@JoinColumn(name = "order_id" , nullable = false,unique = true)
 	private Order order;
 	
-	@Column(name = "rating", nullable = false, 
-	columnDefinition = "DECIMAL(2,1) CHECK (rating >= 1.0 AND rating <= 5.0)")
-	@DecimalMin(value = "1.0")
-	@DecimalMax(value = "5.0")
+	@Column(name = "rating", nullable = false)
+	@DecimalMin(value = "1.0", inclusive = true)
+	@DecimalMax(value = "5.0", inclusive = true)
 	private double rating;
 	
 	@Column(name = "review_title" , nullable = false,length = 30)

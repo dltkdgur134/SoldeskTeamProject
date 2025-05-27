@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
+import com.soldesk6F.ondal.useract.complain.dto.ComplainDetailViewDto;
+import com.soldesk6F.ondal.useract.complain.dto.ComplainDetailViewDto.ReplyDto;
 import com.soldesk6F.ondal.useract.complain.dto.ComplainUserDTO;
 import com.soldesk6F.ondal.useract.complain.entity.Complain;
 import com.soldesk6F.ondal.useract.complain.entity.ComplainImg;
@@ -162,5 +164,38 @@ public class ComplainController {
             return "redirect:/complains";
         }
     }
+    
+    @GetMapping("/complains/complainReply/{id}")
+    public String viewDetail(@PathVariable("id") UUID id, Model model) {
+        Complain complain = complainRepository.findById(id).orElseThrow();
+        List<String> complainImgs = complain.getComplainImgs().stream()
+            .map(ComplainImg::getComplainImg).toList();
+
+        List<ReplyDto> replies = complain.getReplies().stream()
+            .map(r -> new ReplyDto(
+                r.getReplyContent(),
+                r.getAdmin().getLoginId(),
+                r.getRepliedDate()))
+            .toList();
+
+        ComplainDetailViewDto dto = new ComplainDetailViewDto(
+            complain.getComplainId(),
+            complain.getComplainTitle(),
+            complain.getComplainContent(),
+            complain.getRole().name(),
+            complain.getCreatedDate(),
+            complain.getComplainStatus().name(),
+            complain.getUser() != null ? complain.getUser().getUserId() : complain.getGuestId(),
+            complainImgs,
+            replies
+        );	
+
+        model.addAttribute("complain", dto);
+        model.addAttribute("complainImgList", dto.complainImgList());
+        model.addAttribute("replyList", dto.replyList());
+        return "content/user/complain/complainDetailWithReply";
+    }
+    
+    
     
 }

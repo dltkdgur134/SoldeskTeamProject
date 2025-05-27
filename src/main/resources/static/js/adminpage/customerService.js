@@ -36,19 +36,23 @@ export function initCustomerService(root) {
   }
 
   /* ===== <tr> ===== */
-  function rowHtml(c,i){
-    const esc=s=>String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-	const map      = {WAIT:'PENDING',IN_PROGRESS:'IN_PROGRESS',RESOLVED:'RESOLVED'};
-    const [cls,st] = STAT[map[c.complainStatus] ?? c.status] ?? STAT.PENDING;
-	const imgIcon  = c.firstImage ? '<i class="bi bi-image text-primary me-1"></i>' : '';
+  function rowHtml(c, i) {
+    const esc = s => String(s).replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
+
+    const map = { WAIT: 'PENDING', IN_PROGRESS: 'IN_PROGRESS', RESOLVED: 'RESOLVED' };
+    const [cls, st] = STAT[map[c.status] ?? c.complainStatus] ?? STAT.PENDING;
+    const imgIcon = c.hasImg ? '<i class="bi bi-image text-primary me-1"></i>' : ''; // ✅ 수정된 부분
+
     return `
-      <tr data-all='${esc(JSON.stringify(c))}'>
-        <td>${i+1+page*size}</td>
+      <tr data-id="${esc(c.id)}">
+        <td>${i + 1 + page * size}</td>
         <td class="text-start">${imgIcon}${esc(c.title)}</td>
         <td>${esc(c.userId)}</td>
-        <td><span class="badge bg-secondary">${ROLE[c.role]??c.role}</span></td>
-        <td>${CAT[c.category]??c.category}</td>
-         <td>${dayjs(c.createdDate).format('YYYY-MM-DD HH:mm')}</td>
+        <td><span class="badge bg-secondary">${ROLE[c.role] ?? c.role}</span></td>
+        <td>${CAT[c.category] ?? c.category}</td>
+        <td>${dayjs(c.createdAt).format('YYYY-MM-DD HH:mm')}</td>
         <td><span class="badge ${cls}">${st}</span></td>
         <td><button class="btn btn-sm btn-outline-primary reply-btn">답변</button></td>
       </tr>`;
@@ -101,22 +105,36 @@ export function initCustomerService(root) {
   const rPrev    = modalEl.querySelector('#replyPreview');
   const rForm    = modalEl.querySelector('#replyForm');
 
-  /* ── 행 클릭 → 모달 열기 ── */
-  tbody.addEventListener('click',e=>{
-    const btn=e.target.closest('.reply-btn'); if(!btn) return;
-    const data = JSON.parse(btn.closest('tr').dataset.all);
+  /* ── 답변 버튼 클릭 시 모달 오픈 + Ajax로 상세 조회 ── */
+  tbody.addEventListener('click', async e => {
+    const btn = e.target.closest('.reply-btn');
+    if (!btn) return;
 
-    mId.value = data.id;
-    mTit.textContent = data.title;
-    mCon.textContent = data.content;
-    mImgs.innerHTML = (data.images?.length)
-      ? data.images.map(src=>`<img src="/uploads/${src}" class="w-25 rounded me-2 mb-2">`).join('')
-      : '<p class="text-muted mb-0">첨부 이미지 없음</p>';
+    const tr = btn.closest('tr');
+    const complainId = tr.dataset.id;
 
-    rText.value='';
-    rInput.value='';
-    rPrev.innerHTML='';
-    modal.show();
+    try {
+      const res = await fetch(`/api/admin/complains/${complainId}`);
+      if (!res.ok) throw new Error('서버 응답 오류');
+      const data = await res.json();
+
+      mId.value = data.complainId;
+      mTit.textContent = data.complainTitle;
+      mCon.textContent = data.complainContent;
+
+      mImgs.innerHTML = data.images?.length
+        ? data.images.map(src => `<img src="/img/complain/${src}" class="w-25 rounded me-2 mb-2">`).join('')
+        : '<p class="text-muted mb-0">첨부 이미지 없음</p>';
+
+      rText.value = '';
+      rInput.value = '';
+      rPrev.innerHTML = '';
+      modal.show();
+
+    } catch (err) {
+      console.error(err);
+      alert('문의 상세를 불러오지 못했습니다.');
+    }
   });
 
   /* ── 답변 이미지 프리뷰 ── */
