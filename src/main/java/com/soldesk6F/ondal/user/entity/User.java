@@ -48,6 +48,7 @@ public class User {
 
 	@OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
 	private Owner owner;
+	
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
