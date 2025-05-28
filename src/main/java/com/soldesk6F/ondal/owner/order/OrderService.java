@@ -377,6 +377,7 @@ public class OrderService {
 		dto.setOrderDate(order.getOrderTime());
 		LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
 		int menuTotalPrice = 0;
+		int discountAmount = 1000; 
 		for (OrderDetail orderDetails : order.getOrderDetails()) {
 			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
 			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
@@ -398,7 +399,7 @@ public class OrderService {
 		dto.setMenuItems(menuItems);
 		dto.setTotalPrice(order.getTotalPrice());
 		dto.setDeliveryFee(order.getDeliveryFee());
-		dto.setMenuTotalPrice(menuTotalPrice);
+		dto.setMenuTotalPrice(menuTotalPrice - discountAmount);
 		
 		Optional<Payment> payment = paymentRepository.findByOrder(order);
 		if (payment.isEmpty() || payment.get() == null) {
@@ -428,6 +429,7 @@ public class OrderService {
     	
     	LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
 		int menuTotalPrice = 0;
+		int discountAmount = 1000; 
 		for (OrderDetail orderDetails : order.getOrderDetails()) {
 			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
 			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
@@ -449,7 +451,7 @@ public class OrderService {
 		dto.setMenuItems(menuItems);
 		dto.setMenuTotalPrice(menuTotalPrice);
 		
-    	dto.setTotalPrice(order.getTotalPrice());
+    	dto.setTotalPrice(order.getTotalPrice() - discountAmount);
     	dto.setDeliveryFee(order.getDeliveryFee());
     	
     	Optional<Payment> payment = paymentRepository.findByOrder(order);

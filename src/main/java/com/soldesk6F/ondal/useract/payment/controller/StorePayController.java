@@ -20,6 +20,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.service.CartService;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
+import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.service.PaymentFailLogService;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 
@@ -70,7 +71,9 @@ public class StorePayController {
 		    @RequestParam("amount") int amount,Model model) {
 		
 			if(paymentService.confirmPayment(paymentKey, orderId, amount)) {
-				return "/content/index";
+				String nowOrderId = paymentService.findOrder(paymentKey);
+				
+				return "redirect:/user/order/" + nowOrderId;
 			}else {
 				return "/content/errorPage";
 			}

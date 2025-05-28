@@ -78,6 +78,11 @@ public class PaymentService {
 	@Value("${toss.secret-key}")
 	private String tossSecretKey;
 
+	public String findOrder(String PaymentKey) {
+		Optional<Payment> payment = paymentRepository.findByPaymentKey(PaymentKey);
+		String orderId = payment.get().getOrder().getOrderId().toString();
+		return orderId;
+	}
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -297,7 +302,6 @@ public class PaymentService {
 	@Transactional
 	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";
-
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("paymentKey", paymentKey);
 		requestBody.put("orderId", orderId);
@@ -388,7 +392,10 @@ public class PaymentService {
 								+ user.getUserSelectedAddress().getDetailAddress())
 						.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
 						.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
-						.orderToOwner(OrderToOwner.PENDING).build();
+						.orderToOwner(OrderToOwner.PENDING)
+						.orderToUser(OrderToUser.PENDING)
+						.deliveryFee(cart.getStore().getDeliveryFee())
+						.build();
 				break;
 			case "READY":
 			case "IN_PROGRESS":
@@ -404,16 +411,24 @@ public class PaymentService {
 			}
 			payment.setOrder(order);
 			orderRepository.save(order);
+			orderRepository.flush();
 			paymentRepository.save(payment);
 			cartItemsRepository.deleteByCart_cartId(cartUUID);
 			cartRepository.deleteById(cartUUID);
-
 			return true;
 		} catch (HttpClientErrorException e) {
 			return false;
 		}
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
 	@Transactional
 	public void confirmOndalWalletCharge(String paymentKey, String orderId, int amount, UUID userUUID) {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";

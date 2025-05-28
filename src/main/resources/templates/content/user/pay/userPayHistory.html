@@ -47,11 +47,11 @@
                 <tr th:each="payment : ${payHistoryList}"
                     th:data-status="${payment.paymentStatus}"
                     th:data-usage="${payment.paymentUsageType != null ? payment.paymentUsageType.name() : 'UNKNOWN'}"
-                    th:data-requested="${payment.requestedAt}">
+                    th:data-requested="${payment.paymentTime}">
                     <td th:text="${payment.paymentMethod}">CARD</td>
                     <td th:text="${#numbers.formatInteger(payment.amount, 3, 'COMMA') + '원'}">10,000원</td>
-                    <td th:text="${#temporals.format(payment.requestedAt, 'yyyy-MM-dd HH:mm')}">2025-05-14 13:00</td>
-                    <td th:text="${payment.approvedAt != null ? #temporals.format(payment.approvedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                    <td th:text="${#temporals.format(payment.paymentTime, 'yyyy-MM-dd HH:mm')}">2025-05-14 13:00</td>
+                    <td th:text="${payment.updatedDate != null ? #temporals.format(payment.updatedDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
                     <td th:text="${payment.paymentStatus}">COMPLETED</td>
                     <td th:text="${payment.paymentUsageType != null ? payment.paymentUsageType.description : '-'}">온달 지갑 충전</td>
     				<td>
