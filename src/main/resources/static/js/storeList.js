@@ -1,11 +1,3 @@
-$(function () {
-  $(".nav-item > .active").css("color", "red");
-  $(".nav-link").on("click", function () {
-    $(".nav-link").removeClass("active").css("color", "#ffc107");
-    $(this).addClass("active").css("color", "red");
-  });
-});
-
 /* ───────────────────────────────  검색 로직  ─────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
 	var flashDurationInSeconds = 5;
@@ -24,11 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	var borderSearchDiv = document.getElementById('search-box');
     var activeIndex = -1;
 	const authInfo = document.getElementById('authInfo');
-	const modalEl = document.getElementById('addressModal');
-	const modal = new bootstrap.Modal(modalEl);
 
-	const isLogin = authInfo?.dataset.login === 'true';	
+	const isLogin = authInfo?.dataset.login === 'true';
 
+	
+	
+	
 	function showHistory() {
 	const history = loadHistory();
 		clearList();
@@ -38,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	}
 	
-	if(hadAddress()||isLogin){
+	if(hadAddress() || isLogin){
 		activeIndex=-1;
 		showReenterBtn();
 		searchInput.setAttribute("placeholder" , "뭐 먹을까?");
@@ -85,9 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const firstItem = document.querySelector('#list-autocomplete li');
 		saveHistory(query);
 		
-		const encodeQuery = encodeURIComponent(query);
-		const encodeBestMatcher = encodeURIComponent(firstItem);
-		location.href = "/search/storeInRadius?orignal=" + encodeQuery + "&bestMatcher="+encodeBestMatcher;		
+		location.href("/searchStoreInRadius?orignal=" + query + "&bestMatcher="+firstItem );		
 	}
 		
 		clearList();		
@@ -105,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	  hist.forEach(a => {
 		if(a)list.appendChild(createItem(a, /* isHistory */ true))});
 
-	  hist.forEach(a => {if(a)list.appendChild(createItem(a,true))});	
+	  hist.forEach(a => {if(a)list.appendChild(createItem(a,true))});
 
 	  listWrapper.classList.remove('d-none');
 	  listWrapper.classList.add('d-flex');
@@ -169,9 +160,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	  try {
 	    const res = await fetch(`/autocomplete?query=${encodeURIComponent(q)}`);
-
 	    if (!res.ok) throw new Error('Server error');
-	    const data = await res.json();           
+	    const data = await res.json();            // [ "감자탕", "갈비탕", ... ]
 
 	    /* 리스트 갱신 */
 	    clearList();
@@ -237,19 +227,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	
     searchInput.addEventListener('focus', function(){
-		if(isLogin){
-			if(searchInput.value){
-				handleAutocomplete();
-			}else{
-			showHistory();
-			}
-		}else{
 		if(!hadAddress()){
 			showAddrHistory();
 		}else{
 			showHistory();
 		}
-		}
+		
 		borderSearchDiv.classList.add('expand');
 		listWrapper.classList.remove('d-none');
 		listWrapper.classList.add('d-flex');
@@ -266,16 +249,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	reenterBtn.addEventListener('click', function() {
 	  activeIndex = -1;
 	  if(isLogin){
-		modal.show();
-	  }else{
+		
+	  }
 	  sessionStorage.removeItem('address');  
 	  searchInput.value = '';                      // input 필드 초기화
 	  searchInput.setAttribute('placeholder', '배달받을 주소를 입력하세요'); // placeholder 초기화
 	  
 	  reenterBtn.classList.add("d-none");
-		
-	    showAddrHistory();
-	}
+	  showAddrHistory();
+
 	});
 
 
