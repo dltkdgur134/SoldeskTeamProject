@@ -7,10 +7,15 @@
 	<script th:src="@{/js/index.js}"></script>
 	<link th:href="@{/css/index.css}" rel="stylesheet" />
 	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<script th:src="@{/js/zipcode.js}" defer></script>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 
 <div layout:fragment="content">
-<!-- rider 등록 관련 alert  -->
+
+	<div id="authInfo" th:attr="data-login=${#authorization.expression('isAuthenticated()')}"></div>
+	
+	<!-- rider 등록 관련 alert  -->
 	<div th:if="${riderSuccess}" class="alert alert-success" role="alert"
 		style="margin-bottom: 20px;">
 		<span th:text="${riderSuccess}"></span>
@@ -212,6 +217,46 @@ style="height: 10px;">
     			</div>
   			</div>
 		</div>
-	
+		
+		
+		<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-lg mt-5">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="addressModalLabel">주소 등록</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+		      </div>
+		      <div class="modal-body">
+		        <form th:action="@{/content/regAddress}" method="POST" name="regAddressForm"
+		              autocomplete="off" id="reg-address-form">
+		          <div class="input-group mb-3">
+		            <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span> 
+		            <input type="text" class="form-control" name="address" id="userAddress" placeholder="주소" readonly>
+		            <input type="button" onclick="regUserAddress()" value="주소 찾기" class="btn btn-warning">
+		          </div>
+
+		          <div class="input-group mb-3">
+		            <span class="input-group-text"><i class="fa-solid fa-house-user"></i></span> 
+		            <input type="text" class="form-control" name="detailAddress" id="detailAddress" placeholder="상세주소" required>
+		          </div>
+
+
+
+		          <div id="iframe-layer" class="mb-3">
+
+		          </div>
+		        </form>
+		      </div>
+
+		      <div class="modal-footer justify-content-between">
+		        <button type="submit" class="btn btn-primary" form="reg-address-form">확인</button>
+		        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<input type="hidden" name="latitude" class="form-control" id="userAddresslatitude"readonly>
+		<input type="hidden" name="longitude" class="form-control" id="userAddresslongitude"readonly>
+		
 	</div>
 </html>
