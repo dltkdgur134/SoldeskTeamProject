@@ -44,6 +44,8 @@
 .store-category {
   color: #888;
   font-size: 14px;
+  margin: auto;
+  margin-top: 10px;
 }
 
 
@@ -66,4 +68,35 @@
 	cursor: pointer;
 	
 }
+
+.store-row2-wrapper {
+	position: relative;
+}
+
+.store-status-text {
+	color: red;
+	font-size: 14px;
+	text-align: center;
+	width: 100%;
+}
+
+.reapply-btn {
+	position: absolute;
+	bottom: 24px;
+	right: 20px;
+	background-color: #ff9800;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-size: 13px;
+	padding: 6px 12px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: background-color 0.2s;
+}
+
+.reapply-btn:hover {
+	background-color: #e68900;
+}
+
 

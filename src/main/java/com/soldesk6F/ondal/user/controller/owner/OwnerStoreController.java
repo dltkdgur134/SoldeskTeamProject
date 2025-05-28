@@ -33,6 +33,7 @@ import com.soldesk6F.ondal.menu.entity.MenuCategory;
 import com.soldesk6F.ondal.menu.service.MenuCategoryService;
 import com.soldesk6F.ondal.menu.service.MenuService;
 import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.entity.Store.StoreStatus;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.store.service.StoreService;
 import com.soldesk6F.ondal.user.entity.Owner;
@@ -52,6 +53,7 @@ public class OwnerStoreController {
 	private final MenuService menuService;
 	private final MenuCategoryService menuCategoryService;
 	
+	// 점주 가게 리스트 페이지
 	@GetMapping("/ownerStoreList")
 	public String getOwnerStores(@AuthenticationPrincipal CustomUserDetails userDetails, Model model, RedirectAttributes redirectAttributes) {
 
@@ -73,6 +75,7 @@ public class OwnerStoreController {
 		return "content/owner/ownerStoreList";
 	}
 	
+	// 휴대폰 번호 형식 변환 (01012345678 -> 010-1234-5678)
 	private String formatPhoneNumber(String phone) {
 		if (phone == null) return "";
 		phone = phone.replaceAll("[^0-9]", "");
@@ -88,6 +91,7 @@ public class OwnerStoreController {
 		}
 	}
 	
+	// 매장 관리 페이지
 	@GetMapping("/storeManagement/{storeId}")
 	public String manageStore(@PathVariable("storeId") UUID storeId, 
 							@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -102,6 +106,7 @@ public class OwnerStoreController {
 	    return "content/store/storeManagement2";
 	}
 	
+	// 메뉴 정보 수정 페이지
 	@GetMapping("/storeManagement/{storeId}/menu-manage")
 	public String menuManagePage(
 			@PathVariable("storeId") UUID storeId,
@@ -135,6 +140,7 @@ public class OwnerStoreController {
 		return "content/store/storeMenuManage";
 	}
 	
+	// 가게 정보 수정 페이지
 	@GetMapping("/storeManagement/{storeId}/info-manage")
 	public String infoManagePage(
 			@PathVariable("storeId") UUID storeId,
@@ -185,6 +191,7 @@ public class OwnerStoreController {
 		return times;
 	}
 
+	// 가게 정보 수정
 	@PostMapping("/storeManagement/{storeId}/info-manage/save")
 	public String updateStoreInfo(
 		@PathVariable("storeId") UUID storeId,
@@ -252,6 +259,7 @@ public class OwnerStoreController {
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";
 	}
 	
+	// 브랜드 이미지 업로드
 	@PostMapping("/storeManagement/{storeId}/info-manage/upload-brandImg")
 	public String uploadBrandImg(
 		@PathVariable("storeId") UUID storeId,
@@ -274,6 +282,7 @@ public class OwnerStoreController {
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";
 	}
 	
+	// 스토어 이미지 업로드
 	@PostMapping("/storeManagement/{storeId}/info-manage/upload-storeImg")
 	public String uploadStoreImgs(
 		@PathVariable("storeId") UUID storeId,
@@ -296,6 +305,7 @@ public class OwnerStoreController {
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";
 	}
 	
+	// 스토어 이미지 수정 or 삭제
 	@PostMapping("/storeManagement/{storeId}/info-manage/updateOrDelete-storeImg/{imgId}")
 	public String updateOrDeleteImage(
 		@PathVariable("storeId") UUID storeId,
@@ -330,7 +340,7 @@ public class OwnerStoreController {
 		return "redirect:/owner/storeManagement/" + storeId + "/info-manage";
 	}
 	
-	
+	// 메뉴 등록
 	@PostMapping("/storeManagement/{storeId}/menu-register")
 	public String registerMenu(@PathVariable("storeId") UUID storeId,
 	                           @ModelAttribute MenuRegisterDto menuDto,
@@ -350,6 +360,7 @@ public class OwnerStoreController {
 	    return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
 	}
 	
+	// 메뉴 수정
 	@PostMapping("/storeManagement/{storeId}/menu-edit")
 	public String editMenu(@PathVariable("storeId") UUID storeId,
 	                       @ModelAttribute MenuRegisterDto menuDto,
@@ -368,6 +379,7 @@ public class OwnerStoreController {
 		return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
 	}
 	
+	// 메뉴 삭제
 	@PostMapping("/storeManagement/{storeId}/menu-delete")
 	public String deleteMenu(@PathVariable("storeId") UUID storeId, @RequestParam("menuId") UUID menuId, RedirectAttributes redirectAttributes) {
 		try {
@@ -377,6 +389,26 @@ public class OwnerStoreController {
 		redirectAttributes.addFlashAttribute("error", "메뉴 삭제 중 오류 발생: " + e.getMessage());
 		}
 		return "redirect:/owner/storeManagement/" + storeId + "/menu-manage";
+	}
+	
+	// 입정 승인 재신청
+	@PostMapping("/store/reapply/{storeId}")
+	@ResponseBody
+	public ResponseEntity<String> reapplyStore(@PathVariable("storeId") UUID storeId) {
+		Optional<Store> optionalStore = storeRepository.findById(storeId);
+		if (optionalStore.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		Store store = optionalStore.get();
+
+		// 승인거부 상태일 때만 처리
+		if (store.getStoreStatus() == StoreStatus.PENDING_REFUSES) {
+			store.setStoreStatus(StoreStatus.PENDING_APPROVAL);
+			storeRepository.save(store);
+			return ResponseEntity.ok("재입점 신청 완료");
+		}
+
+		return ResponseEntity.badRequest().body("잘못된 요청");
 	}
 	
 	

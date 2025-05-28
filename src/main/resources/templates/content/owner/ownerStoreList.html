@@ -15,17 +15,24 @@
 		<h2 class="text-center">내 점포</h2>
 		<div id="gallery-area">
 			<div th:each="store : ${myStores}" class="store-row">
-				<a th:href="@{store-management/{id}(id=${store.storeId})}" class="store-row2">
-					<img class="store-image"
-     				th:src="${store.brandImg != null ? store.brandImg : '/img/store/default.png'}"
-     				th:alt="${store.storeName}" />
-					<div class="store-info">
-						<p class="store-name" th:text="${store.storeName}">점포명</p>
-						<p class="store-category category-text" th:text="${store.category}">카테고리</p>
-						<p class="store-category" th:text="${store.storeAddress}">주소</p>
-						<p class="store-category" th:text="${store.storeStatus?.description}" style="color: red">상태</p>
-					</div>
-				</a>
+				<div class="store-row2-wrapper">
+					<a th:href="@{store-management/{id}(id=${store.storeId})}" class="store-row2">
+						<img class="store-image"
+	     				th:src="${store.brandImg != null ? store.brandImg : '/img/store/default.png'}"
+	     				th:alt="${store.storeName}" />
+						<div class="store-info">
+							<p class="store-name" th:text="${store.storeName}">점포명</p>
+							<p class="store-category category-text" th:text="${store.category}">카테고리</p>
+							<p class="store-category" th:text="${store.storeAddress}">주소</p>
+							<p class="store-category" th:text="${store.storeStatus?.description}" style="color: red">상태</p>
+						</div>
+					</a>
+					<!-- 승인거부 상태에서만 표시 -->
+					<button th:if="${store.storeStatus?.name() == 'PENDING_REFUSES'}" type="button" class="reapply-btn" 
+					th:attr="data-store-id=${store.storeId}" onclick="confirmReapply(this)">
+						재입점 신청
+					</button>
+				</div>
 			</div>
 		</div>
 		<div id="btn-area">
@@ -58,6 +65,29 @@
 				}
 			});
 		});
+		
+		function confirmReapply(btn) {
+			const storeId = btn.getAttribute('data-store-id');
+			if (!storeId) return;
+
+			if (confirm("재입점 신청을 하시겠습니까?")) {
+				fetch(`/owner/store/reapply/${storeId}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					}
+				})
+				.then(res => {
+					if (res.ok) return res.text();
+					return res.text().then(msg => { throw new Error(msg); });
+				})
+				.then(msg => {
+					alert(msg);
+					location.reload();
+				})
+				.catch(() => alert("에러가 발생했습니다."));
+			}
+		}
 		</script>
 	</div>
 </html>

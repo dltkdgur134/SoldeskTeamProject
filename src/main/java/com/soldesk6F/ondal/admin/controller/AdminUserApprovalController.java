@@ -118,7 +118,7 @@ public class AdminUserApprovalController {
 				case "rider" -> {
 					user.setRiderRequested(false);
 					riderRepository.findByUser(user).ifPresent(rider -> {
-						// ✅ RiderManagement 먼저 삭제
+						// RiderManagement 먼저 삭제
 						riderManagementRepository.findByRider(rider).ifPresent(rm -> {
 							riderManagementRepository.delete(rm);
 						});
