@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.soldesk6F.ondal.user.entity.Rider;
+import com.soldesk6F.ondal.user.entity.User;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,6 +17,8 @@ public interface RiderRepository extends JpaRepository<Rider, UUID> {
 	boolean existsByUser_UserId(String userId);
 	Optional<Rider> findByUser_UserId(String userId);
 	Optional<Rider> findByUser_UserUuid(UUID userUuid);
+	void deleteByUser_UserUuid(UUID userUuid);
+	Optional<Rider> findByUser(User user);
 	@Query(value = """
 		    SELECT r.rider_id, SUM(ds.delivery_price) AS total_sales, COUNT(ds.delivery_sales_id) AS total_deliveries
 		    FROM rider r

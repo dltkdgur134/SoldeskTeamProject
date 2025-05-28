@@ -79,7 +79,8 @@
 					</div>
 					<div class="form-group">
 						<label>점포 상태</label>
-						<select name="storeStatus_display" disabled>
+						<select name="storeStatus_display"
+						        th:attr="disabled=${store.storeStatus.name() != 'OPEN' and store.storeStatus.name() != 'CLOSED'}">
 							<option th:value="'OPEN'" th:selected="${store.storeStatus.name() == 'OPEN'}">영업중</option>
 							<option th:value="'CLOSED'" th:selected="${store.storeStatus.name() == 'CLOSED'}">영업종료</option>
 
