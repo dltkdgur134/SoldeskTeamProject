@@ -17,6 +17,8 @@ import com.soldesk6F.ondal.useract.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -101,28 +104,71 @@ public class StoreService {
 		storeRepository.save(store);
 	}
 
+	/*
+	 * public List<StoreDto> getStoresByCategory(String category, User user) {
+	 * RegAddress userAddress = user.getUserSelectedAddress(); double userLat =
+	 * userAddress.getUserAddressLatitude(); double userLon =
+	 * userAddress.getUserAddressLongitude();
+	 * 
+	 * log.info("카테고리로 가게 검색 요청: {}", category);
+	 * 
+	 * List<Store> stores = storeRepository.findByCategory(category);
+	 * 
+	 * log.info("조회된 가게 수: {}", stores.size());
+	 * 
+	 * return stores.stream().map(store -> { // 가게 이미지 String imageUrl =
+	 * (store.getBrandImg() != null && !store.getBrandImg().isBlank()) ?
+	 * store.getBrandImg() : "/img/store/default.png"; // 가게 평점 계산 double avgRating
+	 * = reviewRepository.findAverageRatingByStore(store); // 리뷰 long reviewCount =
+	 * reviewRepository.countByStore(store); // 거리 계산 double distance =
+	 * calculateDistance(userLat, userLon, store.getStoreLatitude(),
+	 * store.getStoreLongitude()); StoreDto dto = StoreDto.builder()
+	 * .storeId(store.getStoreId()) .storeName(store.getStoreName())
+	 * .category(store.getCategory()) .storePhone(store.getStorePhone())
+	 * .storeAddress(store.getStoreAddress())
+	 * .storeIntroduce(store.getStoreIntroduce())
+	 * .storeStatus(store.getStoreStatus().name()) .imageUrl(imageUrl)
+	 * .avgRating(avgRating) .reviewCount(reviewCount) .distanceInKm(distance)
+	 * .build(); return dto; }).collect(Collectors.toList()); }
+	 */
+	
 	public List<StoreDto> getStoresByCategory(String category, User user) {
+		// 로그인된 유저의 선택된 주소에서 위도/경도 추출
 		RegAddress userAddress = user.getUserSelectedAddress();
-		double userLat = userAddress.getUserAddressLatitude();
-		double userLon = userAddress.getUserAddressLongitude();
+		double userLat = userAddress.getUserAddressLatitude();   // 사용자 위도
+		double userLon = userAddress.getUserAddressLongitude();  // 사용자 경도
 
-		log.info("카테고리로 가게 검색 요청: {}", category);
+		// 거리 필터링 기준 반경 (km)
+		double radiusKm = 6.0;
 
-		List<Store> stores = storeRepository.findByCategory(category);
+		// 전체 가게 조회
+		List<Store> allStores = storeRepository.findAll();
 
-		log.info("조회된 가게 수: {}", stores.size());
+		// 서비스에서 직접 거리 계산 + 범위 + 카테고리 필터
+		return allStores.stream()
+			//  각 가게에 대해 사용자와의 거리를 계산하여 Map.Entry<Store, Distance> 형태로 반환
+			.map(store -> { 
+				// 거리 계산
+				double distance = calculateDistance(
+					userLat, userLon,
+					store.getStoreLatitude(), store.getStoreLongitude()
+				);
+				return new AbstractMap.SimpleEntry<>(store, distance);
+			})
+			// 6km 반경 필터
+			.filter(entry -> entry.getValue() <= radiusKm)
+			// 카테고리 필터
+			.filter(entry -> category.trim().equals(entry.getKey().getCategory().trim()))
+			// StoreDto로 변환
+			.map(entry -> {
+				Store store = entry.getKey();
+				double distance = entry.getValue();
 
-		return stores.stream().map(store -> {
-			// 가게 이미지
-			String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank()) ? store.getBrandImg()
-					: "/img/store/default.png";
-			// 가게 평점 계산
-			double avgRating = reviewRepository.findAverageRatingByStore(store);
-			// 리뷰
-			long reviewCount = reviewRepository.countByStore(store);
-			// 거리 계산
-			double distance = calculateDistance(userLat, userLon, store.getStoreLatitude(), store.getStoreLongitude());
-			StoreDto dto = StoreDto.builder()
+				String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank())
+					? store.getBrandImg()
+					: "/img/store/default.png"; // 이미지 없으면 default.png로 대체
+
+				return StoreDto.builder()
 					.storeId(store.getStoreId())
 					.storeName(store.getStoreName())
 					.category(store.getCategory())
@@ -131,13 +177,14 @@ public class StoreService {
 					.storeIntroduce(store.getStoreIntroduce())
 					.storeStatus(store.getStoreStatus().name())
 					.imageUrl(imageUrl)
-					.avgRating(avgRating)
-					.reviewCount(reviewCount)
-					.distanceInKm(distance)
+					.avgRating(reviewRepository.findAverageRatingByStore(store))
+					.reviewCount(reviewRepository.countByStore(store))
+					.distanceInKm(Math.round(distance * 10) / 10.0)
 					.build();
-			return dto;
-		}).collect(Collectors.toList());
+			})
+			.toList();
 	}
+
 
 	public List<Store> findStoresByOwner(Owner owner) {
 		List<Store> stores = storeRepository.findByOwner(owner);
