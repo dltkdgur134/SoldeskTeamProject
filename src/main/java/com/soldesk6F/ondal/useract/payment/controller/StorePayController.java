@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
@@ -68,7 +70,7 @@ public class StorePayController {
 	
 	@GetMapping("/store/paySuccess")
 	public String showPaySuccessPage(@RequestParam("paymentKey") String paymentKey,@RequestParam("orderId") String orderId,
-		    @RequestParam("amount") int amount,Model model) {
+		    @RequestParam("amount") int amount,Model model) throws JsonMappingException, JsonProcessingException {
 		
 			if(paymentService.confirmPayment(paymentKey, orderId, amount)) {
 				String nowOrderId = paymentService.findOrder(paymentKey);

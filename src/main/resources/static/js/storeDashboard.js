@@ -377,9 +377,10 @@ function renderOrderDetail(order) {
 	$('#detailStatus').text(order.orderStatus);
 	$('#detailStoreRequest').text(order.storeRequest);
 	$('#detailDeliveryRequest').text(order.deliveryRequest);
-	$('#detailTotalPrice').text(order.totalPrice);
-	$('#detailDeliveryFee').text(order.deliveryFee);
-	$('#TotalPrice').text(order.deliveryFee + order.totalPrice);
+	$('#detailTotalPrice').text(order.totalPrice - order.deliveryFee + "원");
+	$('#detailDeliveryFee').text(order.deliveryFee + "원");
+	$('#totalPrice').text(order.totalPrice - 1000 + "원");
+	$('#discountAmount').text("1000원");
 
 
 

@@ -5,6 +5,7 @@ import com.soldesk6F.ondal.store.entity.StoreImg;
 import com.soldesk6F.ondal.store.entity.StoreIntroduceImg;
 import com.soldesk6F.ondal.store.entity.StoreRegisterDto;
 import com.soldesk6F.ondal.store.entity.Store;
+import com.soldesk6F.ondal.store.entity.Store.StoreStatus;
 import com.soldesk6F.ondal.store.repository.StoreImgRepository;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.Owner;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +92,8 @@ public class StoreService {
 				.category(dto.getCategory()).storePhone(dto.getStorePhone()).storeAddress(dto.getStoreAddress())
 				.storeLatitude(dto.getLatitude()).storeLongitude(dto.getLongitude()).storeLocation(location)
 				.storeStatus(Store.StoreStatus.PENDING_APPROVAL).brandImg(brandImgPath)
-				.foodOrigin("").deliveryFee(dto.getDeliveryFee()).build();
+				.foodOrigin("").deliveryFee(dto.getDeliveryFee()).lastOrderDate(LocalDateTime.now())
+				.build();
 
 		storeRepository.save(store);
 	}
@@ -148,13 +151,15 @@ public class StoreService {
 
 	@Transactional
 	public void updateStoreInfo(UUID storeId, String loginUserId, String storeName, String storePhone,
-			String storeAddress, String category, String storeStatus, String storeIntroduce, LocalTime openingTime,
+			String storeAddress, String category, StoreStatus storeStatus, String storeIntroduce, LocalTime openingTime,
 			LocalTime closingTime, String holiday, Store.DeliveryRange deliveryRange, String storeEvent,
 			String foodOrigin, Double latitude, Double longitude,int deliveryFee) {
 
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
-
+		
+		
+		
 		if (!store.getOwner().getUser().getUserId().equals(loginUserId)) {
 			throw new AccessDeniedException("본인의 점포만 수정할 수 있습니다.");
 		}
@@ -163,7 +168,7 @@ public class StoreService {
 		store.setStorePhone(storePhone);
 		store.setStoreAddress(storeAddress);
 		store.setCategory(category);
-		store.setStoreStatus(Store.StoreStatus.valueOf(storeStatus));
+		store.setStoreStatus(storeStatus);
 		store.setStoreIntroduce(storeIntroduce);
 		store.setOpeningTime(openingTime);
 		store.setClosingTime(closingTime);
@@ -176,6 +181,7 @@ public class StoreService {
 		store.setDeliveryFee(deliveryFee);
 
 		storeRepository.save(store);
+		storeRepository.flush();
 	}
 
 	public void uploadBrandImg(UUID storeId, String loginUserId, MultipartFile brandImgFile) throws IOException {

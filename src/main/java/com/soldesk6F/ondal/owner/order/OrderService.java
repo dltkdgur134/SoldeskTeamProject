@@ -44,6 +44,8 @@ import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
+import com.soldesk6F.ondal.useract.review.entity.Review;
+import com.soldesk6F.ondal.useract.review.repository.ReviewRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +59,7 @@ public class OrderService {
 	    private final OrderRepository orderRepository;
 	    private final MenuRepository menuRepository;
 	    private final PaymentRepository paymentRepository;
+	    private final ReviewRepository reviewRepository;
 	    private final SimpMessagingTemplate messagingTemplate;
 	    private final RegAddressRepository regAddressRepository;
 	    private final DateFunctions dateFunctions;
@@ -74,6 +77,7 @@ public class OrderService {
 	        @Lazy PaymentService paymentService,
 	        SimpMessagingTemplate messagingTemplate,
 	        RegAddressRepository regAddressRepository,
+	        ReviewRepository reviewRepository,
 	        DateFunctions dateFunctions) {
 	        this.userRepository = userRepository;
 	        this.storeRepository = storeRepository;
@@ -83,6 +87,7 @@ public class OrderService {
 	        this.paymentService = paymentService;
 	        this.messagingTemplate = messagingTemplate;
 	        this.regAddressRepository = regAddressRepository;
+	        this.reviewRepository = reviewRepository;
 	        this.dateFunctions = dateFunctions;
 	    }
 	    
@@ -199,7 +204,6 @@ public class OrderService {
     public Order completeOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
-        order.setOrderToOwner(OrderToOwner.IN_DELIVERY); // 확인 필요!
         Order savedOrder = orderRepository.save(order);
         messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
         return savedOrder;
@@ -271,9 +275,14 @@ public class OrderService {
         // 1) 매장 존재 확인이 필요하다면
         storeRepository.findById(storeId)
             .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
-        
+        List<Order> orderList = orderRepository.findByStore_StoreId(storeId);
+        for (Order order : orderList) {
+			if (order.getOrderToUser() == OrderToUser.COMPLETED) {
+				orderList.remove(order);
+			}
+		}
         // 2) 실제로 주문만 조회
-        return orderRepository.findByStore_StoreId(storeId);
+        return orderList;
     }
     
     @Transactional(readOnly = true)
@@ -299,7 +308,7 @@ public class OrderService {
         dto.setStoreId(order.getStore().getStoreId());
         dto.setStoreName(order.getStore().getStoreName());
         dto.setStoreImageUrl(order.getStore().getBrandImg());
-        
+        Optional<Review> review = reviewRepository.findByOrder(order);
         if (order.getOrderToOwner() == OrderToOwner.PENDING) {
     	   dto.setOrderStatus("PENDING");
         } else if (order.getOrderToOwner() == OrderToOwner.CONFIRMED) {
@@ -309,9 +318,17 @@ public class OrderService {
         } 
         if (order.getOrderToRider() == OrderToRider.COMPLETED) {
         	dto.setOrderStatus("COMPLETED");
+        	
         } else if (order.getOrderToOwner() == OrderToOwner.CANCELED) {
         	dto.setOrderStatus("CANCELED");
         } 
+        if (review.isEmpty()) {
+			dto.setReivewWrited(false);
+		}else {
+			dto.setReivewWrited(true);
+		}
+        
+        
         
         dto.setOrderToUser(order.getOrderToUser());
         
@@ -324,6 +341,7 @@ public class OrderService {
         			order.getOrderDetails().get(i).getQuantity());
         }
         dto.setMenuItems(menuItems);
+        
         return dto;
     }
     private OrderResponseDto convertToDto(Order order) {

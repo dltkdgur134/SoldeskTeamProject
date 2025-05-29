@@ -315,9 +315,9 @@ public class ReviewService {
     			redirectAttributes.addFlashAttribute("resultMsg", "리뷰 등록 성공!.");
 				return true;
 			}
-			redirectAttributes.addFlashAttribute("result", 1);
-			redirectAttributes.addFlashAttribute("resultMsg", "리뷰 이미지 업로드 실패.");
-			return false;
+			redirectAttributes.addFlashAttribute("result", 0);
+			redirectAttributes.addFlashAttribute("resultMsg", "리뷰 등록 성공!.");
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("result", 1);
