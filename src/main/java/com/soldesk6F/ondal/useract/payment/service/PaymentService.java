@@ -78,6 +78,11 @@ public class PaymentService {
 	@Value("${toss.secret-key}")
 	private String tossSecretKey;
 
+	public String findOrder(String PaymentKey) {
+		Optional<Payment> payment = paymentRepository.findByPaymentKey(PaymentKey);
+		String orderId = payment.get().getOrder().getOrderId().toString();
+		return orderId;
+	}
 	public List<CartItemsDTO> getAllCartItems(UUID cartUUID) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -295,9 +300,8 @@ public class PaymentService {
 	}
 
 	@Transactional
-	public boolean confirmPayment(String paymentKey, String orderId, int amount) {
+	public boolean confirmPayment(String paymentKey, String orderId, int amount) throws JsonMappingException, JsonProcessingException {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";
-
 		Map<String, Object> requestBody = new HashMap<>();
 		requestBody.put("paymentKey", paymentKey);
 		requestBody.put("orderId", orderId);
@@ -313,107 +317,119 @@ public class PaymentService {
 		RestTemplate restTemplate = new RestTemplate();
 
 		try {
-			ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-			if (!response.getStatusCode().is2xxSuccessful()) {
+	        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+	        if (!response.getStatusCode().is2xxSuccessful()) {
+	            return false;
+	        }
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        objectMapper.registerModule(new JavaTimeModule());
+	        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	        TossPaymentResponse tossResponse = objectMapper.readValue(response.getBody(), TossPaymentResponse.class);
 
-				return false;
-//	        	throw new IllegalStateException("결제 승인 실패: " + response.getBody());
-			}
-			ObjectMapper objectMapper = new ObjectMapper();
-			objectMapper.registerModule(new JavaTimeModule());
-			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			TossPaymentResponse tossResponse = null;
-			try {
-				tossResponse = objectMapper.readValue(response.getBody(), TossPaymentResponse.class);
-			} catch (JsonMappingException e) {
-				e.printStackTrace();
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
-			UUID cartUUID = UUID.fromString(orderId);
+	        UUID cartUUID = UUID.fromString(orderId);
+	        Cart cart = cartRepository.findById(cartUUID)
+	            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카트입니다."));
+	        
+	        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	        CustomUserDetails cud = (CustomUserDetails) auth.getPrincipal();
+	        User user = cud.getUser();
 
-			Optional<Cart> optCart = cartRepository.findById(cartUUID);
-			Cart cart = optCart.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카트입니다."));
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			CustomUserDetails cud = (CustomUserDetails) auth.getPrincipal();
-			User user = cud.getUser();
+	        List<OrderDetail> orderDetailList = new ArrayList<>();
+	        for (CartItems cartItem : cart.getCartItems()) {
+	            OrderDetail orderDetail = new OrderDetail();
+	            orderDetail.setMenu(cartItem.getMenu());
+	            orderDetail.setPrice(cartItem.getItemTotalPrice());
+	            orderDetail.setQuantity(cartItem.getQuantity());
 
-			List<OrderDetail> orderDetailList = new ArrayList<OrderDetail>();
+	            List<String> cion = new ArrayList<>();
+	            List<Integer> ciop = new ArrayList<>();
+	            for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
+	                cion.add(cartItemOption.getOptionName());
+	                ciop.add(cartItemOption.getOptionPrice());
+	            }
+	            orderDetail.setOptionNames(cion);
+	            orderDetail.setOptionPrices(ciop);
 
-			Order order = null;
-			for (CartItems cartItem : cart.getCartItems()) {
-				OrderDetail orderDetail = new OrderDetail();
+	            orderDetailList.add(orderDetail);
+	        }
 
-				orderDetail.setMenu(cartItem.getMenu());
-				orderDetail.setPrice(cartItem.getItemTotalPrice());
-				orderDetail.setQuantity(cartItem.getQuantity());
-				orderDetail.setOptionNames(cartItem.getOptionsAsList());
-				List<Integer> ciop = new ArrayList<Integer>();
-				List<String> cion = new ArrayList<String>();
+	        Payment payment = new Payment();
+	        payment.setAmount(tossResponse.getTotalAmount());
+	        payment.setPaymentKey(tossResponse.getPaymentKey());
+	        payment.setTossOrderId(tossResponse.getOrderId());
+	        payment.setUser(user);
+	        payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
+	        payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
+	        payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
 
-				for (CartItemOption cartItemOption : cartItem.getCartItemOptions()) {
-					ciop.add(cartItemOption.getOptionPrice());
-					cion.add(cartItemOption.getOptionName());
-				}
-				orderDetail.setOptionNames(cion);
-				orderDetail.setOptionPrices(ciop);
-				orderDetailList.add(orderDetail);
-			}
+	        switch (tossResponse.getMethod()) {
+	            case "카드": payment.setPaymentMethod(PaymentMethod.CREDIT); break;
+	            default: payment.setPaymentMethod(PaymentMethod.CASH); break;
+	        }
 
-			Payment payment = new Payment();
-			payment.setAmount(tossResponse.getTotalAmount());
-			payment.setPaymentKey(tossResponse.getPaymentKey());
-			payment.setTossOrderId(tossResponse.getOrderId());
-			payment.setUser(user);
-			payment.setApprovedAt(tossResponse.getApprovedAt().toLocalDateTime());
-			payment.setRequestedAt(tossResponse.getRequestedAt().toLocalDateTime());
-			payment.setPaymentUsageType(Payment.PaymentUsageType.ORDER_PAYMENT);
-			switch (tossResponse.getMethod()) {
-			case "카드":
-				payment.setPaymentMethod(PaymentMethod.CREDIT);
-				break;
-			default:
-				payment.setPaymentMethod(PaymentMethod.CASH);
-				break;
+	        Order order = null;
 
-			}
-			switch (tossResponse.getStatus()) {
-			case "DONE":
-				payment.setPaymentStatus(PaymentStatus.COMPLETED);
-				order = Order.builder().store(cart.getStore()).user(cart.getUser())
-						.totalPrice(tossResponse.getTotalAmount())
-						.storeRequest(tossResponse.getMetadata().getReqStore())
-						.deliveryRequest(tossResponse.getMetadata().getReqDel()).orderDetails(orderDetailList)
-						.deliveryAddress(user.getUserSelectedAddress().getAddress() + " "
-								+ user.getUserSelectedAddress().getDetailAddress())
-						.deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
-						.deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
-						.orderToOwner(OrderToOwner.PENDING).build();
-				break;
-			case "READY":
-			case "IN_PROGRESS":
-				payment.setPaymentStatus(PaymentStatus.CANCELED);
-				break;
-			default:
-				payment.setPaymentStatus(PaymentStatus.CANCELED);
-				break;
-			}
+	        switch (tossResponse.getStatus()) {
+	            case "DONE":
+	                payment.setPaymentStatus(PaymentStatus.COMPLETED);
 
-			for (OrderDetail od : order.getOrderDetails()) {
-				od.setOrder(order);
-			}
-			payment.setOrder(order);
-			orderRepository.save(order);
-			paymentRepository.save(payment);
-			cartItemsRepository.deleteByCart_cartId(cartUUID);
-			cartRepository.deleteById(cartUUID);
+	                order = Order.builder()
+	                        .store(cart.getStore())
+	                        .user(cart.getUser())
+	                        .totalPrice(tossResponse.getTotalAmount())
+	                        .storeRequest(tossResponse.getMetadata().getReqStore())
+	                        .deliveryRequest(tossResponse.getMetadata().getReqDel())
+	                        .deliveryAddress(user.getUserSelectedAddress().getAddress() + " " + user.getUserSelectedAddress().getDetailAddress())
+	                        .deliveryAddressLatitude(user.getUserSelectedAddress().getUserAddressLatitude())
+	                        .deliveryAddressLongitude(user.getUserSelectedAddress().getUserAddressLongitude())
+	                        .orderToOwner(OrderToOwner.PENDING)
+	                        .orderToUser(OrderToUser.PENDING)
+	                        .deliveryFee(cart.getStore().getDeliveryFee())
+	                        .orderDetails(orderDetailList)
+	                        .build();
 
-			return true;
-		} catch (HttpClientErrorException e) {
-			return false;
-		}
+	                // 연관관계 설정
+	                for (OrderDetail od : orderDetailList) {
+	                    od.setOrder(order);
+	                }
+
+	                // 저장
+	                orderRepository.save(order);
+	                orderRepository.flush();
+
+	                // 소유주 지갑 업데이트
+	                Owner owner = order.getStore().getOwner();
+	                owner.setOwnerWallet(owner.getOwnerWallet() + (order.getTotalPrice() - order.getDeliveryFee()));
+	                ownerRepository.save(owner);
+
+	                // WebSocket 전송
+	                OrderResponseDto orderResponseDto = OrderResponseDto.from(order);
+	                simpMessagingTemplate.convertAndSend("/topic/store/" + order.getStore().getStoreId(), orderResponseDto);
+
+	                break;
+
+	            case "READY":
+	            case "IN_PROGRESS":
+	            default:
+	                payment.setPaymentStatus(PaymentStatus.CANCELED);
+	                break;
+	        }
+
+	        if (order != null) {
+	            payment.setOrder(order);
+	        }
+
+	        paymentRepository.save(payment);
+	        cartItemsRepository.deleteByCart_cartId(cartUUID);
+	        cartRepository.deleteById(cartUUID);
+	        return true;
+
+	    } catch (HttpClientErrorException | JsonProcessingException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
-
+	
 	@Transactional
 	public void confirmOndalWalletCharge(String paymentKey, String orderId, int amount, UUID userUUID) {
 		String url = "https://api.tosspayments.com/v1/payments/confirm";

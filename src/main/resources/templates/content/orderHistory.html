@@ -83,12 +83,17 @@
         <div class="container d-flex justify-content-center mb-4">
         <a type="button" th:href="@{'/writeReview/' + ${order.orderId}}" 
         	class="btn btn-outline-secondary position-relative write-review-btn"
-        	th:if="${#strings.equals(order.orderToUser, 'COMPLETED') && order.daysLeftForReview > 0}">
+        	th:if="${#strings.equals(order.orderToUser,'COMPLETED') && order.daysLeftForReview > 0 && !order.reivewWrited}">
         	리뷰 작성
         	 <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-dark days-left">
     			<strong th:text="${'D-' + order.daysLeftForReview}"></strong>
     			<span class="visually-hidden">리뷰 작성 가능 일수</span>
   			</span>
+        </a>
+        <a type="button" th:href = "@{'/myReview'}"
+        class="btn btn-outline-secondary position-relative write-review-btn"
+        th:if="${#strings.equals(order.orderToUser, 'COMPLETED') && order.reivewWrited}">
+        리뷰 내역
         </a>
       </div>
       

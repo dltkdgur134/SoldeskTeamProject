@@ -32,7 +32,7 @@ public class ReviewReply {
 	@Id
 	@GeneratedValue
 	@UuidGenerator
-	@Column(name = "comment_id" , nullable = false , unique = true)
+	@Column(name = "review_reply_id" , nullable = false , unique = true)
 	private UUID reviewReplyId;
 	
 	@OneToOne

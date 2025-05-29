@@ -10,16 +10,63 @@
 	<!--<link th:fragment="css" th:href="@{/css/storeRegSubmit.css}" rel="stylesheet"/>-->
 	<!--<link rel="stylesheet" th:href="@{/css/storeRegSubmit.css}">-->
 	<link rel="stylesheet" th:href="@{/css/storelist.css}">
+	<script th:src="@{/js/storeList.js}"></script>
 </head>
 <body>
     <div layout:fragment="content">
-	  	<div class="d-flex justify-content-center px-5">
-        	<div class="search"> 
-        		<input type="text" class="search-input" placeholder="뭐 먹을까?" name=""> 
-        		<a href="#" class="search-icon"> <i class="fa fa-search"></i> </a> 
-        	</div>
-        </div>
-		<div class="food-buttons">
+		
+		
+		<div id="authInfo" th:attr="data-login=${#authorization.expression('isAuthenticated()')}"></div>
+
+		
+		<div class="d-flex flex-column align-items-center px-5 w-100 mb-2"
+		style="height: 10px;">
+
+		  <div id="search-area"
+		       class="d-flex justify-content-center p-0 mt-4"
+		       style="max-width: 500px; width: 100%;">
+
+		    <!-- 주소 다시 입력 버튼 -->
+		    <button id="btn-address-reset"
+		            class="	btn btn-outline-secondary flex-shrink-0 d-none me-2
+			               align-items-center justify-content-center px-3"
+		            style="width: 140px; height: 48px; z-index: 4;">주소 다시 입력</button>
+			
+		    <!-- 검색 박스 (자동 확장) -->
+		    <div id="search-box"
+		         class="d-flex flex-column bg-white border border-3 border-warning rounded-2 shadow-sm p-0 overflow-hidden"
+		         style="width: 100%; max-width: 400px; height:48px; display: flex; align-items: center; z-index: 4;">
+
+		      <!-- input-group -->
+			  <div class="input-group m-0"
+			  style="height: 48px;">
+
+			    <input type="text"
+			           class="form-control border-0 rounded-0 shadow-none"
+			           placeholder="배달받을 주소를 입력하세요"
+			           id="inp-search"
+			           autocomplete="off"/>
+
+			    <button id="btn-search"
+			            class="btn btn-warning d-flex align-items-center justify-content-center p-0 rounded-0"
+			            style="width:48px; height: 100%;">
+			      <i class="fa fa-search"></i>
+			    </button>	
+				
+			  </div>
+			  <div id="list-wrapper" class="d-none list-wrapper overflow-auto w-100 m-0 p-0">
+		      <!-- 자동완성 리스트 -->
+		      <ul id="list-autocomplete"
+		          class="list-group w-100 mb-0 px-0"
+		          style="top: 48px;">
+				  </ul>
+		    </div>
+			</div>
+			</div>
+
+
+		  </div>
+		<div class="food-buttons" style="margin-top: 5rem;" >
 			<button class="food-btn" onclick="loadCategory('fastfood', this)">패스트푸드</button>
 		    <button class="food-btn" onclick="loadCategory('cn', this)">중식</button>
 		    <button class="food-btn" onclick="loadCategory('kr', this)">한식</button>
@@ -40,6 +87,8 @@
 	<div layout:fragment="js">
 		<script th:inline="javascript">
 			const selectedCategory = /*[[${selectedCategory}]]*/ null;
+			const original = /*[[${original}]]*/ null;
+			const bestMatcher = /*[[${bestMatcher}]]*/ null;
 		</script>
 		<script>
 			const categoryMap = {
@@ -117,11 +166,79 @@
 					.catch(error => console.error("가게 리스트 불러오기 실패: ", error));
 			}
 			
+			function loadSearch(category) {							
+							const params = new URLSearchParams({
+							    orignal: original,
+							    bestMatcher: bestMatcher,
+								category : category
+							});
+							
+							fetch(`/search/api/${params}`)
+								.then(res => res.json())
+								.then(data => {
+									console.log("받아온 데이터", data);
+									const gallery = document.querySelector("#gallery-area");
+									gallery.innerHTML = `
+										${
+											data
+												.filter(store => !['PENDING_APPROVAL', 'PENDING_REFUSES', 'BANNED', 'SUSPENDED'].includes(store.storeStatus))
+												.map(store => {
+													const isClosed = store.storeStatus === 'CLOSED';
+												const imageSection = `
+													<div class="store-image-wrapper ${isClosed ? 'closed' : ''}">
+														<img class="store-image" src="${store.imageUrl}" alt="${store.storeName}">
+														${isClosed ? '<div class="overlay-text">준비중</div>' : ''}
+													</div>
+												`;
+
+												const storeInfo = `
+													<div class="store-info">
+														<p class="store-category">[${categoryMap[store.category] || store.category}]</p>
+														<p class="store-name">
+															${store.storeName}
+															<span style="font-size: 12px; color: #444; margin-left: 5px;">
+																<span style="color: gold;">🌜</span> ${store.avgRating.toFixed(1)} (${store.reviewCount})
+															</span>
+														</p>
+														<p class="store-delivery">무료배달 최소주문 10,000원 </p>
+													</div>
+												`;
+
+												return isClosed
+													? `
+														<div class="store-list disabled">
+															<div class="store-row">
+																${imageSection}
+																${storeInfo}
+															</div>
+														</div>
+													`
+													: `
+														<a class="store-list" href="/store/view/${store.storeId}">
+															<div class="store-row">
+																${imageSection}
+																${storeInfo}
+															</div>
+														</a>
+													`;
+											}).join("")
+										}
+									`;
+								})
+								.catch(error => console.error("가게 리스트 불러오기 실패: ", error));
+						}
+			
+			
+			
 			document.addEventListener("DOMContentLoaded", () => {
 				if (selectedCategory) {
+					if(selectedCategory != "all"){
 					const btn = document.querySelector(`.food-btn[onclick*="${selectedCategory}"]`);
 					loadCategory(selectedCategory, btn);
+				}else{
+					loadSearch()
 				}
+			}
 			});
 		</script>
 	</div>

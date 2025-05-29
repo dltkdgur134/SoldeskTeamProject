@@ -254,6 +254,7 @@ public class RiderService {
 	    order.setRealDeliveryTime(realDeliveryTime);
 	    order.setOrderToRider(Order.OrderToRider.COMPLETED);
 	    order.setOrderToUser(Order.OrderToUser.COMPLETED);
+	    order.setOrderToOwner(Order.OrderToOwner.COMPLETED);
 	    orderRepository.save(order);
 
 	    // 4. 배달료 및 수수료 계산

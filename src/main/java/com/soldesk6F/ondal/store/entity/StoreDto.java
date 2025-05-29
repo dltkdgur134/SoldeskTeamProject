@@ -23,5 +23,6 @@ public class StoreDto {
     private double avgRating;
 	private long reviewCount;
 	private double distanceInKm; // 가게와 유저간의 거리
+	
 }
 

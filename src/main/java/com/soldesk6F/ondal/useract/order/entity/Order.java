@@ -194,6 +194,7 @@ public class Order {
         PENDING("주문 요청 중"), 
         CONFIRMED("주문 확인 완료"),
         COOKING("조리중"),
+        COOKED("조리완료"),
         DELIVERING("배달중"),
         COMPLETED("주문 완료"), 
         CANCELED("주문 취소");

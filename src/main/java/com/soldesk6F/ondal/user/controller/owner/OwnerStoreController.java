@@ -237,7 +237,7 @@ public class OwnerStoreController {
 			storeService.updateStoreInfo(
 				storeId, loginUserId,
 				storeName, storePhone, finalAddress,
-				category, storeStatus,
+				category,StoreStatus.valueOf(storeStatus),
 				storeIntroduce,
 				openingTime, closingTime,
 				holidayStr, 
