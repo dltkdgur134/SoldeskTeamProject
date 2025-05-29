@@ -10,6 +10,7 @@ import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.OwnerRepository;
+import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.review.repository.ReviewRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import static java.lang.Math.*;
+
 
 @Slf4j
 @Service
@@ -95,7 +98,10 @@ public class StoreService {
 		storeRepository.save(store);
 	}
 
-	public List<StoreDto> getStoresByCategory(String category) {
+	public List<StoreDto> getStoresByCategory(String category, User user) {
+		RegAddress userAddress = user.getUserSelectedAddress();
+		double userLat = userAddress.getUserAddressLatitude();
+		double userLon = userAddress.getUserAddressLongitude();
 
 		log.info("카테고리로 가게 검색 요청: {}", category);
 
@@ -103,16 +109,29 @@ public class StoreService {
 
 		log.info("조회된 가게 수: {}", stores.size());
 
-		return storeRepository.findByCategory(category).stream().map(store -> {
+		return stores.stream().map(store -> {
+			// 가게 이미지
 			String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank()) ? store.getBrandImg()
 					: "/img/store/default.png";
+			// 가게 평점 계산
 			double avgRating = reviewRepository.findAverageRatingByStore(store);
+			// 리뷰
 			long reviewCount = reviewRepository.countByStore(store);
-			StoreDto dto = StoreDto.builder().storeId(store.getStoreId()).storeName(store.getStoreName())
-					.category(store.getCategory()).storePhone(store.getStorePhone())
-					.storeAddress(store.getStoreAddress()).storeIntroduce(store.getStoreIntroduce())
-					.storeStatus(store.getStoreStatus().name()).imageUrl(imageUrl)
-					.avgRating(avgRating).reviewCount(reviewCount).build();
+			// 거리 계산
+			double distance = calculateDistance(userLat, userLon, store.getStoreLatitude(), store.getStoreLongitude());
+			StoreDto dto = StoreDto.builder()
+					.storeId(store.getStoreId())
+					.storeName(store.getStoreName())
+					.category(store.getCategory())
+					.storePhone(store.getStorePhone())
+					.storeAddress(store.getStoreAddress())
+					.storeIntroduce(store.getStoreIntroduce())
+					.storeStatus(store.getStoreStatus().name())
+					.imageUrl(imageUrl)
+					.avgRating(avgRating)
+					.reviewCount(reviewCount)
+					.distanceInKm(distance)
+					.build();
 			return dto;
 		}).collect(Collectors.toList());
 	}
@@ -319,5 +338,21 @@ public class StoreService {
 	public Store findByIdWithImgs(UUID storeId) {
 		return storeRepository.findWithStoreImgsByStoreId(storeId)
 			.orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+	}
+	
+	// 로그인된 유저 주소를 기준으로 가게 주소와 거리 계산 (호의 길이 계산 공식)
+	private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+		// lat1, lon1 - 사용자의 위도, 경도 / lat2, lon2 - 가게의 위도, 경도
+		final int R = 6371; // 한국 기준 지구 반지름 (km)
+		double latDistance = toRadians(lat2 - lat1); // 위도 차이 (Δφ)
+		double lonDistance = toRadians(lon2 - lon1); // 경도 차이 (Δλ)
+		// a = sin²(Δφ/2) + cos φ1 ⋅ cos φ2 ⋅ sin²(Δλ/2)
+		double a = sin(latDistance / 2) * sin(latDistance / 2)
+			+ cos(toRadians(lat1)) * cos(toRadians(lat2))
+			* sin(lonDistance / 2) * sin(lonDistance / 2);
+		double c = 2 * atan2(sqrt(a), sqrt(1 - a)); // 지구 중심을 기준으로 두 지점 사이의 중심각
+		double distance = R * c; // 가게와 유저 주소 간의 거리
+		
+		return Math.round(distance * 10) / 10.0; // 소수점 1자리까지 반올림
 	}
 }
