@@ -252,6 +252,8 @@ function renderOrderList(orderList) {
 			$('#processingOrderList').prepend(li);
 		} else if (status === 'IN_DELIVERY') {
 			$('#deliveringOrderList').prepend(li);
+		} else if (status === 'COMPLETED') {
+			$('#deliveredOrderList').prepend(li);
 		}
 	});
 }
@@ -547,6 +549,8 @@ function addOrderToList(order) {
 		$('#processingOrderList').prepend(li);
 	} else if (status === 'IN_DELIVERY') {
 		$('#deliveringOrderList').prepend(li);
+	} else if (status === 'COMPLETED') {
+		$('#deliveredOrderList').prepend(li);
 	}
 }
 

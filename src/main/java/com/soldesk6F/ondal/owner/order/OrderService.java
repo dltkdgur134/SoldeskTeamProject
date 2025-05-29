@@ -279,14 +279,8 @@ public class OrderService {
         storeRepository.findById(storeId)
             .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
         List<Order> orderList = orderRepository.findByStore_StoreId(storeId);
-        List<Order> newOrderList = new ArrayList<>();
-        for (Order order : orderList) {
-			if (order.getOrderToUser() != OrderToUser.COMPLETED) {
-				newOrderList.add(order);
-			}
-		}
         // 2) 실제로 주문만 조회
-        return newOrderList;
+        return orderList;
     }
     
     @Transactional(readOnly = true)
