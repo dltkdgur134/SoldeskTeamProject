@@ -25,7 +25,6 @@ public class searchController {
 	@GetMapping("/storeInRadiusFromIndex")
 	public String searchStoreInRadius(@RequestParam("orignal") String orignalSearchQuery , @RequestParam("bestMatcher") String bestMatcher , Model model) {
 		
-		List<StoreDto> storeDtoList = storeSearchService.searchByRadiusWithCond(3000, orignalSearchQuery, bestMatcher,StoreSortType.DISTANCE, 0, 20);
 		model.addAttribute("selectedCategory","all");
 		model.addAttribute("original",orignalSearchQuery);
 		model.addAttribute("bestMatcher",bestMatcher);

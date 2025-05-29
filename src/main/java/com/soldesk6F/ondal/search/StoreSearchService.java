@@ -33,7 +33,7 @@ public class StoreSearchService {
     
     
     
-    public List<StoreDto> searchByRadiusWithCond(int radiusMeters , String original ,String bestMatcher, StoreSortType sortType, int page , int size ) {
+    public List<StoreDto> searchByRadiusWithCond(int radiusMeters , String original ,String bestMatcher, StoreSortType sortType, int page , int size,String category ) {
     	
     	
     	
@@ -50,28 +50,37 @@ public class StoreSearchService {
         	if(dbUser != null) {
         		lat = dbUser.getUserSelectedAddress().getUserAddressLatitude();
         		lon = dbUser.getUserSelectedAddress().getUserAddressLongitude();
+        		System.out.println(lat);
+        		System.out.println(lon);
         	}
         	}
         
        
         
-        double degreeLat = radiusMeters / 111319.9;
-        double degreeLon = radiusMeters / (111319.9 * Math.cos(Math.toRadians(lat)));
-        double minLat = lat - degreeLat;
-        double maxLat = lat + degreeLat;
-        double minLon = lon - degreeLon;
-        double maxLon = lon + degreeLon;
+        double degLat = radiusMeters / 111_319.9;
+        double degLon = radiusMeters / (111_319.9 * Math.cos(Math.toRadians(lat)));
+
+        double minLat = lat - degLat;
+        double maxLat = lat + degLat;
+        double minLon = lon - degLon;
+        double maxLon = lon + degLon;
         
+
         String bbox = String.format(
-                "POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))",
-                minLon, minLat,
-                maxLon, minLat,
-                maxLon, maxLat,
-                minLon, maxLat,
-                minLon, minLat
-        );
+        	    "POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))",
+        	    minLon, minLat,   // 좌하 (lon, lat)
+        	    maxLon, minLat,   // 우하
+        	    maxLon, maxLat,   // 우상
+        	    minLon, maxLat,   // 좌상
+        	    minLon, minLat    // 닫기
+        	);
+        
+        System.out.println(bbox);
+       
         // 2. Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
+        if(category.equals("all")) {
+        
     	switch(sortType) {
     	
     	case DISTANCE:
@@ -109,9 +118,46 @@ public class StoreSearchService {
     			
     	default: throw new IllegalStateException("예상치 못한 정렬 타입: " + sortType);
 
-    	
+    		
     	}
+        }else {
+        	
+    	    return storeRepository.searchNearbyStoresByDistanceWithCategory(
+                    lon,               // 기준 경도
+                    lat,               // 기준 위도
+                    bbox,              // ← WKT 바운딩 박스
+                    radiusMeters,      // 반경 (m)
+                    original,
+                    bestMatcher,
+                    category,
+                    pageable
+                    )
+               .stream()
+               .map(store -> {
+                   String imageUrl = (store.getBrandImg() != null && !store.getBrandImg().isBlank())
+                                     ? store.getBrandImg()
+                                     : "/img/store/default.png";
 
+                   double avgRating = reviewRepository.findAverageRatingByStore(store);
+                   long reviewCount = reviewRepository.countByStore(store);
+
+                   return StoreDto.builder()
+                                  .storeId(store.getStoreId())
+                                  .storeName(store.getStoreName())
+                                  .category(store.getCategory())
+                                  .storePhone(store.getStorePhone())
+                                  .storeAddress(store.getStoreAddress())
+                                  .storeIntroduce(store.getStoreIntroduce())
+                                  .storeStatus(store.getStoreStatus().name())
+                                  .imageUrl(imageUrl)
+                                  .avgRating(avgRating)
+                                  .reviewCount(reviewCount)
+                                  .build();
+               })
+               .toList();
+        	
+        	
+        }
     	
  
     }

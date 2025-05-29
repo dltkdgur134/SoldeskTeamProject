@@ -1,5 +1,78 @@
 /* ───────────────────────────────  검색 로직  ─────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
+	let redirCategory = selectedCategory;
+	
+	function loadSearch(category) {							
+					const params = new URLSearchParams({
+					    orignal: original,
+					    bestMatcher: bestMatcher,
+						category : category
+					});
+					fetch(`/search/api/storeInRadius?${params.toString()}`)
+						.then(res => res.json())
+						.then(data => {
+							console.log("받아온 데이터", data);
+							const gallery = document.querySelector("#gallery-area");
+							gallery.innerHTML = `
+								${
+									data
+										.filter(store => !['PENDING_APPROVAL', 'PENDING_REFUSES', 'BANNED', 'SUSPENDED'].includes(store.storeStatus))
+										.map(store => {
+											const isClosed = store.storeStatus === 'CLOSED';
+										const imageSection = `
+											<div class="store-image-wrapper ${isClosed ? 'closed' : ''}">
+												<img class="store-image" src="${store.imageUrl}" alt="${store.storeName}">
+												${isClosed ? '<div class="overlay-text">준비중</div>' : ''}
+											</div>
+										`;
+
+										const storeInfo = `
+											<div class="store-info">
+												<p class="store-category">[${categoryMap[store.category] || store.category}]</p>
+												<p class="store-name">
+													${store.storeName}
+													<span style="font-size: 12px; color: #444; margin-left: 5px;">
+														<span style="color: gold;">🌜</span> ${store.avgRating.toFixed(1)} (${store.reviewCount})
+													</span>
+												</p>
+												<p class="store-delivery">무료배달 최소주문 10,000원 </p>
+											</div>
+										`;
+
+										return isClosed
+											? `
+												<div class="store-list disabled">
+													<div class="store-row">
+														${imageSection}
+														${storeInfo}
+													</div>
+												</div>
+											`
+											: `
+												<a class="store-list" href="/store/view/${store.storeId}">
+													<div class="store-row">
+														${imageSection}
+														${storeInfo}
+													</div>
+												</a>
+											`;
+									}).join("")
+								}
+							`;
+						})
+						.catch(error => console.error("가게 리스트 불러오기 실패: ", error));
+				}
+				
+				
+		if (selectedCategory) {
+			if(selectedCategory != "all"){
+			const btn = document.querySelector(`.food-btn[onclick*="${selectedCategory}"]`);
+			loadCategory(selectedCategory, btn);
+		}else{
+			loadSearch(selectedCategory);
+		}
+	}
+	
 	var flashDurationInSeconds = 5;
 	 var flashContainerId = 'flash-messages';
 
@@ -18,6 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	const authInfo = document.getElementById('authInfo');
 
 	const isLogin = authInfo?.dataset.login === 'true';
+
+	
+	
 
 	
 	
@@ -77,8 +153,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		sessionStorage.setItem("food" , query);
 		const firstItem = document.querySelector('#list-autocomplete li');
 		saveHistory(query);
-		
-		location.href("/searchStoreInRadius?orignal=" + query + "&bestMatcher="+firstItem );		
+			
+		const encodeQuery = encodeURIComponent(query);
+		const encodeBestMatcher = encodeURIComponent(firstItem.textContent);
+		alert("여기");
+		const encodeCategory = encodeURIComponent(redircategory);
+		alert("이거뜨면 산거다");
+		location.href = "/search/storeInRadiusFromIndex?orignal=" + encodeQuery + "&bestMatcher="+encodeBestMatcher + "&category="+encodeCategory ;			
 	}
 		
 		clearList();		

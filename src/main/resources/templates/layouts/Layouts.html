@@ -21,6 +21,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <!-- Ondal CSS -->
     <!-- <th:block layout:fragment="css"></th:block> -->
 	<script th:inline="javascript">
+		
 	/*<![CDATA[*/
 	const userId = /*[[${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}]]*/ '';
 	/*]]>*/
@@ -28,6 +29,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <th:block layout:fragment="css"></th:block>
 </head>
 <body th:data-userid="${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}">
+	<layout:fragment th:fragment="js"></layout:fragment>
 	<div th:replace="~{fragments/header::header}"></div>
 	
 	<div layout:fragment="content" class="content"></div>
