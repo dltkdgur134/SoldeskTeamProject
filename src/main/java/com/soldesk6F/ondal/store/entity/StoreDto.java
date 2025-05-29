@@ -22,5 +22,7 @@ public class StoreDto {
     private String imageUrl;
     private double avgRating;
 	private long reviewCount;
+	
+	
 }
 
