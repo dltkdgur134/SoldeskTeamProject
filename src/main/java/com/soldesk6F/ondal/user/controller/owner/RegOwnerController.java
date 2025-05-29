@@ -1,26 +1,19 @@
 package com.soldesk6F.ondal.user.controller.owner;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.user.dto.owner.OwnerForm;
-import com.soldesk6F.ondal.user.dto.rider.RiderForm;
 import com.soldesk6F.ondal.user.entity.User;
-import com.soldesk6F.ondal.user.entity.User.UserRole;
 import com.soldesk6F.ondal.user.repository.UserRepository;
 import com.soldesk6F.ondal.user.service.OwnerService;
-import com.soldesk6F.ondal.user.service.RiderService;
 import com.soldesk6F.ondal.user.service.UserRoleService;
 
 import lombok.RequiredArgsConstructor;
@@ -95,8 +88,8 @@ public class RegOwnerController {
         User user = userRepository.findByUserId(userId).orElseThrow();
         userRoleService.changeRoleToOwner(user, ownerForm);
         // 알림을 띄움
-        model.addAttribute("ownerSuccess", "점주 등록 신청이 완료되었습니다!");
-        return "content/owner/ownerRegister";
+        model.addAttribute("ownerSuccess", "점주 등록 신청이 완료되었습니다! 로그아웃 됩니다.");
+        return "redirect:/logout";
 	    
 	}
 	

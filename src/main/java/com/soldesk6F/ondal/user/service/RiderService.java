@@ -355,7 +355,7 @@ public class RiderService {
 
 
 	    int fee = amount / 10;
-	    int actualAmount = amount - fee;
+	    int actualAmount = amount + fee;
 	    if (actualAmount > rider.getRiderWallet()) {
 	    	return "잔액이 부족합니다.";
 	    }

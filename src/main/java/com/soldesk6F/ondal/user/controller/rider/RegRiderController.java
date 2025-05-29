@@ -92,8 +92,8 @@ public class RegRiderController {
 		 * SecurityContextHolder.getContext().setAuthentication(newAuth);
 		 */
 //        redirectAttributes.addFlashAttribute("riderSuccess", "라이더 등록 신청이 완료되었습니다!");
-        model.addAttribute("riderSuccess", "라이더 등록 신청이 완료되었습니다!");
-        return "content/rider/riderRegister";
+        model.addAttribute("riderSuccess", "라이더 등록 신청이 완료되었습니다! 로그아웃 됩니다.");
+        return "redirect:/logout";
         
     }
 

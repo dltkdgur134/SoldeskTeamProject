@@ -33,11 +33,9 @@ public class UserRoleService {
 		 * user.setUserRole(UserRole.OWNER); // 점주 역할만 부여 }
 		 */
         user.setOwnerRequested(true);
-        String userId = user.getUserId();
         userRepository.save(user);
         // 기타 점주 관련 로직 처리
         ownerService.registerOwner(user, form); // Owner 등록
-        userService.refreshUserAuthentication(userId);
     }
 
     public void changeRoleToRider(User user, RiderForm form) {
@@ -47,11 +45,9 @@ public class UserRoleService {
 		 * user.setUserRole(UserRole.RIDER); // 라이더 역할만 부여 }
 		 */
         user.setRiderRequested(true);
-        String userId = user.getUserId();
         userRepository.save(user);
         // 기타 라이더 관련 로직 처리
         riderService.registerRider(user, form); // 라이더 등록 로직
-        userService.refreshUserAuthentication(userId);
     }
 }
 
