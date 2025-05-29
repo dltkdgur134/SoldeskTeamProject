@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -204,6 +205,8 @@ public class OrderService {
     public Order completeOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+        order.setOrderToOwner(OrderToOwner.IN_DELIVERY); // 확인 필요!
+        order.setOrderToUser(OrderToUser.COOKED);
         Order savedOrder = orderRepository.save(order);
         messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
         return savedOrder;
@@ -276,13 +279,14 @@ public class OrderService {
         storeRepository.findById(storeId)
             .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
         List<Order> orderList = orderRepository.findByStore_StoreId(storeId);
+        List<Order> newOrderList = new ArrayList<>();
         for (Order order : orderList) {
-			if (order.getOrderToUser() == OrderToUser.COMPLETED) {
-				orderList.remove(order);
+			if (order.getOrderToUser() != OrderToUser.COMPLETED) {
+				newOrderList.add(order);
 			}
 		}
         // 2) 실제로 주문만 조회
-        return orderList;
+        return newOrderList;
     }
     
     @Transactional(readOnly = true)

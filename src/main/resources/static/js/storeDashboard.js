@@ -706,7 +706,6 @@ function completeOrder(orderId) {
 			removeOrderFromList(orderId);
 			addOrderToList(updatedOrder);
 			loadOrderList();
-			notifyUserOrderUpdate(updatedOrder);
 		},
 		error: function(err) {
 			console.error('조리 완료 실패:', err);
