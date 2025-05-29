@@ -200,7 +200,7 @@ public class Store {
                  double storeLatitude, double storeLongitude, Point storeLocation, DeliveryRange deliveryRange,
                  String storeIntroduce, String storeEvent , String foodOrigin,
                  LocalTime openingTime, LocalTime closingTime,
-                 String holiday, StoreStatus storeStatus,int deliveryFee) {
+                 String holiday, StoreStatus storeStatus,int deliveryFee,LocalDateTime lastOrderDate) {
         this.owner = owner;
         this.businessNum = businessNum;
         this.storeName = storeName;
@@ -228,6 +228,7 @@ public class Store {
         this.holiday = holiday;
         this.storeStatus = storeStatus != null ? storeStatus : StoreStatus.CLOSED;
         this.deliveryFee = deliveryFee;
+        this.lastOrderDate = lastOrderDate;
     }
     
     public String getStoreUuidAsString() {

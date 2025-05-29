@@ -27,6 +27,7 @@ public class OrderHistoryDto {
     private LocalDateTime orderDate;
     private Long daysLeftForReview;
     private int totalPrice;
+    private boolean reivewWrited;
 
 //    public static OrderHistoryDto from(Order order) {
 //        OrderHistoryDto dto = new OrderHistoryDto();

@@ -252,6 +252,8 @@ function renderOrderList(orderList) {
 			$('#processingOrderList').prepend(li);
 		} else if (status === 'IN_DELIVERY') {
 			$('#deliveringOrderList').prepend(li);
+		} else if (status === 'COMPLETED') {
+			$('#deliveredOrderList').prepend(li);
 		}
 	});
 }
@@ -377,9 +379,10 @@ function renderOrderDetail(order) {
 	$('#detailStatus').text(order.orderStatus);
 	$('#detailStoreRequest').text(order.storeRequest);
 	$('#detailDeliveryRequest').text(order.deliveryRequest);
-	$('#detailTotalPrice').text(order.totalPrice);
-	$('#detailDeliveryFee').text(order.deliveryFee);
-	$('#TotalPrice').text(order.deliveryFee + order.totalPrice);
+	$('#detailTotalPrice').text(order.totalPrice - order.deliveryFee + "원");
+	$('#detailDeliveryFee').text(order.deliveryFee + "원");
+	$('#totalPrice').text(order.totalPrice - 1000 + "원");
+	$('#discountAmount').text("1000원");
 
 
 
@@ -546,6 +549,8 @@ function addOrderToList(order) {
 		$('#processingOrderList').prepend(li);
 	} else if (status === 'IN_DELIVERY') {
 		$('#deliveringOrderList').prepend(li);
+	} else if (status === 'COMPLETED') {
+		$('#deliveredOrderList').prepend(li);
 	}
 }
 
@@ -705,7 +710,6 @@ function completeOrder(orderId) {
 			removeOrderFromList(orderId);
 			addOrderToList(updatedOrder);
 			loadOrderList();
-			notifyUserOrderUpdate(updatedOrder);
 		},
 		error: function(err) {
 			console.error('조리 완료 실패:', err);

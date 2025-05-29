@@ -25,6 +25,8 @@ public class PaymentHistoryDTO {
     private String refundReason;
     private PaymentUsageType paymentUsageType;
     private String tossOrderId; // 선택적: 외부 조회용, 필요시 제거 가능
+    private LocalDateTime paymentTime;
+    private LocalDateTime updatedDate;
     
     private OrderToOwner orderToOwner;
     
@@ -40,6 +42,8 @@ public class PaymentHistoryDTO {
                 .refundReason(payment.getRefundReason())
                 .paymentUsageType(payment.getPaymentUsageType())
                 .tossOrderId(payment.getTossOrderId())
+                .paymentTime(payment.getPaymentTime())
+                .updatedDate(payment.getUpdatedDate())
                 .orderToOwner(orderToOwner)
                 .build();
     }

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.menu.entity.Menu;
 import com.soldesk6F.ondal.useract.cart.entity.Cart;
@@ -20,6 +22,7 @@ import com.soldesk6F.ondal.useract.cart.entity.CartItems;
 import com.soldesk6F.ondal.useract.cart.service.CartService;
 import com.soldesk6F.ondal.useract.payment.dto.CartItemsDTO;
 import com.soldesk6F.ondal.useract.payment.dto.UserInfoDTO;
+import com.soldesk6F.ondal.useract.payment.entity.Payment;
 import com.soldesk6F.ondal.useract.payment.service.PaymentFailLogService;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 
@@ -67,10 +70,12 @@ public class StorePayController {
 	
 	@GetMapping("/store/paySuccess")
 	public String showPaySuccessPage(@RequestParam("paymentKey") String paymentKey,@RequestParam("orderId") String orderId,
-		    @RequestParam("amount") int amount,Model model) {
+		    @RequestParam("amount") int amount,Model model) throws JsonMappingException, JsonProcessingException {
 		
 			if(paymentService.confirmPayment(paymentKey, orderId, amount)) {
-				return "/content/index";
+				String nowOrderId = paymentService.findOrder(paymentKey);
+				
+				return "redirect:/user/order/" + nowOrderId;
 			}else {
 				return "/content/errorPage";
 			}

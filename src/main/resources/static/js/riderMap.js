@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 	});
 
 	await fetchOrders();
-	setInterval(fetchOrders, 30000); // 30초마다 주문 새로고침
+	setInterval(fetchOrders, 10000); // 10초마다 주문 새로고침
 
 	document.addEventListener('click', function(e) {
 		if (e.target && e.target.classList.contains('view-orders')) {

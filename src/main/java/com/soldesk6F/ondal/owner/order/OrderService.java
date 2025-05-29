@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +45,8 @@ import com.soldesk6F.ondal.useract.payment.repository.PaymentRepository;
 import com.soldesk6F.ondal.useract.payment.service.PaymentService;
 import com.soldesk6F.ondal.useract.regAddress.entity.RegAddress;
 import com.soldesk6F.ondal.useract.regAddress.repository.RegAddressRepository;
+import com.soldesk6F.ondal.useract.review.entity.Review;
+import com.soldesk6F.ondal.useract.review.repository.ReviewRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +60,7 @@ public class OrderService {
 	    private final OrderRepository orderRepository;
 	    private final MenuRepository menuRepository;
 	    private final PaymentRepository paymentRepository;
+	    private final ReviewRepository reviewRepository;
 	    private final SimpMessagingTemplate messagingTemplate;
 	    private final RegAddressRepository regAddressRepository;
 	    private final DateFunctions dateFunctions;
@@ -74,6 +78,7 @@ public class OrderService {
 	        @Lazy PaymentService paymentService,
 	        SimpMessagingTemplate messagingTemplate,
 	        RegAddressRepository regAddressRepository,
+	        ReviewRepository reviewRepository,
 	        DateFunctions dateFunctions) {
 	        this.userRepository = userRepository;
 	        this.storeRepository = storeRepository;
@@ -83,6 +88,7 @@ public class OrderService {
 	        this.paymentService = paymentService;
 	        this.messagingTemplate = messagingTemplate;
 	        this.regAddressRepository = regAddressRepository;
+	        this.reviewRepository = reviewRepository;
 	        this.dateFunctions = dateFunctions;
 	    }
 	    
@@ -200,6 +206,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
         order.setOrderToOwner(OrderToOwner.IN_DELIVERY); // 확인 필요!
+        order.setOrderToUser(OrderToUser.COOKED);
         Order savedOrder = orderRepository.save(order);
         messagingTemplate.convertAndSend("/topic/order/" + order.getOrderId(), OrderResponseDto.from(savedOrder));
         return savedOrder;
@@ -271,9 +278,9 @@ public class OrderService {
         // 1) 매장 존재 확인이 필요하다면
         storeRepository.findById(storeId)
             .orElseThrow(() -> new EntityNotFoundException("Store not found: " + storeId));
-        
+        List<Order> orderList = orderRepository.findByStore_StoreId(storeId);
         // 2) 실제로 주문만 조회
-        return orderRepository.findByStore_StoreId(storeId);
+        return orderList;
     }
     
     @Transactional(readOnly = true)
@@ -299,7 +306,7 @@ public class OrderService {
         dto.setStoreId(order.getStore().getStoreId());
         dto.setStoreName(order.getStore().getStoreName());
         dto.setStoreImageUrl(order.getStore().getBrandImg());
-        
+        Optional<Review> review = reviewRepository.findByOrder(order);
         if (order.getOrderToOwner() == OrderToOwner.PENDING) {
     	   dto.setOrderStatus("PENDING");
         } else if (order.getOrderToOwner() == OrderToOwner.CONFIRMED) {
@@ -309,9 +316,17 @@ public class OrderService {
         } 
         if (order.getOrderToRider() == OrderToRider.COMPLETED) {
         	dto.setOrderStatus("COMPLETED");
+        	
         } else if (order.getOrderToOwner() == OrderToOwner.CANCELED) {
         	dto.setOrderStatus("CANCELED");
         } 
+        if (review.isEmpty()) {
+			dto.setReivewWrited(false);
+		}else {
+			dto.setReivewWrited(true);
+		}
+        
+        
         
         dto.setOrderToUser(order.getOrderToUser());
         
@@ -324,6 +339,7 @@ public class OrderService {
         			order.getOrderDetails().get(i).getQuantity());
         }
         dto.setMenuItems(menuItems);
+        
         return dto;
     }
     private OrderResponseDto convertToDto(Order order) {
@@ -377,6 +393,7 @@ public class OrderService {
 		dto.setOrderDate(order.getOrderTime());
 		LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
 		int menuTotalPrice = 0;
+		int discountAmount = 1000; 
 		for (OrderDetail orderDetails : order.getOrderDetails()) {
 			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
 			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
@@ -398,7 +415,7 @@ public class OrderService {
 		dto.setMenuItems(menuItems);
 		dto.setTotalPrice(order.getTotalPrice());
 		dto.setDeliveryFee(order.getDeliveryFee());
-		dto.setMenuTotalPrice(menuTotalPrice);
+		dto.setMenuTotalPrice(menuTotalPrice - discountAmount);
 		
 		Optional<Payment> payment = paymentRepository.findByOrder(order);
 		if (payment.isEmpty() || payment.get() == null) {
@@ -428,6 +445,7 @@ public class OrderService {
     	
     	LinkedList<HashMap<String, Object>> menuItems = new LinkedList<HashMap<String, Object>>();
 		int menuTotalPrice = 0;
+		int discountAmount = 1000; 
 		for (OrderDetail orderDetails : order.getOrderDetails()) {
 			HashMap<String ,Object> menuDetails = new HashMap<String ,Object>();
 			menuDetails.put("menuName", orderDetails.getMenu().getMenuName());
@@ -449,7 +467,7 @@ public class OrderService {
 		dto.setMenuItems(menuItems);
 		dto.setMenuTotalPrice(menuTotalPrice);
 		
-    	dto.setTotalPrice(order.getTotalPrice());
+    	dto.setTotalPrice(order.getTotalPrice() - discountAmount);
     	dto.setDeliveryFee(order.getDeliveryFee());
     	
     	Optional<Payment> payment = paymentRepository.findByOrder(order);

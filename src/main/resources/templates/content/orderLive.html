@@ -169,17 +169,21 @@
 					</div>
 					<hr>
 					<div class="container d-flex justify-content-between">
-						<span><strong>결제 금액</strong></span>
-						<span><strong th:text="${#numbers.formatInteger(order.menuTotalPrice + order.deliveryFee, 3, 'COMMA') + ' 원'}"></strong></span>
-					</div>
-					<div class="container d-flex justify-content-between">
 						<span><strong class="order-detail-sublabel">메뉴 금액</strong></span>
-						<span><small class="order-detail-text" th:text="${#numbers.formatInteger(order.menuTotalPrice - order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
+						<span><small class="order-detail-text" th:text="${#numbers.formatInteger(order.menuTotalPrice, 3, 'COMMA') + ' 원'}"></small></span>
 					</div>
 					<div class="container d-flex justify-content-between">
 						<span><strong class="order-detail-sublabel">배달팁</strong></span>
 						<span th:if="${order.deliveryFee > 0}"><small class="order-detail-text" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
 						<span th:if="${order.deliveryFee == 0}"><small class="order-detail-text" th:text="${order.deliveryFee + ' 원'}"></small></span>
+					</div>
+					<div class="container d-flex justify-content-between">
+						<span><strong>할인 금액</strong></span>
+						<span><strong style = "color : red;" th:text="${#numbers.formatInteger(1000, 3, 'COMMA') + ' 원'}"></strong></span>
+					</div>
+					<div class="container d-flex justify-content-between">
+						<span><strong>결제 금액</strong></span>
+						<span><strong th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA') + ' 원'}"></strong></span>
 					</div>
 					<div class="container d-flex justify-content-between">
 					<a id="refundLink" href="/userPayHistory" style="display: inline;">환불하러가기</a>
