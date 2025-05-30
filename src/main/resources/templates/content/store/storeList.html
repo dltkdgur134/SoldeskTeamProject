@@ -83,6 +83,42 @@
 				<div><a href="#" class="labels">기본 가게</a><img class="imgs" src="/css/imgs/img1.png"></div>
 			</div>
 		</div>
+		<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-lg mt-5">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="addressModalLabel">주소 등록</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+		      </div>
+		      <div class="modal-body">
+		        <form th:action="@{/content/regAddress}" method="POST" name="regAddressForm"
+		              autocomplete="off" id="reg-address-form">
+		          <div class="input-group mb-3">
+		            <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span> 
+		            <input type="text" class="form-control" name="address" id="userAddress" placeholder="주소" readonly>
+		            <input type="button" onclick="regUserAddress()" value="주소 찾기" class="btn btn-warning">
+		          </div>
+
+		          <div class="input-group mb-3">
+		            <span class="input-group-text"><i class="fa-solid fa-house-user"></i></span> 
+		            <input type="text" class="form-control" name="detailAddress" id="detailAddress" placeholder="상세주소" required>
+		          </div>
+
+
+
+		          <div id="iframe-layer" class="mb-3">
+
+		          </div>
+		        </form>
+		      </div>
+
+		      <div class="modal-footer justify-content-between">
+		        <button type="submit" class="btn btn-primary" form="reg-address-form">확인</button>
+		        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
 	</div>
 	<div layout:fragment="js">
 		<script th:inline="javascript">
@@ -103,12 +139,12 @@
 				jp: "일식",
 				caffe: "카페"
 			};
-				
+			let redirCategory = selectedCategory;
+
 			function loadCategory(category, btn) {
 				document.querySelectorAll(".food-btn").forEach(b => b.classList.remove("active"));
 				btn.classList.add("active");
 				redirCategory = category;
-				
 				fetch(`/api/stores/${category}`)
 					.then(res => res.json())
 					.then(data => {

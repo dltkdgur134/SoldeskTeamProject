@@ -1,7 +1,8 @@
 /* ───────────────────────────────  검색 로직  ─────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
-	let redirCategory = selectedCategory;
-	
+	const authInfo = document.getElementById('authInfo');
+	const modalEl = document.getElementById('addressModal');
+	const modal = new bootstrap.Modal(modalEl);
 	function loadSearch(category) {							
 					const params = new URLSearchParams({
 					    orignal: original,
@@ -36,6 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
 													</span>
 												</p>
 												<p class="store-delivery">무료배달 최소주문 10,000원 </p>
+												<span class="store-distance">${store.distanceInKm.toFixed(1)}km</span>
+
 											</div>
 										`;
 
@@ -88,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var reenterBtn = document.getElementById('btn-address-reset');
 	var borderSearchDiv = document.getElementById('search-box');
     var activeIndex = -1;
-	const authInfo = document.getElementById('authInfo');
 
 	const isLogin = authInfo?.dataset.login === 'true';
 
@@ -156,9 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			
 		const encodeQuery = encodeURIComponent(query);
 		const encodeBestMatcher = encodeURIComponent(firstItem.textContent);
-		alert("여기");
-		const encodeCategory = encodeURIComponent(redircategory);
-		alert("이거뜨면 산거다");
+		const encodeCategory = encodeURIComponent(redirCategory);
 		location.href = "/search/storeInRadiusFromIndex?orignal=" + encodeQuery + "&bestMatcher="+encodeBestMatcher + "&category="+encodeCategory ;			
 	}
 		
@@ -308,11 +308,19 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	
     searchInput.addEventListener('focus', function(){
-		if(!hadAddress()){
-			showAddrHistory();
-		}else{
-			showHistory();
-		}
+		if(isLogin){
+					if(searchInput.value){
+						handleAutocomplete();
+					}else{
+					showHistory();
+					}
+				}else{
+				if(!hadAddress()){
+					showAddrHistory();
+				}else{
+					showHistory();
+				}
+				}
 		
 		borderSearchDiv.classList.add('expand');
 		listWrapper.classList.remove('d-none');
@@ -330,15 +338,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	reenterBtn.addEventListener('click', function() {
 	  activeIndex = -1;
 	  if(isLogin){
-		
-	  }
+	  modal.show();}
+	  else{
 	  sessionStorage.removeItem('address');  
 	  searchInput.value = '';                      // input 필드 초기화
 	  searchInput.setAttribute('placeholder', '배달받을 주소를 입력하세요'); // placeholder 초기화
 	  
 	  reenterBtn.classList.add("d-none");
 	  showAddrHistory();
-
+}
 	});
 
 

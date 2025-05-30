@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		const encodeQuery = encodeURIComponent(query);
 		const encodeBestMatcher = encodeURIComponent(firstItem.textContent);
-		location.href = "/search/storeInRadiusFromIndex?orignal=" + encodeQuery + "&bestMatcher="+encodeBestMatcher;		
+		location.href = "/search/storeInRadiusFromIndex?orignal=" + encodeQuery + "&bestMatcher="+encodeBestMatcher + "&category=all";		
 	}
 		
 		clearList();		
