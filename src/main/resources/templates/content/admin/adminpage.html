@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
+<head>
+	<meta charset="UTF-8">
+	<title>관리자 페이지</title>
+	<link th:href="@{/css/admin/adminpage.css}" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+	<script type="module" src="/js/adminpage/customerService.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script
+	  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+	</script>
+
+
+	<style>
+	  /* 데모용 카드 스타일만 살짝 */
+	  .cs-card{background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.05);}
+	  /* 모달 안 버튼 풀-width */
+	  #replyModal .modal-footer .btn{width:120px;}
+	  /* nav-pills 간격 */
+	  #roleFilter .nav-link{min-width:110px;text-align:center;}
+	</style>
+</head>
+<body>
+	<div class="setting-container">
+		<div class="setting-header">
+			<span class="back-btn">❮ 이전</span>
+			<div class="right-controls">
+				<span class="datetime" id="today-date"></span>
+				<button onclick="logout()" style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer;">
+					로그아웃
+				</button>
+			</div>
+		</div>
+		
+		<div class="tab-buttons">
+			<button data-url="/admin/setting/usersetting">유저 설정</button>
+			<button data-url="/admin/setting/storeapproval">매장 승인</button>
+			<button data-url="/admin/setting/ownerRiderapproval">점주/라이더 승인</button>
+			<button data-url="/admin/setting/customerService">고객센터</button>
+		</div>
+		
+		<div class="content" id="setting-content">
+			
+		</div>
+	</div>
+	<script type="module" src="/js/adminpage/adminpage.js"></script>
+</body>
+</html>

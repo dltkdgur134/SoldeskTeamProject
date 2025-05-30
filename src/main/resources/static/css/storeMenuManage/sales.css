@@ -1,0 +1,132 @@
+.container {
+	max-width: 960px;
+	margin: 40px auto;
+	font-family: 'Noto Sans KR', sans-serif;
+	color: #333;
+}
+
+h1 {
+	font-family: 'Gowun Dodum', serif;
+	font-weight: 700;
+	font-size: 2.4rem;
+	margin-bottom: 30px;
+	text-align: center;
+	color: #2c3e50;
+}
+
+.summary-cards {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	margin-bottom: 40px;
+}
+
+.summary-cards .card {
+	flex: 1;
+	background: #f5f7fa;
+	border-radius: 12px;
+	padding: 20px;
+	font-weight: 600;
+	font-size: 1.25rem;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	color: #34495e;
+	transition: background-color 0.3s ease;
+}
+
+.summary-cards .card:hover {
+	background: #e1e7f0;
+}
+
+.filter {
+	margin-bottom: 40px;
+	text-align: center;
+}
+
+.filter form {
+	display: inline-flex;
+	align-items: center;
+	gap: 15px;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.filter label {
+	font-weight: 600;
+}
+
+.filter select, .filter input[type="date"] {
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	font-size: 1rem;
+}
+
+.filter input[type="date"]:disabled {
+	background-color: #eee;
+	cursor: not-allowed;
+}
+
+.filter button {
+	background-color: #2980b9;
+	border: none;
+	color: white;
+	padding: 8px 18px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: background-color 0.3s ease;
+}
+
+.filter button:hover {
+	background-color: #1f6391;
+}
+
+.store-sales {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 24px;
+	margin-bottom: 50px;
+}
+
+.store-card {
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+	padding: 20px;
+	transition: transform 0.2s ease;
+	cursor: pointer;
+}
+
+.store-card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.store-card h3 {
+	margin-top: 0;
+	margin-bottom: 8px;
+	color: #2c3e50;
+}
+
+.store-card p {
+	margin: 4px 0;
+	font-weight: 500;
+}
+
+.store-card a {
+	display: inline-block;
+	margin-top: 12px;
+	color: #2980b9;
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.store-card a:hover {
+	text-decoration: underline;
+}
+
+.sales-chart {
+	max-width: 900px;
+	margin: 0 auto 60px;
+}

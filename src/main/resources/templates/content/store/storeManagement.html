@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8" />
+    <title>매장 관리</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- SockJS / STOMP 라이브러리 -->    
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/webjars/org.webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css"/>
+	<!-- Popper and Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/js/bootstrap.bundle.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- 기존 storeManagement 전용 CSS·JS -->
+    <link rel="stylesheet" th:href="@{/css/storeManagement.css}" />
+    <link rel="stylesheet" th:href="@{/css/storeDashboard.css}">
+</head>
+
+<body th:attr="data-storeid=${storeId}">
+	<div class="store-header">
+		<h1 th:text="${store.storeName}">점포명</h1>
+		<div class="store-info">
+			<p th:text="${store.storeAddress}" style="margin: 1px 0">주소</p>
+			<p th:text="${formattedPhone}" style="margin: 1px 0">전화번호</p>
+			<p th:text="${store.storeStatus.description}" style="margin: 1px 0">영업 상태</p>
+		</div>
+	</div>
+	<div class="topbar">
+		<button class="menu-btn" onclick="toggleSidebar()">☰</button>
+		<h1>영업중</h1>
+		<div class="date-container">
+			<span id="today-date"></span>
+		</div>
+	</div>
+	<div class="sidebar-wrapper" id="sidebarWrapper">
+		<div class="sidebar" id="sidebar">
+			<div class="sidebar-title">
+				<h3 th:text="${store.storeName + ' 사장님'}"></h3>
+				<button class="close-btn" onclick="toggleSidebar()">X</button>
+			</div>
+			<div class="sidebar-menu">
+				<button class="sidebar-btn"><i class="fas fa-comment"></i> 공지 · 한마디</button>
+				<a th:href="@{'/owner/storeManagement/' + ${store.storeId} + '/info-manage'}">
+				<button class="sidebar-btn"><i class="fas fa-home"></i> 운영정보 관리</button>
+				</a>
+				<a th:href="@{'/owner/storeManagement/' + ${store.storeId} + '/menu-manage'}">
+				    <button class="sidebar-btn"><i class="fas fa-clipboard-list"></i> 메뉴 · 품절 관리</button>
+				</a>
+				<button class="sidebar-btn"><i class="fas fa-file-pen"></i> 리뷰 관리</button>
+				<a class="sidebar-btn2" href="/owner/storesetting?tab=operation"> 운영 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+				<a class="sidebar-btn2" href="/owner/storesetting?tab=printer"> 주문 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+				<a class="sidebar-btn2" href="/owner/storesetting?tab=alarm"> 배달 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+				<a class="sidebar-btn2" href="/owner/storesetting?tab=delivery"> 배달대행사 설정<i class="fas fa-chevron-right arrow-icon"></i></a>
+			</div>
+		</div>
+	</div>
+	<div class="app-container">
+		<!-- ========================  대시보드 삽입  ======================== -->
+		<div class="app-container" th:replace="~{content/store/storeDashboard :: dashboard}">
+		</div>
+		<!-- ================================================================= -->
+
+	</div>
+</body>
+<script defer th:src="@{/js/storeManagement.js}"></script>
+<script th:src="@{/js/storeDashboard.js}"></script>
+</html>

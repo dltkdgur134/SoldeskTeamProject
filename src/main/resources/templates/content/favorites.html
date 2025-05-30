@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+  <meta charset="UTF-8">
+  <title>내 찜 목록</title>
+
+  <!-- 공통 CSS -->
+  <link th:href="@{/css/custom.css}"    rel="stylesheet"/>
+  <link th:href="@{/css/storelist.css}" rel="stylesheet"/>
+
+  <!-- 🎯 ‘추가’·‘하트’ 전용 오버라이드 -->
+  <link th:href="@{/css/favorites.css}" rel="stylesheet"/>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css}"/>
+</head>
+
+<body>
+<div layout:fragment="content" class="favorites-page">
+
+  <section class="container py-4">
+    <h2 class="fw-bold mb-4" style="font-size:26px;">내&nbsp;찜&nbsp;목록</h2>
+
+    <div id="gallery-area">
+      <div class="text-center py-5 text-muted"
+           th:if="${#lists.isEmpty(favorites)}">
+        아직&nbsp;찜한&nbsp;가게가&nbsp;없습니다.
+      </div>
+
+      <!-- ☆☆ store-list 기본 구조 유지 ☆☆ -->
+      <a th:each="store : ${favorites}"
+         class="store-list"
+         th:href="@{|/store/view/${store.id}|}">
+
+        <div class="store-row">
+
+          <!-- ❤️ 하트 (우상단) -->
+          <button type="button"
+                  class="fav-btn"
+                  title="찜/찜취소"
+                  onclick="event.stopPropagation(); toggleFav([[${store.id}]])">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+
+          <!-- ➕ 플러스 (우하단) -->
+          <button type="button"
+                  class="add-btn"
+                  title="추가"
+                  onclick="event.stopPropagation(); addStore([[${store.id}]])">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+
+          <!-- 이미지 -->
+          <img class="store-image"
+               th:src="${store.imageUrl != null ? store.imageUrl : '/css/imgs/default-store.png'}"
+               th:alt="${store.name}"/>
+
+          <!-- 정보 -->
+          <div class="store-info">
+            <p class="store-category"
+               th:text="'[' + ${store.category} + ']'">[cat]</p>
+
+            <p class="store-name">
+              <span th:text="${store.name}">가게</span>
+              <span class="rating-badge">
+                <i class="fa-solid fa-moon"></i>
+                <span th:text="${store.avgRating != null ? store.avgRating : 0.0}">0.0</span>
+                (<span th:text="${store.reviewCount}">0</span>)
+              </span>
+            </p>
+
+            <p class="store-delivery"
+               th:text="'무료배달 최소주문 ' + ${#numbers.formatInteger(10000,0,'COMMA')} + '원'">
+              무료배달 최소주문 10,000원
+            </p>
+          </div>
+
+        </div><!-- /.store-row -->
+      </a><!-- /.store-list -->
+
+    </div><!-- /gallery-area -->
+  </section>
+
+</div><!-- /.favorites-page -->
+</body>
+</html>

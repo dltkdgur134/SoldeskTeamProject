@@ -1,0 +1,104 @@
+<!-- ===== 고객센터 탭 DIV – id="setting-content" 에 주입될 조각 ===== -->
+<div>
+
+  <section class="cs-card p-4 mb-4">
+
+    <!-- 1차 필터 : 문의 주체 -->
+    <ul class="nav nav-pills gap-1 mb-3" id="roleFilter">
+      <li class="nav-item"><button class="nav-link active" data-role="">전체</button></li>
+      <li class="nav-item"><button class="nav-link" data-role="USER">일반 사용자</button></li>
+      <li class="nav-item"><button class="nav-link" data-role="RIDER">라이더</button></li>
+      <li class="nav-item"><button class="nav-link" data-role="OWNER">업주</button></li>
+      <li class="nav-item"><button class="nav-link" data-role="GUEST">비회원</button></li>
+    </ul>
+
+    <!-- 2차 필터 + 검색 -->
+    <form id="csSearchForm" class="row gy-2 gx-3 align-items-center">
+      <div class="col-auto">
+        <select id="csCategory" class="form-select">
+          <option value="">모든 카테고리</option>
+          <option value="FOOD_ISSUE">음식 문제</option>
+          <option value="DELAY">배달 지연</option>
+          <option value="PAY">정산/결제</option>
+          <option value="BUSINESS">사업자/매장</option>
+        </select>
+      </div>
+      <div class="col-auto flex-grow-1">
+        <div class="input-group">
+          <input id="csKeyword" class="form-control" placeholder="검색어(제목·내용)">
+          <button class="btn btn-outline-secondary">검색</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- 목록 -->
+    <div class="table-responsive mt-4">
+      <table class="table table-hover text-center align-middle">
+        <thead class="table-light"><tr>
+          <th style="width:70px">#</th><th class="text-start">제목</th>
+          <th style="width:100px">ID</th>
+          <th style="width:100px">주체</th>
+          <th style="width:160px">작성일</th><th style="width:100px">상태</th>
+          <th style="width:90px">관리</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <nav id="csPagination" class="d-flex justify-content-center mt-3"></nav>
+  </section>
+
+  <!-- 모달 -->
+  <div class="modal fade" id="replyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <form id="replyForm" enctype="multipart/form-data">
+          <input type="hidden" id="modalComplainId" name="id">
+
+          <div class="modal-header">
+            <h5 class="modal-title">문의 상세 / 답변 작성</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <!-- 문의 제목·내용 -->
+            <div class="mb-2"><label class="fw-bold">제목</label>
+              <p id="modalTitle" class="form-control-plaintext mb-0"></p></div>
+            <div class="mb-3"><label class="fw-bold">내용</label>
+              <p id="modalContent" class="form-control-plaintext"></p></div>
+
+            <!-- 문의 이미지 미리보기 -->
+            <div class="mb-3">
+              <label class="fw-bold">첨부 이미지</label>
+              <div id="complainImages" class="d-flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- 답변 입력 -->
+            <div class="mb-3">
+              <label class="fw-bold">답변 작성</label>
+              <textarea id="replyText" class="form-control" rows="5" required></textarea>
+            </div>
+
+            <!-- 답변 이미지 업로드 + 프리뷰 -->
+            <div class="mb-3">
+              <label class="fw-bold d-block mb-1">답변 이미지 (여러 장 선택 가능)</label>
+              <input id="replyImages" name="images" type="file" accept="image/*" multiple class="form-control mb-2">
+              <div id="replyPreview" class="d-flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            <button class="btn btn-primary" type="submit">저장</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 필요 CDN -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js" defer></script>

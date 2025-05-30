@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>온달</title>
+	    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- SockJS / STOMP 라이브러리 -->    
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/webjars/org.webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+  	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-DQvkBjpPgn7RC31MCQoOeC9TI2kdqa4+BSgNMNj8v77fdC77Kj5zpWFTJaaAoMbC" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/js/bootstrap.bundle.min.js" integrity="sha384-YUe2LzesAfftltw+PEaao2tjU/QATaW/rOitAq67e0CT0Zi2VVRL0oC4+gAaeBKu" crossorigin="anonymous"></script>
+  	<script src="https://kit.fontawesome.com/20dab02d7e.js" crossorigin="anonymous"></script> 
+	<!-- Ondal JS -->
+	 <!-- <th:block layout:fragment="js"></th:block> -->
+    <!-- Ondal CSS -->
+    <!-- <th:block layout:fragment="css"></th:block> -->
+	<script th:inline="javascript">
+		
+	/*<![CDATA[*/
+	const userId = /*[[${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}]]*/ '';
+	/*]]>*/
+	</script>
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body th:data-userid="${(#authentication != null and #authentication.authenticated and #authentication.principal != 'anonymousUser') ? #authentication.principal.userUuid : ''}">
+	<layout:fragment th:fragment="js"></layout:fragment>
+	<div th:replace="~{fragments/header::header}"></div>
+	
+	<div layout:fragment="content" class="content"></div>
+
+	<div th:replace="~{fragments/footer::footer}"></div>
+
+    <th:block layout:fragment="js">
+    </th:block>
+    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+</body>
+<script th:src="@{/js/hideLogo.js}"></script>
+<script th:src="@{/js/websocket.js}"></script>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+<meta charset="UTF-8">
+<title>온달</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.4/dist/css/bootstrap.min.css" rel="stylesheet">
+<link th:fragment="css" th:href="@{/css/rider/riderOwnerRegister.css}" rel="stylesheet">
+<link th:fragment="css" th:href="@{/css/rider/RiderCustom.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet" />
+<link th:fragment="css" th:href="@{/css/infopage.css}" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/initialize.js}"></script>
+<script th:src="@{/js/zipcode.js}"></script>
+<script th:src="@{/js/update.js}"></script>
+<script th:src="@{/js/blockSpaceInput.js}"></script>
+<script
+	src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<div layout:fragment="content">
+	<div class="rider-register-wrapper">
+		<div class="form-container">
+			<div class="title-and-error">
+				<h1>라이더 등록</h1>
+				<div class="error-message" th:if="${error}" th:text="${error}"></div>
+			</div>
+
+			<form th:action="@{/user/riderRegister}" method="post">
+				<div class="form-group">
+					<i class="fa-solid fa-id-card input-icon"></i> <input type="text"
+						name="riderNickname" placeholder="라이더 닉네임" maxlength="20" required>
+				</div>
+				<div class="form-group password-group">
+					<i class="fa-solid fa-lock input-icon"></i> <input type="password"
+						name="secondaryPassword" placeholder="2차 비밀번호" maxlength="10"
+						required>
+				</div>
+				<div class="form-group password-group">
+					<i class="fa-solid fa-lock input-icon"></i> <input type="password"
+						name="secondaryPasswordConfirm" placeholder="2차 비밀번호 확인"
+						maxlength="10" required>
+				</div>
+				<div class="form-group">
+					<i class="fa-solid fa-car input-icon"></i> <input type="text"
+						name="vehicleNumber" placeholder="차량 번호" maxlength="15" required>
+				</div>
+
+				<div class="form-group">
+					<i class="fa-solid fa-phone input-icon"></i> <input type="text"
+						name="riderPhone" placeholder="라이더 전화번호" pattern="[0-9\-]+"
+						maxlength="13" required>
+				</div>
+
+				<div class="form-group address-group">
+					<i class="fa-solid fa-warehouse input-icon"></i> <input type="text"
+						name="riderHubAddress" id="riderHubAddress"
+						placeholder="라이더 허브 주소" maxlength="80" readonly required>
+					<button type="button" class="address-btn"
+						onclick="execDaumPostcode()">주소 검색</button>
+				</div>
+				<div class="form-group">
+					<i class="fa-solid fa-location-crosshairs input-icon"></i> <input
+						type="number" step="any" name="hubAddressLatitude"
+						id="hubAddressLatitude" placeholder="위도" required readonly>
+				</div>
+
+				<div class="form-group">
+					<i class="fa-solid fa-location-crosshairs input-icon"></i> <input
+						type="number" step="any" name="hubAddressLongitude"
+						id="hubAddressLongitude" placeholder="경도" required readonly>
+				</div>
+				<div class="form-group">
+					<i class="fa-solid fa-truck input-icon"></i>
+					<div class="delivery-range-options">
+						<button type="button" class="delivery-range-btn"
+							onclick="selectRange(this, 'ONE_KM')">1 km</button>
+						<button type="button" class="delivery-range-btn"
+							onclick="selectRange(this, 'THREE_KM')">3 km</button>
+						<button type="button" class="delivery-range-btn"
+							onclick="selectRange(this, 'FIVE_KM')">5 km</button>
+					</div>
+					<!-- hidden input to store the selected delivery range -->
+					<input type="hidden" name="deliveryRange" id="deliveryRange"
+						required>
+				</div>
+
+
+
+				<div class="form-group">
+					<button class="rider-reg-btn" type="submit">라이더 등록하기</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<th:block layout:fragment="js">
+	<script th:if="${riderSuccess}" th:inline="javascript">
+		alert('[[${riderSuccess}]]');
+		window.location.href = '/';
+	</script>
+</th:block>
+</html>

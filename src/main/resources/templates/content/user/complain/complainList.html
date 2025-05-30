@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+  <link th:href="@{/css/Custom.css}" rel="stylesheet" />
+  <link th:href="@{/css/update.css}" rel="stylesheet" />
+  <link th:href="@{/css/user/complain.css}" rel="stylesheet" />
+  <script th:src="@{/js/complain.js}"></script>
+</head>
+
+<div layout:fragment="content" class="container py-5">
+  <h3>전체 문의글</h3>
+  <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+  <!-- 검색 & 필터 -->
+  <form method="get" th:action="@{/complains}" class="row mb-3">
+    <div class="col-md-4">
+      <input type="text" name="keyword" class="form-control" placeholder="제목 검색">
+    </div>
+    <div class="col-md-3">
+      <input type="text" name="userId" class="form-control" placeholder="작성자 ID">
+    </div>
+    <div class="col-md-3">
+      <select name="role" class="form-select">
+        <option value="">사용자 유형</option>
+        <option value="USER">일반 사용자</option>
+        <option value="RIDER">라이더</option>
+        <option value="OWNER">점주</option>
+        <option value="OTHER">기타</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select name="complainStatus" class="form-select">
+        <option value="">처리 상황</option>
+        <option value="PENDING">처리 전</option>
+        <option value="IN_PROGRESS">처리 중</option>
+        <option value="RESOLVED">처리 완료</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-outline-primary">검색</button>
+    </div>
+  </form>
+
+  <!-- 목록 테이블 -->
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>유형</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>처리 상태</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="c, stat : ${complains}">
+        <td th:text="${stat.count}"></td>
+
+        <td>
+          <span th:if="${c.complainStatus.name() == 'RESOLVED'}">
+            <span th:if="${c.complainPassword != null}">🔒</span>
+            <span th:text="${c.complainTitle}"></span>
+          </span>
+          <a th:if="${c.complainStatus.name() != 'RESOLVED'}"
+             href="#"
+             th:attr="data-id=${c.complainId}, data-password=${c.complainPassword != null}"
+             onclick="openComplain(this)">
+            <span th:if="${c.complainPassword != null}">🔒</span>
+            <span th:text="${c.complainTitle}"></span>
+          </a>
+        </td>
+
+        <td th:text="${c.role}"></td>
+
+        <td>
+          <span th:if="${c.user != null}" th:text="${c.user.userId}">회원명</span>
+          <span th:if="${c.user == null}" th:text="${c.guestId}">비회원 ID</span>
+        </td>
+
+        <td th:text="${#temporals.format(c.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+
+        <td>
+          <span th:if="${c.complainStatus.name() == 'PENDING'}">처리전</span>
+          <span th:if="${c.complainStatus.name() == 'IN_PROGRESS'}">처리중</span>
+          <a th:if="${c.complainStatus.name() == 'RESOLVED'}"
+             href="#"
+             th:attr="data-id=${c.complainId}, data-password=${c.complainPassword != null}"
+             onclick="openResolvedComplain(this)">문의확인</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 비밀번호 입력 모달 -->
+  <div id="passwordModal" style="display:none;">
+    <h3>비밀번호 입력</h3>
+    <form id="passwordForm" method="post" action="">
+      <input type="password" name="password" id="complainPasswordInput" required />
+      <button type="submit">확인</button>
+      <button type="button" onclick="closePasswordModal()">취소</button>
+    </form>
+  </div>
+</div>
+
+</html>

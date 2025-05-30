@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
+	<link th:fragment="css" th:href="@{/css/custom.css}" rel="stylesheet"/>
+	<link th:fragment="css" th:href="@{/css/orderHistory.css}" rel="stylesheet"/>
+  	<!-- Chart.js -->
+  	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<section layout:fragment="content">
+  <h1 class="my-4">주문 상세</h1>
+  <div class="card info-card p-4">
+  	<div class="card w-100 text-start p-4">
+  		<strong class="status" th:text="${order.orderStatus}"></strong>
+  		<div class="order-basic-detail">주문일시 <small th:text="${#temporals.format(order.orderDate, 'yyyy년 MM월 dd일 a hh시 mm분')}"></small></div>
+  		<div class="order-basic-detail">주문번호 <small th:text="${order.orderId}"></small></div>
+  		<hr>
+  		<div>
+  			<img th:src="${order.storeImageUrl}" class="img-fluid rounded-circle" alt="매장 이미지" th:if="${order.storeImageUrl != null}"/>
+	    	<img th:src="@{/img/store/storeimg/default_img.jpg}" class="img-fluid rounded-circle" alt="기본 이미지" th:if="${order.storeImageUrl == null}"/>
+  			<a th:href="@{/store/view/{storeId}(storeId=${order.storeId})}" class="icon-link icon-link-hover ms-2">
+				<strong class="store-name" th:text="${order.storeName}">가게 이름</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+					class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true">
+		  			<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6
+		  				6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+				</svg>
+	   		</a>
+  		</div>
+	</div>
+	
+	<nav id="navbar-order-details" class="navbar bg-body-tertiary px-3 mb-3 d-flex justify-content-center scrollspy-navbar">
+  		<ul class="nav nav-pills">
+    		<li class="nav-item">
+      			<a class="nav-link" href="#order-tab">주문 메뉴</a>
+    		</li>
+    		<li class="nav-item">
+      			<a class="nav-link" href="#payment-tab">결제 정보</a>
+    		</li>
+   			<li class="nav-item">
+      			<a class="nav-link" href="#delivery-tab">배달 정보</a>
+    		</li>
+  		</ul>
+	</nav>
+	<div data-bs-spy="scroll" data-bs-target="#navbar-order-details" data-bs-root-margin="0px 0px -40%" 
+		data-bs-smooth-scroll="true" class="scrollspy-example bg-body-tertiary rounded-2 mt-2" tabindex="0">
+  		<div class="card w-100 text-start p-4" id="order-tab">
+			<div class="tab-content">
+				<h5 class="my-2">주문 메뉴</h5>
+				<div class="card p-4">
+						<ul class="list-group list-group-flush" th:each="item : ${order.menuItems}">
+							<li class="list-group-item">
+								<div><strong th:text="${item.menuName}"></strong></div>
+								<div>
+									<span><small class="order-detail-small-text" th:text="${item.menuName}"></small></span>
+									<span><small class="order-detail-small-text" th:text="'-' + ${item.menuPrice} + ' 원'"></small></span>
+								</div>
+								<div th:each="option : ${item.options}">
+									<small class="order-detail-text" th:text="${option.key	}" ></small>
+									<small class="order-detail-text" th:text="${' - ' + option.value + ' 원'}"></small>
+								</div>
+								<div>
+									<span><strong class="order-detail-label" th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + ' 원'}"></strong></span> 
+									<span><small class="order-detail-text" th:text="${item.quantity + '개'}"></small></span> 
+								</div>
+							</li>
+						</ul>
+				</div>
+			</div>
+		</div>
+		<div class="card w-100 text-start p-4 my-4" id="payment-tab">
+			<div class="tab-content">
+				<h5 class="my-2">결제 정보</h5>
+				<div class="card p-4">
+					<div class="container d-flex justify-content-between">
+						<span><strong>결제 금액</strong></span>
+						<span><strong th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA') + ' 원'}"></strong></span>
+					</div>
+					<hr>
+					<div class="container d-flex justify-content-between">
+						<span><strong>결제 방법</strong></span>
+						<span><strong th:text="${order.paymentMethod}"></strong></span>
+					</div>
+				</div>
+				<div class="card p-4 my-2">
+					<div class="container d-flex justify-content-between">
+						<span><strong>총 금액</strong></span>
+						<span><strong th:text="${#numbers.formatInteger(order.totalPrice, 3, 'COMMA') + ' 원'}"></strong></span>
+					</div>
+					<div class="container d-flex justify-content-between">
+						<span><strong class="order-detail-sublabel">메뉴 금액</strong></span>
+						<span><small class="order-detail-text" th:text="${#numbers.formatInteger(order.menuTotalPrice, 3, 'COMMA') + ' 원'}"></small></span>
+					</div>
+					<div class="container d-flex justify-content-between">
+						<span><strong class="order-detail-sublabel">배달팁</strong></span>
+						<span th:if="${order.deliveryFee > 0}"><small class="order-detail-text" th:text="${#numbers.formatInteger(order.deliveryFee, 3, 'COMMA') + ' 원'}"></small></span>
+						<span th:if="${order.deliveryFee == 0}"><small class="order-detail-text" th:text="${order.deliveryFee + ' 원'}"></small></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card w-100 text-start p-4 my-4" id="delivery-tab">
+			<div class="tab-content">
+				<h5 class="my-2">배달 정보</h5>
+				<div class="card p-4">
+					<div>
+						<strong>전화번호</strong>
+					</div>
+					<div>
+						<small class="order-detail-text" th:text="${order.phoneNum}"></small>
+					</div>
+					<hr>
+					<div>
+						<strong>배달 주소</strong>
+					</div>
+					<div>
+						<small class="order-detail-text" th:text="${order.deliveryAddress}"></small>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const navbar = document.getElementById("navbar-order-details");
+        const scrollOffset = 200; // Distance to scroll before showing navbar
+
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > scrollOffset) {
+                navbar.classList.add("visible");
+            } else {
+                navbar.classList.remove("visible");
+            }
+        });
+    });
+</script>
+</section>
+</body>
+</html>

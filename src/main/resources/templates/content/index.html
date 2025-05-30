@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<script th:src="@{/js/index.js}"></script>
+	<link th:href="@{/css/index.css}" rel="stylesheet" />
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<script th:src="@{/js/zipcode.js}" defer></script>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+
+<div layout:fragment="content">
+
+	<div id="authInfo" th:attr="data-login=${#authorization.expression('isAuthenticated()')}"></div>
+	
+	<!-- rider 등록 관련 alert  -->
+	<div th:if="${riderSuccess}" class="alert alert-success" role="alert"
+		style="margin-bottom: 20px;">
+		<span th:text="${riderSuccess}"></span>
+	</div>
+	<div th:if="${errorMessage}" class="alert alert-danger">
+    <p th:text="${errorMessage}"></p>
+	</div>
+	<div th:if="${riderExists}" class="alert alert-danger text-center" role="alert"
+     style="margin-bottom: 20px;" id="riderAlert">
+     
+    <div class="d-flex justify-content-center align-items-center flex-wrap">
+        <span id="alertText" style="margin-right: 10px;">이미 라이더로 등록된 사용자입니다.</span>
+
+        <!-- rider alert 버튼 그룹 -->
+        <span id="riderChoice" style="display: none;">
+            <button onclick="goToRiderPage()" class="btn btn-sm btn-primary me-1">Y</button>
+            <button onclick="hideRiderChoice()" class="btn btn-sm btn-secondary">N</button>
+        </span>
+    </div>
+</div>
+	<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+		<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
+	<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
+<script>
+  setTimeout(function() {
+    document.getElementById('alertText').textContent = '라이더 페이지로 이동하시겠습니까?';
+    document.getElementById('riderChoice').style.display = 'inline';
+  }, 2000);
+
+  function goToRiderPage() {
+    window.location.href = '/rider/home'; // 실제 경로로 수정
+  }
+
+  function hideRiderChoice() {
+    document.getElementById('riderAlert').style.display = 'none';
+  }
+</script>
+	
+	<!-- 점주 등록 관련 alert -->
+<div th:if="${ownerExists}" class="alert alert-danger text-center" role="alert"
+     style="margin-bottom: 20px;" id="ownerAlert">
+     
+    <div class="d-flex justify-content-center align-items-center flex-wrap">
+        <span id="alertText" style="margin-right: 10px;">이미 점주로 등록된 사용자입니다.</span>
+<!-- owner alert 버튼 그룹 -->
+<span id="ownerChoice" style="display: none;">
+    <button onclick="goToOwnerPage()" class="btn btn-sm btn-primary me-1">Y</button>
+    <button onclick="hideOwnerChoice()" class="btn btn-sm btn-secondary">N</button>
+</span>	
+    </div>
+</div>
+
+<script>
+  setTimeout(function() {
+    document.getElementById('alertText').textContent = '점주 페이지로 이동하시겠습니까?';
+    document.getElementById('ownerChoice').style.display = 'inline';
+  }, 2000);
+
+  function goToOwnerPage() {
+    window.location.href = '/owner/home'; // 실제 점주 메인 페이지 경로로 수정
+  }
+
+  function hideOwnerChoice() {
+    document.getElementById('ownerAlert').style.display = 'none';
+  }
+</script>
+
+
+
+  
+<!-- 익명 사용자 전용 -->
+<div class="d-flex flex-column align-items-center px-5 w-100 mb-2"
+style="height: 10px;">
+
+  <div id="search-area"
+       class="d-flex justify-content-center p-0 mt-4"
+       style="max-width: 500px; width: 100%;">
+
+    <!-- 주소 다시 입력 버튼 -->
+    <button id="btn-address-reset"
+            class="	btn btn-outline-secondary flex-shrink-0 d-none me-2
+	               align-items-center justify-content-center px-3"
+            style="width: 140px; height: 48px; z-index: 4;">주소 다시 입력</button>
+	
+    <!-- 검색 박스 (자동 확장) -->
+    <div id="search-box"
+         class="d-flex flex-column bg-white border border-3 border-warning rounded-2 shadow-sm p-0 overflow-hidden"
+         style="width: 100%; max-width: 400px; height:48px; display: flex; align-items: center; z-index: 4;">
+
+      <!-- input-group -->
+	  <div class="input-group m-0"
+	  style="height: 48px;">
+
+	    <input type="text"
+	           class="form-control border-0 rounded-0 shadow-none"
+	           placeholder="배달받을 주소를 입력하세요"
+	           id="inp-search"
+	           autocomplete="off"/>
+
+	    <button id="btn-search"
+	            class="btn btn-warning d-flex align-items-center justify-content-center p-0 rounded-0"
+	            style="width:48px; height: 100%;">
+	      <i class="fa fa-search"></i>
+	    </button>	
+		
+	  </div>
+	  <div id="list-wrapper" class="d-none list-wrapper overflow-auto w-100 m-0 p-0">
+      <!-- 자동완성 리스트 -->
+      <ul id="list-autocomplete"
+          class="list-group w-100 mb-0 px-0"
+          style="top: 48px;">
+		  </ul>
+    </div>
+	</div>
+	</div>
+
+
+  </div>
+
+	<br>
+	<br>
+	<div class="container-md text-center px-3 mt-3">
+  			<div class="row d-flex justify-content-start">
+    			<div class="col">
+    				<a th:href="@{/store/list(category='fastfood')}">
+    	  				<img src="/css/imgs/category1.webp" alt="패스트푸드" class="img-fluid">
+	      				<br>
+						<label class="category-label">패스트푸드</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='cn')}">
+     					<img src="/css/imgs/category2.webp" alt="중식" class="img-fluid">
+      					<br>
+						<label class="category-label">중식</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='kr')}">
+	      				<img src="/css/imgs/category3.webp" alt="한식" class="img-fluid">
+      					<br>
+						<label class="category-label">한식</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='bunsik')}">
+      					<img src="/css/imgs/category4.webp" alt="분식" class="img-fluid">
+      					<br>
+						<label class="category-label">분식</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='chicken')}">
+      					<img src="/css/imgs/category5.webp" alt="치킨" class="img-fluid">
+      					<br>
+						<label class="category-label">치킨</label>
+					</a>
+    			</div>
+  			</div>
+  			<br>
+  			<div class="row d-flex justify-content-between">
+    			<div class="col">
+    				<a th:href="@{/store/list(category='pizza')}">
+      					<img src="/css/imgs/category6.webp" alt="피자" class="img-fluid">
+      					<br>
+						<label class="category-label">피자</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='jjimtang')}">
+     					<img src="/css/imgs/category7.webp" alt="찜탕" class="img-fluid">
+      					<br>
+						<label class="category-label">찜 · 탕</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='jp')}">
+      					<img src="/css/imgs/category8.webp" alt="일식" class="img-fluid">
+      					<br>
+						<label class="category-label">일식</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='roast')}">
+      					<img src="/css/imgs/category9.webp" alt="구이" class="img-fluid">
+      					<br>
+						<label class="category-label">구이</label>
+					</a>
+    			</div>
+    			<div class="col">
+    				<a th:href="@{/store/list(category='caffe')}">
+      					<img src="/css/imgs/category10.webp" alt="카페" class="img-fluid">
+      					<br>
+						<label class="category-label">카페</label>
+					</a>
+    			</div>
+  			</div>
+		</div>
+		
+		
+		<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-lg mt-5">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="addressModalLabel">주소 등록</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+		      </div>
+		      <div class="modal-body">
+		        <form th:action="@{/content/regAddress}" method="POST" name="regAddressForm"
+		              autocomplete="off" id="reg-address-form">
+		          <div class="input-group mb-3">
+		            <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span> 
+		            <input type="text" class="form-control" name="address" id="userAddress" placeholder="주소" readonly>
+		            <input type="button" onclick="regUserAddress()" value="주소 찾기" class="btn btn-warning">
+		          </div>
+
+		          <div class="input-group mb-3">
+		            <span class="input-group-text"><i class="fa-solid fa-house-user"></i></span> 
+		            <input type="text" class="form-control" name="detailAddress" id="detailAddress" placeholder="상세주소" required>
+		          </div>
+
+
+
+		          <div id="iframe-layer" class="mb-3">
+
+		          </div>
+		        </form>
+		      </div>
+
+		      <div class="modal-footer justify-content-between">
+		        <button type="submit" class="btn btn-primary" form="reg-address-form">확인</button>
+		        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<input type="hidden" name="latitude" class="form-control" id="userAddresslatitude"readonly>
+		<input type="hidden" name="longitude" class="form-control" id="userAddresslongitude"readonly>
+		
+	</div>
+</html>

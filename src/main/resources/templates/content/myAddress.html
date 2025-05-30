@@ -1,0 +1,85 @@
+	<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+	<link th:href="@{/css/custom.css}" rel="stylesheet" />
+	<link th:href="@{/css/myAddress.css}" rel="stylesheet">
+	<script th:src="@{/js/zipcode.js}" defer></script>
+	<script th:src="@{/js/myAddress.js}" defer></script>
+	<script th:src="@{/js/initialize.js}"></script>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+
+<div layout:fragment="content" class="container py-5">
+	<div class="alert alert-success" id="flash-messages" role="alert" th:if="${result} == 0">
+		<i class="fa-solid fa-circle-check"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
+	<div class="alert alert-danger" id="flash-messages" role="alert" th:if="${result} == 1">
+		<i class="fa-solid fa-circle-exclamation"></i>  <strong th:text="${resultMsg}"></strong>
+	</div>
+	<div id="result-msg-container">
+		
+	</div>
+	<div class="container d-flex justify-content-center my-3" id="result-status"></div>
+	<div class="card info-card p-4">
+		<h4 class="card-title">
+			내 주소
+		</h4>
+		<div class="card-body">
+				<div class="card info-card my-2">
+					<div class="card-header">
+						<i class="fa-solid fa-house"></i>
+						<strong>우리집</strong>
+						<span class="badge rounded-pill text-bg-primary" id="default-address-badge">현재 설정된 주소</span>
+					</div>
+  					<div class="card-body">
+						<strong th:text="${#authentication.principal.user.userSelectedAddress.address} "></strong>
+	    				<strong th:text="${#authentication.principal.user.userSelectedAddress.detailAddress}"></strong>
+	    				<br>
+	    				<a th:href="@{updateAddress/{regAddressId}(regAddressId=${#authentication.principal.user.userSelectedAddress.regAddressId})}" type="button" class="btn btn-light" id="updateAddress-btn"><strong>수정</strong></a>
+  					</div>
+				</div>
+				<th:block th:each="address : ${addressList}">
+					<th:block th:if="${address.isUserSelectedAddress == false}">
+						<form th:id="address-form + ${addressStat.count}" th:name="addressForm + ${addressStat.count}" action="/content/setDefaultAddress" method="POST">
+							<div class="card info-card my-2">
+								<div class="card-header">
+									<i class="fa-solid fa-location-dot"></i>
+									<strong th:text="주소 + ${addressStat.count}"></strong>
+								</div>
+								<div class="card-body">
+			  							<input class="form-control" type="text" name="regAddressId" th:id="'reg-address' + ${addressStat.count}" 
+			  								hidden="true" th:value="${address.regAddressId}">
+			  							<p class="card-text">
+			    							<button type="submit" class="btn btn-link" data-bs-toggle="tooltip" 
+			    								data-bs-placement="right"
+        										data-bs-custom-class="custom-tooltip"
+        										data-bs-title="이 주소를 기본 주소로 설정하기">
+				    							<strong th:text="${address.address} "></strong>
+				    							<strong th:text=${address.detailAddress}></strong>
+			    							</button>
+			    							<br>
+											<a th:href="@{updateAddress/{regAddressId}(regAddressId=${address.regAddressId})}" type="button" class="btn btn-light" id="updateAddress-btn"><strong>수정</strong></a>
+											<button type="button" class="btn btn-light" 
+												th:id="delete-address-btn + ${addressStat.count}"
+												th:onclick="deleteAddress([[${addressStat.count}]])"
+												><strong id="delete-address-btn-text">삭제</strong>
+											</button>
+			  							</p>
+								</div>
+							</div>
+						</form>
+					</th:block>
+				</th:block>
+				<div class="container d-flex justify-content-between mt-5">
+					<a href="regAddress" type="button" class="btn btn-warning" id="regAddress-btn"><strong>주소 등록</strong></a>
+					<button type="button" class="btn btn-secondary btn-lg" id="back-btn" 
+								onclick="return window.location.href='/myPage'"><strong>뒤로가기</strong></button>	
+				</div>
+		</div>
+	</div> 
+</div>
+
+</html>

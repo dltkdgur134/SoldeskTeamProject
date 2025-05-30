@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/Layouts}">
+<head>
+<title>점포 입점</title>
+<meta charset="UTF-8">
+	<link rel="stylesheet" th:href="@{/css/storeRegSubmit.css}">
+	<link th:fragment="css" th:href="@{/css/index.css}" rel="stylesheet"/>
+	<link th:fragment="css" th:href="@{/css/ownerCustom.css}" rel="stylesheet"/>
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a82eb7e13124954eb1c020ac4cece497&libraries=services"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div th:if="${ownerSuccess}" class="alert alert-success" role="alert"
+			style="margin-bottom: 20px;">
+			<span th:text="${ownerSuccess}"></span>
+		</div>
+		<div class="form-container">
+			<div class="title-and-error">
+				<h1>점포 입점</h1>
+				<div class="error-message" th:if="${error}" th:text="${error}"></div>
+			</div>
+			<form th:action="@{/store/register}" method="post" enctype="multipart/form-data">
+				<div class="form-group">
+					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="storeName" th:value="${storeName}" 
+					placeholder="점포 이름" pattern="[가-힣a-zA-Z0-9\s]+" title="점포 이름은 한글, 영어, 숫자만 입력할 수 있어요" maxlength="15" required>
+				</div>
+	
+				<div class="form-group">
+					<i class="fa-solid fa-user input-icon"></i> <input type="text" name="businessNum" th:value="${businessNum}" 
+					placeholder="사업자등록번호" pattern="[a-zA-Z0-9]+" title="사업자등록번호는 영여와 숫자만 입력할 수 있어요" maxlength="15" required>
+				</div>
+
+				<div class="form-group">
+					<i class="fa-solid fa-phone input-icon"></i> <input type="text" name="storePhone" th:value="${storePhone}"
+					 placeholder="점포 전화번호" pattern="[0-9\-]+" title="숫자와 (-)만 입력하세요" maxlength="13" required>
+				</div>
+				<div class="form-group">
+					<i class="fa-solid fa-motorcycle input-icon"></i> <input type="text" name="deliveryFee" th:value="${deliverFee}"
+					 placeholder="배달료"maxlength="4" required>
+				</div>
+				
+				<div class="form-group">
+				    <div  class="input-wrapper" style="display: flex; gap: 5px;">
+						<i class="fa-solid fa-signs-post input-icon"></i><input type="text" id="postcode" placeholder="우편번호" readonly required>
+						<button class="address-btn" type="button" onclick="execDaumPostcode()">주소 검색</button>
+				    </div>
+					<div class="input-wrapper">
+						<i class="fa-solid fa-road input-icon"></i><input type="text" id="store_roadAddress" name="store_roadAddress" placeholder="도로명 주소" readonly required>
+					</div>
+					<div class="input-wrapper">
+						<i class="fa-solid fa-house input-icon"></i><input type="text" id="store_detailAddress" name="store_detailAddress" placeholder="상세 주소" required>
+					</div>
+					<input type="hidden" id="storeAddress" name="storeAddress">
+				    <input type="hidden" id="latitude" name="latitude">
+				    <input type="hidden" id="longitude" name="longitude">
+				</div>
+				
+				<div class="form-group" style="padding-left: 35px;">
+					<i class="fa-solid fa-list-ul input-icon"></i>
+					<label>카테고리</label>
+					<select name="category" required>
+						<option value="" disabled selected>선택</option>
+						<option value="fastfood">패스트푸드</option>
+						<option value="cn">중식</option>
+						<option value="kr">한식</option>
+						<option value="bunsik">분식</option>
+						<option value="chicken">치킨</option>
+						<option value="pizza">피자</option>
+						<option value="jjimtang">찜,탕</option>
+						<option value="roast">구이</option>
+						<option value="jp">일식</option>
+					</select>
+				</div>
+				
+				<!--<div class="form-group">
+					<label>배달 가능 거리 (km)</label>
+					<select name="delivery_range" required>
+						<option value="1">1km</option>
+						<option value="3">3km</option>
+						<option value="5">5km</option>
+					</select>
+				</div>-->
+				
+				<div class="form-group file-upload-group">
+	
+					<input type="file" id="brandImg" name="brandImg" accept="image/*" hidden>
+	
+					<label for="brandImg" class="custom-file-label">점포 사진 선택</label>
+					
+					<i class="fa-solid fa-folder-open input-icon"></i>
+	
+					<span id="file-name-display" class="file-name">이미지를 선택해주세요</span>
+				
+					<img id="brandImgPreview" class="img-preview" style="display:none; max-width:100%; margin-top:10px;">
+				</div>
+				
+				<!--<div class="form-group file-upload-group">
+					<i class="fa-solid fa-folder-open input-icon"></i>
+	
+					<input type="file" id="profileImage" name="busiImgs" accept="image/*" hidden>
+	
+					<label for="profileImage" class="custom-file-label">영업신고증</label>
+	
+					<span id="file-name-display" class="file-name">파일을 첨부 해주세요</span>
+				</div>-->
+				
+				<div class="form-group">
+					<button class="reg-btn" type="submit">신청하기</button>
+				</div>
+			</form>
+		</div>
+	
+	</div>
+	<div layout:fragment="js">
+		<script src="/js/storeReg.js"></script>
+	</div>
+</body>
+</html>

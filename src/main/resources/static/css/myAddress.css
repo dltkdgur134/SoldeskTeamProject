@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+#iframe-layer {
+	display:none; 
+	position: relative; 
+	overflow:hidden; 
+	z-index:1; 
+	-webkit-overflow-scrolling:touch;
+	width:100%;
+}
+
+.address-search-container {
+  position: relative;
+  width: 100%;
+} 
+
+#address-search-bar {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.dropdown-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-top: none;
+  background-color: white;
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1000;
+}
+
+.dropdown-menu li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-light {
+	font-size: 8pt;
+	border-radius: 10px;
+}
+
+.btn-link {
+	text-decoration: none;
+}

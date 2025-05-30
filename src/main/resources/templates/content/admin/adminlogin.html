@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
+<head>
+	<meta charset="UTF-8">
+	<title>관리자 로그인</title>
+	<link rel="stylesheet" th:href="@{/css/admin/adminLogin.css}">
+	<script th:src="@{/js/blockSpaceInput.js}"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+	<div class="login-container">
+		<h2>관리자 로그인</h2>
+		<form th:action="@{/admin/login}" method="post">
+			<input type="text" name="loginId" placeholder="아이디" required>
+			<input type="password" name="password" placeholder="비밀번호" required>
+			<button type="submit">로그인</button>
+
+			<!-- 로그인 실패 메시지 -->
+			<div class="error-message" th:if="${error}" th:text="${error}"></div>
+		</form>
+	</div>
+</body>
+</html>
