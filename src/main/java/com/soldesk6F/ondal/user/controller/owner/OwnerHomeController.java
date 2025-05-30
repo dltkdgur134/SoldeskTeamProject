@@ -17,6 +17,7 @@ import com.soldesk6F.ondal.store.entity.Store;
 import com.soldesk6F.ondal.store.repository.StoreRepository;
 import com.soldesk6F.ondal.user.entity.Owner;
 import com.soldesk6F.ondal.user.repository.OwnerRepository;
+import com.soldesk6F.ondal.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,14 +27,15 @@ import lombok.RequiredArgsConstructor;
 public class OwnerHomeController {
 	
 	private final OwnerRepository ownerRepository;
-
+	private final UserService userService;
+	
 	@Autowired
 	private StoreRepository storeRepository;
    
 	@GetMapping("/home")
     public String ownerHomeGet(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
          UUID userUuid = userDetails.getUser().getUserUuid();
-
+         String userId = userDetails.getUser().getUserId();
         Optional<Owner> optionalOwner = ownerRepository.findByUser_UserUuid(userUuid);
 
         if (optionalOwner.isPresent()) {
@@ -54,7 +56,7 @@ public class OwnerHomeController {
         } else {
             System.out.println("❌ Owner 정보 없음. userId = " + userUuid);
         }
-
+        userService.refreshUserAuthentication(userId);
         return "content/owner/ownerHome"; // templates/content/owner/ownerHome.html
     }
 

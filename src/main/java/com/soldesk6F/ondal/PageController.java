@@ -14,6 +14,7 @@ import com.soldesk6F.ondal.login.CustomUserDetails;
 import com.soldesk6F.ondal.owner.order.OrderService;
 import com.soldesk6F.ondal.user.entity.User;
 import com.soldesk6F.ondal.user.repository.UserRepository;
+import com.soldesk6F.ondal.user.service.UserService;
 import com.soldesk6F.ondal.useract.complain.entity.Complain;
 import com.soldesk6F.ondal.useract.complain.entity.Complain.ComplainStatus;
 import com.soldesk6F.ondal.useract.complain.entity.Complain.Role;
@@ -30,10 +31,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PageController {
 	
+	private final UserService userService;
 	// 마이페이지 이동
 	@GetMapping (value = "/myPage")
 	public String goMyPage(@AuthenticationPrincipal CustomUserDetails userDetails,Model model) {
 		UUID userUuid = UUID.fromString(userDetails.getUser().getUserUuidAsString());
+		String userId = userDetails.getUser().getUserId();
         User freshUser = userRepository.findById(userUuid)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         
@@ -44,6 +47,7 @@ public class PageController {
     	model.addAttribute("riderRequested", freshUser.isRiderRequested());
     	model.addAttribute("ownerRequested", freshUser.isOwnerRequested());
 		System.out.println("myPage 컨트롤러 진입");
+		 userService.refreshUserAuthentication(userId);
 		return "content/myPage";
 	}
 	

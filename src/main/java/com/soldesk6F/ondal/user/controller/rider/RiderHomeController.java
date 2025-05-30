@@ -34,6 +34,7 @@ import com.soldesk6F.ondal.user.entity.Rider;
 import com.soldesk6F.ondal.user.entity.Rider.DeliveryRange;
 import com.soldesk6F.ondal.user.repository.RiderRepository;
 import com.soldesk6F.ondal.user.service.RiderService;
+import com.soldesk6F.ondal.user.service.UserService;
 import com.soldesk6F.ondal.useract.order.entity.Order;
 import com.soldesk6F.ondal.useract.order.repository.OrderRepository;
 
@@ -46,6 +47,7 @@ public class RiderHomeController {
 
     private final RiderRepository riderRepository;
     private final OrderRepository orderRepository;
+    private final UserService userService;
     
     @Autowired
     private RiderService riderService;
@@ -87,7 +89,7 @@ public class RiderHomeController {
         } else {
             System.out.println("❌ Rider 정보 없음. userId = " + userId);
         }
-
+        userService.refreshUserAuthentication(userId);
         return "content/rider/riderHome";
     }
     

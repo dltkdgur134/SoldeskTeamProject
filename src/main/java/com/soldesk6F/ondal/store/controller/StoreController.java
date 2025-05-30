@@ -30,8 +30,9 @@ public class StoreController {
 
     @GetMapping("/api/stores/{category}")
     @ResponseBody
-    public List<StoreDto> getStoresByCategory(@PathVariable("category") String category) {
-        return storeService.getStoresByCategory(category);
+    public List<StoreDto> getStoresByCategory(@PathVariable("category") String category,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return storeService.getStoresByCategory(category, userDetails.getUser());
     }
     
     @GetMapping("/store/register")
