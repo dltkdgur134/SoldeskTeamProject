@@ -59,7 +59,7 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 		                ) AS dist
 		        FROM    store s
 		        WHERE   MBRContains(
-		    			ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
+		    			ST_GeomFromText(:bbox , 4326, 'axis-order=long-lat')
 		                 ,   s.store_location
 		                )
 		          AND   ST_Distance_Sphere(
@@ -85,7 +85,7 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 		        SELECT COUNT(*)
 		        FROM   store s
 		        WHERE  MBRContains(
-		    				ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
+		    				ST_GeomFromText(:bbox, 4326, 'axis-order=long-lat')
 		                   ,s.store_location
 		               )
 		          AND  ST_Distance_Sphere(
@@ -128,7 +128,7 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 		                ) AS dist
 		        FROM    store s
 		        WHERE   MBRContains(
-		    			ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
+		    			ST_GeomFromText(:bbox, 4326, 'axis-order=long-lat')
 		                 ,   s.store_location
 		                )
 		          AND   ST_Distance_Sphere(
@@ -155,7 +155,7 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 		        SELECT COUNT(*)
 		        FROM   store s
 		        WHERE  MBRContains(
-		    				ST_GeomFromText('POLYGON((126.971639 37.508727, 127.039609 37.508727, 127.039609 37.562625, 126.971639 37.562625, 126.971639 37.508727))', 4326, 'axis-order=long-lat')
+		    				ST_GeomFromText(:bbox, 4326, 'axis-order=long-lat')
 		                   ,s.store_location
 		               )
 		          AND  ST_Distance_Sphere(

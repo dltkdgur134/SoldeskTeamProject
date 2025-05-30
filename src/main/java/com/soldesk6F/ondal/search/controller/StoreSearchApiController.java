@@ -27,7 +27,7 @@ public class StoreSearchApiController {
     	
     		
     		return storeSearchService.searchByRadiusWithCond(
-    				3000,
+    				5000,
     				originalSearchQuery,
     				bestMatcher,
     				StoreSortType.DISTANCE,
